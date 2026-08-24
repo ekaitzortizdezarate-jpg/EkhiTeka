@@ -119,15 +119,24 @@ export function Footer() {
               />
               <h4 className="font-black text-white uppercase tracking-wider text-[12px]">EkhiTeka Bilbao</h4>
             </div>
+
+            <div className="w-full h-24 rounded-2xl overflow-hidden border border-stone-800 relative">
+              <img
+                src="/images/secciones/Tienda.JPG"
+                alt="Quesería EkhiTeka Bilbao"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
             <p className="text-stone-400 leading-relaxed font-medium">
               Gran Vía 14, Bilbao · Bizkaia
             </p>
-            <div className="text-stone-400 font-medium space-y-0.5">
+            <div className="text-stone-400 font-medium space-y-0.5 text-[11px]">
               <p className="font-bold text-stone-300">Horario de Tienda:</p>
-              <p>Lunes a Viernes: 10:00 - 14:30 | 17:00 - 20:30</p>
+              <p>Lun-Vie: 10:00 - 14:30 | 17:00 - 20:30</p>
               <p>Sábados: 10:30 - 15:00</p>
             </div>
-            <p className="text-stone-400 font-bold">
+            <p className="text-stone-300 font-bold text-[11px]">
               WhatsApp: +34 600 000 000
             </p>
           </div>

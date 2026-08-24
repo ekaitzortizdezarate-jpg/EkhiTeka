@@ -241,7 +241,57 @@ export function CatalogView({
       {/* 4. Bloques de Experiencias y Catas (Estilo La Manducateca) */}
       <ExperienceBanners />
 
-      {/* 5. Opiniones de Clientes */}
+      {/* 5. Nuestra Tienda Física en Bilbao (La Manducateca style) */}
+      <section className="relative rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 overflow-hidden shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-6 space-y-4">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+              Visítanos en Bilbao · Km0
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif sm:font-sans">
+              Nuestra Quesería & Espacio Gourmet
+            </h2>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+              En nuestra web ves una selección, en nuestra quesería de Bilbao lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
+            </p>
+            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
+              <div className="flex items-center gap-2">
+                <span className="text-base">📍</span>
+                <span>Gran Vía 14, Bilbao · Bizkaia</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-base">🕒</span>
+                <span>Lun-Vie: 10:00 - 20:30 | Sáb: 10:30 - 15:00</span>
+              </div>
+            </div>
+            <div className="pt-2">
+              <a
+                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Bilbao"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
+              >
+                <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
+                <span>Contactar con la Tienda</span>
+              </a>
+            </div>
+          </div>
+          <div className="lg:col-span-6">
+            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 h-64 sm:h-80 group">
+              <img
+                src="/images/secciones/Tienda.JPG"
+                alt="Tienda EkhiTeka Bilbao"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute top-4 right-4 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black rounded-full uppercase tracking-wider shadow-md">
+                Bilbao Centro
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Opiniones de Clientes */}
       <CustomerReviews />
     </div>
   );
