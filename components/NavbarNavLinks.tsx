@@ -89,50 +89,53 @@ export function NavbarNavLinks({
         </div>
       </Link>
 
-      {/* Enlaces Principales (Estilo Maison du Monde: estilizado, centrado y refinado) */}
-      <nav className="hidden lg:flex items-center gap-1.5 font-serif">
+      {/* Enlaces Principales (Estilo Maison du Monde: estilizado, centrado y refinado en 2 líneas) */}
+      <nav className="hidden lg:flex items-center gap-1 font-serif">
         <Link
           href="/tienda"
-          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+          className={`flex items-center justify-center text-center px-3.5 py-2 rounded-2xl tracking-[0.16em] uppercase text-[10.5px] font-bold transition-all whitespace-nowrap ${
             pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
               : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
           }`}
         >
-          {t.nav_shop}
+          <span>{t.nav_shop}</span>
         </Link>
 
         <Link
           href="/regalos-gourmet"
-          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+          className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
             pathname === '/regalos-gourmet'
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
               : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
           }`}
         >
-          Regalos Gourmet
+          <span className="block text-center">Regalos</span>
+          <span className="block text-center">Gourmet</span>
         </Link>
 
         <Link
           href="/experiencias"
-          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+          className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
             pathname === '/experiencias'
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
               : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
           }`}
         >
-          Catas & Experiencias
+          <span className="block text-center">Catas &</span>
+          <span className="block text-center">Experiencias</span>
         </Link>
 
         <Link
           href="/regalos-empresa"
-          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+          className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
             pathname === '/regalos-empresa'
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
               : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
           }`}
         >
-          Regalos de Empresa
+          <span className="block text-center">Regalos de</span>
+          <span className="block text-center">Empresa</span>
         </Link>
 
         {user && (

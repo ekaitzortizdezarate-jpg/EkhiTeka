@@ -440,6 +440,15 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Botón Seguir Comprando */}
+            <Link
+              href="/tienda"
+              className="w-full py-3 px-4 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs uppercase tracking-wider rounded-2xl transition-all flex items-center justify-center gap-2 font-serif border border-stone-200 dark:border-stone-700 hover:scale-101 shadow-xs"
+            >
+              <ShoppingBag className="w-4 h-4 text-[#C68D07]" />
+              <span>Seguir Comprando</span>
+            </Link>
+
             <button
               type="submit"
               disabled={loading}
