@@ -179,7 +179,6 @@ export function CatalogView({
                 : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-stone-400'
             }`}
           >
-            <span>✨</span>
             <span>{t.cat_all}</span>
             <span className="text-[10px] opacity-70 font-sans">({products.length})</span>
           </button>
@@ -197,7 +196,6 @@ export function CatalogView({
                     : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-stone-400'
                 }`}
               >
-                <span>{cat.icon}</span>
                 <span>{getCategoryName(cat)}</span>
                 <span className="text-[10px] opacity-70 font-sans">({count})</span>
               </button>
