@@ -55,6 +55,7 @@ export interface TranslationDict {
   prod_sort_name_desc: string;
   prod_sort_price_asc: string;
   prod_sort_price_desc: string;
+  prod_showing: string;
 
   // Cart & Checkout
   cart_title: string;
@@ -81,6 +82,9 @@ export interface TranslationDict {
 
   // Orders & Statuses
   orders_title: string;
+  orders_title_seller: string;
+  orders_subtitle_buyer: string;
+  orders_subtitle_seller: string;
   orders_status: string;
   orders_pending: string;
   orders_confirmed: string;
@@ -94,6 +98,24 @@ export interface TranslationDict {
   orders_chat_with_buyer: string;
   orders_chat_with_seller: string;
   orders_no_orders: string;
+  orders_no_orders_seller: string;
+  orders_no_orders_seller_sub: string;
+  orders_products_label: string;
+  orders_products_to_prepare: string;
+  orders_purchase_date: string;
+  orders_date_time: string;
+  orders_order_number: string;
+  orders_total_to_charge: string;
+  orders_new_status: string;
+  orders_mark_seen: string;
+  orders_client_label: string;
+  orders_qty_label: string;
+
+  // Status action buttons
+  status_confirm: string;
+  status_preparing: string;
+  status_ready: string;
+  status_delivered: string;
 
   // Seller Dashboard
   seller_new_product: string;
@@ -141,6 +163,38 @@ export interface TranslationDict {
   cookie_reject: string;
   cookie_settings: string;
 
+  // Footer
+  footer_club_title: string;
+  footer_club_subtitle: string;
+  footer_club_desc: string;
+  footer_join_whatsapp: string;
+  footer_cheese_desc: string;
+  footer_delivery_desc: string;
+  footer_pickup_desc: string;
+  footer_categories: string;
+  footer_experiences: string;
+  footer_legal: string;
+  footer_schedule_title: string;
+  footer_schedule_weekdays: string;
+  footer_schedule_saturday: string;
+  footer_copyright: string;
+  footer_tagline: string;
+  footer_exp_tasting: string;
+  footer_exp_weddings: string;
+  footer_exp_gifts: string;
+  footer_exp_consult: string;
+
+  // Catalog / Shop hero
+  shop_specialty: string;
+  shop_hero_title: string;
+  shop_hero_desc: string;
+  shop_see_cheeses: string;
+  shop_whatsapp_orders: string;
+  shop_visit_title: string;
+  shop_visit_subtitle: string;
+  shop_visit_desc: string;
+  shop_visit_contact: string;
+
   // Common
   common_save: string;
   common_cancel: string;
@@ -153,7 +207,16 @@ export interface TranslationDict {
   common_theme_light: string;
   common_theme_dark: string;
   common_theme_system: string;
+  common_select_language: string;
 }
+
+// Helper: locale string for date formatting
+export const LOCALE_MAP: Record<Language, string> = {
+  eu: 'eu',
+  es: 'es-ES',
+  en: 'en-GB',
+  fr: 'fr-FR',
+};
 
 export const translations: Record<Language, TranslationDict> = {
   eu: {
@@ -165,7 +228,7 @@ export const translations: Record<Language, TranslationDict> = {
     top_store_pickup: 'Dendan jasotzeko aukera',
 
     nav_shop: 'Denda',
-    nav_cart: 'Kasketa',
+    nav_cart: 'Saskia',
     nav_orders: 'Eskaerak',
     nav_my_products: 'Nire Produktuak',
     nav_chats: 'Mezuak',
@@ -207,6 +270,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_name_desc: 'Izena (Z-A)',
     prod_sort_price_asc: 'Prezioa (baxuena lehenik)',
     prod_sort_price_desc: 'Prezioa (altuena lehenik)',
+    prod_showing: 'produktu erabilgarri erakusten',
 
     cart_title: 'Zure Saskia',
     cart_empty: 'Saskia hutsik dago',
@@ -225,12 +289,15 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_shipping_address: 'Bidalketa helbidea',
     deliv_shipping_notes: 'Bidalketarako oharrak (ordutegia, atezaina...)',
     deliv_pickup_time: 'Jasotzeko gutxi gorabeherako ordua',
-    deliv_pickup_address: 'Dendaren helbidea: Kale Nagusia 14, Lekeitio',
+    deliv_pickup_address: 'Dendaren helbidea: Gamarra Kalea 4, Lekeitio',
     deliv_confirm_order: 'Berretsi eta Bidali Eskaera',
     deliv_order_success: 'Eskaera ongi burutu da!',
     deliv_order_success_desc: 'Saltzaileak zure eskaera jaso du eta prestatzen hasiko da.',
 
-    orders_title: 'Eskaerak',
+    orders_title: 'Nire Eskaerak',
+    orders_title_seller: 'Eskaerak Kudeatu',
+    orders_subtitle_buyer: 'Zure erosketen jarraipena, produktuak eta egoera.',
+    orders_subtitle_seller: 'Bezeroaren eskaerak kudeatu, egoera eguneratu eta produktuak prestatu.',
     orders_status: 'Egoera',
     orders_pending: 'Balioztatzeko',
     orders_confirmed: 'Balioztatuta',
@@ -244,6 +311,23 @@ export const translations: Record<Language, TranslationDict> = {
     orders_chat_with_buyer: 'Hitz egin bezeroarekin',
     orders_chat_with_seller: 'Hitz egin saltzailearekin',
     orders_no_orders: 'Ez duzu eskaerarik oraindik',
+    orders_no_orders_seller: 'Ez dago eskaerarik oraindik',
+    orders_no_orders_seller_sub: 'Bezeroek egindako eskaerak automatikoki agertuko dira hemen.',
+    orders_products_label: 'Eskaerako Produktuak',
+    orders_products_to_prepare: 'Prestatzeko Produktuak',
+    orders_purchase_date: 'Erosketa data',
+    orders_date_time: 'Data eta ordua',
+    orders_order_number: 'Eskaera:',
+    orders_total_to_charge: 'Kobratzekoa:',
+    orders_new_status: 'Egoera berria! Zure eskaera aldatu da:',
+    orders_mark_seen: 'Ikusia markatu',
+    orders_client_label: 'Bezeroa',
+    orders_qty_label: 'Kantitatea',
+
+    status_confirm: 'Baieztatu',
+    status_preparing: 'Prestatzen',
+    status_ready: 'Prest',
+    status_delivered: 'Entregatuta',
 
     seller_new_product: 'Gehitu Produktu Berria',
     seller_edit_product: 'Editatu Produktua',
@@ -287,6 +371,36 @@ export const translations: Record<Language, TranslationDict> = {
     cookie_reject: 'Ukatu',
     cookie_settings: 'Konfiguratu',
 
+    footer_club_title: 'Gazta Onaren Lagunen Kluba',
+    footer_club_subtitle: 'EkhiTekako nobedadeetan eguneratuta egon nahi al duzu?',
+    footer_club_desc: 'Denboraldiko gazta berriak, Lekeition egindako cata esklusiboak eta lote mugatuak besteen aurretik.',
+    footer_join_whatsapp: 'WhatsApp bidez sartu',
+    footer_cheese_desc: 'Afilatutako gaztak, kantabriar gatzadurak eta eskuz hautatutako artisau kontserbak.',
+    footer_delivery_desc: 'Hotz-katea bermatuta 24/48 ordutan, produktu bakoitza bere puntuan irits dadin.',
+    footer_pickup_desc: 'Eskatu online eta jaso prestatuta itxaron gabe gure Lekeitioko gaztaterian.',
+    footer_categories: 'Kategoriak',
+    footer_experiences: 'Esperientziak',
+    footer_legal: 'Informazio Legala',
+    footer_schedule_title: 'Dendaren Ordutegia:',
+    footer_schedule_weekdays: 'Al-Os: 10:00 - 14:30 | 17:00 - 20:30',
+    footer_schedule_saturday: 'Larunbatak: 10:30 - 15:00',
+    footer_copyright: 'Eskubide guztiak erreserbatuak.',
+    footer_tagline: 'Artisau inspirazioa & km0 afinatzea · Lekeitio',
+    footer_exp_tasting: 'Cata presentzialak Lekeition',
+    footer_exp_weddings: 'Ezkontzarako gazta-mahaiak',
+    footer_exp_gifts: 'Saskiak eta Opari Gourmetak',
+    footer_exp_consult: 'Kontsultak Gazta Maisuarekin',
+
+    shop_specialty: 'Gure Espezialitatea',
+    shop_hero_title: 'Gaztak eta opari gastronomikoak Lekeition',
+    shop_hero_desc: 'Egileak sinatutako gaztak, Kantabriako altxorrak eta hautatutako marinadak. Lekeitioko zapore benetakoa opari eta gozatzeko.',
+    shop_see_cheeses: 'GURE GAZTAK IKUSI',
+    shop_whatsapp_orders: 'WhatsApp bidez eskaerak',
+    shop_visit_title: 'Gure Gaztategia & Gourmet Gunea',
+    shop_visit_subtitle: 'Bisitatu Lekeition · Km0',
+    shop_visit_desc: 'Gure webgunean aukeraketa bat ikusten duzu, gure Lekeitioko gaztaterian dena duzu: 80 baino gehiago erreferentzia artisau gazta, Kantabriako kontserbak eta gure gazta maisuek emandako aholkularitza pertsonalizatua.',
+    shop_visit_contact: 'Kontaktatu Dendarekin',
+
     common_save: 'Gorde',
     common_cancel: 'Utzi',
     common_delete: 'Ezabatu',
@@ -298,7 +412,9 @@ export const translations: Record<Language, TranslationDict> = {
     common_theme_light: 'Argia',
     common_theme_dark: 'Iluna',
     common_theme_system: 'Sistema',
+    common_select_language: 'Hizkuntza hautatu',
   },
+
   es: {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Tienda Gourmet & Productos Artesanos',
@@ -350,6 +466,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_name_desc: 'Nombre (Z-A)',
     prod_sort_price_asc: 'Precio (menor a mayor)',
     prod_sort_price_desc: 'Precio (mayor a menor)',
+    prod_showing: 'productos disponibles',
 
     cart_title: 'Tu Cesta',
     cart_empty: 'Tu cesta está vacía',
@@ -373,7 +490,10 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_order_success: '¡Pedido realizado con éxito!',
     deliv_order_success_desc: 'El artesano ha recibido tu pedido y comenzará a prepararlo.',
 
-    orders_title: 'Gestión de Pedidos',
+    orders_title: 'Mis Pedidos',
+    orders_title_seller: 'Gestión de Pedidos',
+    orders_subtitle_buyer: 'Seguimiento, detalles de productos y estado de tus compras gourmet.',
+    orders_subtitle_seller: 'Gestiona pedidos de clientes, actualiza estados y revisa los productos encargados.',
     orders_status: 'Estado',
     orders_pending: 'Por validar',
     orders_confirmed: 'Validado',
@@ -387,6 +507,23 @@ export const translations: Record<Language, TranslationDict> = {
     orders_chat_with_buyer: 'Chat con el cliente',
     orders_chat_with_seller: 'Chat con el artesano',
     orders_no_orders: 'No tienes pedidos aún',
+    orders_no_orders_seller: 'No hay pedidos recibidos todavía',
+    orders_no_orders_seller_sub: 'Los nuevos pedidos de tus clientes aparecerán aquí automáticamente.',
+    orders_products_label: 'Productos del Pedido',
+    orders_products_to_prepare: 'Productos a Preparar',
+    orders_purchase_date: 'Fecha de Compra',
+    orders_date_time: 'Fecha y Hora',
+    orders_order_number: 'Pedido:',
+    orders_total_to_charge: 'Total a cobrar:',
+    orders_new_status: '¡Novedad! El estado de tu pedido ha cambiado a:',
+    orders_mark_seen: 'Marcar como Visto',
+    orders_client_label: 'Cliente',
+    orders_qty_label: 'Cantidad',
+
+    status_confirm: 'Confirmar',
+    status_preparing: 'Preparando',
+    status_ready: 'Listo Entrega',
+    status_delivered: 'Entregado',
 
     seller_new_product: 'Añadir Producto Gourmet',
     seller_edit_product: 'Editar Producto',
@@ -430,6 +567,36 @@ export const translations: Record<Language, TranslationDict> = {
     cookie_reject: 'Rechazar',
     cookie_settings: 'Configurar',
 
+    footer_club_title: 'Club de Amigos del Buen Queso',
+    footer_club_subtitle: '¿Quieres estar al día de las novedades de EkhiTeka?',
+    footer_club_desc: 'Nuevas llegadas de quesos de temporada, catas exclusivas en Lekeitio y lotes limitados antes que nadie.',
+    footer_join_whatsapp: 'Unirme por WhatsApp',
+    footer_cheese_desc: 'Quesos afinados, salazones del cantábrico y conservas artesanales seleccionadas una a una.',
+    footer_delivery_desc: 'Cadena de frío garantizada 24/48 horas para que cada producto llegue en su punto óptimo.',
+    footer_pickup_desc: 'Haz tu pedido online y recógelo preparado sin esperas en nuestra quesería de Lekeitio.',
+    footer_categories: 'Categorías',
+    footer_experiences: 'Experiencias',
+    footer_legal: 'Información Legal',
+    footer_schedule_title: 'Horario de Tienda:',
+    footer_schedule_weekdays: 'Lun-Vie: 10:00 - 14:30 | 17:00 - 20:30',
+    footer_schedule_saturday: 'Sábados: 10:30 - 15:00',
+    footer_copyright: 'Todos los derechos reservados.',
+    footer_tagline: 'Inspiración artesana & afinado km0 · Lekeitio',
+    footer_exp_tasting: 'Catas Presenciales Lekeitio',
+    footer_exp_weddings: 'Mesas de Queso para Bodas',
+    footer_exp_gifts: 'Cestas y Regalos Gourmet',
+    footer_exp_consult: 'Consultas con el Maestro Quesero',
+
+    shop_specialty: 'Nuestra Especialidad',
+    shop_hero_title: 'Quesos y regalos gastronómicos en Lekeitio',
+    shop_hero_desc: 'Quesos afinados de autor, tesoros del Cantábrico y maridajes selectos. El sabor auténtico de Lekeitio para regalar y disfrutar.',
+    shop_see_cheeses: 'VER NUESTROS QUESOS',
+    shop_whatsapp_orders: 'Encargos por WhatsApp',
+    shop_visit_title: 'Nuestra Quesería & Espacio Gourmet',
+    shop_visit_subtitle: 'Visítanos en Lekeitio · Km0',
+    shop_visit_desc: 'En nuestra web ves una selección, en nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.',
+    shop_visit_contact: 'Contactar con la Tienda',
+
     common_save: 'Guardar',
     common_cancel: 'Cancelar',
     common_delete: 'Eliminar',
@@ -440,8 +607,10 @@ export const translations: Record<Language, TranslationDict> = {
     common_error: 'Ha ocurrido un error',
     common_theme_light: 'Claro',
     common_theme_dark: 'Oscuro',
-    common_theme_system: 'Sistema',
+    common_theme_system: 'Auto',
+    common_select_language: 'Seleccionar Idioma',
   },
+
   en: {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Gourmet Store & Artisan Delicacies',
@@ -493,10 +662,11 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_name_desc: 'Name (Z-A)',
     prod_sort_price_asc: 'Price (Lowest first)',
     prod_sort_price_desc: 'Price (Highest first)',
+    prod_showing: 'products available',
 
     cart_title: 'Your Cart',
     cart_empty: 'Your cart is empty',
-    cart_empty_sub: 'Explore our gourmet selection and add your favorite delicacies.',
+    cart_empty_sub: 'Explore our gourmet selection and add your favourite delicacies.',
     cart_explore_btn: 'Browse Shop',
     cart_subtotal: 'Subtotal',
     cart_total: 'Total',
@@ -511,12 +681,15 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_shipping_address: 'Shipping Address',
     deliv_shipping_notes: 'Delivery notes (preferred time, building instructions...)',
     deliv_pickup_time: 'Estimated pickup time',
-    deliv_pickup_address: 'Store Address: Gran Via 14, Lekeitio',
+    deliv_pickup_address: 'Store Address: Gamarra Kalea 4, Lekeitio',
     deliv_confirm_order: 'Confirm & Place Order',
     deliv_order_success: 'Order placed successfully!',
     deliv_order_success_desc: 'The artisan has received your order and is preparing it.',
 
-    orders_title: 'Order Management',
+    orders_title: 'My Orders',
+    orders_title_seller: 'Order Management',
+    orders_subtitle_buyer: 'Track your purchases, product details and order status.',
+    orders_subtitle_seller: 'Manage customer orders, update statuses and review items.',
     orders_status: 'Status',
     orders_pending: 'Pending Validation',
     orders_confirmed: 'Confirmed',
@@ -530,6 +703,23 @@ export const translations: Record<Language, TranslationDict> = {
     orders_chat_with_buyer: 'Chat with Buyer',
     orders_chat_with_seller: 'Chat with Artisan',
     orders_no_orders: 'You have no orders yet',
+    orders_no_orders_seller: 'No orders received yet',
+    orders_no_orders_seller_sub: 'New customer orders will appear here automatically.',
+    orders_products_label: 'Order Items',
+    orders_products_to_prepare: 'Items to Prepare',
+    orders_purchase_date: 'Purchase Date',
+    orders_date_time: 'Date & Time',
+    orders_order_number: 'Order:',
+    orders_total_to_charge: 'Total to charge:',
+    orders_new_status: 'Update! Your order status changed to:',
+    orders_mark_seen: 'Mark as Seen',
+    orders_client_label: 'Customer',
+    orders_qty_label: 'Quantity',
+
+    status_confirm: 'Confirm',
+    status_preparing: 'Preparing',
+    status_ready: 'Ready',
+    status_delivered: 'Delivered',
 
     seller_new_product: 'Add Gourmet Product',
     seller_edit_product: 'Edit Product',
@@ -573,6 +763,36 @@ export const translations: Record<Language, TranslationDict> = {
     cookie_reject: 'Decline',
     cookie_settings: 'Preferences',
 
+    footer_club_title: 'Friends of Good Cheese Club',
+    footer_club_subtitle: 'Want to stay up to date with EkhiTeka news?',
+    footer_club_desc: 'Seasonal cheese arrivals, exclusive tastings in Lekeitio and limited batches — before anyone else.',
+    footer_join_whatsapp: 'Join via WhatsApp',
+    footer_cheese_desc: 'Aged artisan cheeses, Cantabrian salted fish and hand-picked preserves.',
+    footer_delivery_desc: 'Cold chain guaranteed 24/48 hours so every product arrives in perfect condition.',
+    footer_pickup_desc: 'Order online and collect your prepared order with no wait at our Lekeitio cheesemonger.',
+    footer_categories: 'Categories',
+    footer_experiences: 'Experiences',
+    footer_legal: 'Legal Information',
+    footer_schedule_title: 'Store Hours:',
+    footer_schedule_weekdays: 'Mon-Fri: 10:00 - 14:30 | 17:00 - 20:30',
+    footer_schedule_saturday: 'Saturdays: 10:30 - 15:00',
+    footer_copyright: 'All rights reserved.',
+    footer_tagline: 'Artisan inspiration & km0 ageing · Lekeitio',
+    footer_exp_tasting: 'In-Person Tastings Lekeitio',
+    footer_exp_weddings: 'Cheese Boards for Weddings',
+    footer_exp_gifts: 'Gourmet Hampers & Gifts',
+    footer_exp_consult: 'Consult the Master Cheesemonger',
+
+    shop_specialty: 'Our Speciality',
+    shop_hero_title: 'Artisan cheeses & gourmet gifts in Lekeitio',
+    shop_hero_desc: 'Author-aged cheeses, Cantabrian treasures and curated pairings. The authentic taste of Lekeitio to gift and enjoy.',
+    shop_see_cheeses: 'SEE OUR CHEESES',
+    shop_whatsapp_orders: 'Custom Orders via WhatsApp',
+    shop_visit_title: 'Our Cheesemonger & Gourmet Space',
+    shop_visit_subtitle: 'Visit us in Lekeitio · Km0',
+    shop_visit_desc: 'Our website shows a selection, but our Lekeitio shop has it all: over 80 references of aged artisan cheeses, Cantabrian preserved fish and personalised advice from our master cheesemongers.',
+    shop_visit_contact: 'Contact the Shop',
+
     common_save: 'Save',
     common_cancel: 'Cancel',
     common_delete: 'Delete',
@@ -583,14 +803,16 @@ export const translations: Record<Language, TranslationDict> = {
     common_error: 'An error occurred',
     common_theme_light: 'Light',
     common_theme_dark: 'Dark',
-    common_theme_system: 'System',
+    common_theme_system: 'Auto',
+    common_select_language: 'Select Language',
   },
+
   fr: {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Épicerie Fine & Produits Artisanaux',
     brand_subtitle: 'Fromages fermiers, thon blanc, salaisons, gildas, bière artisanale, vin txakoli et cidre basque.',
     top_refrigerated_shipping: 'Livraison réfrigérée 24/48h',
-    top_custom_orders: 'Coffrets sur mesure et conseils d’experts',
+    top_custom_orders: 'Coffrets sur mesure et conseils d'experts',
     top_store_pickup: 'Retrait gratuit en boutique',
 
     nav_shop: 'Boutique',
@@ -626,7 +848,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_stock: 'Stock',
     prod_unlimited: 'Illimité',
     prod_add_to_cart: 'Ajouter au panier',
-    prod_ask_artisan: 'Contacter l’artisan',
+    prod_ask_artisan: 'Contacter l'artisan',
     prod_consult_product: 'Question sur ce produit',
     prod_details: 'Détails',
     prod_search_placeholder: 'Rechercher fromages, thon, vins...',
@@ -636,6 +858,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_name_desc: 'Nom (Z-A)',
     prod_sort_price_asc: 'Prix (croissant)',
     prod_sort_price_desc: 'Prix (décroissant)',
+    prod_showing: 'produits disponibles',
 
     cart_title: 'Votre Panier',
     cart_empty: 'Votre panier est vide',
@@ -654,12 +877,15 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_shipping_address: 'Adresse de livraison',
     deliv_shipping_notes: 'Instructions de livraison (digicode, créneau...)',
     deliv_pickup_time: 'Heure de retrait estimée',
-    deliv_pickup_address: 'Adresse boutique : Gran Via 14, Lekeitio',
+    deliv_pickup_address: 'Adresse boutique : Gamarra Kalea 4, Lekeitio',
     deliv_confirm_order: 'Confirmer la commande',
     deliv_order_success: 'Commande validée avec succès !',
-    deliv_order_success_desc: 'L’artisan a reçu votre commande et prépare vos produits.',
+    deliv_order_success_desc: 'L'artisan a reçu votre commande et prépare vos produits.',
 
-    orders_title: 'Gestion des Commandes',
+    orders_title: 'Mes Commandes',
+    orders_title_seller: 'Gestion des Commandes',
+    orders_subtitle_buyer: 'Suivez vos achats, les détails des produits et le statut de vos commandes.',
+    orders_subtitle_seller: 'Gérez les commandes clients, mettez à jour les statuts et préparez les articles.',
     orders_status: 'Statut',
     orders_pending: 'À valider',
     orders_confirmed: 'Validée',
@@ -669,10 +895,27 @@ export const translations: Record<Language, TranslationDict> = {
     orders_cancelled: 'Annulée',
     orders_change_status: 'Changer le statut',
     orders_cancel_order: 'Annuler la commande',
-    orders_cancel_reason: 'Motif d’annulation',
+    orders_cancel_reason: 'Motif d'annulation',
     orders_chat_with_buyer: 'Chat avec le client',
-    orders_chat_with_seller: 'Chat avec l’artisan',
-    orders_no_orders: 'Vous n’avez aucune commande pour le moment',
+    orders_chat_with_seller: 'Chat avec l'artisan',
+    orders_no_orders: 'Vous n'avez aucune commande pour le moment',
+    orders_no_orders_seller: 'Aucune commande reçue pour le moment',
+    orders_no_orders_seller_sub: 'Les nouvelles commandes de vos clients apparaîtront ici automatiquement.',
+    orders_products_label: 'Articles de la commande',
+    orders_products_to_prepare: 'Articles à préparer',
+    orders_purchase_date: 'Date d'achat',
+    orders_date_time: 'Date & Heure',
+    orders_order_number: 'Commande :',
+    orders_total_to_charge: 'Total à encaisser :',
+    orders_new_status: 'Mise à jour ! Le statut de votre commande a changé :',
+    orders_mark_seen: 'Marquer comme lu',
+    orders_client_label: 'Client',
+    orders_qty_label: 'Quantité',
+
+    status_confirm: 'Confirmer',
+    status_preparing: 'En préparation',
+    status_ready: 'Prête',
+    status_delivered: 'Livrée',
 
     seller_new_product: 'Ajouter un Produit Gourmet',
     seller_edit_product: 'Modifier le Produit',
@@ -716,6 +959,36 @@ export const translations: Record<Language, TranslationDict> = {
     cookie_reject: 'Refuser',
     cookie_settings: 'Personnaliser',
 
+    footer_club_title: 'Club des Amis du Bon Fromage',
+    footer_club_subtitle: 'Vous souhaitez rester informé des actualités d'EkhiTeka ?',
+    footer_club_desc: 'Nouvelles arrivées de fromages de saison, dégustations exclusives à Lekeitio et lots limités avant tout le monde.',
+    footer_join_whatsapp: 'Rejoindre par WhatsApp',
+    footer_cheese_desc: 'Fromages affinés, poissons salés du Cantabrique et conserves artisanales sélectionnées à la main.',
+    footer_delivery_desc: 'Chaîne du froid garantie 24/48h pour que chaque produit arrive dans son état optimal.',
+    footer_pickup_desc: 'Commandez en ligne et récupérez votre commande prête sans attente dans notre fromagerie de Lekeitio.',
+    footer_categories: 'Catégories',
+    footer_experiences: 'Expériences',
+    footer_legal: 'Informations Légales',
+    footer_schedule_title: 'Horaires boutique :',
+    footer_schedule_weekdays: 'Lun-Ven : 10h00 - 14h30 | 17h00 - 20h30',
+    footer_schedule_saturday: 'Samedis : 10h30 - 15h00',
+    footer_copyright: 'Tous droits réservés.',
+    footer_tagline: 'Inspiration artisanale & affinage km0 · Lekeitio',
+    footer_exp_tasting: 'Dégustations en Présentiel Lekeitio',
+    footer_exp_weddings: 'Plateaux de Fromages pour Mariages',
+    footer_exp_gifts: 'Paniers et Cadeaux Gourmets',
+    footer_exp_consult: 'Consultations avec le Maître Fromager',
+
+    shop_specialty: 'Notre Spécialité',
+    shop_hero_title: 'Fromages et cadeaux gastronomiques à Lekeitio',
+    shop_hero_desc: 'Fromages affinés d'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
+    shop_see_cheeses: 'VOIR NOS FROMAGES',
+    shop_whatsapp_orders: 'Commandes sur WhatsApp',
+    shop_visit_title: 'Notre Fromagerie & Espace Gourmet',
+    shop_visit_subtitle: 'Venez nous rendre visite à Lekeitio · Km0',
+    shop_visit_desc: 'Sur notre site vous voyez une sélection, dans notre fromagerie de Lekeitio vous trouvez tout : plus de 80 références de fromages artisanaux affinés, conserves du Cantabrique et conseils personnalisés de nos maîtres fromagers.',
+    shop_visit_contact: 'Contacter la Boutique',
+
     common_save: 'Enregistrer',
     common_cancel: 'Annuler',
     common_delete: 'Supprimer',
@@ -726,6 +999,7 @@ export const translations: Record<Language, TranslationDict> = {
     common_error: 'Une erreur est survenue',
     common_theme_light: 'Clair',
     common_theme_dark: 'Sombre',
-    common_theme_system: 'Système',
+    common_theme_system: 'Auto',
+    common_select_language: 'Choisir la langue',
   },
 };

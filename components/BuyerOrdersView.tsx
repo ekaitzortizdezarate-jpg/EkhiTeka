@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { cancelOrder } from '@/app/actions/orders';
 import type { Order } from '@/types/database';
 import { getProductImage } from '@/lib/productHelpers';
+import { LOCALE_MAP } from '@/lib/i18n/translations';
 import {
   Package,
   Store,
@@ -25,7 +26,7 @@ interface BuyerOrdersViewProps {
 const STORAGE_KEY = 'ekhiteka_seen_orders_buyer';
 
 export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [seenStatuses, setSeenStatuses] = useState<Record<string, string>>({});
 
@@ -66,7 +67,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
           {t.orders_title}
         </h1>
         <p className="text-xs text-stone-500 dark:text-stone-400">
-          Seguimiento, detalles de productos y estado de tus compras gourmet.
+          {t.orders_subtitle_buyer}
         </p>
       </div>
 
@@ -93,7 +94,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                     <div className="flex items-center gap-2 text-xs font-black text-stone-900 dark:text-stone-100 font-serif">
                       <Sparkles className="w-4 h-4 text-[#C68D07]" />
                       <span>
-                        ¡Novedad! El estado de tu pedido ha cambiado a:{' '}
+                        {t.orders_new_status}{' '}
                         <span className="uppercase text-[#C68D07] font-sans">
                           {order.status}
                         </span>
@@ -105,7 +106,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                       className="px-4 py-1.5 bg-[#1D1D1B] hover:bg-stone-800 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer hover:scale-102 font-serif"
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      <span>Marcar como Visto</span>
+                      <span>{t.orders_mark_seen}</span>
                     </button>
                   </div>
                 )}
@@ -113,7 +114,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                 {/* FILA 1 — Productos del pedido (izq) · Estado (der) */}
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider text-[11px] font-serif">
-                    Productos del Pedido ({order.order_items?.length || 0})
+                    {t.orders_products_label} ({order.order_items?.length || 0})
                   </span>
                   <span
                     className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider shrink-0 ${
@@ -209,13 +210,15 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                     <Clock className="w-4 h-4 text-[#C68D07] shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-stone-900 dark:text-stone-100 block">
-                        Fecha de Compra
+                        {t.orders_purchase_date}
                       </span>
                       <p className="text-stone-500 dark:text-stone-400 text-[11px] mt-0.5">
-                        {new Date(order.created_at).toLocaleDateString('es-ES', {
+                        {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language], {
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric',
+                        })}{' '}
+                        {new Date(order.created_at).toLocaleTimeString(LOCALE_MAP[language], {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
@@ -231,7 +234,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                     <div className="flex items-center gap-1.5">
                       <Package className="w-3.5 h-3.5 text-stone-400" />
                       <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400">
-                        Pedido:
+                        {t.orders_order_number}
                       </span>
                       <span className="text-[11px] font-bold text-stone-700 dark:text-stone-300 font-mono">
                         #{order.id.slice(0, 8).toUpperCase()}
@@ -277,7 +280,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
               {t.orders_no_orders}
             </h3>
             <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto">
-              Aún no has realizado ninguna compra. Explora nuestra selección de quesos de autor y lotes gourmet.
+              {t.cart_empty_sub}
             </p>
             <Link
               href="/tienda"

@@ -68,32 +68,30 @@ export function CatalogView({
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero Editorial Gourmet con fondo Tienda.JPG visible */}
+      {/* 1. Hero Editorial Gourmet */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[420px] flex items-center">
-        {/* Imagen de fondo Tienda.JPG con overlay equilibrado para máxima visibilidad y legibilidad */}
         <div className="absolute inset-0 z-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/secciones/Tienda.JPG"
             alt="Tienda EkhiTeka Lekeitio"
             className="w-full h-full object-cover object-center scale-100"
           />
-          {/* Overlay suave para resaltar los textos sin tapar la foto */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/85 dark:via-black/65 dark:to-black/40" />
         </div>
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
           <div className="lg:col-span-8 space-y-5">
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md">
-              <Sparkles className="w-3.5 h-3.5" /> Quesería Gourmet & Tienda Artesana · Lekeitio
+              <Sparkles className="w-3.5 h-3.5" /> {t.shop_specialty} · Lekeitio
             </span>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif sm:font-sans text-white drop-shadow-md">
-              Quesos y regalos <br className="hidden sm:inline" />
-              <span className="text-[#FFE259] drop-shadow-sm">gastronómicos</span> en Lekeitio
+              {t.shop_hero_title}
             </h1>
 
             <p className="text-sm sm:text-base text-white/95 leading-relaxed max-w-xl font-medium drop-shadow-md">
-              Quesos afinados de autor, tesoros del Cantábrico y maridajes selectos. El sabor auténtico de Lekeitio para regalar y disfrutar.
+              {t.shop_hero_desc}
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -102,7 +100,7 @@ export function CatalogView({
                 onClick={scrollToCatalog}
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider"
               >
-                <span>VER NUESTROS QUESOS</span>
+                <span>{t.shop_see_cheeses}</span>
                 <ArrowDown className="w-4 h-4" />
               </button>
 
@@ -113,14 +111,14 @@ export function CatalogView({
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-black/60 hover:bg-black/80 text-white font-black text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4 text-[#FFE259]" />
-                <span>Encargos por WhatsApp</span>
+                <span>{t.shop_whatsapp_orders}</span>
               </a>
             </div>
           </div>
 
-          {/* Logo Oficial EkhiTeka destacado en Hero */}
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
             <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] hover:scale-105 transition-transform duration-500">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/Logo.jpg"
                 alt="EkhiTeka Lekeitio"
@@ -131,7 +129,7 @@ export function CatalogView({
         </div>
       </section>
 
-      {/* 2. Sección "¿Qué te apetece hoy?" con Tarjetas Interactivas */}
+      {/* 2. Categorías */}
       <CategoryCircleGrid
         categories={categories}
         selectedCategory={selectedCat}
@@ -141,15 +139,15 @@ export function CatalogView({
         }}
       />
 
-      {/* 3. Catálogo Principal "LOS QUESOS & SELECCIÓN" */}
+      {/* 3. Catálogo Principal */}
       <section id="catalogo" className="space-y-6 pt-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-2 border-b border-stone-200 dark:border-stone-800">
           <div>
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Nuestra Especialidad
+              {t.shop_specialty}
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight uppercase">
-              Los Quesos & Selección Gourmet
+              {t.cat_queso} & {t.brand_tagline}
             </h2>
           </div>
 
@@ -159,16 +157,16 @@ export function CatalogView({
                 href="/vendedor/productos/nuevo"
                 className="px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center gap-1.5 hover:scale-102"
               >
-                <span>+ Añadir Producto</span>
+                <span>+ {t.seller_new_product}</span>
               </Link>
             )}
             <span className="text-xs font-bold text-stone-500 dark:text-stone-400">
-              Mostrando {filteredProducts.length} productos disponibles
+              {t.prod_showing ? `${filteredProducts.length} ${t.prod_showing}` : `${filteredProducts.length}`}
             </span>
           </div>
         </div>
 
-        {/* Pestañas de Categorías (Estilo Maison du Monde: estilizado, centrado y refinado) */}
+        {/* Pestañas de Categorías */}
         <div className="flex items-center gap-2.5 overflow-x-auto pb-2 no-scrollbar font-serif">
           <button
             type="button"
@@ -203,7 +201,7 @@ export function CatalogView({
           })}
         </div>
 
-        {/* Buscador y Selector de Orden */}
+        {/* Buscador y Orden */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-2xs">
           <div className="relative w-full sm:max-w-md">
             <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -231,7 +229,7 @@ export function CatalogView({
           </div>
         </div>
 
-        {/* Grid de Productos con Animación y Movimiento */}
+        {/* Grid de Productos */}
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {filteredProducts.map((product) => (
@@ -245,27 +243,27 @@ export function CatalogView({
               {t.prod_no_results}
             </h3>
             <p className="text-xs text-stone-500 dark:text-stone-400">
-              Prueba a cambiar el término de búsqueda o pulsa en otra categoría de arriba.
+              {t.prod_search_placeholder}
             </p>
           </div>
         )}
       </section>
 
-      {/* 4. Bloques de Experiencias y Catas (Estilo La Manducateca) */}
+      {/* 4. Experiencias */}
       <ExperienceBanners />
 
-      {/* 5. Nuestra Tienda Física en Lekeitio (La Manducateca style) */}
+      {/* 5. Tienda Física */}
       <section className="relative rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 overflow-hidden shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-4">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Visítanos en Lekeitio · Km0
+              {t.shop_visit_subtitle}
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif sm:font-sans">
-              Nuestra Quesería & Espacio Gourmet
+              {t.shop_visit_title}
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              En nuestra web ves una selección, en nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
+              {t.shop_visit_desc}
             </p>
             <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
               <div className="flex items-center gap-2">
@@ -274,7 +272,7 @@ export function CatalogView({
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-base">🕒</span>
-                <span>Lun-Vie: 10:00 - 20:30 | Sáb: 10:30 - 15:00</span>
+                <span>{t.footer_schedule_weekdays}</span>
               </div>
             </div>
             <div className="pt-2">
@@ -285,12 +283,13 @@ export function CatalogView({
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-                <span>Contactar con la Tienda</span>
+                <span>{t.shop_visit_contact}</span>
               </a>
             </div>
           </div>
           <div className="lg:col-span-6">
             <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 h-64 sm:h-80 group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/secciones/Tienda.JPG"
                 alt="Tienda EkhiTeka Lekeitio"
@@ -304,7 +303,7 @@ export function CatalogView({
         </div>
       </section>
 
-      {/* 6. Opiniones de Clientes */}
+      {/* 6. Opiniones */}
       <CustomerReviews />
     </div>
   );
