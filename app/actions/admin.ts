@@ -118,6 +118,18 @@ export async function updateProfile(formData: FormData) {
       town,
       address: formattedAddress,
       bio: structuredBio,
+      first_name: firstName,
+      last_name_1: lastName1,
+      last_name_2: lastName2,
+      birth_date: birthDate || null,
+      dni,
+      province,
+      postal_code: postalCode,
+      street,
+      number,
+      stair,
+      floor,
+      door,
       updated_at: new Date().toISOString(),
     })
     .eq('id', user.id);
