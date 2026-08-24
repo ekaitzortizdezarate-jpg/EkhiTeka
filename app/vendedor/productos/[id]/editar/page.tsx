@@ -16,9 +16,19 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
   if (!user) redirect('/login');
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
+    redirect('/');
+  }
+
   const [categoriesRes, productRes] = await Promise.all([
     supabase.from('categories').select('*').eq('is_active', true).order('display_order', { ascending: true }),
-    supabase.from('products').select('*').eq('id', id).eq('seller_id', user.id).single(),
+    supabase.from('products').select('*').eq('id', id).single(),
   ]);
 
   if (productRes.error || !productRes.data) {

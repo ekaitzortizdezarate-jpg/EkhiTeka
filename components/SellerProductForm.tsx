@@ -248,28 +248,50 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
           </div>
         </div>
 
-        {/* 7. Botón Guardar */}
-        <div className="pt-4 border-t border-stone-200 dark:border-stone-800 flex items-center justify-end gap-3">
-          <Link
-            href="/"
-            className="px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-900 rounded-xl"
-          >
-            {t.common_cancel}
-          </Link>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:opacity-50 text-white font-black text-xs rounded-2xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            {loading ? (
-              <span>{t.common_loading}</span>
-            ) : (
-              <>
-                <Check className="w-4 h-4" />
-                <span>{isEdit ? t.common_save : t.seller_save_product}</span>
-              </>
-            )}
-          </button>
+        {/* 7. Botones de Acción */}
+        <div className="pt-4 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between gap-3">
+          {isEdit && initialProduct ? (
+            <button
+              type="button"
+              onClick={async () => {
+                if (confirm(`¿Estás seguro de que deseas eliminar "${initialProduct.name}" del catálogo de EkhiTeka?`)) {
+                  setLoading(true);
+                  const { deleteProduct } = await import('@/app/actions/products');
+                  await deleteProduct(initialProduct.id);
+                  window.location.href = '/';
+                }
+              }}
+              className="px-4 py-2.5 bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Eliminar Producto</span>
+            </button>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="px-4 py-2.5 text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-900 rounded-xl"
+            >
+              {t.common_cancel}
+            </Link>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] active:bg-[#E5C428] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer hover:scale-102"
+            >
+              {loading ? (
+                <span>{t.common_loading}</span>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>{isEdit ? t.common_save : t.seller_save_product}</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
     </div>

@@ -10,7 +10,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [categoriesRes, productsRes] = await Promise.all([
+  const [{ data: { user } }, categoriesRes, productsRes] = await Promise.all([
+    supabase.auth.getUser(),
     supabase
       .from('categories')
       .select('*')
@@ -23,6 +24,18 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       .order('created_at', { ascending: false }),
   ]);
 
+  let isSeller = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+      isSeller = true;
+    }
+  }
+
   const categories = (categoriesRes.data || []) as Category[];
   const products = (productsRes.data || []) as unknown as ProductWithSeller[];
 
@@ -31,6 +44,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       categories={categories}
       products={products}
       initialCategory={id}
+      isSeller={isSeller}
     />
   );
 }

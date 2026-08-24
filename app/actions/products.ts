@@ -4,6 +4,16 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+async function checkSellerPermission(supabase: any, userId: string) {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single();
+
+  return profile?.role === 'vendedor' || profile?.role === 'admin';
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -12,6 +22,11 @@ export async function createProduct(formData: FormData) {
 
   if (!user) {
     return { error: 'No autenticado' };
+  }
+
+  const isAllowed = await checkSellerPermission(supabase, user.id);
+  if (!isAllowed) {
+    return { error: 'Permisos insuficientes. Solo los vendedores de EkhiTeka pueden añadir productos.' };
   }
 
   const name = formData.get('name') as string;
@@ -83,6 +98,11 @@ export async function updateProduct(productId: string, formData: FormData) {
     return { error: 'No autenticado' };
   }
 
+  const isAllowed = await checkSellerPermission(supabase, user.id);
+  if (!isAllowed) {
+    return { error: 'Permisos insuficientes. Solo los vendedores de EkhiTeka pueden editar productos.' };
+  }
+
   const name = formData.get('name') as string;
   const description = formData.get('description') as string;
   const categoryId = formData.get('category_id') as string;
@@ -128,8 +148,7 @@ export async function updateProduct(productId: string, formData: FormData) {
       image_url: imageUrl,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', productId)
-    .eq('seller_id', user.id);
+    .eq('id', productId);
 
   if (error) {
     return { error: error.message };
@@ -150,16 +169,22 @@ export async function deleteProduct(productId: string) {
     return { error: 'No autenticado' };
   }
 
+  const isAllowed = await checkSellerPermission(supabase, user.id);
+  if (!isAllowed) {
+    return { error: 'Permisos insuficientes. Solo los vendedores de EkhiTeka pueden eliminar productos.' };
+  }
+
   const { error } = await supabase
     .from('products')
     .update({ is_active: false })
-    .eq('id', productId)
-    .eq('seller_id', user.id);
+    .eq('id', productId);
 
   if (error) {
     return { error: error.message };
   }
 
   revalidatePath('/');
+  revalidatePath(`/producto/${productId}`);
   return { success: true };
 }
+

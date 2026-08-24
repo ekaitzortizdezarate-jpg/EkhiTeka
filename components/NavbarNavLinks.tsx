@@ -141,9 +141,9 @@ export function NavbarNavLinks({
             {isSeller && (
               <Link
                 href="/vendedor/productos/nuevo"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl transition-all shadow-2xs font-bold"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl transition-all shadow-xs font-black uppercase text-xs hover:scale-102"
               >
-                <PlusCircle className="w-4 h-4" />
+                <PlusCircle className="w-4 h-4 stroke-[2.5]" />
                 <span>{t.seller_new_product}</span>
               </Link>
             )}
@@ -272,6 +272,16 @@ export function NavbarNavLinks({
                 </p>
                 {user ? (
                   <>
+                    {isSeller && (
+                      <Link
+                        href="/vendedor/productos/nuevo"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-2 p-2.5 rounded-xl font-black text-xs bg-[#FFE259] text-[#1D1D1B] shadow-xs"
+                      >
+                        <PlusCircle className="w-4 h-4 stroke-[2.5]" />
+                        <span>+ {t.seller_new_product}</span>
+                      </Link>
+                    )}
                     <Link
                       href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                       onClick={() => setMobileMenuOpen(false)}

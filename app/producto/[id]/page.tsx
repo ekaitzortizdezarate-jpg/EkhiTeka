@@ -2,9 +2,10 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, MessageCircle, MapPin, Store, Truck, ArrowLeft, Sparkles, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, MessageCircle, MapPin, Store, Truck, ArrowLeft, Sparkles, ShieldCheck, Pencil, Trash2 } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
+import { deleteProduct } from '@/app/actions/products';
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string }>;
@@ -14,15 +15,30 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: productData, error } = await supabase
-    .from('products')
-    .select('*, profiles!products_seller_id_fkey(id, full_name, town, address, avatar_url, phone, bio)')
-    .eq('id', id)
-    .eq('is_active', true)
-    .single();
+  const [{ data: { user } }, { data: productData, error }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('products')
+      .select('*, profiles!products_seller_id_fkey(id, full_name, town, address, avatar_url, phone, bio)')
+      .eq('id', id)
+      .eq('is_active', true)
+      .single(),
+  ]);
 
   if (error || !productData) {
     notFound();
+  }
+
+  let isSeller = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+      isSeller = true;
+    }
   }
 
   const product = productData as unknown as ProductWithSeller;
@@ -141,8 +157,34 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               </div>
             )}
 
-            {/* Botón interactivo de añadir a la cesta */}
-            <ProductDetailAddToCart product={product} />
+            {/* Botón interactivo de añadir a la cesta o Panel de Gestión para Vendedor */}
+            {isSeller ? (
+              <div className="p-5 rounded-2xl bg-[#FFE259]/15 border-2 border-[#FFE259] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-[#C68D07]" />
+                    <span>Panel de Gestión EkhiTeka</span>
+                  </span>
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] uppercase">
+                    Modo Vendedor
+                  </span>
+                </div>
+                <p className="text-xs text-stone-600 dark:text-stone-300 font-medium">
+                  Como vendedor puedes actualizar los detalles, precios, stock o eliminar este producto del catálogo general.
+                </p>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <Link
+                    href={`/vendedor/productos/${product.id}/editar`}
+                    className="flex-1 py-3 px-4 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 hover:scale-102"
+                  >
+                    <Pencil className="w-4 h-4" />
+                    <span>Editar Ficha de Producto</span>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <ProductDetailAddToCart product={product} />
+            )}
 
             {/* Garantías de Envío */}
             <div className="grid grid-cols-2 gap-3 pt-3">
@@ -172,7 +214,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {related.map((rel) => (
-              <ProductCard key={rel.id} product={rel} />
+              <ProductCard key={rel.id} product={rel} isSeller={isSeller} />
             ))}
           </div>
         </div>

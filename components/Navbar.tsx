@@ -67,7 +67,17 @@ export default async function Navbar() {
 
         {/* Acciones Derecha */}
         <div className="flex items-center gap-2.5">
-          <CartNavButton />
+          {(!profile || profile.role === 'comprador') && (
+            <CartNavButton />
+          )}
+
+          {profile && (profile.role === 'vendedor' || profile.role === 'admin') && (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] rounded-xl text-[11px] font-black uppercase tracking-wider shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Vendedor EkhiTeka</span>
+            </div>
+          )}
+
           <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-stone-200 dark:border-stone-800">
             <ThemeSelector />
             <LanguageSelector />

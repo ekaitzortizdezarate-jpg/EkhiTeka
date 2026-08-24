@@ -29,6 +29,16 @@ export async function createOrder(payload: CreateOrderPayload) {
     return { error: 'Debes iniciar sesión para realizar un pedido.' };
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role === 'vendedor') {
+    return { error: 'Los vendedores de EkhiTeka no pueden realizar compras con la cuenta de vendedor. Utiliza una cuenta de comprador.' };
+  }
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
