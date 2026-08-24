@@ -114,7 +114,7 @@ export async function updateProduct(productId: string, formData: FormData) {
   const originRegion = formData.get('origin_region') as string;
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
 
-  let imageUrl = formData.get('existing_image_url') as string | null;
+  let imageUrl = (formData.get('existing_image_url') as string) || (formData.get('image_url_fallback') as string) || null;
   const imageFile = formData.get('image_file') as File | null;
 
   if (imageFile && imageFile.size > 0) {

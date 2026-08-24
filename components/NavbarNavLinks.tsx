@@ -72,13 +72,13 @@ export function NavbarNavLinks({
         </div>
       </Link>
 
-      {/* Enlaces Principales (Estilo La Manducateca) */}
-      <nav className="hidden lg:flex items-center gap-1.5 text-xs font-black">
+      {/* Enlaces Principales (Estilo Maison du Monde: estilizado, centrado y refinado) */}
+      <nav className="hidden lg:flex items-center gap-2 font-serif">
         <Link
           href="/"
-          className={`px-3.5 py-2 rounded-xl transition-all ${
+          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all min-w-[90px] ${
             pathname === '/'
-              ? 'bg-[#FFE259] text-[#1D1D1B] shadow-2xs'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
               : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
           }`}
         >
@@ -87,14 +87,14 @@ export function NavbarNavLinks({
 
         <Link
           href="/#experiencias"
-          className="px-3.5 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+          className="flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
         >
           Catas & Experiencias
         </Link>
 
         <Link
           href="/#opiniones"
-          className="px-3.5 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+          className="flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
         >
           Opiniones
         </Link>
@@ -104,13 +104,13 @@ export function NavbarNavLinks({
             {/* Pedidos */}
             <Link
               href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-              className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
+              className={`relative flex items-center justify-center text-center gap-1.5 px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
                 pathname.includes('/pedidos')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] shadow-2xs'
+                  ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
-              <Package className="w-4 h-4" />
+              <Package className="w-3.5 h-3.5" />
               <span>{t.nav_orders}</span>
               {ordersCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-[#FFE259] text-stone-950 text-[10px] font-black flex items-center justify-center border border-stone-800 animate-pulse">
@@ -122,13 +122,13 @@ export function NavbarNavLinks({
             {/* Mensajes / Chat */}
             <Link
               href="/chat"
-              className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
+              className={`relative flex items-center justify-center text-center gap-1.5 px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
                 pathname.startsWith('/chat')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] shadow-2xs'
+                  ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-3.5 h-3.5" />
               <span>{t.nav_chats}</span>
               {unreadMessagesCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center animate-pulse">
@@ -141,10 +141,10 @@ export function NavbarNavLinks({
             {isSeller && (
               <Link
                 href="/vendedor/productos/nuevo"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl transition-all shadow-xs font-black uppercase text-xs hover:scale-102"
+                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102"
               >
-                <PlusCircle className="w-4 h-4 stroke-[2.5]" />
-                <span>{t.seller_new_product}</span>
+                <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>+ {t.seller_new_product}</span>
               </Link>
             )}
 
@@ -152,9 +152,9 @@ export function NavbarNavLinks({
             {isAdmin && (
               <Link
                 href="/admin"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-xl transition-all font-black"
+                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-full transition-all font-semibold uppercase tracking-[0.16em] text-[11px]"
               >
-                <ShieldCheck className="w-4 h-4" />
+                <ShieldCheck className="w-3.5 h-3.5" />
                 <span>{t.nav_admin}</span>
               </Link>
             )}
@@ -203,15 +203,15 @@ export function NavbarNavLinks({
 
       {/* Mobile Navigation Drawer (La Manducateca style) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-[99999] lg:hidden">
           {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Drawer Content */}
-          <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-stone-900 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto">
+          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-stone-900 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[100000] border-r border-stone-200 dark:border-stone-800">
             <div className="space-y-6">
               {/* Header Drawer */}
               <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">

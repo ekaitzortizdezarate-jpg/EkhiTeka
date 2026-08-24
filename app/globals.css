@@ -2,6 +2,7 @@
 
 @theme {
   --font-sans: var(--font-dm-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: var(--font-cormorant), 'Playfair Display', Georgia, Cambria, serif;
   --color-manduca-yellow: #FFE259;
   --color-manduca-yellow-hover: #F5D742;
   --color-manduca-yellow-light: #FFF9DE;

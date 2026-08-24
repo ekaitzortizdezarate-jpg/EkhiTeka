@@ -93,7 +93,7 @@ export function CatalogView({
             </h1>
 
             <p className="text-sm sm:text-base text-white/95 leading-relaxed max-w-xl font-medium drop-shadow-md">
-              No somos una tienda gourmet cualquiera. En nuestra web ves una parte, en nuestra quesería de Lekeitio, todo. Quesos de autor afinados, anchoas del Cantábrico y maridajes únicos.
+              Quesos afinados de autor, tesoros del Cantábrico y maridajes selectos. El sabor auténtico de Lekeitio para regalar y disfrutar.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -173,20 +173,20 @@ export function CatalogView({
           </div>
         </div>
 
-        {/* Pestañas de Categorías (7 secciones + dinámicas) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+        {/* Pestañas de Categorías (Estilo Maison du Monde: estilizado, centrado y refinado) */}
+        <div className="flex items-center gap-2.5 overflow-x-auto pb-2 no-scrollbar font-serif">
           <button
             type="button"
             onClick={() => setSelectedCat('all')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
+            className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-semibold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
               selectedCat === 'all'
-                ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 shadow-xs border border-stone-800 font-extrabold'
-                : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-[#FFE259]'
+                ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 shadow-xs border border-stone-800 font-bold'
+                : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-stone-400'
             }`}
           >
             <span>✨</span>
             <span>{t.cat_all}</span>
-            <span className="text-[10px] opacity-75 font-normal">({products.length})</span>
+            <span className="text-[10px] opacity-70 font-sans">({products.length})</span>
           </button>
 
           {categories.map((cat) => {
@@ -196,15 +196,15 @@ export function CatalogView({
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCat(cat.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-xs whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
+                className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-semibold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
                   selectedCat === cat.id
-                    ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 shadow-xs border border-stone-800 font-extrabold'
-                    : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-[#FFE259]'
+                    ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 shadow-xs border border-stone-800 font-bold'
+                    : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-stone-400'
                 }`}
               >
                 <span>{cat.icon}</span>
                 <span>{getCategoryName(cat)}</span>
-                <span className="text-[10px] opacity-75 font-normal">({count})</span>
+                <span className="text-[10px] opacity-70 font-sans">({count})</span>
               </button>
             );
           })}

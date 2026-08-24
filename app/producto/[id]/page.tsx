@@ -6,6 +6,7 @@ import { ShoppingBag, MessageCircle, MapPin, Store, Truck, ArrowLeft, Sparkles, 
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
 import { deleteProduct } from '@/app/actions/products';
+import { getProductImage } from '@/lib/productHelpers';
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string }>;
@@ -70,17 +71,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14 bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 p-6 sm:p-10 lg:p-12 shadow-sm">
         {/* Imagen */}
         <div className="relative aspect-4/3 sm:aspect-square w-full rounded-3xl bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden border border-stone-200/80 dark:border-stone-800">
-          {product.image_url ? (
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-7xl bg-[#FFE259]/20 text-[#1D1D1B] dark:text-[#FFE259]">
-              🧀
-            </div>
-          )}
+          <img
+            src={getProductImage(product)}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
 
           {product.origin_region && (
             <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1D1D1B]/80 backdrop-blur-xs text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-md">

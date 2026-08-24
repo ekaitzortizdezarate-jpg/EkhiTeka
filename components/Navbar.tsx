@@ -4,7 +4,6 @@ import { NavbarNavLinks } from '@/components/NavbarNavLinks';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ThemeSelector } from '@/components/ThemeSelector';
 import { CartNavButton } from '@/components/CartNavButton';
-import { Truck, Store, Sparkles } from 'lucide-react';
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -37,27 +36,9 @@ export default async function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 dark:bg-[#141312]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-stone-800 shadow-xs transition-colors">
-      {/* 1. Top Banner Avisos Gourmet (La Manducateca signature yellow banner) */}
-      <div className="bg-[#FFE259] text-[#1D1D1B] text-[11px] font-black py-2 px-4 shadow-2xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 shrink-0">
-            <Truck className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Envío refrigerado 24/48h en península · Bidalpen hoztua</span>
-          </div>
-          <div className="hidden md:flex items-center gap-2 shrink-0">
-            <Store className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Recogida gratuita en tienda · Dendan doako jasotzea</span>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Encargos y tablas a medida por WhatsApp</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Barra Principal de Navegación */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-22 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 bg-[#FAF8F5]/95 dark:bg-[#141312]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-stone-800 shadow-xs transition-colors">
+      {/* Barra Principal de Navegación */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
         <NavbarNavLinks
           user={user}
           profile={profile}

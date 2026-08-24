@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
+import { getProductImage } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import { ShoppingBag, MessageCircle, MapPin, Sparkles, Check, Pencil, Trash2 } from 'lucide-react';
 
@@ -39,22 +40,20 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
   const sellerName = 'EkhiTeka Gourmet Lekeitio';
   const sellerId = product.seller_id;
+  const imageUrl = getProductImage(product);
 
   return (
     <article aria-label={product.name} className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col overflow-hidden ${isDeleting ? 'opacity-40 pointer-events-none' : ''}`}>
       {/* 1. Imagen y Badges */}
       <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden">
-        {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl bg-[#FFE259]/15 text-[#1D1D1B] dark:text-[#FFE259]">
-            🧀
-          </div>
-        )}
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+          }}
+        />
 
         {/* Badge de Origen */}
         {product.origin_region && (
