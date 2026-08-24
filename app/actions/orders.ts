@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import type { OrderStatus } from '@/types/database';
+import { type OrderStatus, isProfileComplete } from '@/types/database';
 
 export interface CreateOrderPayload {
   sellerId: string;
@@ -31,12 +31,16 @@ export async function createOrder(payload: CreateOrderPayload) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('*')
     .eq('id', user.id)
     .single();
 
   if (profile?.role === 'vendedor') {
     return { error: 'Los vendedores de EkhiTeka no pueden realizar compras con la cuenta de vendedor. Utiliza una cuenta de comprador.' };
+  }
+
+  if (!isProfileComplete(profile)) {
+    return { error: 'Debes completar tu perfil con todos tus datos personales y de dirección antes de realizar un pedido.' };
   }
 
   const { data: order, error: orderError } = await supabase

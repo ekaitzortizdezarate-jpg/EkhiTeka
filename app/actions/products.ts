@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { isProfileComplete } from '@/types/database';
 
 async function checkSellerPermission(supabase: any, userId: string) {
   const { data: profile } = await supabase
@@ -27,6 +28,11 @@ export async function createProduct(formData: FormData) {
   const isAllowed = await checkSellerPermission(supabase, user.id);
   if (!isAllowed) {
     return { error: 'Permisos insuficientes. Solo los vendedores de EkhiTeka pueden añadir productos.' };
+  }
+
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  if (!isProfileComplete(profile)) {
+    return { error: 'Debes completar tu perfil con todos los campos obligatorios antes de publicar productos.' };
   }
 
   const name = formData.get('name') as string;

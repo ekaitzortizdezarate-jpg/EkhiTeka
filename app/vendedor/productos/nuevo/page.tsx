@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { SellerProductForm } from '@/components/SellerProductForm';
-import type { Category } from '@/types/database';
+import { type Category, isProfileComplete } from '@/types/database';
 
 export default async function NewProductPage() {
   const supabase = await createClient();
@@ -13,12 +13,16 @@ export default async function NewProductPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('*')
     .eq('id', user.id)
     .single();
 
   if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
     redirect('/');
+  }
+
+  if (!isProfileComplete(profile)) {
+    redirect('/perfil');
   }
 
   const { data: categories } = await supabase

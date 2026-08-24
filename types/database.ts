@@ -18,7 +18,24 @@ export type OrderStatus =
   | 'entregado'
   | 'cancelado';
 
-export interface Profile {
+export interface ProfileDetails {
+  first_name?: string | null;
+  last_name_1?: string | null;
+  last_name_2?: string | null;
+  birth_date?: string | null;
+  dni?: string | null;
+  phone?: string | null;
+  province?: string | null;
+  town?: string | null;
+  postal_code?: string | null;
+  street?: string | null;
+  number?: string | null;
+  stair?: string | null;
+  floor?: string | null;
+  door?: string | null;
+}
+
+export interface Profile extends ProfileDetails {
   id: string;
   role: Role;
   full_name: string;
@@ -30,6 +47,85 @@ export interface Profile {
   bio?: string | null;
   created_at?: string;
   updated_at?: string;
+}
+
+export function parseProfile(raw?: any): Profile {
+  if (!raw) {
+    return {
+      id: '',
+      role: 'comprador',
+      full_name: '',
+      first_name: '',
+      last_name_1: '',
+      last_name_2: '',
+      birth_date: '',
+      dni: '',
+      phone: '',
+      province: '',
+      town: '',
+      postal_code: '',
+      street: '',
+      number: '',
+      stair: '',
+      floor: '',
+      door: '',
+    };
+  }
+
+  let details: Partial<ProfileDetails> = {};
+  if (raw.bio) {
+    try {
+      const parsed = JSON.parse(raw.bio);
+      if (typeof parsed === 'object' && parsed !== null) {
+        details = parsed;
+      }
+    } catch {
+      // bio was plain text
+    }
+  }
+
+  return {
+    ...raw,
+    first_name: details.first_name || raw.first_name || raw.full_name?.split(' ')[0] || '',
+    last_name_1: details.last_name_1 || raw.last_name_1 || raw.full_name?.split(' ')[1] || '',
+    last_name_2: details.last_name_2 || raw.last_name_2 || raw.full_name?.split(' ').slice(2).join(' ') || '',
+    birth_date: details.birth_date || raw.birth_date || '',
+    dni: details.dni || raw.dni || '',
+    phone: details.phone || raw.phone || '',
+    province: details.province || raw.province || (raw.town?.toLowerCase().includes('lekeitio') ? 'Bizkaia' : ''),
+    town: details.town || raw.town || '',
+    postal_code: details.postal_code || raw.postal_code || '',
+    street: details.street || raw.street || '',
+    number: details.number || raw.number || '',
+    stair: details.stair || raw.stair || '',
+    floor: details.floor || raw.floor || '',
+    door: details.door || raw.door || '',
+  };
+}
+
+export function isProfileComplete(raw?: any): boolean {
+  if (!raw) return false;
+  const p = parseProfile(raw);
+
+  const requiredKeys: (keyof ProfileDetails)[] = [
+    'first_name',
+    'last_name_1',
+    'birth_date',
+    'dni',
+    'phone',
+    'province',
+    'town',
+    'postal_code',
+    'street',
+    'number',
+    'floor',
+    'door',
+  ];
+
+  return requiredKeys.every((key) => {
+    const val = p[key];
+    return val !== undefined && val !== null && String(val).trim().length > 0;
+  });
 }
 
 export interface Category {

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import type { Profile } from '@/types/database';
+import { type Profile, parseProfile } from '@/types/database';
 import { NavbarNavLinks } from '@/components/NavbarNavLinks';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ThemeSelector } from '@/components/ThemeSelector';
@@ -14,6 +14,19 @@ export default async function Navbar() {
   let profile: Profile | null = null;
   let unreadMessagesCount = 0;
   let ordersCount = 0;
+
+  // Consultar perfil del vendedor para la dirección dinámica en la sub-barra
+  const { data: sellerRaw } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'vendedor')
+    .limit(1)
+    .maybeSingle();
+
+  const sellerProfile = parseProfile(sellerRaw);
+  const storeAddress = sellerProfile.street
+    ? `${sellerProfile.street}${sellerProfile.number ? ` ${sellerProfile.number}` : ''}, ${sellerProfile.town || 'Lekeitio'}${sellerProfile.province ? ` · ${sellerProfile.province}` : ''}`
+    : 'Gamarra Kalea 4, Lekeitio · Bizkaia';
 
   if (user) {
     const [profileRes, unreadRes, ordersRes] = await Promise.all([
@@ -54,11 +67,11 @@ export default async function Navbar() {
         </div>
       </div>
 
-      {/* Sub-barra de Utilidades (Modo Oscuro/Claro & Idiomas justo debajo del menú superior) */}
+      {/* Sub-barra de Utilidades con dirección dinámica del vendedor */}
       <div className="border-t border-[#E8E5DF]/70 dark:border-stone-800/80 bg-[#FAF8F5]/80 dark:bg-[#141312]/80 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
           <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
-            Gamarra Kalea 4, Lekeitio · Bizkaia
+            {storeAddress}
           </span>
           <div className="flex items-center gap-2">
             <ThemeSelector />
