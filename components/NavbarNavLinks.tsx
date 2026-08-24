@@ -90,11 +90,11 @@ export function NavbarNavLinks({
       </Link>
 
       {/* Enlaces Principales (Estilo Maison du Monde: estilizado, centrado y refinado) */}
-      <nav className="hidden lg:flex items-center gap-2 font-serif">
+      <nav className="hidden lg:flex items-center gap-1.5 font-serif">
         <Link
-          href="/"
-          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all min-w-[90px] ${
-            pathname === '/'
+          href="/tienda"
+          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+            pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
               ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
               : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
           }`}
@@ -103,17 +103,36 @@ export function NavbarNavLinks({
         </Link>
 
         <Link
-          href="/#experiencias"
-          className="flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+          href="/regalos-gourmet"
+          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+            pathname === '/regalos-gourmet'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+              : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+          }`}
+        >
+          Regalos Gourmet
+        </Link>
+
+        <Link
+          href="/experiencias"
+          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+            pathname === '/experiencias'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+              : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+          }`}
         >
           Catas & Experiencias
         </Link>
 
         <Link
-          href="/#opiniones"
-          className="flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+          href="/regalos-empresa"
+          className={`flex items-center justify-center text-center px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all whitespace-nowrap ${
+            pathname === '/regalos-empresa'
+              ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+              : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+          }`}
         >
-          Opiniones
+          Regalos de Empresa
         </Link>
 
         {user && (
@@ -121,7 +140,7 @@ export function NavbarNavLinks({
             {/* Pedidos */}
             <Link
               href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-              className={`relative flex items-center justify-center text-center gap-1.5 px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+              className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
                 pathname.includes('/pedidos')
                   ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -139,7 +158,7 @@ export function NavbarNavLinks({
             {/* Mensajes / Chat */}
             <Link
               href="/chat"
-              className={`relative flex items-center justify-center text-center gap-1.5 px-4 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+              className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
                 pathname.startsWith('/chat')
                   ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -158,7 +177,7 @@ export function NavbarNavLinks({
             {isSeller && (
               <Link
                 href="/vendedor/productos/nuevo"
-                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102"
+                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102 whitespace-nowrap"
               >
                 <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>+ {t.seller_new_product}</span>
@@ -169,7 +188,7 @@ export function NavbarNavLinks({
             {isAdmin && (
               <Link
                 href="/admin"
-                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-full transition-all font-semibold uppercase tracking-[0.16em] text-[11px]"
+                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-full transition-all font-semibold uppercase tracking-[0.16em] text-[11px] whitespace-nowrap"
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>{t.nav_admin}</span>
@@ -260,15 +279,15 @@ export function NavbarNavLinks({
               </div>
 
               {/* Navigation Links - Maison du Monde centered uppercase typography */}
-              <div className="space-y-2.5 font-serif">
+              <div className="space-y-2 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Explorar Selección
                 </p>
                 <Link
-                  href="/"
+                  href="/tienda"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
-                    pathname === '/'
+                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/tienda'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
@@ -276,18 +295,37 @@ export function NavbarNavLinks({
                   <span>🧀 {t.nav_shop}</span>
                 </Link>
                 <Link
-                  href="/#experiencias"
+                  href="/regalos-gourmet"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center text-center p-3.5 rounded-full bg-stone-850 hover:bg-stone-800 font-bold text-xs tracking-[0.16em] uppercase text-white border border-stone-700 hover:border-[#FFE259] transition-all shadow-md"
+                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/regalos-gourmet'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
+                >
+                  <span>🎁 Regalos Gourmet</span>
+                </Link>
+                <Link
+                  href="/experiencias"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/experiencias'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
                 >
                   <span>🍷 Catas & Experiencias</span>
                 </Link>
                 <Link
-                  href="/#opiniones"
+                  href="/regalos-empresa"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center text-center p-3.5 rounded-full bg-stone-850 hover:bg-stone-800 font-bold text-xs tracking-[0.16em] uppercase text-white border border-stone-700 hover:border-[#FFE259] transition-all shadow-md"
+                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/regalos-empresa'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
                 >
-                  <span>⭐ Opiniones Clientes</span>
+                  <span>🏢 Regalos de Empresa</span>
                 </Link>
               </div>
 
