@@ -27,6 +27,7 @@ interface NavbarNavLinksProps {
   profile: Profile | null;
   unreadMessagesCount: number;
   ordersCount: number;
+  activeOrders?: { id: string; status: string }[];
 }
 
 export function NavbarNavLinks({
@@ -34,15 +35,55 @@ export function NavbarNavLinks({
   profile,
   unreadMessagesCount,
   ordersCount,
+  activeOrders = [],
 }: NavbarNavLinksProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const isSeller = profile?.role === 'vendedor';
+  const isAdmin = profile?.role === 'admin';
+
+  useEffect(() => {
+    function checkUnseenOrders() {
+      if (!user || !activeOrders || activeOrders.length === 0) {
+        setHasUnseenOrderUpdates(false);
+        return;
+      }
+      const storageKey = isSeller ? 'ekhiteka_seen_orders_seller' : 'ekhiteka_seen_orders_buyer';
+      let seenMap: Record<string, string> = {};
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) seenMap = JSON.parse(stored);
+      } catch {}
+
+      const unseen = activeOrders.some((order) => {
+        const lastSeen = seenMap[order.id];
+        if (lastSeen) {
+          return lastSeen !== order.status;
+        }
+        // If not registered in localStorage yet:
+        // For seller, pending orders need attention. For buyer, changes from 'pendiente' need attention.
+        return isSeller ? order.status === 'pendiente' : order.status !== 'pendiente';
+      });
+
+      setHasUnseenOrderUpdates(unseen);
+    }
+
+    checkUnseenOrders();
+    window.addEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
+    window.addEventListener('storage', checkUnseenOrders);
+    return () => {
+      window.removeEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
+      window.removeEventListener('storage', checkUnseenOrders);
+    };
+  }, [user, activeOrders, isSeller]);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -54,9 +95,6 @@ export function NavbarNavLinks({
       document.body.style.overflow = '';
     };
   }, [mobileMenuOpen]);
-
-  const isSeller = profile?.role === 'vendedor';
-  const isAdmin = profile?.role === 'admin';
 
   return (
     <div className="flex items-center gap-4 sm:gap-8 min-w-0">
@@ -146,17 +184,15 @@ export function NavbarNavLinks({
               className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
                 pathname.includes('/pedidos')
                   ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                  : ordersCount > 0
-                  ? 'bg-[#FFE259]/25 text-stone-900 dark:text-stone-100 border border-[#FFE259] animate-pulse font-bold shadow-xs'
+                  : hasUnseenOrderUpdates
+                  ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
               <Package className="w-3.5 h-3.5" />
               <span>{t.nav_orders}</span>
-              {ordersCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-[#FFE259] text-stone-950 text-[10px] font-black flex items-center justify-center border border-stone-800 animate-pulse">
-                  {ordersCount}
-                </span>
+              {hasUnseenOrderUpdates && (
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
               )}
             </Link>
 
@@ -357,16 +393,16 @@ export function NavbarNavLinks({
                       className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname.includes('/pedidos')
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : ordersCount > 0
-                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] animate-pulse font-bold'
+                          : hasUnseenOrderUpdates
+                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
                           : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
                       }`}
                     >
                       <Package className="w-4 h-4" />
                       <span>{t.nav_orders}</span>
-                      {ordersCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black">
-                          {ordersCount}
+                      {hasUnseenOrderUpdates && (
+                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black uppercase">
+                          Nuevo
                         </span>
                       )}
                     </Link>

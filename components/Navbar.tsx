@@ -14,6 +14,7 @@ export default async function Navbar() {
   let profile: Profile | null = null;
   let unreadMessagesCount = 0;
   let ordersCount = 0;
+  let activeOrders: { id: string; status: string }[] = [];
 
   // Consultar perfil del vendedor para la dirección dinámica en la sub-barra
   const { data: sellerRaw } = await supabase
@@ -38,14 +39,18 @@ export default async function Navbar() {
         .eq('is_read', false),
       supabase
         .from('orders')
-        .select('*', { count: 'exact', head: true })
+        .select('id, status')
         .or(`seller_id.eq.${user.id},buyer_id.eq.${user.id}`)
-        .in('status', ['pendiente', 'confirmado', 'preparando', 'listo_entrega']),
+        .order('updated_at', { ascending: false })
+        .limit(25),
     ]);
 
     profile = profileRes.data;
     unreadMessagesCount = unreadRes.count || 0;
-    ordersCount = ordersRes.count || 0;
+    activeOrders = ordersRes.data || [];
+    ordersCount = activeOrders.filter((o) =>
+      ['pendiente', 'confirmado', 'preparando', 'listo_entrega'].includes(o.status)
+    ).length;
   }
 
   return (
@@ -57,6 +62,7 @@ export default async function Navbar() {
           profile={profile}
           unreadMessagesCount={unreadMessagesCount}
           ordersCount={ordersCount}
+          activeOrders={activeOrders}
         />
 
         {/* Acciones Derecha */}
