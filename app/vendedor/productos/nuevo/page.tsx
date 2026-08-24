@@ -1,0 +1,31 @@
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { SellerProductForm } from '@/components/SellerProductForm';
+import type { Category } from '@/types/database';
+
+export default async function NewProductPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
+    redirect('/');
+  }
+
+  const { data: categories } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true });
+
+  return <SellerProductForm categories={(categories || []) as Category[]} />;
+}
