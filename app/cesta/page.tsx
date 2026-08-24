@@ -28,7 +28,6 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   const [deliveryType, setDeliveryType] = useState<'domicilio' | 'recogida_tienda'>('domicilio');
-  const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
   const [pickupSchedule, setPickupSchedule] = useState('11:00 - 14:00');
   const [loading, setLoading] = useState(false);
@@ -36,7 +35,18 @@ export default function CheckoutPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [useProfileAddress, setUseProfileAddress] = useState(false);
+  // Por defecto está marcada la opción de usar la dirección del perfil
+  const [useProfileAddress, setUseProfileAddress] = useState(true);
+
+  // Campos individuales de dirección si el usuario desmarca la opción de perfil
+  const [customStreet, setCustomStreet] = useState('');
+  const [customNumber, setCustomNumber] = useState('');
+  const [customStair, setCustomStair] = useState('');
+  const [customFloor, setCustomFloor] = useState('');
+  const [customDoor, setCustomDoor] = useState('');
+  const [customPostalCode, setCustomPostalCode] = useState('48280');
+  const [customTown, setCustomTown] = useState('Lekeitio');
+  const [customProvince, setCustomProvince] = useState('Bizkaia');
 
   useEffect(() => {
     async function loadUserProfile() {
@@ -57,23 +67,13 @@ export default function CheckoutPage() {
             const parsed = parseProfile(data);
             setProfile(parsed);
             if (parsed.street && parsed.number) {
-              const formatted = [
-                parsed.street,
-                parsed.number ? `Nº ${parsed.number}` : '',
-                parsed.stair ? `Esc. ${parsed.stair}` : '',
-                parsed.floor ? `Piso ${parsed.floor}` : '',
-                parsed.door ? `Pta ${parsed.door}` : '',
-                parsed.postal_code,
-                parsed.town,
-                parsed.province ? `(${parsed.province})` : '',
-              ]
-                .filter(Boolean)
-                .join(', ');
-
-              setAddress(formatted);
               setUseProfileAddress(true);
+            } else {
+              setUseProfileAddress(false);
             }
           }
+        } else {
+          setUseProfileAddress(false);
         }
       } catch (err) {
         console.error('Error loading user profile in checkout:', err);
@@ -82,27 +82,6 @@ export default function CheckoutPage() {
 
     loadUserProfile();
   }, []);
-
-  const handleToggleProfileAddress = (checked: boolean) => {
-    setUseProfileAddress(checked);
-    if (checked && profile && profile.street) {
-      const formatted = [
-        profile.street,
-        profile.number ? `Nº ${profile.number}` : '',
-        profile.stair ? `Esc. ${profile.stair}` : '',
-        profile.floor ? `Piso ${profile.floor}` : '',
-        profile.door ? `Pta ${profile.door}` : '',
-        profile.postal_code,
-        profile.town,
-        profile.province ? `(${profile.province})` : '',
-      ]
-        .filter(Boolean)
-        .join(', ');
-      setAddress(formatted);
-    } else if (!checked) {
-      setAddress('');
-    }
-  };
 
   if (success) {
     return (
@@ -162,21 +141,62 @@ export default function CheckoutPage() {
 
   const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (deliveryType === 'domicilio' && !address.trim()) {
-      setErrorMsg('Por favor, introduce la dirección de entrega o selecciona usar la de tu perfil.');
-      return;
+    setErrorMsg(null);
+
+    let finalShippingAddress = '';
+
+    if (deliveryType === 'domicilio') {
+      if (useProfileAddress && profile && profile.street && profile.number) {
+        finalShippingAddress = [
+          profile.street,
+          profile.number ? `Nº ${profile.number}` : '',
+          profile.stair ? `Esc. ${profile.stair}` : '',
+          profile.floor ? `Piso ${profile.floor}` : '',
+          profile.door ? `Pta ${profile.door}` : '',
+          profile.postal_code,
+          profile.town,
+          profile.province ? `(${profile.province})` : '',
+        ]
+          .filter(Boolean)
+          .join(', ');
+      } else {
+        // Validar campos individuales
+        if (
+          !customStreet.trim() ||
+          !customNumber.trim() ||
+          !customFloor.trim() ||
+          !customDoor.trim() ||
+          !customPostalCode.trim() ||
+          !customTown.trim() ||
+          !customProvince.trim()
+        ) {
+          setErrorMsg('Por favor, completa todos los campos obligatorios (*) de la dirección de entrega.');
+          return;
+        }
+
+        finalShippingAddress = [
+          customStreet.trim(),
+          `Nº ${customNumber.trim()}`,
+          customStair.trim() ? `Esc. ${customStair.trim()}` : '',
+          `Piso ${customFloor.trim()}`,
+          `Pta ${customDoor.trim()}`,
+          customPostalCode.trim(),
+          customTown.trim(),
+          `(${customProvince.trim()})`,
+        ]
+          .filter(Boolean)
+          .join(', ');
+      }
+    } else {
+      finalShippingAddress = 'Recogida en tienda física (Gamarra Kalea 4, Lekeitio · Bizkaia)';
     }
 
     setLoading(true);
-    setErrorMsg(null);
 
     const payload = {
       sellerId,
       deliveryType,
-      shippingAddress:
-        deliveryType === 'domicilio'
-          ? address
-          : 'Recogida en tienda física (Gamarra Kalea 4, Lekeitio · Bizkaia)',
+      shippingAddress: finalShippingAddress,
       shippingNotes: notes,
       pickupSchedule: deliveryType === 'recogida_tienda' ? pickupSchedule : undefined,
       items: items.map((i) => ({
@@ -265,62 +285,173 @@ export default function CheckoutPage() {
               </button>
             </div>
 
-            {/* Campos condicionales */}
+            {/* Campos condicionales de Domicilio */}
             {deliveryType === 'domicilio' ? (
               <div className="space-y-4 pt-3 border-t border-stone-100 dark:border-stone-800">
-                {/* Opción de usar dirección del perfil */}
-                {profile && profile.street && (
+                {/* Opción de usar dirección del perfil (POR DEFECTO MARCADA) */}
+                {profile && profile.street ? (
                   <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-2">
                     <label className="flex items-center gap-2.5 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={useProfileAddress}
-                        onChange={(e) => handleToggleProfileAddress(e.target.checked)}
+                        onChange={(e) => setUseProfileAddress(e.target.checked)}
                         className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 cursor-pointer accent-[#C68D07]"
                       />
                       <span className="text-xs font-black text-stone-800 dark:text-stone-200 flex items-center gap-1.5 font-serif">
                         <MapPin className="w-3.5 h-3.5 text-[#C68D07]" />
-                        <span>Usar la dirección habitual de mi perfil</span>
+                        <span>Usar la dirección habitual de mi perfil (Por defecto)</span>
                       </span>
                     </label>
 
                     {useProfileAddress && (
-                      <p className="text-[11px] font-bold text-stone-600 dark:text-stone-300 pl-6 leading-relaxed">
-                        {profile.street}, Nº {profile.number}
-                        {profile.stair ? `, Esc. ${profile.stair}` : ''}
-                        {profile.floor ? `, Piso ${profile.floor}` : ''}
-                        {profile.door ? `, Pta ${profile.door}` : ''} · {profile.postal_code} {profile.town} ({profile.province})
-                      </p>
+                      <div className="pl-6 pt-1 border-t border-stone-200/60 dark:border-stone-700/60">
+                        <p className="text-[11px] font-bold text-stone-700 dark:text-stone-200 leading-relaxed">
+                          {profile.street}, Nº {profile.number}
+                          {profile.stair ? `, Esc. ${profile.stair}` : ''}
+                          {profile.floor ? `, Piso ${profile.floor}` : ''}
+                          {profile.door ? `, Pta ${profile.door}` : ''} · {profile.postal_code} {profile.town} ({profile.province})
+                        </p>
+                      </div>
                     )}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-amber-50/60 dark:bg-amber-950/30 rounded-2xl border border-amber-200 dark:border-amber-800/50 flex items-center justify-between text-xs">
+                    <span className="text-stone-600 dark:text-stone-400 font-medium">
+                      No tienes dirección completa en tu perfil.
+                    </span>
+                    <Link
+                      href="/perfil"
+                      className="font-bold text-[#C68D07] hover:underline"
+                    >
+                      Editar Perfil
+                    </Link>
                   </div>
                 )}
 
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-[11px] font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-                      {t.deliv_shipping_address} *
-                    </label>
-                    {profile && !profile.street && (
-                      <Link
-                        href="/perfil"
-                        className="text-[10px] font-bold text-amber-600 hover:underline"
-                      >
-                        Completar dirección en mi perfil
-                      </Link>
-                    )}
+                {/* Si el usuario desmarca la opción, aparecen los campos de dirección de uno en uno */}
+                {!useProfileAddress && (
+                  <div className="p-4 sm:p-5 bg-stone-50 dark:bg-stone-850 rounded-2xl border border-stone-200 dark:border-stone-700 space-y-4 animate-in fade-in duration-200">
+                    <p className="text-[11px] font-sans font-black uppercase tracking-[0.16em] text-[#C68D07] dark:text-[#FFE259] pb-1">
+                      Nueva Dirección de Entrega (Campos individuales)
+                    </p>
+
+                    {/* Fila 1: Calle y Número */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:col-span-2 space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Calle / Vía *
+                        </label>
+                        <input
+                          type="text"
+                          required={!useProfileAddress}
+                          value={customStreet}
+                          onChange={(e) => setCustomStreet(e.target.value)}
+                          placeholder="Ej: Gamarra Kalea"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Número *
+                        </label>
+                        <input
+                          type="text"
+                          required={!useProfileAddress}
+                          value={customNumber}
+                          onChange={(e) => setCustomNumber(e.target.value)}
+                          placeholder="Ej: 4"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Fila 2: Escalera, Piso, Puerta */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Escalera
+                        </label>
+                        <input
+                          type="text"
+                          value={customStair}
+                          onChange={(e) => setCustomStair(e.target.value)}
+                          placeholder="Opcional"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Piso *
+                        </label>
+                        <input
+                          type="text"
+                          required={!useProfileAddress}
+                          value={customFloor}
+                          onChange={(e) => setCustomFloor(e.target.value)}
+                          placeholder="Ej: 2º"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Puerta *
+                        </label>
+                        <input
+                          type="text"
+                          required={!useProfileAddress}
+                          value={customDoor}
+                          onChange={(e) => setCustomDoor(e.target.value)}
+                          placeholder="Ej: Dcha"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Fila 3: Código Postal, Pueblo, Provincia */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Código Postal *
+                        </label>
+                        <input
+                          type="text"
+                          required={!useProfileAddress}
+                          value={customPostalCode}
+                          onChange={(e) => setCustomPostalCode(e.target.value)}
+                          placeholder="48280"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Pueblo / Municipio *
+                        </label>
+                        <input
+                          type="text"
+                          required={!useProfileAddress}
+                          value={customTown}
+                          onChange={(e) => setCustomTown(e.target.value)}
+                          placeholder="Ej: Lekeitio"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-stone-700 dark:text-stone-300">
+                          Provincia *
+                        </label>
+                        <input
+                          type="text"
+                          required={!useProfileAddress}
+                          value={customProvince}
+                          onChange={(e) => setCustomProvince(e.target.value)}
+                          placeholder="Ej: Bizkaia"
+                          className="w-full px-3.5 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <input
-                    type="text"
-                    required
-                    value={address}
-                    onChange={(e) => {
-                      setAddress(e.target.value);
-                      setUseProfileAddress(false);
-                    }}
-                    placeholder="Calle, número, piso, puerta, código postal y municipio"
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100 placeholder:text-stone-400"
-                  />
-                </div>
+                )}
 
                 <div className="space-y-1">
                   <label className="block text-[11px] font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
@@ -449,6 +580,7 @@ export default function CheckoutPage() {
               <span>Seguir Comprando</span>
             </Link>
 
+            {/* Botón Confirmar Pedido */}
             <button
               type="submit"
               disabled={loading}
