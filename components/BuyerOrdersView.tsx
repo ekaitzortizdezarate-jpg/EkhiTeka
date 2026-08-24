@@ -76,7 +76,6 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
           orders.map((order) => {
             const isDelivery = order.delivery_type === 'domicilio';
             const lastSeen = seenStatuses[order.id];
-            // Se considera actualizado si el estado actual es diferente al último visto (o es nuevo)
             const isUpdated = lastSeen ? lastSeen !== order.status : order.status !== 'pendiente';
 
             return (
@@ -135,8 +134,8 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                   </span>
                 </div>
 
-                {/* FILA 2 — Lista de productos */}
-                <div className="divide-y divide-stone-100 dark:divide-stone-800 bg-stone-50 dark:bg-stone-850 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+                {/* FILA 2 — Lista de productos con soporte para Modo Oscuro */}
+                <div className="divide-y divide-stone-100 dark:divide-stone-800 bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden">
                   {order.order_items?.map((it) => {
                     const prodImg = getProductImage({
                       name: it.products?.name || '',
@@ -153,7 +152,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                           <img
                             src={prodImg}
                             alt={it.products?.name || 'Producto'}
-                            className="w-14 h-14 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0 bg-white"
+                            className="w-14 h-14 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0 bg-white dark:bg-stone-900"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
                             }}
@@ -170,7 +169,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                                 <span>· {it.products.origin_region}</span>
                               )}
                             </div>
-                            <span className="text-[11px] font-bold text-[#C68D07] block mt-0.5">
+                            <span className="text-[11px] font-bold text-[#C68D07] dark:text-[#FFE259] block mt-0.5">
                               {it.quantity} x {Number(it.unit_price).toFixed(2)} €
                             </span>
                           </div>
@@ -185,13 +184,13 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                   })}
                 </div>
 
-                {/* FILA 3 — Tipo de envío + dirección · Fecha de compra */}
+                {/* FILA 3 — Tipo de envío + dirección · Fecha de compra (Modo Oscuro Corregido) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-800 flex items-start gap-2.5">
+                  <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 flex items-start gap-2.5">
                     {isDelivery ? (
-                      <Truck className="w-4 h-4 text-[#C68D07] shrink-0 mt-0.5" />
+                      <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0 mt-0.5" />
                     ) : (
-                      <Store className="w-4 h-4 text-[#C68D07] shrink-0 mt-0.5" />
+                      <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0 mt-0.5" />
                     )}
                     <div>
                       <span className="font-bold text-stone-900 dark:text-stone-100 block">
@@ -206,8 +205,8 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                     </div>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-800 flex items-start gap-2.5">
-                    <Clock className="w-4 h-4 text-[#C68D07] shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 flex items-start gap-2.5">
+                    <Clock className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-stone-900 dark:text-stone-100 block">
                         {t.orders_purchase_date}
@@ -229,7 +228,6 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
 
                 {/* FILA 4 — Nº pedido + Chat (izq) · Precio total (der) */}
                 <div className="flex items-center justify-between gap-3 pt-3 border-t border-stone-100 dark:border-stone-800">
-                  {/* Izquierda: Nº pedido y chat apilados */}
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-1.5">
                       <Package className="w-3.5 h-3.5 text-stone-400" />
@@ -249,9 +247,8 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                     </Link>
                   </div>
 
-                  {/* Derecha: Precio total centrado verticalmente */}
                   <div className="flex flex-col items-end justify-center">
-                    <span className="text-[11px] font-bold text-stone-500">Total</span>
+                    <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400">Total</span>
                     <span className="text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
                       {Number(order.total_price).toFixed(2)} €
                     </span>

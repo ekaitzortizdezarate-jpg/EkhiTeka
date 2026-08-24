@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { signout } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
+import { CartNavButton } from '@/components/CartNavButton';
 import {
   Package,
   MessageCircle,
@@ -68,8 +69,6 @@ export function NavbarNavLinks({
         if (lastSeen) {
           return lastSeen !== order.status;
         }
-        // If not registered in localStorage yet:
-        // For seller, pending orders need attention. For buyer, changes from 'pendiente' need attention.
         return isSeller ? order.status === 'pendiente' : order.status !== 'pendiente';
       });
 
@@ -97,152 +96,161 @@ export function NavbarNavLinks({
   }, [mobileMenuOpen]);
 
   return (
-    <div className="flex items-center gap-4 sm:gap-8 min-w-0">
-      {/* Botón Menú Móvil */}
-      <button
-        type="button"
-        onClick={() => setMobileMenuOpen(true)}
-        className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
-        aria-label="Abrir menú de navegación"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
-
-      {/* Logotipo Oficial EkhiTeka con Logo.jpg */}
-      <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-        <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
-          <img
-            src="/Logo.jpg"
-            alt="EkhiTeka Logo"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="font-serif font-black text-lg sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
-            Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
-          </span>
-          <span className="hidden sm:block text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-            Quesería & Selección Gourmet · Lekeitio
-          </span>
-        </div>
-      </Link>
-
-      {/* Enlaces Principales (Estilo Maison du Monde: estilizado, centrado y refinado en 2 líneas) */}
-      <nav className="hidden lg:flex items-center gap-1 font-serif">
-        <Link
-          href="/tienda"
-          className={`flex items-center justify-center text-center px-3.5 py-2 rounded-2xl tracking-[0.16em] uppercase text-[10.5px] font-bold transition-all whitespace-nowrap ${
-            pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-              : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-          }`}
+    <div className="flex items-center justify-between w-full min-w-0">
+      {/* 1. LADO IZQUIERDO: Botón Móvil, Logotipo y Enlaces */}
+      <div className="flex items-center gap-4 sm:gap-8 min-w-0">
+        {/* Botón Menú Móvil */}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
+          aria-label="Abrir menú de navegación"
         >
-          <span>{t.nav_shop}</span>
+          <Menu className="w-6 h-6" />
+        </button>
+
+        {/* Logotipo Oficial EkhiTeka */}
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
+          <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
+            <img
+              src="/Logo.jpg"
+              alt="EkhiTeka Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="font-serif font-black text-lg sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
+              Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
+            </span>
+            <span className="hidden sm:block text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
+              Quesería & Selección Gourmet · Lekeitio
+            </span>
+          </div>
         </Link>
 
-        <Link
-          href="/regalos-gourmet"
-          className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
-            pathname === '/regalos-gourmet'
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-              : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-          }`}
-        >
-          <span className="block text-center">Regalos</span>
-          <span className="block text-center">Gourmet</span>
-        </Link>
+        {/* Enlaces Principales */}
+        <nav className="hidden lg:flex items-center gap-1 font-serif">
+          <Link
+            href="/tienda"
+            className={`flex items-center justify-center text-center px-3.5 py-2 rounded-2xl tracking-[0.16em] uppercase text-[10.5px] font-bold transition-all whitespace-nowrap ${
+              pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span>{t.nav_shop}</span>
+          </Link>
 
-        <Link
-          href="/experiencias"
-          className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
-            pathname === '/experiencias'
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-              : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-          }`}
-        >
-          <span className="block text-center">Catas &</span>
-          <span className="block text-center">Experiencias</span>
-        </Link>
+          <Link
+            href="/regalos-gourmet"
+            className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+              pathname === '/regalos-gourmet'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span className="block text-center">Regalos</span>
+            <span className="block text-center">Gourmet</span>
+          </Link>
 
-        <Link
-          href="/regalos-empresa"
-          className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
-            pathname === '/regalos-empresa'
-              ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-              : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-          }`}
-        >
-          <span className="block text-center">Regalos de</span>
-          <span className="block text-center">Empresa</span>
-        </Link>
+          <Link
+            href="/experiencias"
+            className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+              pathname === '/experiencias'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span className="block text-center">Catas &</span>
+            <span className="block text-center">Experiencias</span>
+          </Link>
 
-        {user && (
-          <>
-            {/* Pedidos */}
-            <Link
-              href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-              className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
-                pathname.includes('/pedidos')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                  : hasUnseenOrderUpdates
-                  ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
-                  : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-              }`}
-            >
-              <Package className="w-3.5 h-3.5" />
-              <span>{t.nav_orders}</span>
-              {hasUnseenOrderUpdates && (
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
-              )}
-            </Link>
+          <Link
+            href="/regalos-empresa"
+            className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+              pathname === '/regalos-empresa'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span className="block text-center">Regalos de</span>
+            <span className="block text-center">Empresa</span>
+          </Link>
 
-            {/* Mensajes / Chat */}
-            <Link
-              href="/chat"
-              className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
-                pathname.startsWith('/chat')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                  : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-              }`}
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>{t.nav_chats}</span>
-              {unreadMessagesCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center animate-pulse">
-                  {unreadMessagesCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Vendedor: Añadir Producto */}
-            {isSeller && (
+          {user && (
+            <>
+              {/* Pedidos */}
               <Link
-                href="/vendedor/productos/nuevo"
-                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102 whitespace-nowrap"
+                href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
+                className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+                  pathname.includes('/pedidos')
+                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                    : hasUnseenOrderUpdates
+                    ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
+                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                }`}
               >
-                <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>+ {t.seller_new_product}</span>
+                <Package className="w-3.5 h-3.5" />
+                <span>{t.nav_orders}</span>
+                {hasUnseenOrderUpdates && (
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
+                )}
               </Link>
-            )}
 
-            {/* Admin */}
-            {isAdmin && (
+              {/* Mensajes / Chat */}
               <Link
-                href="/admin"
-                className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-full transition-all font-semibold uppercase tracking-[0.16em] text-[11px] whitespace-nowrap"
+                href="/chat"
+                className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+                  pathname.startsWith('/chat')
+                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                }`}
               >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{t.nav_admin}</span>
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>{t.nav_chats}</span>
+                {unreadMessagesCount > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center animate-pulse">
+                    {unreadMessagesCount}
+                  </span>
+                )}
               </Link>
-            )}
-          </>
-        )}
-      </nav>
 
-      {/* Menú Usuario */}
-      <div className="flex items-center gap-2">
+              {/* Vendedor: Añadir Producto */}
+              {isSeller && (
+                <Link
+                  href="/vendedor/productos/nuevo"
+                  className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102 whitespace-nowrap"
+                >
+                  <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>+ {t.seller_new_product}</span>
+                </Link>
+              )}
+
+              {/* Admin */}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-full transition-all font-semibold uppercase tracking-[0.16em] text-[11px] whitespace-nowrap"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>{t.nav_admin}</span>
+                </Link>
+              )}
+            </>
+          )}
+        </nav>
+      </div>
+
+      {/* 2. LADO DERECHO: Menú Usuario (Orden visual de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta) */}
+      <div className="flex items-center gap-2 shrink-0">
         {user ? (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            {/* 3º de derecha a izquierda: Cesta */}
+            {(!profile || profile.role === 'comprador') && (
+              <CartNavButton />
+            )}
+
+            {/* 2º de derecha a izquierda: Perfil */}
             <Link
               href="/perfil"
               className="p-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
@@ -250,6 +258,8 @@ export function NavbarNavLinks({
             >
               <User className="w-4 h-4" />
             </Link>
+
+            {/* 1º de derecha a izquierda (Extremo Derecho): Cerrar Sesión */}
             <form action={signout}>
               <button
                 type="submit"
@@ -261,6 +271,7 @@ export function NavbarNavLinks({
             </form>
           </div>
         ) : (
+          /* Sin sesión: la cesta no aparece en absoluto */
           <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/login"
@@ -278,7 +289,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* Mobile Navigation Drawer (Montado directamente en document.body con máximo contraste y legibilidad) */}
+      {/* 3. Mobile Navigation Drawer con createPortal */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           {/* Overlay */}
@@ -287,7 +298,7 @@ export function NavbarNavLinks({
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Drawer Content - High contrast gourmet palette */}
+          {/* Drawer Content */}
           <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
               {/* Header Drawer */}
@@ -319,7 +330,7 @@ export function NavbarNavLinks({
                 </button>
               </div>
 
-              {/* Navigation Links - Maison du Monde centered uppercase typography */}
+              {/* Navigation Links */}
               <div className="space-y-2 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Explorar Selección
@@ -461,7 +472,7 @@ export function NavbarNavLinks({
               </div>
             </div>
 
-            {/* Bottom contact info in drawer */}
+            {/* Información de Contacto en Pie del Drawer */}
             <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
               <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
                 <Store className="w-3.5 h-3.5 text-[#FFE259]" />
@@ -477,4 +488,3 @@ export function NavbarNavLinks({
     </div>
   );
 }
-

@@ -3,7 +3,6 @@ import { type Profile, parseProfile } from '@/types/database';
 import { NavbarNavLinks } from '@/components/NavbarNavLinks';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ThemeSelector } from '@/components/ThemeSelector';
-import { CartNavButton } from '@/components/CartNavButton';
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -16,7 +15,6 @@ export default async function Navbar() {
   let ordersCount = 0;
   let activeOrders: { id: string; status: string }[] = [];
 
-  // Consultar perfil del vendedor para la dirección dinámica en la sub-barra
   const { data: sellerRaw } = await supabase
     .from('profiles')
     .select('*')
@@ -64,16 +62,9 @@ export default async function Navbar() {
           ordersCount={ordersCount}
           activeOrders={activeOrders}
         />
-
-        {/* Acciones Derecha */}
-        <div className="flex items-center gap-2.5">
-          {(!profile || profile.role === 'comprador') && (
-            <CartNavButton />
-          )}
-        </div>
       </div>
 
-      {/* Sub-barra de Utilidades con dirección dinámica del vendedor */}
+      {/* Sub-barra de Utilidades */}
       <div className="border-t border-[#E8E5DF]/70 dark:border-stone-800/80 bg-[#FAF8F5]/80 dark:bg-[#141312]/80 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
           <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
