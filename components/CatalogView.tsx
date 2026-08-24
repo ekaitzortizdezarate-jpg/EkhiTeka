@@ -68,30 +68,31 @@ export function CatalogView({
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero Editorial Gourmet (Inspiración La Manducateca con fondo Tienda.JPG) */}
-      <section className="relative rounded-3xl bg-[#1D1D1B] text-white overflow-hidden p-8 sm:p-14 lg:p-16 border border-stone-800 shadow-2xl">
-        {/* Imagen de fondo Tienda.JPG con overlay oscuro gourmet */}
+      {/* 1. Hero Editorial Gourmet con fondo Tienda.JPG visible */}
+      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[420px] flex items-center">
+        {/* Imagen de fondo Tienda.JPG con overlay equilibrado para máxima visibilidad y legibilidad */}
         <div className="absolute inset-0 z-0">
           <img
             src="/images/secciones/Tienda.JPG"
             alt="Tienda EkhiTeka Lekeitio"
-            className="w-full h-full object-cover object-center brightness-40 contrast-115 scale-102"
+            className="w-full h-full object-cover object-center scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1D1D1B]/95 via-[#1D1D1B]/85 to-[#1D1D1B]/60" />
+          {/* Overlay suave para resaltar los textos sin tapar la foto */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/40 backdrop-brightness-90" />
         </div>
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
           <div className="lg:col-span-8 space-y-5">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-xs">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md">
               <Sparkles className="w-3.5 h-3.5" /> Quesería Gourmet & Tienda Artesana · Lekeitio
             </span>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif sm:font-sans">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif sm:font-sans text-white drop-shadow-md">
               Quesos y regalos <br className="hidden sm:inline" />
-              <span className="text-[#FFE259]">gastronómicos</span> en Lekeitio
+              <span className="text-[#FFE259] drop-shadow-sm">gastronómicos</span> en Lekeitio
             </h1>
 
-            <p className="text-sm sm:text-base text-stone-200 leading-relaxed max-w-xl font-normal drop-shadow-xs">
+            <p className="text-sm sm:text-base text-white/95 leading-relaxed max-w-xl font-medium drop-shadow-md">
               No somos una tienda gourmet cualquiera. En nuestra web ves una parte, en nuestra quesería de Lekeitio, todo. Quesos de autor afinados, anchoas del Cantábrico y maridajes únicos.
             </p>
 
@@ -99,7 +100,7 @@ export function CatalogView({
               <button
                 type="button"
                 onClick={scrollToCatalog}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-lg hover:scale-105 cursor-pointer uppercase tracking-wider"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider"
               >
                 <span>VER NUESTROS QUESOS</span>
                 <ArrowDown className="w-4 h-4" />
@@ -109,7 +110,7 @@ export function CatalogView({
                 href="https://wa.me/34600000000?text=Hola,%20quisiera%20hacer%20un%20encargo%20a%20medida"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-black/40 hover:bg-black/60 text-white font-bold text-xs sm:text-sm border border-white/30 transition-all backdrop-blur-md"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-black/60 hover:bg-black/80 text-white font-black text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4 text-[#FFE259]" />
                 <span>Encargos por WhatsApp</span>
@@ -127,15 +128,12 @@ export function CatalogView({
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#FFE259] text-[#1D1D1B] px-4 py-1 rounded-full text-[11px] font-black uppercase tracking-widest whitespace-nowrap shadow-md border border-stone-900">
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#FFE259] text-[#1D1D1B] px-4 py-1 rounded-full text-[11px] font-black uppercase tracking-widest whitespace-nowrap shadow-xl border-2 border-stone-900">
                 Afinado Artesano
               </div>
             </div>
           </div>
         </div>
-
-        {/* Decoración de fondo */}
-        <div className="absolute -bottom-14 -right-14 w-80 h-80 rounded-full bg-[#FFE259]/10 pointer-events-none blur-3xl" />
       </section>
 
       {/* 2. Sección "¿Qué te apetece hoy?" con Tarjetas Interactivas */}

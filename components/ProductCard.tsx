@@ -66,7 +66,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
         {/* Badge de Selección Artesana */}
         <span className="absolute top-3 right-3 px-2 py-0.5 bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black rounded-lg uppercase tracking-tight shadow-xs">
-          {isSeller ? 'Gestión' : 'Artisau'}
+          Artisau
         </span>
 
         {/* Badge de Formato */}

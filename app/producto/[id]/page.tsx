@@ -157,30 +157,16 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               </div>
             )}
 
-            {/* Botón interactivo de añadir a la cesta o Panel de Gestión para Vendedor */}
+            {/* Botón interactivo de añadir a la cesta o Editar para Vendedor */}
             {isSeller ? (
-              <div className="p-5 rounded-2xl bg-[#FFE259]/15 border-2 border-[#FFE259] space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase tracking-wider text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-[#C68D07]" />
-                    <span>Panel de Gestión EkhiTeka</span>
-                  </span>
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] uppercase">
-                    Modo Vendedor
-                  </span>
-                </div>
-                <p className="text-xs text-stone-600 dark:text-stone-300 font-medium">
-                  Como vendedor puedes actualizar los detalles, precios, stock o eliminar este producto del catálogo general.
-                </p>
-                <div className="flex flex-wrap items-center gap-3 pt-2">
-                  <Link
-                    href={`/vendedor/productos/${product.id}/editar`}
-                    className="flex-1 py-3 px-4 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 hover:scale-102"
-                  >
-                    <Pencil className="w-4 h-4" />
-                    <span>Editar Ficha de Producto</span>
-                  </Link>
-                </div>
+              <div className="pt-2">
+                <Link
+                  href={`/vendedor/productos/${product.id}/editar`}
+                  className="w-full py-3.5 px-5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 hover:scale-101"
+                >
+                  <Pencil className="w-4 h-4" />
+                  <span>Editar Producto</span>
+                </Link>
               </div>
             ) : (
               <ProductDetailAddToCart product={product} />
