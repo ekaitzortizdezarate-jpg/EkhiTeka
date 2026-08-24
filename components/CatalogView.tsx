@@ -120,17 +120,12 @@ export function CatalogView({
 
           {/* Logo Oficial EkhiTeka destacado en Hero */}
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="relative group">
-              <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] group-hover:scale-105 transition-transform duration-500">
-                <img
-                  src="/Logo.jpg"
-                  alt="EkhiTeka Lekeitio"
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </div>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#FFE259] text-[#1D1D1B] px-4 py-1 rounded-full text-[11px] font-black uppercase tracking-widest whitespace-nowrap shadow-xl border-2 border-stone-900">
-                Afinado Artesano
-              </div>
+            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] hover:scale-105 transition-transform duration-500">
+              <img
+                src="/Logo.jpg"
+                alt="EkhiTeka Lekeitio"
+                className="w-full h-full object-cover rounded-full"
+              />
             </div>
           </div>
         </div>
