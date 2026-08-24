@@ -313,7 +313,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-101"
+              className="w-full py-4 px-4 bg-[#FFE259] hover:bg-[#F5D742] active:bg-[#E5C428] disabled:opacity-50 text-[#1D1D1B] font-black text-sm uppercase tracking-wider rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-101"
             >
               {loading ? (
                 <span>{t.common_loading}</span>

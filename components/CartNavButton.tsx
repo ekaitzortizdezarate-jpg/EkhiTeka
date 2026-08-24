@@ -12,13 +12,13 @@ export function CartNavButton() {
     <button
       type="button"
       onClick={() => setIsCartOpen(true)}
-      className="relative flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 hover:bg-amber-500/20 dark:hover:bg-amber-500/30 border-2 border-amber-500/40 rounded-2xl font-black text-xs transition-all shadow-2xs cursor-pointer hover:scale-102"
+      className="relative flex items-center gap-2 px-3.5 py-2 bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-850 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 dark:hover:text-stone-900 border border-stone-300 dark:border-stone-700 hover:border-[#FFE259] rounded-2xl font-black text-xs transition-all shadow-2xs cursor-pointer hover:scale-102"
       title={t.nav_cart}
     >
-      <ShoppingBag className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-      <span className="hidden sm:inline">{t.nav_cart}</span>
+      <ShoppingBag className="w-4 h-4 text-stone-800 dark:text-stone-200 group-hover:text-stone-900" />
+      <span className="hidden sm:inline font-bold">{t.nav_cart}</span>
       {totalItems > 0 && (
-        <span className="w-5 h-5 rounded-full bg-amber-600 text-white font-black text-[11px] flex items-center justify-center shadow-xs ml-0.5 animate-bounce">
+        <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[11px] flex items-center justify-center shadow-xs border border-stone-800 animate-bounce">
           {totalItems}
         </span>
       )}

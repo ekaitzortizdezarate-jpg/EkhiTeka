@@ -113,7 +113,7 @@ export function CartDrawer() {
                 <button
                   type="button"
                   onClick={() => setIsCartOpen(false)}
-                  className="mt-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
+                  className="mt-2 px-5 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs rounded-xl shadow-xs transition-all"
                 >
                   {t.cart_explore_btn}
                 </button>
@@ -128,7 +128,7 @@ export function CartDrawer() {
                 <span className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
                   {t.cart_total}:
                 </span>
-                <span className="text-xl font-black text-amber-950 dark:text-amber-300">
+                <span className="text-xl font-black text-[#1D1D1B] dark:text-[#FFE259]">
                   {totalPrice.toFixed(2)} €
                 </span>
               </div>
@@ -136,7 +136,7 @@ export function CartDrawer() {
               <Link
                 href="/cesta"
                 onClick={() => setIsCartOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-black text-sm rounded-2xl shadow-md transition-all hover:scale-101"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-sm rounded-2xl shadow-md transition-all hover:scale-101 uppercase tracking-wider"
               >
                 <span>{t.cart_checkout}</span>
                 <ArrowRight className="w-4 h-4" />

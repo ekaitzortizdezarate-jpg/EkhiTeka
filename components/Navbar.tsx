@@ -37,27 +37,27 @@ export default async function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b-2 border-stone-200 dark:border-stone-800 shadow-xs transition-colors">
-      {/* 1. Top Banner Avisos Gourmet (La Manducateca style) */}
-      <div className="bg-amber-600 dark:bg-amber-700 text-white text-[11px] font-extrabold py-1.5 px-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 shrink-0">
-            <Truck className="w-3.5 h-3.5" />
-            <span>Envío refrigerado 24/48h · Bidalpen hoztua</span>
+    <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 dark:bg-[#141312]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-stone-800 shadow-xs transition-colors">
+      {/* 1. Top Banner Avisos Gourmet (La Manducateca signature yellow banner) */}
+      <div className="bg-[#FFE259] text-[#1D1D1B] text-[11px] font-black py-2 px-4 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 shrink-0">
+            <Truck className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>Envío refrigerado 24/48h en península · Bidalpen hoztua</span>
           </div>
-          <div className="hidden md:flex items-center gap-1.5 shrink-0">
-            <Store className="w-3.5 h-3.5" />
-            <span>Recogida gratuita en tienda · Dendan jasotzea</span>
+          <div className="hidden md:flex items-center gap-2 shrink-0">
+            <Store className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>Recogida gratuita en tienda · Dendan doako jasotzea</span>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Selección de autor · Artisau produktuak</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>Encargos y tablas a medida por WhatsApp</span>
           </div>
         </div>
       </div>
 
       {/* 2. Barra Principal de Navegación */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-22 flex items-center justify-between gap-4">
         <NavbarNavLinks
           user={user}
           profile={profile}
@@ -66,9 +66,9 @@ export default async function Navbar() {
         />
 
         {/* Acciones Derecha */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <CartNavButton />
-          <div className="hidden sm:flex items-center gap-1.5 pl-2 border-l border-stone-200 dark:border-stone-700">
+          <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-stone-200 dark:border-stone-800">
             <ThemeSelector />
             <LanguageSelector />
           </div>
@@ -76,9 +76,12 @@ export default async function Navbar() {
       </div>
 
       {/* 3. Sub-barra móvil para selectores de idioma y tema */}
-      <div className="sm:hidden border-t border-stone-100 dark:border-stone-800/80 bg-stone-50/80 dark:bg-stone-950/80 px-3 py-1 flex items-center justify-end gap-1.5">
-        <ThemeSelector />
-        <LanguageSelector />
+      <div className="sm:hidden border-t border-stone-200/60 dark:border-stone-800/80 bg-stone-50/90 dark:bg-stone-950/90 px-4 py-1.5 flex items-center justify-between text-xs">
+        <span className="text-[11px] font-bold text-stone-500">EkhiTeka Gourmet Bilbao</span>
+        <div className="flex items-center gap-1.5">
+          <ThemeSelector />
+          <LanguageSelector />
+        </div>
       </div>
     </header>
   );

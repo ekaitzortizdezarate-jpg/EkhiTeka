@@ -1,20 +1,24 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { signout } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
 import {
-  Store,
-  ShoppingBag,
   Package,
   MessageCircle,
   ShieldCheck,
   PlusCircle,
   User,
   LogOut,
-  LogIn,
+  Menu,
+  X,
+  Sparkles,
+  Phone,
+  Store,
+  ChevronRight,
 } from 'lucide-react';
 
 interface NavbarNavLinksProps {
@@ -32,38 +36,67 @@ export function NavbarNavLinks({
 }: NavbarNavLinksProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isSeller = profile?.role === 'vendedor';
   const isAdmin = profile?.role === 'admin';
 
   return (
-    <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-      {/* Logotipo Editorial Gourmet */}
-      <Link href="/" className="flex items-center gap-2 shrink-0 group">
-        <div className="w-10 h-10 rounded-2xl bg-amber-500/15 dark:bg-amber-500/25 border-2 border-amber-500/40 flex items-center justify-center text-xl shadow-2xs group-hover:scale-105 transition-transform">
-          🧀
+    <div className="flex items-center gap-4 sm:gap-8 min-w-0">
+      {/* Botón Menú Móvil */}
+      <button
+        type="button"
+        onClick={() => setMobileMenuOpen(true)}
+        className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
+        aria-label="Abrir menú de navegación"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
+
+      {/* Logotipo Oficial EkhiTeka con Logo.jpg */}
+      <Link href="/" className="flex items-center gap-3 shrink-0 group">
+        <div className="relative w-11 h-11 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2]">
+          <img
+            src="/Logo.jpg"
+            alt="EkhiTeka Logo"
+            className="w-full h-full object-cover"
+          />
         </div>
-        <div>
-          <span className="font-black text-lg sm:text-2xl tracking-tight text-stone-900 dark:text-stone-100 block leading-tight">
-            Ekhi<span className="text-amber-600 dark:text-amber-400">Teka</span>
+        <div className="flex flex-col">
+          <span className="font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight font-serif sm:font-sans">
+            Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
           </span>
-          <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-stone-500 dark:text-stone-400 block -mt-0.5">
-            Gourmet · Bilbao
+          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-stone-500 dark:text-stone-400 block -mt-0.5">
+            Quesería & Selección Gourmet · Bilbao
           </span>
         </div>
       </Link>
 
-      {/* Enlaces Principales */}
-      <nav className="hidden lg:flex items-center gap-1 text-xs font-black">
+      {/* Enlaces Principales (Estilo La Manducateca) */}
+      <nav className="hidden lg:flex items-center gap-1.5 text-xs font-black">
         <Link
           href="/"
-          className={`px-3 py-2 rounded-xl transition-all ${
+          className={`px-3.5 py-2 rounded-xl transition-all ${
             pathname === '/'
-              ? 'bg-amber-600 text-white shadow-2xs'
+              ? 'bg-[#FFE259] text-[#1D1D1B] shadow-2xs'
               : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
           }`}
         >
           {t.nav_shop}
+        </Link>
+
+        <Link
+          href="/#experiencias"
+          className="px-3.5 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        >
+          Catas & Experiencias
+        </Link>
+
+        <Link
+          href="/#opiniones"
+          className="px-3.5 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        >
+          Opiniones
         </Link>
 
         {user && (
@@ -71,16 +104,16 @@ export function NavbarNavLinks({
             {/* Pedidos */}
             <Link
               href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-              className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all ${
+              className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
                 pathname.includes('/pedidos')
-                  ? 'bg-amber-600 text-white shadow-2xs'
+                  ? 'bg-[#FFE259] text-[#1D1D1B] shadow-2xs'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
               <Package className="w-4 h-4" />
               <span>{t.nav_orders}</span>
               {ordersCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-amber-500 text-stone-950 text-[10px] font-black flex items-center justify-center animate-pulse">
+                <span className="w-4 h-4 rounded-full bg-[#FFE259] text-stone-950 text-[10px] font-black flex items-center justify-center border border-stone-800 animate-pulse">
                   {ordersCount}
                 </span>
               )}
@@ -89,9 +122,9 @@ export function NavbarNavLinks({
             {/* Mensajes / Chat */}
             <Link
               href="/chat"
-              className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all ${
+              className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
                 pathname.startsWith('/chat')
-                  ? 'bg-amber-600 text-white shadow-2xs'
+                  ? 'bg-[#FFE259] text-[#1D1D1B] shadow-2xs'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
@@ -108,7 +141,7 @@ export function NavbarNavLinks({
             {isSeller && (
               <Link
                 href="/vendedor/productos/nuevo"
-                className="flex items-center gap-1 px-3 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl transition-all shadow-2xs font-bold"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl transition-all shadow-2xs font-bold"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>{t.seller_new_product}</span>
@@ -119,7 +152,7 @@ export function NavbarNavLinks({
             {isAdmin && (
               <Link
                 href="/admin"
-                className="flex items-center gap-1 px-3 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-xl transition-all font-black"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-xl transition-all font-black"
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>{t.nav_admin}</span>
@@ -132,7 +165,7 @@ export function NavbarNavLinks({
       {/* Menú Usuario */}
       <div className="flex items-center gap-2">
         {user ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <Link
               href="/perfil"
               className="p-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
@@ -151,22 +184,153 @@ export function NavbarNavLinks({
             </form>
           </div>
         ) : (
-          <div className="flex items-center gap-1.5">
+          <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/login"
-              className="px-3 py-1.5 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="px-3.5 py-2 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             >
               {t.nav_login}
             </Link>
             <Link
               href="/register"
-              className="px-3 py-1.5 text-xs font-black bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-900 rounded-xl transition-all shadow-2xs"
+              className="px-3.5 py-2 text-xs font-black bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-xl transition-all shadow-2xs"
             >
               {t.nav_register}
             </Link>
           </div>
         )}
       </div>
+
+      {/* Mobile Navigation Drawer (La Manducateca style) */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Drawer Content */}
+          <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-stone-900 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto">
+            <div className="space-y-6">
+              {/* Header Drawer */}
+              <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/Logo.jpg"
+                    alt="EkhiTeka"
+                    className="w-10 h-10 rounded-full object-cover border border-stone-300"
+                  />
+                  <span className="font-black text-lg text-stone-900 dark:text-stone-100">
+                    Ekhi<span className="text-[#C68D07]">Teka</span>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1.5 rounded-xl text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-800"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-wider text-stone-400">
+                  Explorar Catálogo
+                </p>
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-stone-800 font-black text-sm text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
+                >
+                  <span>🧀 {t.nav_shop}</span>
+                  <ChevronRight className="w-4 h-4 text-stone-400" />
+                </Link>
+                <Link
+                  href="/#experiencias"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-stone-800 font-black text-sm text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700"
+                >
+                  <span>🍷 Catas & Talleres</span>
+                  <ChevronRight className="w-4 h-4 text-stone-400" />
+                </Link>
+                <Link
+                  href="/#opiniones"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-stone-800 font-black text-sm text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700"
+                >
+                  <span>⭐ Opiniones Clientes</span>
+                  <ChevronRight className="w-4 h-4 text-stone-400" />
+                </Link>
+              </div>
+
+              {/* User Links */}
+              <div className="space-y-2 pt-4 border-t border-stone-200 dark:border-stone-800">
+                <p className="text-[10px] font-black uppercase tracking-wider text-stone-400">
+                  Tu Cuenta
+                </p>
+                {user ? (
+                  <>
+                    <Link
+                      href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 p-2.5 rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                    >
+                      <Package className="w-4 h-4" />
+                      <span>{t.nav_orders}</span>
+                    </Link>
+                    <Link
+                      href="/chat"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 p-2.5 rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{t.nav_chats}</span>
+                    </Link>
+                    <Link
+                      href="/perfil"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 p-2.5 rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>{t.nav_profile}</span>
+                    </Link>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-center py-2.5 px-3 rounded-xl border border-stone-300 font-black text-xs text-stone-800 dark:text-stone-200"
+                    >
+                      {t.nav_login}
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-center py-2.5 px-3 rounded-xl bg-[#FFE259] font-black text-xs text-[#1D1D1B]"
+                    >
+                      {t.nav_register}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom contact info in drawer */}
+            <div className="pt-6 border-t border-stone-200 dark:border-stone-800 text-[11px] text-stone-500 space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-stone-700 dark:text-stone-300">
+                <Store className="w-3.5 h-3.5 text-[#C68D07]" />
+                <span>Tienda física en Bilbao</span>
+              </div>
+              <p>Gran Vía 14, Bilbao · Bizkaia</p>
+              <p>WhatsApp: +34 600 000 000</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

@@ -1,20 +1,35 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-dm-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-manduca-yellow: #FFE259;
+  --color-manduca-yellow-hover: #F5D742;
+  --color-manduca-yellow-light: #FFF9DE;
+  --color-manduca-dark: #1D1D1B;
+  --color-manduca-cream: #FAF7F2;
+  --color-manduca-border: #E8E5DF;
+}
+
 @layer base {
   :root {
     --background: #FAF8F5;
     --foreground: #1D1D1B;
+    --card-bg: #FFFFFF;
+    --accent-yellow: #FFE259;
   }
 
   .dark {
     --background: #141312;
     --foreground: #F5F5F0;
+    --card-bg: #1F1E1C;
+    --accent-yellow: #FFE259;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: var(--font-dm-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -27,11 +42,35 @@
   scrollbar-width: none;
 }
 
+/* Smooth card transitions & hover lifts */
+.manduca-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+}
+
+.manduca-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
+}
+
+.manduca-btn-yellow {
+  background-color: #FFE259;
+  color: #1D1D1B;
+  font-weight: 800;
+  transition: all 0.25s ease;
+}
+
+.manduca-btn-yellow:hover {
+  background-color: #F5D742;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 226, 89, 0.35);
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+

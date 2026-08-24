@@ -28,31 +28,36 @@ export function ProductCard({ product }: ProductCardProps) {
   const sellerId = product.seller_id;
 
   return (
-    <article aria-label={product.name} className="group relative bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 hover:border-amber-500/50 dark:hover:border-amber-500/50 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
+    <article aria-label={product.name} className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col overflow-hidden">
       {/* 1. Imagen y Badges */}
-      <div className="relative aspect-4/3 w-full bg-stone-100 dark:bg-stone-850 overflow-hidden">
+      <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden">
         {product.image_url ? (
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-4xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600">
+          <div className="w-full h-full flex items-center justify-center text-5xl bg-[#FFE259]/15 text-[#1D1D1B] dark:text-[#FFE259]">
             🧀
           </div>
         )}
 
         {/* Badge de Origen */}
         {product.origin_region && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 bg-black/70 backdrop-blur-xs text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-xs">
-            <MapPin className="w-3 h-3 text-amber-400" />
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/80 backdrop-blur-xs text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-xs">
+            <MapPin className="w-3 h-3 text-[#FFE259]" />
             {product.origin_region}
           </span>
         )}
 
+        {/* Badge de Selección Artesana */}
+        <span className="absolute top-3 right-3 px-2 py-0.5 bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black rounded-lg uppercase tracking-tight shadow-xs">
+          Artisau
+        </span>
+
         {/* Badge de Formato */}
-        <span className="absolute bottom-3 left-3 px-2.5 py-0.5 bg-white/90 dark:bg-stone-900/90 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] font-bold rounded-lg uppercase tracking-tight shadow-xs border border-stone-200/50 dark:border-stone-700/50">
+        <span className="absolute bottom-3 left-3 px-2.5 py-0.5 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] font-bold rounded-lg uppercase tracking-tight shadow-xs border border-stone-200/60 dark:border-stone-700/60">
           {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
         </span>
       </div>
@@ -60,16 +65,16 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* 2. Información del Producto */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
         <div className="space-y-1">
-          <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400 truncate">
+          <p className="text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider truncate">
             {sellerName}
           </p>
-          <Link href={`/producto/${product.id}`} className="block group-hover:text-amber-600 transition-colors">
+          <Link href={`/producto/${product.id}`} className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
             <h2 className="font-black text-stone-900 dark:text-stone-100 text-sm sm:text-base leading-snug line-clamp-2">
               {product.name}
             </h2>
           </Link>
           {product.description && (
-            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed pt-0.5">
+            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed pt-0.5 font-medium">
               {product.description}
             </p>
           )}
@@ -81,7 +86,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
               {t.prod_price}
             </span>
-            <span className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100">
+            <span className="text-base sm:text-lg font-black text-[#1D1D1B] dark:text-stone-100">
               {Number(product.price).toFixed(2)} €
             </span>
           </div>
@@ -90,20 +95,20 @@ export function ProductCard({ product }: ProductCardProps) {
             {/* Botón de Consulta por Chat */}
             <Link
               href={`/chat/${sellerId}?product_id=${product.id}`}
-              className="p-2.5 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700"
+              className="p-2.5 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700"
               title={t.prod_ask_artisan}
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-200" />
             </Link>
 
-            {/* Botón de Añadir a Cesta */}
+            {/* Botón de Añadir a Cesta (La Manducateca signature yellow) */}
             <button
               type="button"
               onClick={handleQuickAdd}
               className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs transition-all shadow-xs active:scale-95 cursor-pointer ${
                 added
                   ? 'bg-emerald-700 text-white'
-                  : 'bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white hover:scale-102'
+                  : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-102'
               }`}
             >
               {added ? (
@@ -114,7 +119,7 @@ export function ProductCard({ product }: ProductCardProps) {
               ) : (
                 <>
                   <ShoppingBag className="w-4 h-4" />
-                  <span className="hidden sm:inline">{t.prod_add_to_cart}</span>
+                  <span className="hidden sm:inline font-bold">{t.prod_add_to_cart}</span>
                 </>
               )}
             </button>
