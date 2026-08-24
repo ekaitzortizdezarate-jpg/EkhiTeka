@@ -16,7 +16,7 @@ export function ExperienceBanners() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Banner 1: Catas en Bilbao */}
+        {/* Banner 1: Catas en Lekeitio */}
         <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
           <div className="space-y-4">
             {/* Foto Cabecera de la Experiencia */}
@@ -43,7 +43,7 @@ export function ExperienceBanners() {
                 Catas Presenciales & Talleres
               </h3>
               <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
-                Aprende a degustar quesos artesanales internacionales y locales, maridados con sidras naturales, txakolis y vinos de autor en Bilbao.
+                Aprende a degustar quesos artesanales internacionales y locales, maridados con sidras naturales, txakolis y vinos de autor en Lekeitio.
               </p>
             </div>
           </div>

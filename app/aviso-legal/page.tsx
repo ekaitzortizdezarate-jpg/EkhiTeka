@@ -18,7 +18,7 @@ export default function LegalNoticePage() {
         <div className="space-y-4 text-xs leading-relaxed text-stone-600 dark:text-stone-300">
           <h2 className="text-sm font-black text-stone-900 dark:text-stone-100">1. Datos Identificativos</h2>
           <p>
-            En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, se informa que <strong>EkhiTeka Gourmet</strong> es una marca y plataforma operada por EkhiTeka Gourmet S.L., con NIF B-12345678, domicilio social en Gran Vía 14, 48001 Bilbao (Bizkaia), y correo electrónico <code>info@ekhiteka.com</code>.
+            En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, se informa que <strong>EkhiTeka Gourmet</strong> es una marca y plataforma operada por EkhiTeka Gourmet S.L., con NIF B-12345678, domicilio social en Gamarra Kalea 4, 48001 Lekeitio (Bizkaia), y correo electrónico <code>info@ekhiteka.com</code>.
           </p>
 
           <h2 className="text-sm font-black text-stone-900 dark:text-stone-100">2. Propiedad Intelectual e Industrial</h2>

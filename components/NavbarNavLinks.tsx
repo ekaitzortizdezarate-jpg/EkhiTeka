@@ -67,7 +67,7 @@ export function NavbarNavLinks({
             Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
           </span>
           <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-stone-500 dark:text-stone-400 block -mt-0.5">
-            Quesería & Selección Gourmet · Bilbao
+            Quesería & Selección Gourmet · Lekeitio
           </span>
         </div>
       </Link>
@@ -322,9 +322,9 @@ export function NavbarNavLinks({
             <div className="pt-6 border-t border-stone-200 dark:border-stone-800 text-[11px] text-stone-500 space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-stone-700 dark:text-stone-300">
                 <Store className="w-3.5 h-3.5 text-[#C68D07]" />
-                <span>Tienda física en Bilbao</span>
+                <span>Tienda física en Lekeitio</span>
               </div>
-              <p>Gran Vía 14, Bilbao · Bizkaia</p>
+              <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
               <p>WhatsApp: +34 600 000 000</p>
             </div>
           </div>

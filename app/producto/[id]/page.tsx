@@ -125,7 +125,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                         {seller.full_name}
                       </span>
                       <span className="text-[11px] text-stone-500 dark:text-stone-400 block truncate">
-                        {seller.town || 'Bilbao'}
+                        {seller.town || 'Lekeitio'}
                       </span>
                     </div>
                   </div>
@@ -152,7 +152,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               </div>
               <div className="flex items-center gap-2 text-xs font-bold text-stone-600 dark:text-stone-400">
                 <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                <span>Recogida en tienda Bilbao</span>
+                <span>Recogida en tienda Lekeitio</span>
               </div>
             </div>
           </div>

@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         <div className="space-y-4 text-xs leading-relaxed text-stone-600 dark:text-stone-300">
           <h2 className="text-sm font-black text-stone-900 dark:text-stone-100">1. Responsable del Tratamiento</h2>
           <p>
-            <strong>EkhiTeka Gourmet S.L.</strong>, con domicilio en Gran Vía 14, Bilbao, y correo de contacto <code>info@ekhiteka.com</code>.
+            <strong>EkhiTeka Gourmet S.L.</strong>, con domicilio en Gamarra Kalea 4, Lekeitio, y correo de contacto <code>info@ekhiteka.com</code>.
           </p>
 
           <h2 className="text-sm font-black text-stone-900 dark:text-stone-100">2. Finalidad del Tratamiento de Datos</h2>

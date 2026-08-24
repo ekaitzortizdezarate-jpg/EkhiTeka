@@ -77,7 +77,7 @@ export default async function Navbar() {
 
       {/* 3. Sub-barra móvil para selectores de idioma y tema */}
       <div className="sm:hidden border-t border-stone-200/60 dark:border-stone-800/80 bg-stone-50/90 dark:bg-stone-950/90 px-4 py-1.5 flex items-center justify-between text-xs">
-        <span className="text-[11px] font-bold text-stone-500">EkhiTeka Gourmet Bilbao</span>
+        <span className="text-[11px] font-bold text-stone-500">EkhiTeka Gourmet Lekeitio</span>
         <div className="flex items-center gap-1.5">
           <ThemeSelector />
           <LanguageSelector />

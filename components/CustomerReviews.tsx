@@ -6,7 +6,7 @@ export function CustomerReviews() {
   const reviews = [
     {
       name: 'Miren Agirre',
-      town: 'Bilbao',
+      town: 'Lekeitio',
       rating: 5,
       comment: 'Los quesos son una auténtica locura. El afinado perfecto y el envío refrigerado llegó impecable en 24h. La mejor quesería de Bizkaia con diferencia.',
       date: 'Hace 3 días',

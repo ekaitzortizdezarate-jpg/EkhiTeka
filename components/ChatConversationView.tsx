@@ -100,7 +100,7 @@ export function ChatConversationView({
               {recipient?.full_name || 'EkhiTeka Usuario'}
             </h2>
             <p className="text-[11px] font-semibold text-stone-500 dark:text-stone-400">
-              {recipient?.role === 'vendedor' ? 'Artesano / Productor' : 'Cliente'} · {recipient?.town || 'Bilbao'}
+              {recipient?.role === 'vendedor' ? 'Artesano / Productor' : 'Cliente'} · {recipient?.town || 'Lekeitio'}
             </p>
           </div>
         </div>

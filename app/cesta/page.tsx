@@ -91,7 +91,7 @@ export default function CheckoutPage() {
     const payload = {
       sellerId,
       deliveryType,
-      shippingAddress: deliveryType === 'domicilio' ? address : 'Recogida en tienda (Gran Vía 14, Bilbao)',
+      shippingAddress: deliveryType === 'domicilio' ? address : 'Recogida en tienda (Gamarra Kalea 4, Lekeitio)',
       shippingNotes: notes,
       pickupSchedule: deliveryType === 'recogida_tienda' ? pickupSchedule : undefined,
       items: items.map((i) => ({

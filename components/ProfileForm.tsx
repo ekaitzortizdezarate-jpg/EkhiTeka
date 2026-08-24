@@ -84,7 +84,7 @@ export function ProfileForm({ userProfile }: ProfileFormProps) {
         <input
           type="text"
           name="town"
-          defaultValue={userProfile?.town || 'Bilbao'}
+          defaultValue={userProfile?.town || 'Lekeitio'}
           className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100"
         />
       </div>

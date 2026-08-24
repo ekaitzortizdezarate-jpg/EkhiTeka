@@ -17,8 +17,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'EkhiTeka | Quesería Gourmet & Tienda Artesana en Bilbao',
-  description: 'Quesos artesanos, regalos gourmet, catas, salazones del cantábrico, txakoli y selección de autor en Bilbao y Euskal Herria.',
+  title: 'EkhiTeka | Quesería Gourmet & Tienda Artesana en Lekeitio',
+  description: 'Quesos artesanos, regalos gourmet, catas, salazones del cantábrico, txakoli y selección de autor en Lekeitio y Euskal Herria.',
   icons: {
     icon: '/Logo.jpg',
     apple: '/Logo.jpg',

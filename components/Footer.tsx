@@ -20,7 +20,7 @@ export function Footer() {
               ¿Quieres estar al día de las novedades de EkhiTeka?
             </h3>
             <p className="text-xs sm:text-sm font-semibold text-stone-800 max-w-xl">
-              Nuevas llegadas de quesos de temporada, catas exclusivas en Bilbao y lotes limitados antes que nadie.
+              Nuevas llegadas de quesos de temporada, catas exclusivas en Lekeitio y lotes limitados antes que nadie.
             </p>
           </div>
 
@@ -69,7 +69,7 @@ export function Footer() {
             <div className="space-y-1">
               <h4 className="text-sm font-black text-white">{t.deliv_store_pickup}</h4>
               <p className="text-xs text-stone-400 leading-relaxed font-medium">
-                Haz tu pedido online y recógelo preparado sin esperas en nuestra quesería de Bilbao.
+                Haz tu pedido online y recógelo preparado sin esperas en nuestra quesería de Lekeitio.
               </p>
             </div>
           </div>
@@ -93,7 +93,7 @@ export function Footer() {
           <div className="space-y-3">
             <h4 className="font-black text-white uppercase tracking-wider text-[11px]">Experiencias</h4>
             <ul className="space-y-2 text-stone-400 font-semibold">
-              <li><Link href="/#experiencias" className="hover:text-[#FFE259] transition-colors">Catas Presenciales Bilbao</Link></li>
+              <li><Link href="/#experiencias" className="hover:text-[#FFE259] transition-colors">Catas Presenciales Lekeitio</Link></li>
               <li><Link href="/#experiencias" className="hover:text-[#FFE259] transition-colors">Mesas de Queso para Bodas</Link></li>
               <li><Link href="/#experiencias" className="hover:text-[#FFE259] transition-colors">Cestas y Regalos Gourmet</Link></li>
               <li><Link href="/chat" className="hover:text-[#FFE259] transition-colors">Consultas con el Maestro Quesero</Link></li>
@@ -117,19 +117,19 @@ export function Footer() {
                 alt="EkhiTeka"
                 className="w-10 h-10 rounded-full object-cover border border-[#FFE259]"
               />
-              <h4 className="font-black text-white uppercase tracking-wider text-[12px]">EkhiTeka Bilbao</h4>
+              <h4 className="font-black text-white uppercase tracking-wider text-[12px]">EkhiTeka Lekeitio</h4>
             </div>
 
             <div className="w-full h-24 rounded-2xl overflow-hidden border border-stone-800 relative">
               <img
                 src="/images/secciones/Tienda.JPG"
-                alt="Quesería EkhiTeka Bilbao"
+                alt="Quesería EkhiTeka Lekeitio"
                 className="w-full h-full object-cover"
               />
             </div>
 
             <p className="text-stone-400 leading-relaxed font-medium">
-              Gran Vía 14, Bilbao · Bizkaia
+              Gamarra Kalea 4, Lekeitio · Bizkaia
             </p>
             <div className="text-stone-400 font-medium space-y-0.5 text-[11px]">
               <p className="font-bold text-stone-300">Horario de Tienda:</p>
@@ -148,7 +148,7 @@ export function Footer() {
           <div className="flex items-center gap-2">
             <span>Inspiración artesana & afinado km0</span>
             <span>·</span>
-            <span>Bilbao</span>
+            <span>Lekeitio</span>
           </div>
         </div>
       </div>

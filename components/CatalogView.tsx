@@ -71,16 +71,16 @@ export function CatalogView({
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-8 space-y-5">
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-xs">
-              <Sparkles className="w-3.5 h-3.5" /> Quesería Gourmet & Tienda Artesana · Bilbao
+              <Sparkles className="w-3.5 h-3.5" /> Quesería Gourmet & Tienda Artesana · Lekeitio
             </span>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif sm:font-sans">
               Quesos y regalos <br className="hidden sm:inline" />
-              <span className="text-[#FFE259]">gastronómicos</span> en Bilbao
+              <span className="text-[#FFE259]">gastronómicos</span> en Lekeitio
             </h1>
 
             <p className="text-sm sm:text-base text-stone-300 leading-relaxed max-w-xl font-normal">
-              No somos una tienda gourmet cualquiera. En nuestra web ves una parte, en nuestra quesería de Bilbao, todo. Quesos de autor afinados, anchoas del Cantábrico y maridajes únicos.
+              No somos una tienda gourmet cualquiera. En nuestra web ves una parte, en nuestra quesería de Lekeitio, todo. Quesos de autor afinados, anchoas del Cantábrico y maridajes únicos.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -111,7 +111,7 @@ export function CatalogView({
               <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] group-hover:scale-105 transition-transform duration-500">
                 <img
                   src="/Logo.jpg"
-                  alt="EkhiTeka Bilbao"
+                  alt="EkhiTeka Lekeitio"
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
@@ -241,23 +241,23 @@ export function CatalogView({
       {/* 4. Bloques de Experiencias y Catas (Estilo La Manducateca) */}
       <ExperienceBanners />
 
-      {/* 5. Nuestra Tienda Física en Bilbao (La Manducateca style) */}
+      {/* 5. Nuestra Tienda Física en Lekeitio (La Manducateca style) */}
       <section className="relative rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 overflow-hidden shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-4">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Visítanos en Bilbao · Km0
+              Visítanos en Lekeitio · Km0
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif sm:font-sans">
               Nuestra Quesería & Espacio Gourmet
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              En nuestra web ves una selección, en nuestra quesería de Bilbao lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
+              En nuestra web ves una selección, en nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
             </p>
             <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
               <div className="flex items-center gap-2">
                 <span className="text-base">📍</span>
-                <span>Gran Vía 14, Bilbao · Bizkaia</span>
+                <span>Gamarra Kalea 4, Lekeitio · Bizkaia</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-base">🕒</span>
@@ -266,7 +266,7 @@ export function CatalogView({
             </div>
             <div className="pt-2">
               <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Bilbao"
+                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
@@ -280,11 +280,11 @@ export function CatalogView({
             <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 h-64 sm:h-80 group">
               <img
                 src="/images/secciones/Tienda.JPG"
-                alt="Tienda EkhiTeka Bilbao"
+                alt="Tienda EkhiTeka Lekeitio"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute top-4 right-4 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black rounded-full uppercase tracking-wider shadow-md">
-                Bilbao Centro
+                Lekeitio Centro
               </div>
             </div>
           </div>

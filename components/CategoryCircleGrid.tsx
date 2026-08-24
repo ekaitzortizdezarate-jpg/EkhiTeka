@@ -44,7 +44,7 @@ export function CategoryCircleGrid({
     {
       id: 'jildas',
       title: 'Gildas Selectas',
-      subtitle: 'Aperitivo Bilbao',
+      subtitle: 'Aperitivo Lekeitio',
       icon: '🫒',
       image: '/images/secciones/Gildas.JPG',
       badge: 'Top Pintxo',
