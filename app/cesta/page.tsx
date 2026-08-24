@@ -1,11 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { createOrder } from '@/app/actions/orders';
-import { Truck, Store, ShoppingBag, ArrowRight, Trash2, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { type Profile, parseProfile } from '@/types/database';
+import { getProductImage } from '@/lib/productHelpers';
+import {
+  Truck,
+  Store,
+  ShoppingBag,
+  ArrowRight,
+  Trash2,
+  CheckCircle2,
+  ShieldCheck,
+  MapPin,
+  Check,
+  User,
+} from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -21,30 +35,99 @@ export default function CheckoutPage() {
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [useProfileAddress, setUseProfileAddress] = useState(false);
+
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (data) {
+            const parsed = parseProfile(data);
+            setProfile(parsed);
+            if (parsed.street && parsed.number) {
+              const formatted = [
+                parsed.street,
+                parsed.number ? `Nº ${parsed.number}` : '',
+                parsed.stair ? `Esc. ${parsed.stair}` : '',
+                parsed.floor ? `Piso ${parsed.floor}` : '',
+                parsed.door ? `Pta ${parsed.door}` : '',
+                parsed.postal_code,
+                parsed.town,
+                parsed.province ? `(${parsed.province})` : '',
+              ]
+                .filter(Boolean)
+                .join(', ');
+
+              setAddress(formatted);
+              setUseProfileAddress(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error loading user profile in checkout:', err);
+      }
+    }
+
+    loadUserProfile();
+  }, []);
+
+  const handleToggleProfileAddress = (checked: boolean) => {
+    setUseProfileAddress(checked);
+    if (checked && profile && profile.street) {
+      const formatted = [
+        profile.street,
+        profile.number ? `Nº ${profile.number}` : '',
+        profile.stair ? `Esc. ${profile.stair}` : '',
+        profile.floor ? `Piso ${profile.floor}` : '',
+        profile.door ? `Pta ${profile.door}` : '',
+        profile.postal_code,
+        profile.town,
+        profile.province ? `(${profile.province})` : '',
+      ]
+        .filter(Boolean)
+        .join(', ');
+      setAddress(formatted);
+    } else if (!checked) {
+      setAddress('');
+    }
+  };
+
   if (success) {
     return (
-      <div className="max-w-xl mx-auto py-16 text-center space-y-6 animate-fadeIn">
+      <div className="max-w-xl mx-auto py-16 px-4 text-center space-y-6 animate-fadeIn">
         <div className="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300 flex items-center justify-center text-3xl mx-auto shadow-md">
           <CheckCircle2 className="w-10 h-10" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100">
+          <h1 className="text-2xl sm:text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
             {t.deliv_order_success}
           </h1>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 max-w-md mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 max-w-md mx-auto leading-relaxed font-medium">
             {t.deliv_order_success_desc}
           </p>
         </div>
-        <div className="flex items-center justify-center gap-3 pt-4">
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-4 font-serif">
           <Link
             href="/comprador/pedidos"
-            className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs rounded-2xl shadow-md transition-all"
+            className="px-6 py-3 bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-105"
           >
             Ver mis Pedidos
           </Link>
           <Link
-            href="/"
-            className="px-6 py-3 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 font-bold text-xs rounded-2xl transition-all"
+            href="/tienda"
+            className="px-6 py-3 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-wider rounded-2xl transition-all"
           >
             Volver a la Tienda
           </Link>
@@ -55,19 +138,19 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto py-16 text-center space-y-4">
+      <div className="max-w-md mx-auto py-16 px-4 text-center space-y-4">
         <div className="w-16 h-16 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 mx-auto">
-          <ShoppingBag className="w-8 h-8 text-amber-600/60" />
+          <ShoppingBag className="w-8 h-8 text-[#C68D07]" />
         </div>
-        <h1 className="text-lg font-black text-stone-800 dark:text-stone-200">
+        <h1 className="text-xl font-black font-serif text-stone-900 dark:text-stone-100">
           {t.cart_empty}
         </h1>
         <p className="text-xs text-stone-500 dark:text-stone-400">
           {t.cart_empty_sub}
         </p>
         <Link
-          href="/"
-          className="inline-block px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+          href="/tienda"
+          className="inline-block px-6 py-3 bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-full shadow-xs transition-all font-serif hover:scale-105"
         >
           {t.cart_explore_btn}
         </Link>
@@ -75,13 +158,12 @@ export default function CheckoutPage() {
     );
   }
 
-  // Agrupar items por vendedor
   const sellerId = items[0]?.sellerId || 'seller';
 
   const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (deliveryType === 'domicilio' && !address.trim()) {
-      setErrorMsg('Por favor, introduce la dirección de entrega.');
+      setErrorMsg('Por favor, introduce la dirección de entrega o selecciona usar la de tu perfil.');
       return;
     }
 
@@ -91,7 +173,10 @@ export default function CheckoutPage() {
     const payload = {
       sellerId,
       deliveryType,
-      shippingAddress: deliveryType === 'domicilio' ? address : 'Recogida en tienda (Gamarra Kalea 4, Lekeitio)',
+      shippingAddress:
+        deliveryType === 'domicilio'
+          ? address
+          : 'Recogida en tienda física (Gamarra Kalea 4, Lekeitio · Bizkaia)',
       shippingNotes: notes,
       pickupSchedule: deliveryType === 'recogida_tienda' ? pickupSchedule : undefined,
       items: items.map((i) => ({
@@ -115,28 +200,28 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-6 space-y-8">
+    <div className="max-w-4xl mx-auto py-6 px-3 sm:px-6 space-y-6 sm:space-y-8 w-full overflow-x-hidden">
       <div>
-        <h1 className="text-xl sm:text-3xl font-black text-stone-900 dark:text-stone-100">
+        <h1 className="text-2xl sm:text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
           {t.cart_checkout}
         </h1>
         <p className="text-xs text-stone-500 dark:text-stone-400">
-          Revisa tus productos y elige la modalidad de recepción.
+          Revisa tus productos gourmet y selecciona la modalidad de entrega.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-100 dark:bg-red-950/60 border border-red-300 dark:border-red-700 text-red-900 dark:text-red-200 text-xs font-bold rounded-2xl">
+        <div className="p-4 bg-red-100 dark:bg-red-950/70 border border-red-300 dark:border-red-800 text-red-900 dark:text-red-200 text-xs font-bold rounded-2xl shadow-xs">
           {errorMsg}
         </div>
       )}
 
-      <form onSubmit={handleConfirmOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form onSubmit={handleConfirmOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* 1. Modalidad y Datos de Entrega */}
         <div className="lg:col-span-2 space-y-6">
           {/* Selector de Modalidad */}
-          <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-5 sm:p-6 space-y-4 shadow-xs">
-            <h2 className="text-sm font-black text-stone-900 dark:text-stone-100 uppercase tracking-wider">
+          <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-4 sm:p-6 space-y-4 shadow-xs">
+            <h2 className="text-xs sm:text-sm font-black text-stone-900 dark:text-stone-100 uppercase tracking-wider font-serif">
               {t.deliv_choose_mode}
             </h2>
 
@@ -147,12 +232,12 @@ export default function CheckoutPage() {
                 onClick={() => setDeliveryType('domicilio')}
                 className={`p-4 rounded-2xl border-2 text-left space-y-1 transition-all cursor-pointer ${
                   deliveryType === 'domicilio'
-                    ? 'border-amber-600 bg-amber-50/50 dark:bg-amber-950/30 shadow-xs'
+                    ? 'border-[#C68D07] bg-[#FFE259]/15 dark:bg-[#FFE259]/10 shadow-xs'
                     : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
                 }`}
               >
                 <div className="flex items-center gap-2 font-black text-xs text-stone-900 dark:text-stone-100">
-                  <Truck className="w-4 h-4 text-amber-600" />
+                  <Truck className="w-4 h-4 text-[#C68D07]" />
                   <span>{t.deliv_home}</span>
                 </div>
                 <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-snug">
@@ -166,12 +251,12 @@ export default function CheckoutPage() {
                 onClick={() => setDeliveryType('recogida_tienda')}
                 className={`p-4 rounded-2xl border-2 text-left space-y-1 transition-all cursor-pointer ${
                   deliveryType === 'recogida_tienda'
-                    ? 'border-amber-600 bg-amber-50/50 dark:bg-amber-950/30 shadow-xs'
+                    ? 'border-[#C68D07] bg-[#FFE259]/15 dark:bg-[#FFE259]/10 shadow-xs'
                     : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
                 }`}
               >
                 <div className="flex items-center gap-2 font-black text-xs text-stone-900 dark:text-stone-100">
-                  <Store className="w-4 h-4 text-amber-600" />
+                  <Store className="w-4 h-4 text-[#C68D07]" />
                   <span>{t.deliv_store_pickup}</span>
                 </div>
                 <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-snug">
@@ -182,57 +267,97 @@ export default function CheckoutPage() {
 
             {/* Campos condicionales */}
             {deliveryType === 'domicilio' ? (
-              <div className="space-y-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+              <div className="space-y-4 pt-3 border-t border-stone-100 dark:border-stone-800">
+                {/* Opción de usar dirección del perfil */}
+                {profile && profile.street && (
+                  <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-2">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={useProfileAddress}
+                        onChange={(e) => handleToggleProfileAddress(e.target.checked)}
+                        className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 cursor-pointer accent-[#C68D07]"
+                      />
+                      <span className="text-xs font-black text-stone-800 dark:text-stone-200 flex items-center gap-1.5 font-serif">
+                        <MapPin className="w-3.5 h-3.5 text-[#C68D07]" />
+                        <span>Usar la dirección habitual de mi perfil</span>
+                      </span>
+                    </label>
+
+                    {useProfileAddress && (
+                      <p className="text-[11px] font-bold text-stone-600 dark:text-stone-300 pl-6 leading-relaxed">
+                        {profile.street}, Nº {profile.number}
+                        {profile.stair ? `, Esc. ${profile.stair}` : ''}
+                        {profile.floor ? `, Piso ${profile.floor}` : ''}
+                        {profile.door ? `, Pta ${profile.door}` : ''} · {profile.postal_code} {profile.town} ({profile.province})
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-1">
-                  <label className="block text-xs font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-                    {t.deliv_shipping_address} *
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[11px] font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
+                      {t.deliv_shipping_address} *
+                    </label>
+                    {profile && !profile.street && (
+                      <Link
+                        href="/perfil"
+                        className="text-[10px] font-bold text-amber-600 hover:underline"
+                      >
+                        Completar dirección en mi perfil
+                      </Link>
+                    )}
+                  </div>
                   <input
                     type="text"
                     required
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Calle, número, piso, código postal y ciudad"
-                    className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100 placeholder:text-stone-400"
+                    onChange={(e) => {
+                      setAddress(e.target.value);
+                      setUseProfileAddress(false);
+                    }}
+                    placeholder="Calle, número, piso, puerta, código postal y municipio"
+                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100 placeholder:text-stone-400"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
+                  <label className="block text-[11px] font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
                     {t.deliv_shipping_notes}
                   </label>
                   <input
                     type="text"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Ej: Dejar al portero o entregar por la tarde"
-                    className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100 placeholder:text-stone-400"
+                    placeholder="Ej: Dejar en portería o entregar por la tarde"
+                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 text-stone-900 dark:text-stone-100 placeholder:text-stone-400"
                   />
                 </div>
               </div>
             ) : (
               <div className="space-y-3 pt-3 border-t border-stone-100 dark:border-stone-800">
-                <div className="p-3 bg-amber-50/50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800/50 text-xs text-stone-700 dark:text-stone-300">
+                <div className="p-3.5 bg-amber-50/60 dark:bg-amber-950/30 rounded-2xl border border-amber-200 dark:border-amber-800/50 text-xs text-stone-700 dark:text-stone-300">
                   <span className="font-black block text-amber-900 dark:text-amber-300">
                     📍 {t.deliv_pickup_address}
                   </span>
-                  <span className="text-[11px] text-stone-500 dark:text-stone-400 block mt-0.5">
-                    Horario de tienda: Lunes a Sábado de 10:00 a 20:30h.
+                  <span className="text-[11px] text-stone-600 dark:text-stone-400 block mt-0.5 font-medium">
+                    Gamarra Kalea 4, Lekeitio · Bizkaia. Horario: Lun-Vie 10:00 a 20:30h.
                   </span>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
+                  <label className="block text-[11px] font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider">
                     {t.deliv_pickup_time}
                   </label>
                   <select
                     value={pickupSchedule}
                     onChange={(e) => setPickupSchedule(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
                   >
                     <option value="10:00 - 13:00">Mañana (10:00 - 13:00)</option>
                     <option value="13:00 - 16:00">Mediodía (13:00 - 16:00)</option>
-                    <option value="16:00 - 20:00">Tarde (16:00 - 20:00)</option>
+                    <option value="16:00 - 20:30">Tarde (16:00 - 20:30)</option>
                   </select>
                 </div>
               </div>
@@ -240,46 +365,51 @@ export default function CheckoutPage() {
           </div>
 
           {/* Lista de Productos en la Cesta */}
-          <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-5 sm:p-6 space-y-4 shadow-xs">
-            <h2 className="text-sm font-black text-stone-900 dark:text-stone-100 uppercase tracking-wider">
+          <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-4 sm:p-6 space-y-4 shadow-xs">
+            <h2 className="text-xs sm:text-sm font-black text-stone-900 dark:text-stone-100 uppercase tracking-wider font-serif">
               Productos en tu pedido ({items.length})
             </h2>
 
             <div className="space-y-3">
-              {items.map((item) => (
-                <div
-                  key={item.productId}
-                  className="flex items-center justify-between gap-3 p-3 bg-stone-50 dark:bg-stone-850 rounded-2xl border border-stone-200 dark:border-stone-800 text-xs"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {item.imageUrl ? (
+              {items.map((item) => {
+                const resolvedImg = getProductImage({
+                  name: item.name,
+                  category_id: item.category,
+                  image_url: item.imageUrl,
+                });
+
+                return (
+                  <div
+                    key={item.productId}
+                    className="flex items-center justify-between gap-3 p-3 bg-stone-50 dark:bg-stone-850 rounded-2xl border border-stone-200 dark:border-stone-800 text-xs min-w-0"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <img
-                        src={item.imageUrl}
+                        src={resolvedImg}
                         alt={item.name}
-                        className="w-12 h-12 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
+                        className="w-13 h-13 sm:w-16 sm:h-16 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0 bg-white"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                        }}
                       />
-                    ) : (
-                      <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900 text-amber-700 flex items-center justify-center font-bold text-base shrink-0">
-                        🧀
+                      <div className="min-w-0 flex-1">
+                        <span className="font-bold text-stone-900 dark:text-stone-100 truncate block text-xs sm:text-sm">
+                          {item.name}
+                        </span>
+                        <span className="text-[11px] font-semibold text-stone-500 dark:text-stone-400 block">
+                          {item.quantity} x {item.price.toFixed(2)} €
+                        </span>
                       </div>
-                    )}
-                    <div className="min-w-0">
-                      <span className="font-extrabold text-stone-900 dark:text-stone-100 truncate block">
-                        {item.name}
-                      </span>
-                      <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400">
-                        {item.quantity} x {item.price.toFixed(2)} €
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="font-black text-xs sm:text-sm text-stone-900 dark:text-stone-100 block">
+                        {(item.price * item.quantity).toFixed(2)} €
                       </span>
                     </div>
                   </div>
-
-                  <div className="text-right shrink-0">
-                    <span className="font-black text-sm text-stone-900 dark:text-stone-100 block">
-                      {(item.price * item.quantity).toFixed(2)} €
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -287,7 +417,7 @@ export default function CheckoutPage() {
         {/* 2. Resumen y Confirmar Pedido */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-5 sm:p-6 space-y-5 shadow-xs sticky top-24">
-            <h2 className="text-sm font-black text-stone-900 dark:text-stone-100 uppercase tracking-wider">
+            <h2 className="text-xs sm:text-sm font-black text-stone-900 dark:text-stone-100 uppercase tracking-wider font-serif">
               Resumen del Pedido
             </h2>
 
@@ -302,9 +432,9 @@ export default function CheckoutPage() {
                   {deliveryType === 'domicilio' ? t.deliv_home : t.deliv_store_pickup}
                 </span>
               </div>
-              <div className="pt-2 border-t border-stone-200 dark:border-stone-800 flex justify-between items-baseline text-base font-black text-stone-900 dark:text-stone-100">
+              <div className="pt-2 border-t border-stone-200 dark:border-stone-800 flex justify-between items-baseline text-base font-black text-stone-900 dark:text-stone-100 font-serif">
                 <span>{t.cart_total}:</span>
-                <span className="text-2xl text-amber-950 dark:text-amber-300">
+                <span className="text-2xl text-amber-950 dark:text-amber-300 font-sans">
                   {totalPrice.toFixed(2)} €
                 </span>
               </div>
@@ -313,7 +443,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-4 bg-[#FFE259] hover:bg-[#F5D742] active:bg-[#E5C428] disabled:opacity-50 text-[#1D1D1B] font-black text-sm uppercase tracking-wider rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-101"
+              className="w-full py-3.5 px-4 bg-[#FFE259] hover:bg-[#F5D742] active:bg-[#E5C428] disabled:opacity-50 text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-102 font-serif"
             >
               {loading ? (
                 <span>{t.common_loading}</span>

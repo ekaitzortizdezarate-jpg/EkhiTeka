@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useSyncExternalStore, useMemo } from 'react';
 import type { Product } from '@/types/database';
+import { getProductImage } from '@/lib/productHelpers';
 
 export interface CartItem {
   productId: string;
@@ -90,7 +91,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         category: product.category_id,
         format: product.format,
         price: Number(product.price),
-        imageUrl: product.image_url,
+        imageUrl: getProductImage(product),
         originRegion: product.origin_region,
         quantity,
       };

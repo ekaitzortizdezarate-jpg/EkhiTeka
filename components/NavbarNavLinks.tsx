@@ -71,19 +71,19 @@ export function NavbarNavLinks({
       </button>
 
       {/* Logotipo Oficial EkhiTeka con Logo.jpg */}
-      <Link href="/" className="flex items-center gap-3 shrink-0 group">
-        <div className="relative w-11 h-11 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2]">
+      <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
+        <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
           <img
             src="/Logo.jpg"
             alt="EkhiTeka Logo"
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="flex flex-col">
-          <span className="font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight font-serif sm:font-sans">
+        <div className="flex flex-col min-w-0">
+          <span className="font-serif font-black text-lg sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
             Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
           </span>
-          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-stone-500 dark:text-stone-400 block -mt-0.5">
+          <span className="hidden sm:block text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
             Quesería & Selección Gourmet · Lekeitio
           </span>
         </div>
@@ -143,6 +143,8 @@ export function NavbarNavLinks({
               className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
                 pathname.includes('/pedidos')
                   ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                  : ordersCount > 0
+                  ? 'bg-[#FFE259]/25 text-stone-900 dark:text-stone-100 border border-[#FFE259] animate-pulse font-bold shadow-xs'
                   : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
               }`}
             >
@@ -286,46 +288,46 @@ export function NavbarNavLinks({
                 <Link
                   href="/tienda"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
                     pathname === '/tienda'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
                 >
-                  <span>🧀 {t.nav_shop}</span>
+                  <span>{t.nav_shop}</span>
                 </Link>
                 <Link
                   href="/regalos-gourmet"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
                     pathname === '/regalos-gourmet'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
                 >
-                  <span>🎁 Regalos Gourmet</span>
+                  <span>Regalos Gourmet</span>
                 </Link>
                 <Link
                   href="/experiencias"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
                     pathname === '/experiencias'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
                 >
-                  <span>🍷 Catas & Experiencias</span>
+                  <span>Catas & Experiencias</span>
                 </Link>
                 <Link
                   href="/regalos-empresa"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
                     pathname === '/regalos-empresa'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
                 >
-                  <span>🏢 Regalos de Empresa</span>
+                  <span>Regalos de Empresa</span>
                 </Link>
               </div>
 
@@ -352,11 +354,18 @@ export function NavbarNavLinks({
                       className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname.includes('/pedidos')
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : ordersCount > 0
+                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] animate-pulse font-bold'
                           : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
                       }`}
                     >
                       <Package className="w-4 h-4" />
                       <span>{t.nav_orders}</span>
+                      {ordersCount > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black">
+                          {ordersCount}
+                        </span>
+                      )}
                     </Link>
                     <Link
                       href="/chat"
