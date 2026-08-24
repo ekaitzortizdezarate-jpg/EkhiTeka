@@ -51,20 +51,19 @@ export default async function Navbar() {
           {(!profile || profile.role === 'comprador') && (
             <CartNavButton />
           )}
-
-          <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-stone-200 dark:border-stone-800">
-            <ThemeSelector />
-            <LanguageSelector />
-          </div>
         </div>
       </div>
 
-      {/* 3. Sub-barra móvil para selectores de idioma y tema */}
-      <div className="sm:hidden border-t border-stone-200/60 dark:border-stone-800/80 bg-stone-50/90 dark:bg-stone-950/90 px-4 py-1.5 flex items-center justify-between text-xs">
-        <span className="text-[11px] font-bold text-stone-500">EkhiTeka Gourmet Lekeitio</span>
-        <div className="flex items-center gap-1.5">
-          <ThemeSelector />
-          <LanguageSelector />
+      {/* Sub-barra de Utilidades (Modo Oscuro/Claro & Idiomas justo debajo del menú superior) */}
+      <div className="border-t border-[#E8E5DF]/70 dark:border-stone-800/80 bg-[#FAF8F5]/80 dark:bg-[#141312]/80 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
+          <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
+            Gamarra Kalea 4, Lekeitio · Afinado artesano & Selección de autor
+          </span>
+          <div className="flex items-center gap-2">
+            <ThemeSelector />
+            <LanguageSelector />
+          </div>
         </div>
       </div>
     </header>
