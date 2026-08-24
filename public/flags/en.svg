@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
+  <!-- Fondo azul -->
+  <rect width="60" height="30" fill="#012169"/>
+  <!-- Aspa blanca San Andrés -->
+  <path d="M0,0 L60,30" stroke="#ffffff" stroke-width="8" stroke-linecap="square"/>
+  <path d="M60,0 L0,30" stroke="#ffffff" stroke-width="8" stroke-linecap="square"/>
+  <!-- Aspa roja San Patricio (encima) -->
+  <path d="M0,0 L60,30" stroke="#C8102E" stroke-width="4" stroke-linecap="square"/>
+  <path d="M60,0 L0,30" stroke="#C8102E" stroke-width="4" stroke-linecap="square"/>
+  <!-- Cruz blanca San Jorge -->
+  <rect x="24" y="0" width="12" height="30" fill="#ffffff"/>
+  <rect x="0" y="9" width="60" height="12" fill="#ffffff"/>
+  <!-- Cruz roja San Jorge (encima) -->
+  <rect x="26" y="0" width="8" height="30" fill="#C8102E"/>
+  <rect x="0" y="11" width="60" height="8" fill="#C8102E"/>
+</svg>

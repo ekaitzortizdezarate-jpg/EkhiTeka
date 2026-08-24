@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2">
+  <!-- Franja roja superior -->
+  <rect width="3" height=".5" fill="#AA151B"/>
+  <!-- Franja amarilla central -->
+  <rect y=".5" width="3" height="1" fill="#F1BF00"/>
+  <!-- Franja roja inferior -->
+  <rect y="1.5" width="3" height=".5" fill="#AA151B"/>
+</svg>
