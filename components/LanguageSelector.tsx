@@ -5,19 +5,51 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Language } from '@/lib/i18n/translations';
 import { ChevronDown, Check } from 'lucide-react';
 
+// Ikurrina SVG inline (bandera del País Vasco)
+function IkurrinaSVG({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 900 600"
+      className={className}
+      aria-label="Ikurrina"
+      role="img"
+    >
+      {/* Fondo rojo */}
+      <rect width="900" height="600" fill="#D52B1E" />
+      {/* Cruz blanca */}
+      <rect x="0" y="225" width="900" height="150" fill="#FFFFFF" />
+      <rect x="375" y="0" width="150" height="600" fill="#FFFFFF" />
+      {/* Aspa verde */}
+      <line x1="0" y1="0" x2="900" y2="600" stroke="#007A3D" strokeWidth="130" />
+      <line x1="900" y1="0" x2="0" y2="600" stroke="#007A3D" strokeWidth="130" />
+      {/* Cruz blanca encima del aspa */}
+      <rect x="0" y="250" width="900" height="100" fill="#FFFFFF" />
+      <rect x="400" y="0" width="100" height="600" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
+type LanguageEntry = {
+  code: Language;
+  label: string;
+  name: string;
+  flag: string | null; // null = usar ikurrina SVG
+};
+
 export function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const languages: { code: Language; label: string; name: string; flag: string }[] = [
-    { code: 'eu', label: 'EUS', name: 'Euskara', flag: '🟢' },
-    { code: 'es', label: 'ESP', name: 'Castellano', flag: '🇪🇸' },
-    { code: 'en', label: 'ENG', name: 'English', flag: '🇬🇧' },
-    { code: 'fr', label: 'FRA', name: 'Français', flag: '🇫🇷' },
+  const languages: LanguageEntry[] = [
+    { code: 'eu', label: 'Eus', name: 'Euskara', flag: null },
+    { code: 'es', label: 'Cas', name: 'Castellano', flag: '🇪🇸' },
+    { code: 'en', label: 'Eng', name: 'English', flag: '🇬🇧' },
+    { code: 'fr', label: 'Fra', name: 'Français', flag: '🇫🇷' },
   ];
 
-  const currentLanguage = languages.find((l) => l.code === language) || languages[1];
+  const currentLanguage = languages.find((l) => l.code === language) || languages[0];
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -41,8 +73,12 @@ export function LanguageSelector() {
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <span className="text-sm leading-none">{currentLanguage.flag}</span>
-        <span className="font-bold text-[11px] tracking-wider uppercase font-sans">
+        {currentLanguage.flag === null ? (
+          <IkurrinaSVG className="w-5 h-[13px] rounded-[2px] object-cover shadow-sm" />
+        ) : (
+          <span className="text-sm leading-none">{currentLanguage.flag}</span>
+        )}
+        <span className="font-bold text-[11px] tracking-wider font-sans">
           {currentLanguage.label}
         </span>
         <ChevronDown
@@ -76,7 +112,11 @@ export function LanguageSelector() {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">{l.flag}</span>
+                  {l.flag === null ? (
+                    <IkurrinaSVG className="w-5 h-[13px] rounded-[2px] object-cover shadow-sm flex-shrink-0" />
+                  ) : (
+                    <span className="text-sm leading-none">{l.flag}</span>
+                  )}
                   <span className="text-[11px] font-serif">{l.name}</span>
                 </div>
                 {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
