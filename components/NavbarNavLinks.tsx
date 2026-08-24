@@ -218,71 +218,82 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* Mobile Navigation Drawer (Montado directamente en document.body para máxima prioridad de capa) */}
+      {/* Mobile Navigation Drawer (Montado directamente en document.body con máximo contraste y legibilidad) */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Drawer Content */}
-          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-[#191816] shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-200 dark:border-stone-800 animate-in slide-in-from-left duration-300">
+          {/* Drawer Content - High contrast gourmet palette */}
+          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
               {/* Header Drawer */}
-              <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">
+              <div className="flex items-center justify-between pb-4 border-b border-stone-800">
                 <div className="flex items-center gap-3">
-                  <img
-                    src="/Logo.jpg"
-                    alt="EkhiTeka"
-                    className="w-10 h-10 rounded-full object-cover border border-stone-300 shadow-xs"
-                  />
-                  <span className="font-serif font-bold text-lg text-stone-900 dark:text-stone-100 tracking-wider">
-                    Ekhi<span className="text-[#C68D07]">Teka</span>
-                  </span>
+                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5]">
+                    <img
+                      src="/Logo.jpg"
+                      alt="EkhiTeka"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-serif font-bold text-lg text-white tracking-wider">
+                      Ekhi<span className="text-[#FFE259]">Teka</span>
+                    </span>
+                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400">
+                      Lekeitio · Bizkaia
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-800 cursor-pointer"
+                  className="p-2 rounded-full text-stone-300 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
                   aria-label="Cerrar menú"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 
               {/* Navigation Links - Maison du Monde centered uppercase typography */}
-              <div className="space-y-2 font-serif">
-                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-stone-400 text-center pb-1">
+              <div className="space-y-2.5 font-serif">
+                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Explorar Selección
                 </p>
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center text-center p-3 rounded-full bg-white dark:bg-stone-850 font-semibold text-xs tracking-[0.16em] uppercase text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
                 >
-                  <span>{t.nav_shop}</span>
+                  <span>🧀 {t.nav_shop}</span>
                 </Link>
                 <Link
                   href="/#experiencias"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center text-center p-3 rounded-full bg-white dark:bg-stone-850 font-semibold text-xs tracking-[0.16em] uppercase text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
+                  className="flex items-center justify-center text-center p-3.5 rounded-full bg-stone-850 hover:bg-stone-800 font-bold text-xs tracking-[0.16em] uppercase text-white border border-stone-700 hover:border-[#FFE259] transition-all shadow-md"
                 >
-                  <span>Catas & Experiencias</span>
+                  <span>🍷 Catas & Experiencias</span>
                 </Link>
                 <Link
                   href="/#opiniones"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center text-center p-3 rounded-full bg-white dark:bg-stone-850 font-semibold text-xs tracking-[0.16em] uppercase text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
+                  className="flex items-center justify-center text-center p-3.5 rounded-full bg-stone-850 hover:bg-stone-800 font-bold text-xs tracking-[0.16em] uppercase text-white border border-stone-700 hover:border-[#FFE259] transition-all shadow-md"
                 >
-                  <span>Opiniones Clientes</span>
+                  <span>⭐ Opiniones Clientes</span>
                 </Link>
               </div>
 
               {/* User Links */}
-              <div className="space-y-2 pt-4 border-t border-stone-200 dark:border-stone-800 font-serif">
-                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-stone-400 text-center pb-1">
+              <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
+                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Tu Cuenta
                 </p>
                 {user ? (
@@ -291,7 +302,7 @@ export function NavbarNavLinks({
                       <Link
                         href="/vendedor/productos/nuevo"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.14em] uppercase shadow-xs"
+                        className="flex items-center justify-center gap-2 p-3.5 rounded-full font-black text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all"
                       >
                         <PlusCircle className="w-4 h-4 stroke-[2.5]" />
                         <span>+ {t.seller_new_product}</span>
@@ -300,7 +311,11 @@ export function NavbarNavLinks({
                     <Link
                       href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2 p-2.5 rounded-full font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        pathname.includes('/pedidos')
+                          ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                      }`}
                     >
                       <Package className="w-4 h-4" />
                       <span>{t.nav_orders}</span>
@@ -308,7 +323,11 @@ export function NavbarNavLinks({
                     <Link
                       href="/chat"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2 p-2.5 rounded-full font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        pathname.startsWith('/chat')
+                          ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                      }`}
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>{t.nav_chats}</span>
@@ -316,25 +335,38 @@ export function NavbarNavLinks({
                     <Link
                       href="/perfil"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2 p-2.5 rounded-full font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        pathname === '/perfil'
+                          ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                      }`}
                     >
                       <User className="w-4 h-4" />
                       <span>{t.nav_profile}</span>
                     </Link>
+                    <form action={signout} className="pt-2">
+                      <button
+                        type="submit"
+                        className="w-full flex items-center justify-center gap-2 p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>{t.nav_logout}</span>
+                      </button>
+                    </form>
                   </>
                 ) : (
                   <div className="grid grid-cols-2 gap-2 pt-1 font-serif">
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-2.5 px-3 rounded-full border border-stone-300 font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200"
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-white hover:border-[#FFE259] hover:text-[#FFE259] transition-all bg-stone-850"
                     >
                       {t.nav_login}
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-2.5 px-3 rounded-full bg-[#FFE259] font-bold text-xs tracking-[0.14em] uppercase text-[#1D1D1B]"
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#FFE259] font-black text-xs tracking-[0.14em] uppercase text-[#1D1D1B] shadow-md hover:scale-102 transition-all"
                     >
                       {t.nav_register}
                     </Link>
@@ -344,13 +376,13 @@ export function NavbarNavLinks({
             </div>
 
             {/* Bottom contact info in drawer */}
-            <div className="pt-6 border-t border-stone-200 dark:border-stone-800 text-[11px] text-stone-500 space-y-1 text-center font-sans">
-              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-700 dark:text-stone-300">
-                <Store className="w-3.5 h-3.5 text-[#C68D07]" />
+            <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
+              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
+                <Store className="w-3.5 h-3.5 text-[#FFE259]" />
                 <span>Quesería & Tienda en Lekeitio</span>
               </div>
               <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
-              <p className="font-semibold text-stone-700 dark:text-stone-300">WhatsApp: +34 600 000 000</p>
+              <p className="font-semibold text-[#FFE259]">WhatsApp: +34 600 000 000</p>
             </div>
           </div>
         </div>,
