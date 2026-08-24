@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
@@ -37,6 +38,22 @@ export function NavbarNavLinks({
   const pathname = usePathname();
   const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   const isSeller = profile?.role === 'vendedor';
   const isAdmin = profile?.role === 'admin';
@@ -201,17 +218,17 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* Mobile Navigation Drawer (La Manducateca style) */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[99999] lg:hidden">
+      {/* Mobile Navigation Drawer (Montado directamente en document.body para máxima prioridad de capa) */}
+      {mounted && mobileMenuOpen && createPortal(
+        <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Drawer Content */}
-          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-stone-900 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[100000] border-r border-stone-200 dark:border-stone-800">
+          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-[#191816] shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-200 dark:border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
               {/* Header Drawer */}
               <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">
@@ -219,55 +236,53 @@ export function NavbarNavLinks({
                   <img
                     src="/Logo.jpg"
                     alt="EkhiTeka"
-                    className="w-10 h-10 rounded-full object-cover border border-stone-300"
+                    className="w-10 h-10 rounded-full object-cover border border-stone-300 shadow-xs"
                   />
-                  <span className="font-black text-lg text-stone-900 dark:text-stone-100">
+                  <span className="font-serif font-bold text-lg text-stone-900 dark:text-stone-100 tracking-wider">
                     Ekhi<span className="text-[#C68D07]">Teka</span>
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 rounded-xl text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-800"
+                  className="p-2 rounded-full text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-800 cursor-pointer"
+                  aria-label="Cerrar menú"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Navigation Links */}
-              <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-wider text-stone-400">
-                  Explorar Catálogo
+              {/* Navigation Links - Maison du Monde centered uppercase typography */}
+              <div className="space-y-2 font-serif">
+                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-stone-400 text-center pb-1">
+                  Explorar Selección
                 </p>
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-stone-800 font-black text-sm text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
+                  className="flex items-center justify-center text-center p-3 rounded-full bg-white dark:bg-stone-850 font-semibold text-xs tracking-[0.16em] uppercase text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
                 >
-                  <span>🧀 {t.nav_shop}</span>
-                  <ChevronRight className="w-4 h-4 text-stone-400" />
+                  <span>{t.nav_shop}</span>
                 </Link>
                 <Link
                   href="/#experiencias"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-stone-800 font-black text-sm text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700"
+                  className="flex items-center justify-center text-center p-3 rounded-full bg-white dark:bg-stone-850 font-semibold text-xs tracking-[0.16em] uppercase text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
                 >
-                  <span>🍷 Catas & Talleres</span>
-                  <ChevronRight className="w-4 h-4 text-stone-400" />
+                  <span>Catas & Experiencias</span>
                 </Link>
                 <Link
                   href="/#opiniones"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-stone-800 font-black text-sm text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700"
+                  className="flex items-center justify-center text-center p-3 rounded-full bg-white dark:bg-stone-850 font-semibold text-xs tracking-[0.16em] uppercase text-stone-900 dark:text-stone-100 shadow-xs border border-stone-200 dark:border-stone-700 hover:border-[#FFE259]"
                 >
-                  <span>⭐ Opiniones Clientes</span>
-                  <ChevronRight className="w-4 h-4 text-stone-400" />
+                  <span>Opiniones Clientes</span>
                 </Link>
               </div>
 
               {/* User Links */}
-              <div className="space-y-2 pt-4 border-t border-stone-200 dark:border-stone-800">
-                <p className="text-[10px] font-black uppercase tracking-wider text-stone-400">
+              <div className="space-y-2 pt-4 border-t border-stone-200 dark:border-stone-800 font-serif">
+                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-stone-400 text-center pb-1">
                   Tu Cuenta
                 </p>
                 {user ? (
@@ -276,7 +291,7 @@ export function NavbarNavLinks({
                       <Link
                         href="/vendedor/productos/nuevo"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-2 p-2.5 rounded-xl font-black text-xs bg-[#FFE259] text-[#1D1D1B] shadow-xs"
+                        className="flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.14em] uppercase shadow-xs"
                       >
                         <PlusCircle className="w-4 h-4 stroke-[2.5]" />
                         <span>+ {t.seller_new_product}</span>
@@ -285,7 +300,7 @@ export function NavbarNavLinks({
                     <Link
                       href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-2 p-2.5 rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                      className="flex items-center justify-center gap-2 p-2.5 rounded-full font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
                     >
                       <Package className="w-4 h-4" />
                       <span>{t.nav_orders}</span>
@@ -293,7 +308,7 @@ export function NavbarNavLinks({
                     <Link
                       href="/chat"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-2 p-2.5 rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                      className="flex items-center justify-center gap-2 p-2.5 rounded-full font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>{t.nav_chats}</span>
@@ -301,25 +316,25 @@ export function NavbarNavLinks({
                     <Link
                       href="/perfil"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-2 p-2.5 rounded-xl font-bold text-xs text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
+                      className="flex items-center justify-center gap-2 p-2.5 rounded-full font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800"
                     >
                       <User className="w-4 h-4" />
                       <span>{t.nav_profile}</span>
                     </Link>
                   </>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-2 gap-2 pt-1 font-serif">
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="text-center py-2.5 px-3 rounded-xl border border-stone-300 font-black text-xs text-stone-800 dark:text-stone-200"
+                      className="flex items-center justify-center text-center py-2.5 px-3 rounded-full border border-stone-300 font-semibold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200"
                     >
                       {t.nav_login}
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="text-center py-2.5 px-3 rounded-xl bg-[#FFE259] font-black text-xs text-[#1D1D1B]"
+                      className="flex items-center justify-center text-center py-2.5 px-3 rounded-full bg-[#FFE259] font-bold text-xs tracking-[0.14em] uppercase text-[#1D1D1B]"
                     >
                       {t.nav_register}
                     </Link>
@@ -329,16 +344,17 @@ export function NavbarNavLinks({
             </div>
 
             {/* Bottom contact info in drawer */}
-            <div className="pt-6 border-t border-stone-200 dark:border-stone-800 text-[11px] text-stone-500 space-y-1">
-              <div className="flex items-center gap-1.5 font-bold text-stone-700 dark:text-stone-300">
+            <div className="pt-6 border-t border-stone-200 dark:border-stone-800 text-[11px] text-stone-500 space-y-1 text-center font-sans">
+              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-700 dark:text-stone-300">
                 <Store className="w-3.5 h-3.5 text-[#C68D07]" />
-                <span>Tienda física en Lekeitio</span>
+                <span>Quesería & Tienda en Lekeitio</span>
               </div>
               <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
-              <p>WhatsApp: +34 600 000 000</p>
+              <p className="font-semibold text-stone-700 dark:text-stone-300">WhatsApp: +34 600 000 000</p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
