@@ -58,7 +58,7 @@ export default async function Navbar() {
       <div className="border-t border-[#E8E5DF]/70 dark:border-stone-800/80 bg-[#FAF8F5]/80 dark:bg-[#141312]/80 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
           <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
-            Gamarra Kalea 4, Lekeitio · Afinado artesano & Selección de autor
+            Gamarra Kalea 4, Lekeitio · Bizkaia
           </span>
           <div className="flex items-center gap-2">
             <ThemeSelector />
