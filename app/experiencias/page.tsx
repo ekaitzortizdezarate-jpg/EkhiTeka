@@ -13,7 +13,7 @@ export default function ExperienciasPage() {
             alt="Catas & Experiencias EkhiTeka"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
         </div>
 
         <div className="relative z-10 max-w-2xl space-y-4 text-white">

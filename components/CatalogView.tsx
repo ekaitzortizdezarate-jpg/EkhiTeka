@@ -78,7 +78,7 @@ export function CatalogView({
             className="w-full h-full object-cover object-center scale-100"
           />
           {/* Overlay suave para resaltar los textos sin tapar la foto */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/40 backdrop-brightness-90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/85 dark:via-black/65 dark:to-black/40" />
         </div>
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
