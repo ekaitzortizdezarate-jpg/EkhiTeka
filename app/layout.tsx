@@ -32,6 +32,21 @@ export const metadata: Metadata = {
   },
 };
 
+// Script bloqueante anti-flash: aplica dark/light ANTES de que React hidrate
+// Se ejecuta sincrónicamente en el navegador para evitar parpadeo de tema
+const themeScript = `
+(function() {
+  try {
+    var saved = localStorage.getItem('ekhiteka_theme');
+    var isDark =
+      saved === 'dark' ||
+      ((!saved || saved === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (isDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  } catch(e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: {
@@ -39,7 +54,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="eu" className={`${dmSans.variable} ${cormorant.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col antialiased selection:bg-[#FFE259] selection:text-[#1D1D1B] transition-colors duration-200 bg-[#FAF8F5] dark:bg-[#141312] text-[#1D1D1B] dark:text-[#F5F5F0]">
+      <head>
+        {/* Script anti-flash: aplica el tema correcto antes del primer render */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="min-h-screen flex flex-col antialiased selection:bg-[#FFE259] selection:text-[#1D1D1B] bg-[#FAF8F5] dark:bg-[#141312] text-[#1D1D1B] dark:text-[#F5F5F0]">
         <ThemeProvider>
           <LanguageProvider>
             <CartProvider>

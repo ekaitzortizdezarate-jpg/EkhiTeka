@@ -1,23 +1,42 @@
 'use client';
 
-import { useTheme } from '@/context/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
+import { useTheme, type Theme } from '@/context/ThemeContext';
+import { Sun, Moon, Monitor } from 'lucide-react';
+
+const MODES: { value: Theme; icon: React.ReactNode; label: string }[] = [
+  { value: 'light', icon: <Sun className="w-3.5 h-3.5" />, label: 'Claro' },
+  { value: 'system', icon: <Monitor className="w-3.5 h-3.5" />, label: 'Auto' },
+  { value: 'dark', icon: <Moon className="w-3.5 h-3.5" />, label: 'Oscuro' },
+];
 
 export function ThemeSelector() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
-    <button
-      type="button"
-      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 transition-colors shadow-2xs"
-      title={resolvedTheme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+    <div
+      className="flex items-center rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-100 dark:bg-stone-800 p-0.5 gap-0.5 shadow-2xs"
+      role="group"
+      aria-label="Seleccionar tema"
     >
-      {resolvedTheme === 'dark' ? (
-        <Sun className="w-4 h-4 text-amber-400" />
-      ) : (
-        <Moon className="w-4 h-4 text-stone-700" />
-      )}
-    </button>
+      {MODES.map(({ value, icon, label }) => {
+        const isActive = theme === value;
+        return (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setTheme(value)}
+            title={label}
+            aria-pressed={isActive}
+            className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all cursor-pointer ${
+              isActive
+                ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-xs'
+                : 'text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-300'
+            }`}
+          >
+            {icon}
+          </button>
+        );
+      })}
+    </div>
   );
 }
