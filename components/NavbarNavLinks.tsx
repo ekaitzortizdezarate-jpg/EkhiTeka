@@ -204,11 +204,15 @@ export function NavbarNavLinks({
                 </Link>
               )}
 
-              {/* Vendedor: Añadir Producto */}
+              {/* Vendedor: Añadir Producto (Solo reborde cuando NO está seleccionado) */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
-                  className="flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl transition-all shadow-xs font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px]"
+                  className={`flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 rounded-2xl transition-all font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px] ${
+                    pathname === '/vendedor/productos/nuevo'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] shadow-xs border border-stone-800/10'
+                      : 'border-2 border-[#FFE259] bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                  }`}
                 >
                   <span className="block text-center">Añadir</span>
                   <span className="block text-center">Producto</span>
@@ -398,7 +402,11 @@ export function NavbarNavLinks({
                         <Link
                           href="/vendedor/productos/nuevo"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center justify-center p-3.5 rounded-full font-black text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all"
+                          className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all ${
+                            pathname === '/vendedor/productos/nuevo'
+                              ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
+                              : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                          }`}
                         >
                           <span>Añadir Producto</span>
                         </Link>
