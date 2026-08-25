@@ -1,4 +1,9 @@
-export type Language = 'eu' | 'es' | 'en' | 'fr';
+const fs = require('fs');
+const path = require('path');
+
+const files = {
+  // 1. DICCIONARIO CENTRAL MULTI-IDIOMA
+  'lib/i18n/translations.ts': `export type Language = 'eu' | 'es' | 'en' | 'fr';
 
 export interface TranslationDict {
   brand_name: string;
@@ -1016,7 +1021,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_tagline: 'Épicerie Fine & Produits Artisanaux',
     brand_subtitle: 'Fromages fermiers, thon blanc, salaisons, gildas, bière artisanale, vin txakoli et cidre basque.',
     top_refrigerated_shipping: 'Livraison réfrigérée 24/48h',
-    top_custom_orders: 'Coffrets sur mesure et conseils d\'experts',
+    top_custom_orders: 'Coffrets sur mesure et conseils d\\'experts',
     top_store_pickup: 'Retrait gratuit en boutique',
 
     nav_shop: 'Boutique',
@@ -1031,7 +1036,7 @@ export const translations: Record<Language, TranslationDict> = {
     nav_logout: 'Déconnexion',
     nav_gourmet_gifts: 'Cadeaux Gourmets',
     nav_tastings_experiences: 'Dégustations & Expériences',
-    nav_corporate_gifts: 'Cadeaux d\'Entreprise',
+    nav_corporate_gifts: 'Cadeaux d\\'Entreprise',
     nav_events: 'Événements',
     nav_add_product: 'Ajouter un Produit',
 
@@ -1058,7 +1063,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_unlimited: 'Illimité',
     prod_add_to_cart: 'Ajouter au panier',
     prod_added: 'Ajouté',
-    prod_ask_artisan: 'Contacter l\'artisan',
+    prod_ask_artisan: 'Contacter l\\'artisan',
     prod_consult_product: 'Question sur ce produit',
     prod_details: 'Détails',
     prod_search_placeholder: 'Rechercher fromages, thon, vins...',
@@ -1090,10 +1095,10 @@ export const translations: Record<Language, TranslationDict> = {
     exp_hero_badge: 'Expériences Gastronomiques',
     exp_hero_title: 'Dégustations &',
     exp_hero_title_highlight: 'Expériences',
-    exp_hero_desc: 'Découvrez l\'art du fromage fermier à travers nos dégustations guidées, événements de célébration et services exclusifs à Lekeitio ou au lieu de votre choix.',
+    exp_hero_desc: 'Découvrez l\\'art du fromage fermier à travers nos dégustations guidées, événements de célébration et services exclusifs à Lekeitio ou au lieu de votre choix.',
     exp_home_tasting_title: 'Dégustations à la Maison',
     exp_home_tasting_badge: 'À votre rythme',
-    exp_home_tasting_desc: 'Devenez l\'hôte idéal grâce à nos kits complets : sélection de 6 fromages affinés par intensités, accords artisanaux, set de table illustré et fiches de dégustation explicatives.',
+    exp_home_tasting_desc: 'Devenez l\\'hôte idéal grâce à nos kits complets : sélection de 6 fromages affinés par intensités, accords artisanaux, set de table illustré et fiches de dégustation explicatives.',
     exp_home_tasting_btn: 'Commander Kit à Domicile',
     exp_store_tasting_title: 'Dégustations en Boutique',
     exp_store_tasting_badge: 'En présentiel à Lekeitio',
@@ -1103,9 +1108,9 @@ export const translations: Record<Language, TranslationDict> = {
     exp_wedding_badge: 'Mariages & Événements',
     exp_wedding_desc: 'Nous créons des buffets de fromages spectaculaires pour cocktails de mariage et fêtes. Mises en scène monumentales avec fruits frais, fruits secs, pains et confitures artisanales.',
     exp_wedding_btn: 'Demander un Devis Mariage',
-    exp_raclette_title: 'Prêt d\'Appareil à Raclette',
+    exp_raclette_title: 'Prêt d\\'Appareil à Raclette',
     exp_raclette_badge: 'Location & Pack',
-    exp_raclette_desc: 'Nous vous prêtons l\'appareil traditionnel suisse professionnel avec le fromage à raclette affiné prédécoupé, charcuteries et pommes de terre pour une soirée conviviale sans contrainte.',
+    exp_raclette_desc: 'Nous vous prêtons l\\'appareil traditionnel suisse professionnel avec le fromage à raclette affiné prédécoupé, charcuteries et pommes de terre pour une soirée conviviale sans contrainte.',
     exp_raclette_btn: 'Consulter la Disponibilité Raclette',
 
     cart_title: 'Votre Panier',
@@ -1129,7 +1134,7 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_pickup_address: 'Adresse boutique : Gamarra Kalea 4, Lekeitio',
     deliv_confirm_order: 'Confirmer la commande',
     deliv_order_success: 'Commande validée avec succès !',
-    deliv_order_success_desc: 'L\'artisan a reçu votre commande et prépare vos produits.',
+    deliv_order_success_desc: 'L\\'artisan a reçu votre commande et prépare vos produits.',
 
     orders_title: 'Mes Commandes',
     orders_title_seller: 'Gestion des Commandes',
@@ -1144,15 +1149,15 @@ export const translations: Record<Language, TranslationDict> = {
     orders_cancelled: 'Annulée',
     orders_change_status: 'Changer le statut',
     orders_cancel_order: 'Annuler la commande',
-    orders_cancel_reason: 'Motif d\'annulation',
+    orders_cancel_reason: 'Motif d\\'annulation',
     orders_chat_with_buyer: 'Chat avec le client',
-    orders_chat_with_seller: 'Chat avec l\'artisan',
-    orders_no_orders: 'Vous n\'avez aucune commande pour le moment',
+    orders_chat_with_seller: 'Chat avec l\\'artisan',
+    orders_no_orders: 'Vous n\\'avez aucune commande pour le moment',
     orders_no_orders_seller: 'Aucune commande reçue pour le moment',
     orders_no_orders_seller_sub: 'Les nouvelles commandes de vos clients apparaîtront ici automatiquement.',
     orders_products_label: 'Articles de la commande',
     orders_products_to_prepare: 'Articles à préparer',
-    orders_purchase_date: 'Date d\'achat',
+    orders_purchase_date: 'Date d\\'achat',
     orders_date_time: 'Date & Heure',
     orders_order_number: 'Commande :',
     orders_total_to_charge: 'Total à encaisser :',
@@ -1187,7 +1192,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_available: 'Disponibles',
     seller_events_collected: 'Encaissé',
     seller_events_attendees_title: 'Participants à la Dégustation',
-    seller_events_no_events: 'Vous n\'avez pas encore créé de dégustation en boutique',
+    seller_events_no_events: 'Vous n\\'avez pas encore créé de dégustation en boutique',
     seller_events_no_events_desc: 'Publiez une dégustation en boutique depuis le menu supérieur pour gérer la jauge et les réservations.',
 
     chat_title: 'Messagerie & Conseils',
@@ -1219,7 +1224,7 @@ export const translations: Record<Language, TranslationDict> = {
     cookie_settings: 'Personnaliser',
 
     footer_club_title: 'Club des Amis du Bon Fromage',
-    footer_club_subtitle: 'Vous souhaitez rester informé des actualités d\'EkhiTeka ?',
+    footer_club_subtitle: 'Vous souhaitez rester informé des actualités d\\'EkhiTeka ?',
     footer_club_desc: 'Nouvelles arrivées de fromages de saison, dégustations exclusives à Lekeitio et lots limités avant tout le monde.',
     footer_join_whatsapp: 'Rejoindre par WhatsApp',
     footer_cheese_desc: 'Fromages affinés, poissons salés du Cantabrique et conserves artisanales sélectionnées à la main.',
@@ -1240,7 +1245,7 @@ export const translations: Record<Language, TranslationDict> = {
 
     shop_specialty: 'Notre Spécialité',
     shop_hero_title: 'Fromages et cadeaux gastronomiques à Lekeitio',
-    shop_hero_desc: 'Fromages affinés d\'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
+    shop_hero_desc: 'Fromages affinés d\\'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
     shop_see_cheeses: 'VOIR NOS FROMAGES',
     shop_whatsapp_orders: 'Commandes sur WhatsApp',
     shop_visit_title: 'Notre Fromagerie & Espace Gourmet',
@@ -1262,3 +1267,525 @@ export const translations: Record<Language, TranslationDict> = {
     common_select_language: 'Choisir la langue',
   },
 };
+`,
+
+  // 2. EXPERIENCIAS (Estructura y Orden Solicitado)
+  'app/experiencias/page.tsx': `import { createClient } from '@/lib/supabase/server';
+import { ProductCard } from '@/components/ProductCard';
+import type { ProductWithSeller } from '@/types/database';
+import {
+  Wine,
+  Store,
+  HeartHandshake,
+  Sparkles,
+  Flame,
+  Calendar,
+} from 'lucide-react';
+
+export const revalidate = 0;
+
+export default async function ExperienciasPage() {
+  const supabase = await createClient();
+
+  const [{ data: { user } }, productsRes] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('products')
+      .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false }),
+  ]);
+
+  let isSeller = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+      isSeller = true;
+    }
+  }
+
+  const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
+
+  const tastingProducts = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    const desc = (p.description || '').toLowerCase();
+
+    if (cat === 'tarjeta_regalo' || (name.includes('tarjeta') && name.includes('regalo'))) {
+      return false;
+    }
+
+    return (
+      cat === 'cata_casa' ||
+      cat === 'cata_presencial' ||
+      cat === 'catas' ||
+      cat === 'experiencia' ||
+      name.includes('cata') ||
+      name.includes('degustación') ||
+      name.includes('taller') ||
+      desc.includes('cata')
+    );
+  });
+
+  const presencialEvents = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    const desc = (p.description || '').toLowerCase();
+
+    if (
+      name.includes('casa') ||
+      cat.includes('casa') ||
+      cat === 'cesta' ||
+      cat === 'tarjeta_regalo' ||
+      name.includes('tarjeta') ||
+      name.includes('cesta')
+    ) {
+      return false;
+    }
+
+    return (
+      cat === 'cata_presencial' ||
+      name.includes('presencial') ||
+      desc.includes('presencial') ||
+      (desc.includes('fecha & hora') && desc.includes('aforo'))
+    );
+  });
+
+  return (
+    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* 1. Tarjeta presentación */}
+      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/secciones/Catas.JPG"
+            alt="Catas & Experiencias EkhiTeka"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+        </div>
+
+        <div className="relative z-10 max-w-2xl space-y-4 text-white">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md">
+            <Sparkles className="w-3.5 h-3.5" /> Experiencias Gastronómicas
+          </span>
+
+          <h1 className="text-3xl sm:text-5xl font-black font-serif tracking-tight leading-tight">
+            Catas & <span className="text-[#FFE259]">Experiencias</span>
+          </h1>
+
+          <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
+            Descubre el arte del queso artesano a través de nuestras catas guiadas, eventos para celebraciones y servicios exclusivos para disfrutar en Lekeitio o donde tú elijas.
+          </p>
+        </div>
+      </section>
+
+      {/* 2. Info Catas en Casa e Info Catas en la Tienda */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
+          <div className="relative h-64 overflow-hidden">
+            <img
+              src="/images/secciones/Catas.JPG"
+              alt="Catas en Casa"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
+              A tu ritmo
+            </div>
+          </div>
+          <div className="p-6 sm:p-8 space-y-4">
+            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+              <Wine className="w-6 h-6" />
+              <h2 className="font-serif font-bold text-2xl sm:text-3xl text-stone-900 dark:text-stone-100">
+                Catas en Casa
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+              Conviértete en anfitrión con nuestros kits completos de cata: selección de 6 quesos afinados clasificados por intensidades, maridajes artesanos de acompañamiento, mantel de cata ilustrado y fichas explicativas con notas de cata y maridajes.
+            </p>
+            {!isSeller && (
+              <div className="pt-2">
+                <a
+                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20reservar%20un%20Kit%20de%20Cata%20en%20Casa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
+                >
+                  <span>Solicitar Kit para Casa</span>
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
+          <div className="relative h-64 overflow-hidden">
+            <img
+              src="/images/secciones/Tienda.JPG"
+              alt="Catas en la Tienda Lekeitio"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
+              Presencial en Lekeitio
+            </div>
+          </div>
+          <div className="p-6 sm:p-8 space-y-4">
+            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+              <Store className="w-6 h-6" />
+              <h2 className="font-serif font-bold text-2xl sm:text-3xl text-stone-900 dark:text-stone-100">
+                Catas en la Tienda
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+              Experiencias presenciales exclusivas en nuestra quesería de Lekeitio (Gamarra Kalea 4). Guiadas por nuestros afinadores queseros en grupos reducidos, probando piezas de autor, txakoli de Bizkaia y maridajes singulares.
+            </p>
+            {!isSeller && (
+              <div className="pt-2">
+                <a
+                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20el%20calendario%20de%20Catas%20en%20la%20Tienda%20de%20Lekeitio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
+                >
+                  <span>Ver Fechas & Reservar Plaza</span>
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Productos tipo cata en casa y cata presencial */}
+      {tastingProducts.length > 0 && (
+        <section className="space-y-6 pt-2">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              Catálogo de Catas & Packs
+            </span>
+            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Catas & Experiencias Disponibles
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {tastingProducts.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 4. Próximos eventos de catas presenciales */}
+      {presencialEvents.length > 0 && (
+        <section className="space-y-6 pt-4">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Plazas limitadas · Lekeitio Centro</span>
+            </span>
+            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Próximos Eventos de Catas Presenciales
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {presencialEvents.map((event) => (
+              <ProductCard key={event.id} product={event} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 5. Mesa para Bodas y Préstamo de Raclette */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
+          <div className="relative h-64 overflow-hidden">
+            <img
+              src="/images/secciones/Mesas.JPG"
+              alt="Mesa de Quesos para Bodas"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
+              Bodas & Eventos
+            </div>
+          </div>
+          <div className="p-6 sm:p-8 space-y-4">
+            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+              <HeartHandshake className="w-6 h-6" />
+              <h2 className="font-serif font-bold text-2xl text-stone-900 dark:text-stone-100">
+                Mesa para Bodas
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+              Creamos mesas de quesos espectaculares para cócteles de bodas y celebraciones. Diseños monumentales con frutas frescas, frutos secos, panes artesanos, confituras y una selección afinada que dejará impresionados a todos los invitados.
+            </p>
+            {!isSeller && (
+              <div className="pt-2">
+                <a
+                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20presupuesto%20para%20Mesa%20de%20Quesos%20para%20Boda/Evento"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
+                >
+                  <span>Pedir Presupuesto para Bodas</span>
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
+          <div className="relative h-64 overflow-hidden">
+            <img
+              src="/images/secciones/Quesos.JPG"
+              alt="Préstamo de Raclette"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
+              Alquiler & Pack
+            </div>
+          </div>
+          <div className="p-6 sm:p-8 space-y-4">
+            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+              <Flame className="w-6 h-6" />
+              <h2 className="font-serif font-bold text-2xl text-stone-900 dark:text-stone-100">
+                Préstamo de Raclette
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+              Te prestamos la máquina profesional de raclette tradicional suiza junto con el queso de raclette afinado cortado a la perfección, embutidos artesanos y patatas para que disfrutes de una velada única sin preocuparte por el equipamiento.
+            </p>
+            {!isSeller && (
+              <div className="pt-2">
+                <a
+                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20información%20sobre%20el%20Préstamo%20de%20Raclette%20y%20pack%20de%20queso"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
+                >
+                  <span>Consultar Disponibilidad de Raclette</span>
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+`,
+
+  // 3. TARJETA DE PRODUCTO LEGIBLE
+  'components/ProductCard.tsx': `'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { deleteProduct } from '@/app/actions/products';
+import { getProductImage } from '@/lib/productHelpers';
+import type { ProductWithSeller } from '@/types/database';
+import { ShoppingBag, MessageCircle, MapPin, Check, Pencil, Trash2, Ticket } from 'lucide-react';
+
+interface ProductCardProps {
+  product: ProductWithSeller;
+  isSeller?: boolean;
+}
+
+export function ProductCard({ product, isSeller = false }: ProductCardProps) {
+  const { addToCart } = useCart();
+  const { t } = useLanguage();
+  const [added, setAdded] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
+  const isLowStock = !product.is_unlimited_stock && (product.stock ?? 0) > 0 && (product.stock ?? 0) <= 5;
+  const isEvent =
+    product.category_id === 'catas' ||
+    product.category_id === 'cata_presencial' ||
+    product.category_id === 'experiencia' ||
+    product.name.toLowerCase().includes('cata');
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isSoldOut) return;
+    addToCart(product, 'EkhiTeka Selección');
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm(\`¿Eliminar "\${product.name}" del catálogo de EkhiTeka?\`)) {
+      setIsDeleting(true);
+      await deleteProduct(product.id);
+      window.location.reload();
+    }
+  };
+
+  const sellerName = 'EkhiTeka Gourmet Lekeitio';
+  const sellerId = product.seller_id;
+  const imageUrl = getProductImage(product);
+
+  return (
+    <article
+      aria-label={product.name}
+      className={\`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col justify-between overflow-hidden transition-all duration-300 \${
+        isDeleting ? 'opacity-40 pointer-events-none' : ''
+      }\`}
+    >
+      <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden shrink-0">
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+          }}
+        />
+
+        {product.origin_region && (
+          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2.5 py-1 bg-[#1D1D1B]/85 dark:bg-black/85 backdrop-blur-xs text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-xs max-w-[55%] truncate">
+            <MapPin className="w-3 h-3 text-[#FFE259] shrink-0" />
+            <span className="truncate">{product.origin_region}</span>
+          </span>
+        )}
+
+        <div className="absolute top-2.5 right-2.5 flex items-center">
+          {isSoldOut ? (
+            <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-md animate-pulse">
+              {isEvent ? 'Sin Plazas' : 'Agotado'}
+            </span>
+          ) : isLowStock ? (
+            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
+              {isEvent ? \`¡\${product.stock} plazas!\` : \`¡\${product.stock} uds!\`}
+            </span>
+          ) : isEvent ? (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
+              <Ticket className="w-3 h-3" />
+              <span>{product.stock} plazas</span>
+            </span>
+          ) : (
+            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-xs">
+              Artisau
+            </span>
+          )}
+        </div>
+
+        <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-tight shadow-xs border border-stone-200/80 dark:border-stone-700/80">
+          {product.format} {product.weight_g ? \`· \${product.weight_g}g\` : ''}
+        </span>
+      </div>
+
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+        <div className="space-y-1.5">
+          <p className="text-[10px] sm:text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider truncate">
+            {sellerName}
+          </p>
+
+          <Link
+            href={\`/producto/\${product.id}\`}
+            className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors"
+          >
+            <h2 className="font-serif font-black text-stone-900 dark:text-stone-100 text-base sm:text-lg leading-snug break-words">
+              {product.name}
+            </h2>
+          </Link>
+
+          {product.description && (
+            <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed pt-0.5 font-medium whitespace-pre-line line-clamp-4">
+              {product.description}
+            </p>
+          )}
+        </div>
+
+        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
+          <div className="shrink-0">
+            <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider block">
+              {isEvent ? 'Precio / Plaza' : t.prod_price}
+            </span>
+            <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
+              {Number(product.price).toFixed(2)} €
+            </span>
+          </div>
+
+          {isSeller ? (
+            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+              <Link
+                href={\`/vendedor/productos/\${product.id}/editar\`}
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-102 font-serif uppercase tracking-wider cursor-pointer"
+                title="Editar Producto"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Editar</span>
+              </Link>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer border border-red-200 dark:border-red-800"
+                title="Eliminar Producto"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+              <Link
+                href={\`/chat/\${sellerId}?product_id=\${product.id}\`}
+                className="p-2.5 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 shrink-0"
+                title={t.prod_ask_artisan}
+              >
+                <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-200" />
+              </Link>
+
+              <button
+                type="button"
+                disabled={isSoldOut}
+                onClick={handleQuickAdd}
+                className={\`flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xs active:scale-95 font-serif cursor-pointer shrink-0 \${
+                  isSoldOut
+                    ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed shadow-none'
+                    : added
+                    ? 'bg-emerald-700 text-white'
+                    : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-102'
+                }\`}
+              >
+                {isSoldOut ? (
+                  <span>{isEvent ? 'Sin plazas' : 'Agotado'}</span>
+                ) : added ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>Añadido</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>{isEvent ? 'Reservar' : t.prod_add_to_cart}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+`
+};
+
+console.log('📦 Escribiendo archivos en el proyecto EkhiTeka...');
+
+Object.entries(files).forEach(([filePath, content]) => {
+  const fullPath = path.join(process.cwd(), filePath);
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+  fs.writeFileSync(fullPath, content.trim(), 'utf8');
+  console.log(`✅ Creado / Actualizado: ${filePath}`);
+});
+
+console.log('\n🎉 ¡Todos los archivos se han aplicado correctamente en sus carpetas!');

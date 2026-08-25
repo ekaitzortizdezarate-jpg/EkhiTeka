@@ -7,7 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
 import { getProductImage } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, MessageCircle, MapPin, Check, Pencil, Trash2, Calendar, Ticket } from 'lucide-react';
+import { ShoppingBag, MessageCircle, MapPin, Check, Pencil, Trash2, Ticket } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductWithSeller;
@@ -58,7 +58,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         isDeleting ? 'opacity-40 pointer-events-none' : ''
       }`}
     >
-      {/* 1. Imagen y Badges Superpuestos */}
       <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden shrink-0">
         <img
           src={imageUrl}
@@ -69,7 +68,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           }}
         />
 
-        {/* Badge Superior Izquierdo: Origen */}
         {product.origin_region && (
           <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2.5 py-1 bg-[#1D1D1B]/85 dark:bg-black/85 backdrop-blur-xs text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-xs max-w-[55%] truncate">
             <MapPin className="w-3 h-3 text-[#FFE259] shrink-0" />
@@ -77,7 +75,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           </span>
         )}
 
-        {/* Badge Superior Derecho: Estado de Plazas / Stock / Artesanal */}
         <div className="absolute top-2.5 right-2.5 flex items-center">
           {isSoldOut ? (
             <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-md animate-pulse">
@@ -99,13 +96,11 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           )}
         </div>
 
-        {/* Badge Inferior Izquierdo: Formato & Peso */}
         <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-tight shadow-xs border border-stone-200/80 dark:border-stone-700/80">
           {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
         </span>
       </div>
 
-      {/* 2. Cuerpo de Información */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
         <div className="space-y-1.5">
           <p className="text-[10px] sm:text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider truncate">
@@ -121,7 +116,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             </h2>
           </Link>
 
-          {/* Descripción completa y legible en todas las resoluciones */}
           {product.description && (
             <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed pt-0.5 font-medium whitespace-pre-line line-clamp-4">
               {product.description}
@@ -129,7 +123,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           )}
         </div>
 
-        {/* 3. Precio y Botones de Acción */}
         <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
           <div className="shrink-0">
             <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider block">
@@ -141,7 +134,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           </div>
 
           {isSeller ? (
-            /* Botones para Vendedor */
             <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
               <Link
                 href={`/vendedor/productos/${product.id}/editar`}
@@ -161,7 +153,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               </button>
             </div>
           ) : (
-            /* Botones para Comprador */
             <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
               <Link
                 href={`/chat/${sellerId}?product_id=${product.id}`}

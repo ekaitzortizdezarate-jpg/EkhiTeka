@@ -38,7 +38,6 @@ export default async function ExperienciasPage() {
 
   const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
 
-  // 1. Catálogo de productos de Catas en Casa y Catas Presenciales
   const tastingProducts = allProducts.filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
@@ -60,7 +59,6 @@ export default async function ExperienciasPage() {
     );
   });
 
-  // 2. Próximos eventos de Catas Presenciales en tienda
   const presencialEvents = allProducts.filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
@@ -87,7 +85,7 @@ export default async function ExperienciasPage() {
 
   return (
     <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Tarjeta de presentación de la ventana (Hero Banner) */}
+      {/* 1. Tarjeta presentación */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
@@ -113,9 +111,8 @@ export default async function ExperienciasPage() {
         </div>
       </section>
 
-      {/* 2. Info de Catas en Casa e Info de Catas en la Tienda */}
+      {/* 2. Info Catas en Casa e Info Catas en la Tienda */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Catas en Casa */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -152,7 +149,6 @@ export default async function ExperienciasPage() {
           </div>
         </div>
 
-        {/* Catas en la Tienda */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -190,7 +186,7 @@ export default async function ExperienciasPage() {
         </div>
       </section>
 
-      {/* 3. Productos generados de tipo Cata en Casa y Cata Presencial */}
+      {/* 3. Productos tipo cata en casa y cata presencial */}
       {tastingProducts.length > 0 && (
         <section className="space-y-6 pt-2">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
@@ -210,7 +206,7 @@ export default async function ExperienciasPage() {
         </section>
       )}
 
-      {/* 4. Próximos Eventos de Catas Presenciales que haya */}
+      {/* 4. Próximos eventos de catas presenciales */}
       {presencialEvents.length > 0 && (
         <section className="space-y-6 pt-4">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
@@ -231,9 +227,8 @@ export default async function ExperienciasPage() {
         </section>
       )}
 
-      {/* 5. Info de Mesa para Bodas e Info de Préstamo de Raclette */}
+      {/* 5. Mesa para Bodas y Préstamo de Raclette */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-        {/* Mesa para Bodas */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -270,7 +265,6 @@ export default async function ExperienciasPage() {
           </div>
         </div>
 
-        {/* Préstamo de Raclette */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
