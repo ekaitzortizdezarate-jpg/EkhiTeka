@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { isProfileComplete } from '@/types/database';
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -64,7 +63,7 @@ export async function register(formData: FormData) {
   redirect('/');
 }
 
-// Alias para compatibilidad con componentes que importan 'signup'
+// Exportación requerida por app/register/page.tsx
 export const signup = register;
 
 export async function updateProfile(formData: FormData) {
