@@ -90,9 +90,9 @@ export function NavbarNavLinks({
   }, [mobileMenuOpen]);
 
   return (
-    <div className="flex items-center justify-between w-full min-w-0 gap-2 lg:gap-3">
-      {/* 1. LADO IZQUIERDO: Logotipo y Enlaces de Navegación */}
-      <div className="flex items-center gap-2 sm:gap-4 lg:gap-3 xl:gap-5 min-w-0">
+    <div className="flex items-center justify-between w-full min-w-0 gap-3">
+      {/* 1. LADO IZQUIERDO: Logotipo y Enlaces Principales */}
+      <div className="flex items-center gap-3 xl:gap-5 min-w-0">
         {/* Botón Menú Móvil */}
         <button
           type="button"
@@ -104,8 +104,8 @@ export function NavbarNavLinks({
         </button>
 
         {/* Logotipo Oficial EkhiTeka */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 group min-w-0">
-          <div className="relative w-10 h-10 sm:w-12 sm:h-12 lg:w-11 lg:h-11 xl:w-13 xl:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
+          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
             <img
               src="/Logo.jpg"
               alt="EkhiTeka Logo"
@@ -113,20 +113,20 @@ export function NavbarNavLinks({
             />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-serif font-black text-lg sm:text-xl lg:text-lg xl:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
+            <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
               Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
             </span>
-            <span className="hidden xl:block text-[9px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              Quesería · Lekeitio
+            <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
+              Quesería & Selección Gourmet · Lekeitio
             </span>
           </div>
         </Link>
 
-        {/* Enlaces Principales */}
-        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 font-serif">
+        {/* Enlaces Principales con tamaño ampliado y sin solapamiento */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 font-serif">
           <Link
             href="/tienda"
-            className={`flex items-center justify-center text-center px-2.5 xl:px-3.5 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-bold transition-all whitespace-nowrap min-h-[38px] ${
               pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -137,7 +137,7 @@ export function NavbarNavLinks({
 
           <Link
             href="/regalos-gourmet"
-            className={`flex flex-col items-center justify-center text-center px-2.5 xl:px-3 py-1 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[9.5px] xl:text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
               pathname === '/regalos-gourmet'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -149,7 +149,7 @@ export function NavbarNavLinks({
 
           <Link
             href="/experiencias"
-            className={`flex flex-col items-center justify-center text-center px-2.5 xl:px-3 py-1 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[9.5px] xl:text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
               pathname === '/experiencias'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -161,7 +161,7 @@ export function NavbarNavLinks({
 
           <Link
             href="/regalos-empresa"
-            className={`flex flex-col items-center justify-center text-center px-2.5 xl:px-3 py-1 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[9.5px] xl:text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
               pathname === '/regalos-empresa'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -176,7 +176,7 @@ export function NavbarNavLinks({
               {/* Pedidos */}
               <Link
                 href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                className={`relative flex items-center justify-center text-center gap-1 px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-semibold transition-all whitespace-nowrap ${
+                className={`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
                   pathname.includes('/pedidos')
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                     : hasUnseenOrderUpdates
@@ -194,7 +194,7 @@ export function NavbarNavLinks({
               {isSeller && (
                 <Link
                   href="/vendedor/eventos"
-                  className={`flex items-center justify-center text-center px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-semibold transition-all whitespace-nowrap ${
+                  className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
                     pathname === '/vendedor/eventos'
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                       : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -204,13 +204,14 @@ export function NavbarNavLinks({
                 </Link>
               )}
 
-              {/* Vendedor: Añadir Producto */}
+              {/* Vendedor: Añadir Producto en 2 líneas justificado en el centro */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
-                  className="flex items-center justify-center text-center px-3 xl:px-3.5 py-1.5 xl:py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl transition-all shadow-xs font-black uppercase tracking-[0.12em] xl:tracking-[0.14em] text-[10px] xl:text-[10.5px] hover:scale-102 whitespace-nowrap"
+                  className="flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl transition-all shadow-xs font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px]"
                 >
-                  <span>Añadir Producto</span>
+                  <span className="block text-center">Añadir</span>
+                  <span className="block text-center">Producto</span>
                 </Link>
               )}
 
@@ -218,7 +219,7 @@ export function NavbarNavLinks({
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="flex items-center justify-center text-center px-2.5 xl:px-3 py-1.5 xl:py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-xl transition-all font-semibold uppercase tracking-[0.12em] text-[10px] whitespace-nowrap"
+                  className="flex items-center justify-center text-center px-3 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-2xl transition-all font-semibold uppercase tracking-[0.14em] text-[11px] whitespace-nowrap min-h-[38px]"
                 >
                   <span>{t.nav_admin}</span>
                 </Link>
@@ -229,18 +230,18 @@ export function NavbarNavLinks({
       </div>
 
       {/* 2. LADO DERECHO: Cesta -> Mensajes -> Perfil -> Cerrar Sesión */}
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         {user ? (
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Cesta (solo comprador) */}
+          <div className="flex items-center gap-2">
+            {/* Cesta */}
             {(!profile || profile.role === 'comprador') && (
               <CartNavButton />
             )}
 
-            {/* Mensajes: Justificado a la derecha, a la izquierda de Perfil, solo icono */}
+            {/* Mensajes (Icono a la izquierda de Perfil) */}
             <Link
               href="/chat"
-              className={`relative p-2 sm:p-2.5 rounded-xl border transition-all shrink-0 ${
+              className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
                 pathname.startsWith('/chat')
                   ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
                   : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
@@ -258,7 +259,7 @@ export function NavbarNavLinks({
             {/* Perfil */}
             <Link
               href="/perfil"
-              className={`p-2 sm:p-2.5 rounded-xl border transition-colors shrink-0 ${
+              className={`p-2.5 rounded-2xl border transition-colors shrink-0 ${
                 pathname === '/perfil'
                   ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
                   : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
@@ -272,7 +273,7 @@ export function NavbarNavLinks({
             <form action={signout} className="shrink-0">
               <button
                 type="submit"
-                className="p-2 sm:p-2.5 rounded-xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
+                className="p-2.5 rounded-2xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
                 title={t.nav_logout}
               >
                 <LogOut className="w-4 h-4" />
@@ -283,13 +284,13 @@ export function NavbarNavLinks({
           <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/login"
-              className="px-3.5 py-2 text-xs font-bold text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="px-4 py-2.5 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             >
               {t.nav_login}
             </Link>
             <Link
               href="/register"
-              className="px-3.5 py-2 text-xs font-black bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-xl transition-all shadow-2xs"
+              className="px-4 py-2.5 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
             >
               {t.nav_register}
             </Link>
