@@ -5,142 +5,91 @@ import type { Category } from '@/types/database';
 
 interface CategoryCircleGridProps {
   categories: Category[];
-  selectedCategory: string;
-  onSelectCategory: (id: string) => void;
+  selectedCategory?: string;
+  onSelectCategory?: (categoryId: string) => void;
 }
 
 export function CategoryCircleGrid({
   categories,
-  selectedCategory,
+  selectedCategory = 'all',
   onSelectCategory,
 }: CategoryCircleGridProps) {
   const { t, language } = useLanguage();
 
-  const curatedCards = [
-    {
-      id: 'queso',
-      title: 'Quesos de Autor',
-      subtitle: 'Afinados & Selección',
-      icon: '🧀',
-      image: '/images/secciones/Quesos.JPG',
-      badge: 'Favorito',
-    },
-    {
-      id: 'salazon',
-      title: 'Salazones & Anchoas',
-      subtitle: 'Del Cantábrico',
-      icon: '🐟',
-      image: '/images/secciones/Salazones.JPG',
-      badge: 'Costera',
-    },
-    {
-      id: 'atun',
-      title: 'Bonito del Norte',
-      subtitle: 'Conserva artesana',
-      icon: '🌊',
-      image: '/images/secciones/Bonito.JPG',
-      badge: 'Artesano',
-    },
-    {
-      id: 'jildas',
-      title: 'Gildas Selectas',
-      subtitle: 'Aperitivo Lekeitio',
-      icon: '🫒',
-      image: '/images/secciones/Gildas.JPG',
-      badge: 'Top Pintxo',
-    },
-    {
-      id: 'txakoli',
-      title: 'Txakoli & Vinos',
-      subtitle: 'Maridaje perfecto',
-      icon: '🍷',
-      image: '/images/secciones/Txakoli.JPG',
-      badge: 'Km0',
-    },
-    {
-      id: 'cerveza',
-      title: 'Cerveza Artesana',
-      subtitle: 'Elaboración local',
-      icon: '🍺',
-      image: '/images/secciones/Cerveza.JPG',
-      badge: 'Craft',
-    },
-    {
-      id: 'sidra',
-      title: 'Sidra Natural',
-      subtitle: 'Tradición vasca',
-      icon: '🍏',
-      image: '/images/secciones/Sidra.JPG',
-      badge: 'Natural',
-    },
-  ];
+  const getCategoryName = (cat: Category) => {
+    if (language === 'eu') return cat.name_eu;
+    if (language === 'fr') return cat.name_fr;
+    if (language === 'en') return cat.name_en;
+    return cat.name_es;
+  };
+
+  const getCategorySubtitle = (slug: string) => {
+    switch (slug) {
+      case 'quesos':
+        return language === 'eu' ? 'Artisau & Afinatuak' : 'Artesanos & Afinados';
+      case 'atun':
+        return language === 'eu' ? 'Kantauri itsasoa' : 'Cantábrico Costera';
+      case 'salazones':
+        return language === 'eu' ? 'Antxoak & Gatzadurak' : 'Anchoas & Salazón';
+      case 'gildas':
+        return language === 'eu' ? 'Gilda & Ozpinetakoak' : 'Gildas & Encurtidos';
+      case 'cerveza':
+        return language === 'eu' ? 'Garagardo Bereziak' : 'Craft & Especiales';
+      case 'txakoli':
+        return language === 'eu' ? 'Bizkaiko Txakolina' : 'Bizkaiko Txakolina';
+      case 'sidra':
+        return language === 'eu' ? 'Euskal Sagardoa' : 'Euskal Sagardoa';
+      default:
+        return 'Gourmet Selection';
+    }
+  };
 
   return (
     <section className="space-y-6 pt-2">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+      <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
         <div>
           <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-            Descubre nuestras joyas
+            {t.cat_explore}
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight">
-            ¿Qué te apetece hoy?
+          <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 uppercase font-serif tracking-tight">
+            Categorías Selección EkhiTeka
           </h2>
         </div>
-        <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">
-          Selecciona una categoría para explorar nuestros bocados más especiales
-        </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-3.5">
-        {curatedCards.map((card) => {
-          const isSelected = selectedCategory === card.id;
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+        {categories.map((cat) => {
+          const isSelected = selectedCategory === cat.id;
           return (
             <button
-              key={card.id}
+              key={cat.id}
               type="button"
-              onClick={() => onSelectCategory(card.id)}
-              className={`manduca-card group text-left p-3.5 sm:p-4 rounded-3xl border transition-all duration-300 flex flex-col justify-between h-44 sm:h-50 cursor-pointer relative overflow-hidden ${
+              onClick={() => onSelectCategory?.(cat.id)}
+              className={`group relative p-3 sm:p-4 rounded-3xl border-2 text-center transition-all flex flex-col items-center justify-between cursor-pointer hover:scale-103 shadow-xs ${
                 isSelected
-                  ? 'bg-[#FFE259] border-stone-800 text-[#1D1D1B] shadow-md scale-102 ring-2 ring-stone-900/10'
-                  : 'bg-white dark:bg-[#1E1D1B] border-stone-200 dark:border-stone-800 hover:border-[#FFE259] text-stone-900 dark:text-stone-100 shadow-2xs'
+                  ? 'bg-[#FFE259] border-stone-900 dark:border-white shadow-md'
+                  : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259]'
               }`}
             >
-              <div className="flex items-start justify-between z-10 w-full">
-                <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 flex items-center justify-center border border-stone-200/60 dark:border-stone-700 shadow-2xs">
-                  <img
-                    src={card.image}
-                    alt={card.title}
-                    className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-500"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
-                      const parent = (e.target as HTMLElement).parentElement;
-                      if (parent && !parent.querySelector('.emoji-fallback')) {
-                        const span = document.createElement('span');
-                        span.className = 'emoji-fallback text-2xl';
-                        span.innerText = card.icon;
-                        parent.appendChild(span);
-                      }
-                    }}
-                  />
-                </div>
-                <span className={`text-[8px] sm:text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase ${
-                  isSelected
-                    ? 'bg-stone-900 text-white'
-                    : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
-                }`}>
-                  {card.badge}
-                </span>
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] mb-2 p-0.5 bg-[#FAF8F5]">
+                <img
+                  src={cat.image_url || '/images/secciones/Quesos.JPG'}
+                  alt={getCategoryName(cat)}
+                  className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
+                />
               </div>
 
-              <div className="z-10 pt-2">
-                <h3 className="font-black text-xs sm:text-sm leading-tight group-hover:text-stone-950 dark:group-hover:text-white">
-                  {card.title}
-                </h3>
-                <p className={`text-[10px] sm:text-[11px] font-semibold pt-0.5 leading-tight ${
-                  isSelected ? 'text-stone-800' : 'text-stone-500 dark:text-stone-400'
+              <div className="space-y-0.5 min-w-0 w-full">
+                <span className={`block font-serif font-black text-xs sm:text-[13px] truncate leading-tight ${
+                  isSelected ? 'text-[#1D1D1B]' : 'text-stone-900 dark:text-stone-100 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259]'
                 }`}>
-                  {card.subtitle}
-                </p>
+                  {getCategoryName(cat)}
+                </span>
+                <span className={`block text-[9.5px] font-sans font-bold uppercase tracking-wider truncate ${
+                  isSelected ? 'text-stone-800' : 'text-stone-400 dark:text-stone-500'
+                }`}>
+                  {getCategorySubtitle(cat.slug)}
+                </span>
               </div>
             </button>
           );

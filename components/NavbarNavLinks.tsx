@@ -91,19 +91,17 @@ export function NavbarNavLinks({
 
   return (
     <div className="flex items-center justify-between w-full min-w-0 gap-3">
-      {/* 1. LADO IZQUIERDO: Logotipo y Enlaces Principales */}
+      {/* LADO IZQUIERDO */}
       <div className="flex items-center gap-3 xl:gap-5 min-w-0">
-        {/* Botón Menú Móvil */}
         <button
           type="button"
           onClick={() => setMobileMenuOpen(true)}
           className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
-          aria-label="Abrir menú de navegación"
+          aria-label="Menu"
         >
           <Menu className="w-6 h-6" />
         </button>
 
-        {/* Logotipo Oficial EkhiTeka */}
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
           <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
             <img
@@ -122,7 +120,7 @@ export function NavbarNavLinks({
           </div>
         </Link>
 
-        {/* Enlaces Principales */}
+        {/* Enlaces Desktop */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 font-serif">
           <Link
             href="/tienda"
@@ -173,7 +171,6 @@ export function NavbarNavLinks({
 
           {user && (
             <>
-              {/* Pedidos */}
               <Link
                 href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                 className={`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
@@ -190,7 +187,6 @@ export function NavbarNavLinks({
                 )}
               </Link>
 
-              {/* Eventos (Solo Vendedor) */}
               {isSeller && (
                 <Link
                   href="/vendedor/eventos"
@@ -200,11 +196,10 @@ export function NavbarNavLinks({
                       : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                 >
-                  <span>Eventos</span>
+                  <span>{t.nav_events}</span>
                 </Link>
               )}
 
-              {/* Vendedor: Añadir Producto */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
@@ -219,7 +214,6 @@ export function NavbarNavLinks({
                 </Link>
               )}
 
-              {/* Admin */}
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -233,16 +227,12 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO: Cesta -> Mensajes -> Perfil -> Cerrar Sesión */}
+      {/* LADO DERECHO */}
       <div className="flex items-center gap-2 shrink-0">
         {user ? (
           <div className="flex items-center gap-2">
-            {/* Cesta */}
-            {(!profile || profile.role === 'comprador') && (
-              <CartNavButton />
-            )}
+            {(!profile || profile.role === 'comprador') && <CartNavButton />}
 
-            {/* Mensajes */}
             <Link
               href="/chat"
               className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
@@ -260,7 +250,6 @@ export function NavbarNavLinks({
               )}
             </Link>
 
-            {/* Perfil */}
             <Link
               href="/perfil"
               className={`p-2.5 rounded-2xl border transition-colors shrink-0 ${
@@ -273,7 +262,6 @@ export function NavbarNavLinks({
               <User className="w-4 h-4" />
             </Link>
 
-            {/* Cerrar Sesión */}
             <form action={signout} className="shrink-0">
               <button
                 type="submit"
@@ -302,7 +290,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* 3. Mobile Navigation Drawer */}
+      {/* DRAWER MÓVIL (Orden estricto a partir de Tu Cuenta: Pedidos, Eventos, Añadir Producto, Mensajes, Perfil, Cerrar Sesión) */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
@@ -334,7 +322,7 @@ export function NavbarNavLinks({
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 rounded-full text-stone-300 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
-                  aria-label="Cerrar menú"
+                  aria-label="Close"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -390,7 +378,7 @@ export function NavbarNavLinks({
                 </Link>
               </div>
 
-              {/* Enlaces de Usuario Móvil (Orden estricto a partir de Tu Cuenta: Pedidos, Eventos, Añadir Producto, Mensajes, Perfil, Cerrar Sesión) */}
+              {/* SECCIÓN TU CUENTA */}
               <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Tu Cuenta
@@ -417,7 +405,7 @@ export function NavbarNavLinks({
                       )}
                     </Link>
 
-                    {/* 2. Eventos (solo vendedor) */}
+                    {/* 2. Eventos */}
                     {isSeller && (
                       <Link
                         href="/vendedor/eventos"
@@ -428,11 +416,11 @@ export function NavbarNavLinks({
                             : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
                         }`}
                       >
-                        <span>Eventos</span>
+                        <span>{t.nav_events}</span>
                       </Link>
                     )}
 
-                    {/* 3. Añadir Producto (solo vendedor) */}
+                    {/* 3. Añadir Producto */}
                     {isSeller && (
                       <Link
                         href="/vendedor/productos/nuevo"

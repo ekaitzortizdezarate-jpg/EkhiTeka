@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { ProductCard } from '@/components/ProductCard';
 import { CategoryCircleGrid } from '@/components/CategoryCircleGrid';
 import { ExperienceBanners } from '@/components/ExperienceBanners';
 import { CustomerReviews } from '@/components/CustomerReviews';
 import type { Category, ProductWithSeller } from '@/types/database';
-import { Search, SlidersHorizontal, Sparkles, ArrowDown, ChevronRight, MessageCircle } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, ArrowDown, MessageCircle } from 'lucide-react';
 
 interface CatalogViewProps {
   products: ProductWithSeller[];
@@ -96,7 +95,7 @@ export function CatalogView({
               <button
                 type="button"
                 onClick={scrollToCatalog}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider font-serif"
               >
                 <span>{t.shop_see_cheeses}</span>
                 <ArrowDown className="w-4 h-4" />
@@ -106,7 +105,7 @@ export function CatalogView({
                 href="https://wa.me/34600000000?text=Hola,%20quisiera%20hacer%20un%20encargo%20a%20medida"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-black/60 hover:bg-black/80 text-white font-black text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-black/60 hover:bg-black/80 text-white font-black text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105 font-serif"
               >
                 <MessageCircle className="w-4 h-4 text-[#FFE259]" />
                 <span>{t.shop_whatsapp_orders}</span>
@@ -143,7 +142,7 @@ export function CatalogView({
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
               {t.shop_specialty}
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight uppercase">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight uppercase font-serif">
               {t.cat_queso} & {t.brand_tagline}
             </h2>
           </div>
@@ -203,7 +202,7 @@ export function CatalogView({
             />
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end font-serif">
             <SlidersHorizontal className="w-4 h-4 text-stone-400 shrink-0" />
             <select
               value={sortBy}
@@ -271,7 +270,7 @@ export function CatalogView({
                 href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105 font-serif"
               >
                 <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
                 <span>{t.shop_visit_contact}</span>
