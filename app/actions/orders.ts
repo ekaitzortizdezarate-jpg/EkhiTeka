@@ -36,13 +36,37 @@ export async function createOrder(payload: CreateOrderPayload) {
     .single();
 
   if (profile?.role === 'vendedor') {
-    return { error: 'Los vendedores de EkhiTeka no pueden realizar compras con la cuenta de vendedor. Utiliza una cuenta de comprador.' };
+    return {
+      error:
+        'Los vendedores de EkhiTeka no pueden realizar compras con la cuenta de vendedor. Utiliza una cuenta de comprador.',
+    };
   }
 
   if (!isProfileComplete(profile)) {
-    return { error: 'Debes completar tu perfil con todos tus datos personales y de dirección antes de realizar un pedido.' };
+    return {
+      error:
+        'Debes completar tu perfil con todos tus datos personales antes de realizar un pedido.',
+    };
   }
 
+  // 1. Descontar plazas / stock inmediatamente al lanzar el pedido
+  for (const it of payload.items) {
+    const { data: prod } = await supabase
+      .from('products')
+      .select('stock, is_unlimited_stock')
+      .eq('id', it.productId)
+      .single();
+
+    if (prod && !prod.is_unlimited_stock && prod.stock !== null && prod.stock !== undefined) {
+      const remainingStock = Math.max(0, prod.stock - it.quantity);
+      await supabase
+        .from('products')
+        .update({ stock: remainingStock })
+        .eq('id', it.productId);
+    }
+  }
+
+  // 2. Crear el registro del pedido
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -62,6 +86,7 @@ export async function createOrder(payload: CreateOrderPayload) {
     return { error: orderError?.message || 'Error al crear el pedido' };
   }
 
+  // 3. Insertar las líneas del pedido
   const orderItemsData = payload.items.map((it) => ({
     order_id: order.id,
     product_id: it.productId,
@@ -78,6 +103,9 @@ export async function createOrder(payload: CreateOrderPayload) {
     return { error: itemsError.message };
   }
 
+  revalidatePath('/experiencias');
+  revalidatePath('/regalos-gourmet');
+  revalidatePath('/tienda');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
   return { success: true, orderId: order.id };
@@ -120,6 +148,29 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: 'No autenticado' };
   }
 
+  // Revertir el stock al cancelar
+  const { data: items } = await supabase
+    .from('order_items')
+    .select('product_id, quantity')
+    .eq('order_id', orderId);
+
+  if (items) {
+    for (const it of items) {
+      const { data: prod } = await supabase
+        .from('products')
+        .select('stock, is_unlimited_stock')
+        .eq('id', it.product_id)
+        .single();
+
+      if (prod && !prod.is_unlimited_stock && prod.stock !== null) {
+        await supabase
+          .from('products')
+          .update({ stock: prod.stock + it.quantity })
+          .eq('id', it.product_id);
+      }
+    }
+  }
+
   const { error } = await supabase
     .from('orders')
     .update({
@@ -133,6 +184,7 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: error.message };
   }
 
+  revalidatePath('/experiencias');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
   return { success: true };
