@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Store,
+  MessageCircle,
 } from 'lucide-react';
 
 interface NavbarNavLinksProps {
@@ -121,7 +122,7 @@ export function NavbarNavLinks({
           </div>
         </Link>
 
-        {/* Enlaces Principales sin solapamiento */}
+        {/* Enlaces Principales */}
         <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 font-serif">
           <Link
             href="/tienda"
@@ -172,7 +173,7 @@ export function NavbarNavLinks({
 
           {user && (
             <>
-              {/* Pedidos (Sin Icono) */}
+              {/* Pedidos */}
               <Link
                 href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                 className={`relative flex items-center justify-center text-center gap-1 px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-semibold transition-all whitespace-nowrap ${
@@ -189,7 +190,7 @@ export function NavbarNavLinks({
                 )}
               </Link>
 
-              {/* Eventos (Sin Icono - Solo Vendedor) */}
+              {/* Eventos (Solo Vendedor) */}
               {isSeller && (
                 <Link
                   href="/vendedor/eventos"
@@ -203,24 +204,7 @@ export function NavbarNavLinks({
                 </Link>
               )}
 
-              {/* Mensajes / Chat (Sin Icono) */}
-              <Link
-                href="/chat"
-                className={`relative flex items-center justify-center text-center gap-1 px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-semibold transition-all whitespace-nowrap ${
-                  pathname.startsWith('/chat')
-                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                }`}
-              >
-                <span>{t.nav_chats}</span>
-                {unreadMessagesCount > 0 && (
-                  <span className="w-3.5 h-3.5 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
-                    {unreadMessagesCount}
-                  </span>
-                )}
-              </Link>
-
-              {/* Vendedor: Añadir Producto (Sin Icono, texto exacto 'Añadir Producto') */}
+              {/* Vendedor: Añadir Producto */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
@@ -244,29 +228,51 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO: Menú Usuario (Cesta -> Perfil -> Salir, ordenados sin solaparse) */}
+      {/* 2. LADO DERECHO: Cesta -> Mensajes -> Perfil -> Cerrar Sesión */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {user ? (
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* 3º de dcha a izq: Cesta */}
+            {/* Cesta (solo comprador) */}
             {(!profile || profile.role === 'comprador') && (
               <CartNavButton />
             )}
 
-            {/* 2º de dcha a izq: Perfil */}
+            {/* Mensajes: Justificado a la derecha, a la izquierda de Perfil, solo icono */}
+            <Link
+              href="/chat"
+              className={`relative p-2 sm:p-2.5 rounded-xl border transition-all shrink-0 ${
+                pathname.startsWith('/chat')
+                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
+                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
+              }`}
+              title={t.nav_chats}
+            >
+              <MessageCircle className="w-4 h-4" />
+              {unreadMessagesCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
+                  {unreadMessagesCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Perfil */}
             <Link
               href="/perfil"
-              className="p-2 sm:p-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors shrink-0"
+              className={`p-2 sm:p-2.5 rounded-xl border transition-colors shrink-0 ${
+                pathname === '/perfil'
+                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
+                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
+              }`}
               title={t.nav_profile}
             >
               <User className="w-4 h-4" />
             </Link>
 
-            {/* 1º de dcha a izq (Extremo Derecho): Cerrar Sesión */}
+            {/* Cerrar Sesión */}
             <form action={signout} className="shrink-0">
               <button
                 type="submit"
-                className="p-2 sm:p-2.5 rounded-xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
+                className="p-2 sm:p-2.5 rounded-xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
                 title={t.nav_logout}
               >
                 <LogOut className="w-4 h-4" />
@@ -379,7 +385,7 @@ export function NavbarNavLinks({
                 </Link>
               </div>
 
-              {/* Enlaces de Usuario Móvil (Sin Iconos) */}
+              {/* Enlaces de Usuario Móvil */}
               <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Tu Cuenta
