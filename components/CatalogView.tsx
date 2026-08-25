@@ -28,7 +28,6 @@ export function CatalogView({
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<'name_asc' | 'name_desc' | 'price_asc' | 'price_desc'>('name_asc');
 
-  // Filtrado y ordenación
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
@@ -71,7 +70,6 @@ export function CatalogView({
       {/* 1. Hero Editorial Gourmet */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[420px] flex items-center">
         <div className="absolute inset-0 z-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/secciones/Tienda.JPG"
             alt="Tienda EkhiTeka Lekeitio"
@@ -118,7 +116,6 @@ export function CatalogView({
 
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
             <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] hover:scale-105 transition-transform duration-500">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/Logo.jpg"
                 alt="EkhiTeka Lekeitio"
@@ -152,14 +149,6 @@ export function CatalogView({
           </div>
 
           <div className="flex items-center gap-3">
-            {isSeller && (
-              <Link
-                href="/vendedor/productos/nuevo"
-                className="px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center gap-1.5 hover:scale-102"
-              >
-                <span>+ {t.seller_new_product}</span>
-              </Link>
-            )}
             <span className="text-xs font-bold text-stone-500 dark:text-stone-400">
               {t.prod_showing ? `${filteredProducts.length} ${t.prod_showing}` : `${filteredProducts.length}`}
             </span>
@@ -289,7 +278,6 @@ export function CatalogView({
           </div>
           <div className="lg:col-span-6">
             <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 h-64 sm:h-80 group">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/secciones/Tienda.JPG"
                 alt="Tienda EkhiTeka Lekeitio"
@@ -308,4 +296,3 @@ export function CatalogView({
     </div>
   );
 }
-

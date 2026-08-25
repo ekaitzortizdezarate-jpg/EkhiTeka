@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { updateEventDetails, removeEventParticipant } from '@/app/actions/events';
 import {
   Users,
-  Wine,
   MapPin,
   Mail,
   Phone,
@@ -17,6 +16,7 @@ import {
   X,
   Check,
   BellRing,
+  Wine,
 } from 'lucide-react';
 
 export interface AttendeeReservation {
@@ -106,7 +106,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
 
   return (
     <div className="max-w-5xl mx-auto py-6 px-3 sm:px-6 space-y-8">
-      {/* Header */}
+      {/* Header sin botón de añadir */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
@@ -124,14 +124,6 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
             </p>
           </div>
         </div>
-
-        <Link
-          href="/vendedor/productos/nuevo"
-          className="px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-xs transition-all flex items-center gap-1.5 font-serif hover:scale-102"
-        >
-          <Wine className="w-4 h-4" />
-          <span>+ Nueva Cata Presencial</span>
-        </Link>
       </div>
 
       {/* Lista de Catas Presenciales */}
@@ -218,7 +210,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                   </div>
                 </div>
 
-                {/* Tabla y Tarjeta de Asistentes con Soporte Total para Modo Oscuro */}
+                {/* Tabla de Asistentes */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300 flex items-center gap-2">
@@ -352,19 +344,13 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
               No tienes catas presenciales creadas todavía
             </h3>
             <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto">
-              Publica una cata presencial en la tienda de Lekeitio para gestionar aforo, plazas y asistentes desde este panel.
+              Publica una cata presencial en la tienda de Lekeitio desde el menú superior para gestionar aforo, plazas y asistentes.
             </p>
-            <Link
-              href="/vendedor/productos/nuevo"
-              className="inline-block px-6 py-3 bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-full shadow-xs transition-all font-serif hover:scale-105"
-            >
-              Publicar Nueva Cata Presencial
-            </Link>
           </div>
         )}
       </div>
 
-      {/* Modal para Editar Todas las Variables de la Cata Presencial */}
+      {/* Modal para Editar Variables de la Cata */}
       {editingEvent && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl">
