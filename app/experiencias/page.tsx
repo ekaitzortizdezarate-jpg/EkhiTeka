@@ -32,28 +32,40 @@ export default async function ExperienciasPage() {
 
   const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
 
-  // Filtrar estrictamente solo catas presenciales en tienda
-  const presencialEvents = allProducts.filter((p) => {
+  // Filtrar productos de tipo Cata Presencial y Cata en Casa
+  const tastingProducts = allProducts.filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
     const desc = (p.description || '').toLowerCase();
 
-    const isHomeOrGift =
-      name.includes('casa') ||
-      cat.includes('casa') ||
-      cat === 'cesta' ||
-      cat === 'tarjeta_regalo' ||
-      name.includes('tarjeta') ||
-      name.includes('cesta');
+    // Descartar tarjetas de regalo o cestas puras que no sean catas
+    if (cat === 'tarjeta_regalo' || (name.includes('tarjeta') && name.includes('regalo'))) {
+      return false;
+    }
 
-    if (isHomeOrGift) return false;
-
-    return (
+    const isCataPresencial =
       cat === 'cata_presencial' ||
       name.includes('presencial') ||
       desc.includes('presencial') ||
-      (desc.includes('fecha & hora') && desc.includes('aforo'))
-    );
+      (desc.includes('fecha & hora') && desc.includes('aforo'));
+
+    const isCataCasa =
+      cat === 'cata_casa' ||
+      name.includes('cata en casa') ||
+      name.includes('pack de cata') ||
+      name.includes('pack experiencia') ||
+      desc.includes('pack en casa') ||
+      desc.includes('en casa') ||
+      desc.includes('incluye pack en casa');
+
+    const isGeneralCata =
+      cat === 'catas' ||
+      cat === 'experiencia' ||
+      name.includes('cata') ||
+      name.includes('degustación') ||
+      name.includes('taller');
+
+    return isCataPresencial || isCataCasa || isGeneralCata;
   });
 
   return (
@@ -98,7 +110,7 @@ export default async function ExperienciasPage() {
         </div>
       </section>
 
-      {/* Grid de las 4 Experiencias */}
+      {/* Grid de las 4 Experiencias Informativas */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* 1. Catas en Casa */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
@@ -249,16 +261,16 @@ export default async function ExperienciasPage() {
         </div>
       </section>
 
-      {/* Sección Próximas Catas Presenciales Disponibles */}
-      {presencialEvents.length > 0 && (
+      {/* Sección Catas Disponibles (Presenciales en Tienda y Kits para Casa) */}
+      {tastingProducts.length > 0 && (
         <section className="space-y-6 pt-6">
           <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
             <div>
               <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-                Plazas limitadas · Tienda Lekeitio
+                Catas en tienda & Kits para casa
               </span>
               <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-                Próximas Catas Presenciales
+                Catas & Experiencias Disponibles
               </h3>
             </div>
             <Link
@@ -271,8 +283,8 @@ export default async function ExperienciasPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {presencialEvents.map((event) => (
-              <ProductCard key={event.id} product={event} isSeller={isSeller} />
+            {tastingProducts.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
             ))}
           </div>
         </section>
