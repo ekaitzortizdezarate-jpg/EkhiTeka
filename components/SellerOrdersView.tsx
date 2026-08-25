@@ -115,7 +115,7 @@ export function SellerOrdersView({ orders }: SellerOrdersViewProps) {
                   </div>
                 )}
 
-                {/* FILA 1 — Header Pedido: Cliente y Estado */}
+                {/* FILA 1 — Header Pedido */}
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-black text-stone-700 dark:text-stone-300 uppercase tracking-wider text-[11px] font-serif">
                     {t.orders_products_to_prepare} ({order.order_items?.length || 0})

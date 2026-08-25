@@ -241,7 +241,7 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO: Menú Usuario (Orden visual de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta) */}
+      {/* 2. LADO DERECHO: Menú Usuario (Orden de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta) */}
       <div className="flex items-center gap-2 shrink-0">
         {user ? (
           <div className="flex items-center gap-2">
@@ -271,7 +271,7 @@ export function NavbarNavLinks({
             </form>
           </div>
         ) : (
-          /* Sin sesión: la cesta no aparece en absoluto */
+          /* Sin sesión: la cesta no aparece */
           <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/login"

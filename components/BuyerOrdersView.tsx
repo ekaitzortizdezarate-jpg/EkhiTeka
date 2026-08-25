@@ -184,7 +184,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                   })}
                 </div>
 
-                {/* FILA 3 — Tipo de envío + dirección · Fecha de compra (Modo Oscuro Corregido) */}
+                {/* FILA 3 — Tipo de envío + dirección · Fecha de compra */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 flex items-start gap-2.5">
                     {isDelivery ? (
@@ -255,7 +255,7 @@ export function BuyerOrdersView({ orders }: BuyerOrdersViewProps) {
                   </div>
                 </div>
 
-                {/* Cancelar pedido (solo si pendiente) */}
+                {/* Cancelar pedido */}
                 {order.status === 'pendiente' && (
                   <button
                     type="button"
