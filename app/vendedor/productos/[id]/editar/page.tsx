@@ -26,9 +26,10 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     redirect('/');
   }
 
-  const [categoriesRes, productRes] = await Promise.all([
+  const [categoriesRes, productRes, productsRes] = await Promise.all([
     supabase.from('categories').select('*').eq('is_active', true).order('display_order', { ascending: true }),
     supabase.from('products').select('*').eq('id', id).single(),
+    supabase.from('products').select('*').eq('is_active', true).order('name', { ascending: true }),
   ]);
 
   if (productRes.error || !productRes.data) {
@@ -39,6 +40,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     <SellerProductForm
       categories={(categoriesRes.data || []) as Category[]}
       initialProduct={productRes.data as Product}
+      storeProducts={(productsRes.data || []) as Product[]}
     />
   );
 }

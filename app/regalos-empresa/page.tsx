@@ -1,11 +1,53 @@
-import { Building2, Users2, Gift, TreePine, Sparkles, MessageCircle, ArrowRight, Award } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { ProductCard } from '@/components/ProductCard';
+import type { ProductWithSeller } from '@/types/database';
+import { Building2, Users2, Gift, TreePine, MessageCircle, ArrowRight } from 'lucide-react';
 
 export const revalidate = 0;
 
-export default function RegalosEmpresaPage() {
+export default async function RegalosEmpresaPage() {
+  const supabase = await createClient();
+
+  const [{ data: { user } }, productsRes] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('products')
+      .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false }),
+  ]);
+
+  let isSeller = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+      isSeller = true;
+    }
+  }
+
+  const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
+
+  // Filtra productos dirigidos a empresas o lotes corporativos
+  const companyProducts = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    return (
+      cat === 'empresa' ||
+      cat === 'regalos_empresa' ||
+      name.includes('empresa') ||
+      name.includes('corporativ') ||
+      name.includes('teambuilding') ||
+      name.includes('navidad')
+    );
+  });
+
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* Header Banner Regalos de Empresa */}
+      {/* 1. Header Banner Regalos de Empresa */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
@@ -43,9 +85,29 @@ export default function RegalosEmpresaPage() {
         </div>
       </section>
 
-      {/* 3 Servicios Corporativos Principales */}
+      {/* 2. Productos y Lotes para Empresas generados por el vendedor */}
+      {companyProducts.length > 0 && (
+        <section className="space-y-6 pt-2">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+              Lotes corporativos & experiencias
+            </span>
+            <h2 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Packs & Servicios Disponibles
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {companyProducts.map((p) => (
+              <ProductCard key={p.id} product={p} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 3. Servicios Corporativos Principales */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* 1. Teambuilding */}
+        {/* Teambuilding */}
         <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div>
             <div className="relative h-56 overflow-hidden">
@@ -66,7 +128,7 @@ export default function RegalosEmpresaPage() {
                 </h2>
               </div>
               <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Catas guiadas a ciegas, retos de maridaje y talleres sensoriales en torno a la cultura del queso artesano. Diseñado para reforzar la cohesión de equipos tanto en nuestra tienda de Lekeitio como en las instalaciones de tu empresa.
+                Catas guiadas a ciegas, retos de maridaje y talleres sensoriales en torno a la cultura del queso artesano. Diseñado para reforzar la cohesión de equipos.
               </p>
             </div>
           </div>
@@ -83,7 +145,7 @@ export default function RegalosEmpresaPage() {
           </div>
         </div>
 
-        {/* 2. Cesta de Navidad */}
+        {/* Cesta de Navidad */}
         <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div>
             <div className="relative h-56 overflow-hidden">
@@ -104,7 +166,7 @@ export default function RegalosEmpresaPage() {
                 </h2>
               </div>
               <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Lotes navideños de autor lejos de los catálogos convencionales: quesos premiados de afinador, bonito del Cantábrico embotado a mano, salazones selectas, turrones artesanos y txakolis de guarda.
+                Lotes navideños de autor: quesos premiados de afinador, bonito del Cantábrico embotado a mano, salazones selectas, turrones artesanos y txakolis de guarda.
               </p>
             </div>
           </div>
@@ -121,7 +183,7 @@ export default function RegalosEmpresaPage() {
           </div>
         </div>
 
-        {/* 3. Cestas para Empresas */}
+        {/* Cestas para Empresas */}
         <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div>
             <div className="relative h-56 overflow-hidden">
@@ -142,7 +204,7 @@ export default function RegalosEmpresaPage() {
                 </h2>
               </div>
               <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Regalos corporativos para clientes VIP, agradecimiento a colaboradores y bienvenidas de nuevos empleados. Personalizamos el packaging con tu identidad corporativa y notas personalizadas.
+                Regalos corporativos para clientes VIP, agradecimiento a colaboradores y bienvenidas. Personalizamos el packaging y las notas con tu identidad corporativa.
               </p>
             </div>
           </div>

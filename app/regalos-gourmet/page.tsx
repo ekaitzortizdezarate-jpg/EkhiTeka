@@ -31,7 +31,7 @@ export default async function RegalosGourmetPage() {
 
   const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
   
-  // Incluye cestas gourmet, tarjetas regalo y packs de cata en casa generados
+  // Incluye tarjetas de regalo, cestas gourmet y packs de cata en casa generados por el vendedor
   const giftProducts = allProducts.filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
@@ -51,7 +51,7 @@ export default async function RegalosGourmetPage() {
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* Header Banner Regalos Gourmet */}
+      {/* 1. Header Banner Regalos Gourmet */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
@@ -89,9 +89,29 @@ export default async function RegalosGourmetPage() {
         </div>
       </section>
 
-      {/* Los 3 Bloques Principales de Regalos Gourmet */}
+      {/* 2. Productos generados por el vendedor */}
+      {giftProducts.length > 0 && (
+        <section className="space-y-6 pt-2">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+              Disponibles para envío o recogida
+            </span>
+            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Cestas & Packs en Tienda
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {giftProducts.map((p) => (
+              <ProductCard key={p.id} product={p} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 3. Bloques de Información y Opciones de Regalo */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* 1. Cestas Gourmet */}
+        {/* Cestas Gourmet */}
         <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div>
             <div className="relative h-56 overflow-hidden">
@@ -112,7 +132,7 @@ export default async function RegalosGourmetPage() {
                 </h2>
               </div>
               <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
-                Selecciones equilibradas de quesos artesanos afinados, bonito del Cantábrico, salazones y maridajes vascos (Txakoli de Bizkaia, sidra y cerveza artesanal) en cajas de madera y estuches de regalo.
+                Selecciones equilibradas de quesos artesanos afinados, bonito del Cantábrico, salazones y maridajes vascos en cajas de madera y estuches de regalo.
               </p>
             </div>
           </div>
@@ -129,7 +149,7 @@ export default async function RegalosGourmetPage() {
           </div>
         </div>
 
-        {/* 2. Catas en Casa */}
+        {/* Catas en Casa */}
         <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div>
             <div className="relative h-56 overflow-hidden">
@@ -150,7 +170,7 @@ export default async function RegalosGourmetPage() {
                 </h2>
               </div>
               <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
-                Todo lo necesario para organizar una cata inolvidable en tu salón: tabla de quesos de autor en porciones identificadas, fichas de cata explicativas, maridajes recomendados y guía paso a paso.
+                Todo lo necesario para organizar una cata inolvidable en tu salón: tabla de quesos de autor, fichas de cata explicativas y maridajes recomendados.
               </p>
             </div>
           </div>
@@ -167,7 +187,7 @@ export default async function RegalosGourmetPage() {
           </div>
         </div>
 
-        {/* 3. Tarjetas Regalo Gourmet */}
+        {/* Tarjetas Regalo Gourmet */}
         <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div>
             <div className="relative h-56 overflow-hidden">
@@ -188,7 +208,7 @@ export default async function RegalosGourmetPage() {
                 </h2>
               </div>
               <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
-                El regalo con el que nunca fallas: tarjetas virtuales o físicas canjeables en tienda o catálogo por 30€, 60€, 75€ o canjeables por una cata de quesos presencial en Lekeitio.
+                El regalo con el que nunca fallas: tarjetas virtuales o físicas canjeables por productos EkhiTeka en tienda física o catálogo online.
               </p>
             </div>
           </div>
@@ -205,26 +225,6 @@ export default async function RegalosGourmetPage() {
           </div>
         </div>
       </section>
-
-      {/* Catálogo de Cestas, Tarjetas y Regalos Generados */}
-      {giftProducts.length > 0 && (
-        <section className="space-y-6 pt-4">
-          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Disponibles para envío o recogida
-            </span>
-            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-              Cestas & Packs en Tienda
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {giftProducts.map((p) => (
-              <ProductCard key={p.id} product={p} isSeller={isSeller} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

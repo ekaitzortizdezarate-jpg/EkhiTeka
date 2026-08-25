@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductWithSeller } from '@/types/database';
-import { UtensilsCrossed, Wine, Store, HeartHandshake, Sparkles, MessageCircle, Calendar, Users, Flame } from 'lucide-react';
+import { Wine, Store, HeartHandshake, Sparkles, MessageCircle, Flame } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -31,7 +31,7 @@ export default async function ExperienciasPage() {
 
   const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
   
-  // Filtra catas presenciales y catas en casa creadas
+  // Filtra catas presenciales (eventos con plazas) y packs de cata en casa creados
   const experienceProducts = allProducts.filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
@@ -48,7 +48,7 @@ export default async function ExperienciasPage() {
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* Header Banner */}
+      {/* 1. Header Banner */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
@@ -86,15 +86,15 @@ export default async function ExperienciasPage() {
         </div>
       </section>
 
-      {/* Catas y Experiencias Creadas Disponibles */}
+      {/* 2. Eventos y Catas Creadas por el Vendedor (Para comprar plazas) */}
       {experienceProducts.length > 0 && (
         <section className="space-y-6 pt-2">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Catas presenciales y kits para casa
+              Eventos con reserva de plaza & kits
             </span>
             <h2 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-              Catas & Experiencias Disponibles
+              Próximas Catas & Eventos Disponibles
             </h2>
           </div>
 
@@ -106,9 +106,9 @@ export default async function ExperienciasPage() {
         </section>
       )}
 
-      {/* Grid de las 4 Experiencias */}
+      {/* 3. Grid de las 4 Experiencias */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* 1. Catas en Casa */}
+        {/* Catas en Casa */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -128,7 +128,7 @@ export default async function ExperienciasPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Conviértete en anfitrión con nuestros kits completos de cata: selección de 6 quesos afinados clasificados por intensidades, maridajes artesanos de acompañamiento, mantel de cata ilustrado y fichas explicativas con notas de cata y maridajes.
+              Conviértete en anfitrión con nuestros kits completos de cata: selección de 6 quesos afinados clasificados por intensidades, maridajes artesanos de acompañamiento, mantel de cata ilustrado y fichas explicativas.
             </p>
             <div className="pt-2">
               <a
@@ -143,7 +143,7 @@ export default async function ExperienciasPage() {
           </div>
         </div>
 
-        {/* 2. Catas en la Tienda */}
+        {/* Catas en la Tienda */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -163,7 +163,7 @@ export default async function ExperienciasPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Experiencias presenciales exclusivas en nuestra quesería de Lekeitio (Gamarra Kalea 4). Guiadas por nuestros afinadores queseros en grupos reducidos, probando piezas de autor, txakoli de Bizkaia y maridajes singulares.
+              Experiencias presenciales exclusivas en nuestra quesería de Lekeitio (Gamarra Kalea 4). Guiadas por nuestros afinadores queseros en grupos reducidos, probando piezas de autor y maridajes singulares.
             </p>
             <div className="pt-2">
               <a
@@ -178,7 +178,7 @@ export default async function ExperienciasPage() {
           </div>
         </div>
 
-        {/* 3. Mesa para Bodas */}
+        {/* Mesa para Bodas */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -198,7 +198,7 @@ export default async function ExperienciasPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Creamos mesas de quesos espectaculares para cócteles de bodas y celebraciones. Diseños monumentales con frutas frescas, frutos secos, panes artesanos, confituras y una selección afinada que dejará impresionados a todos los invitados.
+              Creamos mesas de quesos espectaculares para cócteles de bodas y celebraciones con frutas frescas, panes artesanos, confituras y una selección afinada para impresionar a los invitados.
             </p>
             <div className="pt-2">
               <a
@@ -213,7 +213,7 @@ export default async function ExperienciasPage() {
           </div>
         </div>
 
-        {/* 4. Préstamo de Raclette */}
+        {/* Préstamo de Raclette */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -233,7 +233,7 @@ export default async function ExperienciasPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Te prestamos la máquina profesional de raclette tradicional suiza junto con el queso de raclette afinado cortado a la perfección, embutidos artesanos y patatas para que disfrutes de una velada única sin preocuparte por el equipamiento.
+              Te prestamos la máquina profesional de raclette tradicional suiza junto con el queso de raclette afinado, embutidos y acompañamientos para una velada inolvidable.
             </p>
             <div className="pt-2">
               <a

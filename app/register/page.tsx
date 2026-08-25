@@ -4,11 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { register } from '@/app/actions/auth';
-import { Lock, Mail, User, Phone, MapPin, Store, ArrowRight } from 'lucide-react';
+import { Lock, Mail, User, Phone, MapPin, ArrowRight } from 'lucide-react';
 
 export default function RegisterPage() {
   const { t } = useLanguage();
-  const [role, setRole] = useState<'comprador' | 'vendedor'>('comprador');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -18,7 +17,7 @@ export default function RegisterPage() {
     setErrorMsg(null);
 
     const formData = new FormData(e.currentTarget);
-    formData.set('role', role);
+    formData.set('role', 'comprador');
 
     const res = await register(formData);
     if (res?.error) {
@@ -59,43 +58,10 @@ export default function RegisterPage() {
           onSubmit={handleSubmit}
           className="bg-white/95 dark:bg-stone-900/95 backdrop-blur-md rounded-3xl border-2 border-stone-200/90 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-2xl"
         >
-          {/* Selector de Rol */}
+          {/* Nombre y Apellidos */}
           <div className="space-y-1.5">
             <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              Tipo de Cuenta
-            </label>
-            <div className="grid grid-cols-2 gap-2 font-serif">
-              <button
-                type="button"
-                onClick={() => setRole('comprador')}
-                className={`p-3 rounded-2xl border-2 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  role === 'comprador'
-                    ? 'border-[#C68D07] bg-[#FFE259] text-[#1D1D1B] shadow-xs'
-                    : 'border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 bg-stone-50 dark:bg-stone-800'
-                }`}
-              >
-                <User className="w-4 h-4" />
-                <span>{t.role_buyer}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole('vendedor')}
-                className={`p-3 rounded-2xl border-2 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  role === 'vendedor'
-                    ? 'border-[#C68D07] bg-[#FFE259] text-[#1D1D1B] shadow-xs'
-                    : 'border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 bg-stone-50 dark:bg-stone-800'
-                }`}
-              >
-                <Store className="w-4 h-4" />
-                <span>{t.role_seller}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Nombre */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {role === 'vendedor' ? 'Nombre del Artesano / Tienda' : t.auth_full_name} *
+              {t.auth_full_name} *
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -103,7 +69,7 @@ export default function RegisterPage() {
                 type="text"
                 name="full_name"
                 required
-                placeholder={role === 'vendedor' ? 'Ej: Quesería Idiazabal Etxea' : 'Tu nombre y apellidos'}
+                placeholder="Tu nombre y apellidos"
                 className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#FFE259] text-stone-900 dark:text-stone-100"
               />
             </div>
@@ -143,7 +109,7 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Teléfono y Ciudad */}
+          {/* Teléfono y Municipio */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">

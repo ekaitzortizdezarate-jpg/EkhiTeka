@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { SellerProductForm } from '@/components/SellerProductForm';
-import { type Category, isProfileComplete } from '@/types/database';
+import { type Category, type Product, isProfileComplete } from '@/types/database';
 
 export default async function NewProductPage() {
   const supabase = await createClient();
@@ -25,11 +25,23 @@ export default async function NewProductPage() {
     redirect('/perfil');
   }
 
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true });
+  const [{ data: categories }, { data: products }] = await Promise.all([
+    supabase
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true }),
+    supabase
+      .from('products')
+      .select('*')
+      .eq('is_active', true)
+      .order('name', { ascending: true }),
+  ]);
 
-  return <SellerProductForm categories={(categories || []) as Category[]} />;
+  return (
+    <SellerProductForm
+      categories={(categories || []) as Category[]}
+      storeProducts={(products || []) as Product[]}
+    />
+  );
 }

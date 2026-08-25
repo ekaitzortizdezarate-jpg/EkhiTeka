@@ -4,15 +4,20 @@ import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { createProduct, updateProduct } from '@/app/actions/products';
 import type { Category, Product } from '@/types/database';
-import { Upload, Check, ArrowLeft, Trash2 } from 'lucide-react';
+import { Upload, Check, ArrowLeft, Trash2, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface SellerProductFormProps {
   categories: Category[];
   initialProduct?: Product | null;
+  storeProducts?: Product[];
 }
 
-export function SellerProductForm({ categories, initialProduct }: SellerProductFormProps) {
+export function SellerProductForm({
+  categories,
+  initialProduct,
+  storeProducts = [],
+}: SellerProductFormProps) {
   const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -20,7 +25,6 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
 
   const isEdit = !!initialProduct;
 
-  // Detectar tipo inicial si se está editando
   const detectInitialType = () => {
     if (!initialProduct) return 'producto_suelto';
     const cat = initialProduct.category_id;
@@ -35,11 +39,18 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
     'producto_suelto' | 'cesta_gourmet' | 'cata_casa' | 'tarjeta_regalo' | 'cata_presencial'
   >(detectInitialType());
 
-  const [cestaItems, setCestaItems] = useState('1x Queso Idiazabal Ahumado (500g)\n1x Bonito del Norte de Lekeitio\n1x Txakoli de Bizkaia\n1x Picos artesanos');
-  const [cataFecha, setCataFecha] = useState('Sábado 20 de Septiembre · 19:30h');
-  const [cataAforo, setCataAforo] = useState('12 plazas');
-  const [cataProductos, setCataProductos] = useState('5 quesos artesanos de afinador, 2 txakolis de Bizkaia, 1 sidra natural y pan de masa madre');
-  const [tarjetaImportes, setTarjetaImportes] = useState('30€, 60€, 75€ o Canjeable por Cata Presencial');
+  // Productos seleccionados de la tienda
+  const [selectedStoreProducts, setSelectedStoreProducts] = useState<string[]>([]);
+  const [customItemsText, setCustomItemsText] = useState('');
+
+  // Evento Cata Presencial (Campos separados)
+  const [eventDate, setEventDate] = useState('');
+  const [eventStartTime, setEventStartTime] = useState('19:30');
+  const [eventEndTime, setEventEndTime] = useState('21:30');
+  const [eventAttendees, setEventAttendees] = useState(12);
+
+  // Tarjeta Regalo
+  const [giftCardOption, setGiftCardOption] = useState('Canjeable por productos EkhiTeka');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -58,43 +69,57 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
     }
   };
 
+  const toggleStoreProduct = (prodName: string) => {
+    setSelectedStoreProducts((prev) =>
+      prev.includes(prodName) ? prev.filter((p) => p !== prodName) : [...prev, prodName]
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg(null);
 
     const formData = new FormData(e.currentTarget);
-
     let customDesc = (formData.get('description') as string) || '';
     let fallbackImg = '/images/secciones/Quesos.JPG';
+
+    const includedList = [
+      ...selectedStoreProducts.map((p) => `• ${p} (Tienda)`),
+      ...(customItemsText.trim() ? customItemsText.split('\n').map((l) => `• ${l.trim()}`).filter(Boolean) : []),
+    ].join('\n');
 
     if (publishingType === 'cesta_gourmet') {
       formData.set('category_id', 'cesta_gourmet');
       formData.set('format', 'pack');
       formData.set('stock', '999');
       formData.set('origin_region', 'Lekeitio / Bizkaia');
-      customDesc = `${customDesc}\n\n🎁 CONTENIDO DEL LOTE / CESTA:\n${cestaItems}`;
+      if (includedList) {
+        customDesc = `${customDesc}\n\n🎁 PRODUCTOS INCLUIDOS EN LA CESTA:\n${includedList}`;
+      }
       fallbackImg = '/images/secciones/Cestas.JPG';
-    } else if (publishingType === 'cata_presencial') {
-      formData.set('category_id', 'cata_presencial');
-      formData.set('format', 'unidad');
-      formData.set('stock', '999');
-      formData.set('origin_region', 'Lekeitio / Bizkaia');
-      customDesc = `${customDesc}\n\n📅 FECHA & HORA: ${cataFecha}\n👥 AFORO: ${cataAforo}\n🍷 QUESOS & MARIDAJE A DEGUSTAR:\n${cataProductos}`;
-      fallbackImg = '/images/secciones/Catas.JPG';
     } else if (publishingType === 'cata_casa') {
       formData.set('category_id', 'cata_casa');
       formData.set('format', 'pack');
       formData.set('stock', '999');
       formData.set('origin_region', 'Lekeitio / Bizkaia');
-      customDesc = `${customDesc}\n\n🏠 INCLUYE PACK EN CASA:\n${cestaItems || 'Tabla de quesos afinados, fichas guiadas de cata y maridaje'}`;
+      if (includedList) {
+        customDesc = `${customDesc}\n\n🏠 PACK DE CATA INCLUYE:\n${includedList}`;
+      }
+      fallbackImg = '/images/secciones/Catas.JPG';
+    } else if (publishingType === 'cata_presencial') {
+      formData.set('category_id', 'cata_presencial');
+      formData.set('format', 'unidad');
+      formData.set('stock', String(eventAttendees || 12));
+      formData.set('origin_region', 'Lekeitio');
+      customDesc = `📅 FECHA: ${eventDate}\n⏰ HORARIO: ${eventStartTime} - ${eventEndTime}\n👥 PLAZAS DISPONIBLES: ${eventAttendees}\n\n🍷 PRODUCTOS A DEGUSTAR:\n${includedList || 'Selección de autor afinada y maridaje'}\n\n${customDesc}`;
       fallbackImg = '/images/secciones/Catas.JPG';
     } else if (publishingType === 'tarjeta_regalo') {
       formData.set('category_id', 'tarjeta_regalo');
       formData.set('format', 'unidad');
       formData.set('stock', '999');
       formData.set('origin_region', 'Lekeitio / Bizkaia');
-      customDesc = `${customDesc}\n\n💳 TARJETA REGALO VIRTUAL:\nOpciones canjeables: ${tarjetaImportes}`;
+      customDesc = `💳 MODALIDAD: ${giftCardOption}\n\n${customDesc}`;
       fallbackImg = '/images/secciones/Mesas.JPG';
     }
 
@@ -196,11 +221,11 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
             {publishingType === 'cesta_gourmet'
               ? 'Nombre de la Cesta Gourmet *'
               : publishingType === 'cata_presencial'
-              ? 'Título de la Cata Presencial *'
+              ? 'Título del Evento / Cata Presencial *'
               : publishingType === 'tarjeta_regalo'
               ? 'Nombre de la Tarjeta Regalo *'
               : publishingType === 'cata_casa'
-              ? 'Nombre del Pack de Cata *'
+              ? 'Nombre del Pack de Cata en Casa *'
               : 'Nombre del Producto *'}
           </label>
           <input
@@ -224,7 +249,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
           />
         </div>
 
-        {/* 2. Categoría y Formato (SOLO PARA PRODUCTO SUELTO) */}
+        {/* 2. Categoría y Formato (SOLO VISIBLE PARA PRODUCTO SUELTO) */}
         {isLooseProduct && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -266,100 +291,175 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
           </div>
         )}
 
-        {/* 3. Campos dinámicos según el tipo de publicación */}
-        {publishingType === 'cesta_gourmet' && (
-          <div className="p-4 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-2">
-            <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-              Productos incluidos en esta Cesta Gourmet:
-            </label>
-            <textarea
-              rows={4}
-              value={cestaItems}
-              onChange={(e) => setCestaItems(e.target.value)}
-              placeholder="1x Queso Idiazabal 500g&#10;1x Bonito del Norte de Lekeitio&#10;1x Txakoli..."
-              className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
-            />
-          </div>
-        )}
-
-        {publishingType === 'cata_presencial' && (
-          <div className="p-4 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-                  Fecha y Hora del Evento:
-                </label>
-                <input
-                  type="text"
-                  value={cataFecha}
-                  onChange={(e) => setCataFecha(e.target.value)}
-                  placeholder="Ej: Sábado 20 de Septiembre · 19:30h"
-                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-                  Aforo / Plazas máximas:
-                </label>
-                <input
-                  type="text"
-                  value={cataAforo}
-                  onChange={(e) => setCataAforo(e.target.value)}
-                  placeholder="Ej: 12 plazas"
-                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
-                />
+        {/* 3. Configuración de Cesta Gourmet & Cata en Casa (Seleccionar tienda + Añadir nuevos) */}
+        {(publishingType === 'cesta_gourmet' || publishingType === 'cata_casa') && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-4">
+            <div>
+              <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
+                1. Seleccionar productos de la tienda para incluir:
+              </label>
+              <p className="text-[11px] text-stone-500 dark:text-stone-400 mb-2">
+                Haz clic en los productos existentes que formarán parte de este lote
+              </p>
+              <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700">
+                {storeProducts.length > 0 ? (
+                  storeProducts.map((p) => {
+                    const isSelected = selectedStoreProducts.includes(p.name);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => toggleStoreProduct(p.name)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-[#FFE259] text-[#1D1D1B] border border-stone-800 font-black'
+                            : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200'
+                        }`}
+                      >
+                        <span>{p.name}</span>
+                        {isSelected ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3 text-stone-400" />}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <p className="text-xs text-stone-400 p-2">No hay productos sueltos activos en la tienda.</p>
+                )}
               </div>
             </div>
-            <div className="space-y-1">
-              <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-                Productos y quesos que se van a probar:
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
+                2. Añadir productos adicionales o específicos (uno por línea):
               </label>
               <textarea
                 rows={3}
-                value={cataProductos}
-                onChange={(e) => setCataProductos(e.target.value)}
-                placeholder="5 quesos de afinador, 2 txakolis de Bizkaia..."
+                value={customItemsText}
+                onChange={(e) => setCustomItemsText(e.target.value)}
+                placeholder="1x Tabla artesanal grabada&#10;1x Cuchillo especial para queso&#10;1x Confitura de higos..."
                 className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
               />
             </div>
           </div>
         )}
 
-        {publishingType === 'cata_casa' && (
-          <div className="p-4 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-2">
-            <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-              Contenido del Pack de Cata en Casa:
-            </label>
-            <textarea
-              rows={3}
-              value={cestaItems}
-              onChange={(e) => setCestaItems(e.target.value)}
-              placeholder="Tabla de 6 quesos clasificados, fichas de cata, maridaje..."
-              className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
-            />
+        {/* 4. Configuración de Cata Presencial (Generación de Evento con Fecha, Horarios y Participantes) */}
+        {publishingType === 'cata_presencial' && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-4">
+            <span className="text-xs font-black font-serif text-[#C68D07] dark:text-[#FFE259] uppercase tracking-widest block">
+              Configuración del Evento en Calendario
+            </span>
+
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div className="sm:col-span-2 space-y-1">
+                <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase">
+                  Fecha del Evento *
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase">
+                  Hora Inicio *
+                </label>
+                <input
+                  type="time"
+                  required
+                  value={eventStartTime}
+                  onChange={(e) => setEventStartTime(e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase">
+                  Hora Fin *
+                </label>
+                <input
+                  type="time"
+                  required
+                  value={eventEndTime}
+                  onChange={(e) => setEventEndTime(e.target.value)}
+                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase">
+                Cantidad de Participantes / Plazas Disponibles *
+              </label>
+              <input
+                type="number"
+                min="1"
+                required
+                value={eventAttendees}
+                onChange={(e) => setEventAttendees(parseInt(e.target.value) || 1)}
+                className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
+              />
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
+                Productos y quesos a degustar (tienda + nuevos):
+              </label>
+              <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-2 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700">
+                {storeProducts.map((p) => {
+                  const isSelected = selectedStoreProducts.includes(p.name);
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => toggleStoreProduct(p.name)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        isSelected
+                          ? 'bg-[#FFE259] text-[#1D1D1B] border border-stone-800 font-black'
+                          : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200'
+                      }`}
+                    >
+                      <span>{p.name}</span>
+                      {isSelected ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3 text-stone-400" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <textarea
+                rows={2}
+                value={customItemsText}
+                onChange={(e) => setCustomItemsText(e.target.value)}
+                placeholder="Añadir otros vinos o quesos fuera de carta a degustar..."
+                className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
+              />
+            </div>
           </div>
         )}
 
+        {/* 5. Configuración de Tarjeta Regalo */}
         {publishingType === 'tarjeta_regalo' && (
           <div className="p-4 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-2">
             <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-              Opciones de importes y canje:
+              Opciones de Canje:
             </label>
             <input
               type="text"
-              value={tarjetaImportes}
-              onChange={(e) => setTarjetaImportes(e.target.value)}
-              placeholder="30€, 60€, 75€ o Canjeable por Cata Presencial"
-              className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
+              value={giftCardOption}
+              onChange={(e) => setGiftCardOption(e.target.value)}
+              className="w-full px-3 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100"
             />
           </div>
         )}
 
-        {/* 4. Precio y Stock (Stock solo visible para Producto Suelto) */}
+        {/* 6. Precio y Stock (Stock solo visible para Producto Suelto) */}
         <div className={`grid gap-4 ${isLooseProduct ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
           <div className="space-y-1.5">
             <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {publishingType === 'cata_presencial' ? 'Precio por persona / plaza *' : `${t.seller_product_price} *`}
+              {publishingType === 'cata_presencial' ? 'Precio por Plaza / Asistente (€) *' : `${t.seller_product_price} *`}
             </label>
             <input
               type="number"
@@ -389,7 +489,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
           )}
         </div>
 
-        {/* 5. Origen (SOLO PARA PRODUCTO SUELTO) */}
+        {/* 7. Origen (SOLO PARA PRODUCTO SUELTO) */}
         {isLooseProduct && (
           <div className="space-y-1.5">
             <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
@@ -405,7 +505,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
           </div>
         )}
 
-        {/* 6. Descripción */}
+        {/* 8. Descripción */}
         <div className="space-y-1.5">
           <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
             {t.seller_product_desc}
@@ -419,7 +519,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
           />
         </div>
 
-        {/* 7. Subida de Imagen */}
+        {/* 9. Subida de Imagen */}
         <div className="space-y-2">
           <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
             {t.seller_product_image}
@@ -445,7 +545,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
                 className="text-xs text-stone-600 dark:text-stone-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-[#FFE259] file:text-[#1D1D1B] hover:file:bg-[#F5D742] cursor-pointer font-serif uppercase tracking-wider"
               />
               <p className="text-[10px] text-stone-400 mt-1">
-                Formatos soportados: PNG, JPG, WebP. Si no subes foto, se asignará automáticamente la imagen temática correspondiente.
+                Formatos soportados: PNG, JPG, WebP.
               </p>
             </div>
           </div>
@@ -457,7 +557,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
             <button
               type="button"
               onClick={async () => {
-                if (confirm(`¿Estás seguro de que deseas eliminar "${initialProduct.name}" del catálogo de EkhiTeka?`)) {
+                if (confirm(`¿Estás seguro de que deseas eliminar "${initialProduct.name}" del catálogo?`)) {
                   setLoading(true);
                   const { deleteProduct } = await import('@/app/actions/products');
                   await deleteProduct(initialProduct.id);
