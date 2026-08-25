@@ -9,18 +9,11 @@ import { signout } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
 import { CartNavButton } from '@/components/CartNavButton';
 import {
-  Package,
-  MessageCircle,
-  ShieldCheck,
-  PlusCircle,
   User,
   LogOut,
   Menu,
   X,
-  Sparkles,
-  Phone,
   Store,
-  Wine,
 } from 'lucide-react';
 
 interface NavbarNavLinksProps {
@@ -96,9 +89,9 @@ export function NavbarNavLinks({
   }, [mobileMenuOpen]);
 
   return (
-    <div className="flex items-center justify-between w-full min-w-0">
-      {/* 1. LADO IZQUIERDO */}
-      <div className="flex items-center gap-4 sm:gap-8 min-w-0">
+    <div className="flex items-center justify-between w-full min-w-0 gap-2 lg:gap-3">
+      {/* 1. LADO IZQUIERDO: Logotipo y Enlaces de Navegación */}
+      <div className="flex items-center gap-2 sm:gap-4 lg:gap-3 xl:gap-5 min-w-0">
         {/* Botón Menú Móvil */}
         <button
           type="button"
@@ -110,8 +103,8 @@ export function NavbarNavLinks({
         </button>
 
         {/* Logotipo Oficial EkhiTeka */}
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
+        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 group min-w-0">
+          <div className="relative w-10 h-10 sm:w-12 sm:h-12 lg:w-11 lg:h-11 xl:w-13 xl:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
             <img
               src="/Logo.jpg"
               alt="EkhiTeka Logo"
@@ -119,20 +112,20 @@ export function NavbarNavLinks({
             />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-serif font-black text-lg sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
+            <span className="font-serif font-black text-lg sm:text-xl lg:text-lg xl:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
               Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
             </span>
-            <span className="hidden sm:block text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              Quesería & Selección Gourmet · Lekeitio
+            <span className="hidden xl:block text-[9px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
+              Quesería · Lekeitio
             </span>
           </div>
         </Link>
 
-        {/* Enlaces Principales */}
-        <nav className="hidden lg:flex items-center gap-1 font-serif">
+        {/* Enlaces Principales sin solapamiento */}
+        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 font-serif">
           <Link
             href="/tienda"
-            className={`flex items-center justify-center text-center px-3.5 py-2 rounded-2xl tracking-[0.16em] uppercase text-[10.5px] font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center justify-center text-center px-2.5 xl:px-3.5 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-bold transition-all whitespace-nowrap ${
               pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -143,7 +136,7 @@ export function NavbarNavLinks({
 
           <Link
             href="/regalos-gourmet"
-            className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center px-2.5 xl:px-3 py-1 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[9.5px] xl:text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
               pathname === '/regalos-gourmet'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -155,7 +148,7 @@ export function NavbarNavLinks({
 
           <Link
             href="/experiencias"
-            className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center px-2.5 xl:px-3 py-1 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[9.5px] xl:text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
               pathname === '/experiencias'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -167,7 +160,7 @@ export function NavbarNavLinks({
 
           <Link
             href="/regalos-empresa"
-            className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center px-2.5 xl:px-3 py-1 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[9.5px] xl:text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
               pathname === '/regalos-empresa'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -179,10 +172,10 @@ export function NavbarNavLinks({
 
           {user && (
             <>
-              {/* Pedidos */}
+              {/* Pedidos (Sin Icono) */}
               <Link
                 href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+                className={`relative flex items-center justify-center text-center gap-1 px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-semibold transition-all whitespace-nowrap ${
                   pathname.includes('/pedidos')
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                     : hasUnseenOrderUpdates
@@ -190,54 +183,50 @@ export function NavbarNavLinks({
                     : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                 }`}
               >
-                <Package className="w-3.5 h-3.5" />
                 <span>{t.nav_orders}</span>
                 {hasUnseenOrderUpdates && (
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
                 )}
               </Link>
 
-              {/* Eventos (solo para Vendedor) */}
+              {/* Eventos (Sin Icono - Solo Vendedor) */}
               {isSeller && (
                 <Link
                   href="/vendedor/eventos"
-                  className={`flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+                  className={`flex items-center justify-center text-center px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-semibold transition-all whitespace-nowrap ${
                     pathname === '/vendedor/eventos'
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                       : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                 >
-                  <Wine className="w-3.5 h-3.5 text-[#C68D07]" />
                   <span>Eventos</span>
                 </Link>
               )}
 
-              {/* Mensajes / Chat */}
+              {/* Mensajes / Chat (Sin Icono) */}
               <Link
                 href="/chat"
-                className={`relative flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+                className={`relative flex items-center justify-center text-center gap-1 px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-xl tracking-[0.12em] xl:tracking-[0.16em] uppercase text-[10px] xl:text-[10.5px] font-semibold transition-all whitespace-nowrap ${
                   pathname.startsWith('/chat')
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                     : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                 }`}
               >
-                <MessageCircle className="w-3.5 h-3.5" />
                 <span>{t.nav_chats}</span>
                 {unreadMessagesCount > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center animate-pulse">
+                  <span className="w-3.5 h-3.5 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
                     {unreadMessagesCount}
                   </span>
                 )}
               </Link>
 
-              {/* Vendedor: Añadir Producto */}
+              {/* Vendedor: Añadir Producto (Sin Icono, texto exacto 'Añadir Producto') */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
-                  className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102 whitespace-nowrap"
+                  className="flex items-center justify-center text-center px-3 xl:px-3.5 py-1.5 xl:py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl transition-all shadow-xs font-black uppercase tracking-[0.12em] xl:tracking-[0.14em] text-[10px] xl:text-[10.5px] hover:scale-102 whitespace-nowrap"
                 >
-                  <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>+ {t.seller_new_product}</span>
+                  <span>Añadir Producto</span>
                 </Link>
               )}
 
@@ -245,9 +234,8 @@ export function NavbarNavLinks({
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-full transition-all font-semibold uppercase tracking-[0.16em] text-[11px] whitespace-nowrap"
+                  className="flex items-center justify-center text-center px-2.5 xl:px-3 py-1.5 xl:py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-xl transition-all font-semibold uppercase tracking-[0.12em] text-[10px] whitespace-nowrap"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5" />
                   <span>{t.nav_admin}</span>
                 </Link>
               )}
@@ -256,29 +244,29 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO (Orden de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta) */}
-      <div className="flex items-center gap-2 shrink-0">
+      {/* 2. LADO DERECHO: Menú Usuario (Cesta -> Perfil -> Salir, ordenados sin solaparse) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {user ? (
-          <div className="flex items-center gap-2">
-            {/* 3º: Cesta */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* 3º de dcha a izq: Cesta */}
             {(!profile || profile.role === 'comprador') && (
               <CartNavButton />
             )}
 
-            {/* 2º: Perfil */}
+            {/* 2º de dcha a izq: Perfil */}
             <Link
               href="/perfil"
-              className="p-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="p-2 sm:p-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors shrink-0"
               title={t.nav_profile}
             >
               <User className="w-4 h-4" />
             </Link>
 
-            {/* 1º: Cerrar Sesión */}
-            <form action={signout}>
+            {/* 1º de dcha a izq (Extremo Derecho): Cerrar Sesión */}
+            <form action={signout} className="shrink-0">
               <button
                 type="submit"
-                className="p-2 rounded-xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
+                className="p-2 sm:p-2.5 rounded-xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                 title={t.nav_logout}
               >
                 <LogOut className="w-4 h-4" />
@@ -303,7 +291,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* 3. Mobile Navigation Drawer con createPortal */}
+      {/* 3. Mobile Navigation Drawer */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
@@ -391,6 +379,7 @@ export function NavbarNavLinks({
                 </Link>
               </div>
 
+              {/* Enlaces de Usuario Móvil (Sin Iconos) */}
               <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Tu Cuenta
@@ -402,21 +391,19 @@ export function NavbarNavLinks({
                         <Link
                           href="/vendedor/productos/nuevo"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center justify-center gap-2 p-3.5 rounded-full font-black text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all"
+                          className="flex items-center justify-center p-3.5 rounded-full font-black text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all"
                         >
-                          <PlusCircle className="w-4 h-4 stroke-[2.5]" />
-                          <span>+ {t.seller_new_product}</span>
+                          <span>Añadir Producto</span>
                         </Link>
                         <Link
                           href="/vendedor/eventos"
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                          className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                             pathname === '/vendedor/eventos'
                               ? 'bg-[#FFE259] text-[#1D1D1B]'
                               : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
                           }`}
                         >
-                          <Wine className="w-4 h-4" />
                           <span>Eventos & Catas</span>
                         </Link>
                       </>
@@ -432,7 +419,6 @@ export function NavbarNavLinks({
                           : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
                       }`}
                     >
-                      <Package className="w-4 h-4" />
                       <span>{t.nav_orders}</span>
                       {hasUnseenOrderUpdates && (
                         <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black uppercase">
@@ -449,27 +435,29 @@ export function NavbarNavLinks({
                           : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
                       }`}
                     >
-                      <MessageCircle className="w-4 h-4" />
                       <span>{t.nav_chats}</span>
+                      {unreadMessagesCount > 0 && (
+                        <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
+                          {unreadMessagesCount}
+                        </span>
+                      )}
                     </Link>
                     <Link
                       href="/perfil"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                      className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname === '/perfil'
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
                           : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
                       }`}
                     >
-                      <User className="w-4 h-4" />
                       <span>{t.nav_profile}</span>
                     </Link>
                     <form action={signout} className="pt-2">
                       <button
                         type="submit"
-                        className="w-full flex items-center justify-center gap-2 p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
+                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
                       >
-                        <LogOut className="w-4 h-4" />
                         <span>{t.nav_logout}</span>
                       </button>
                     </form>
