@@ -20,6 +20,7 @@ export default async function SellerEventsPage() {
     redirect('/');
   }
 
+  // Obtener productos/eventos del vendedor con sus reservas y datos de compradores
   const { data: rawEvents } = await supabase
     .from('products')
     .select(`
@@ -49,18 +50,29 @@ export default async function SellerEventsPage() {
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
+  // Filtrar estrictamente solo las CATAS PRESENCIALES en tienda
   const events = (rawEvents || []).filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
     const desc = (p.description || '').toLowerCase();
+
+    // Descartar explícitamente catas para casa, cestas, lotes o tarjetas de regalo
+    const isHomeOrGift =
+      name.includes('casa') ||
+      cat.includes('casa') ||
+      cat === 'cesta' ||
+      cat === 'tarjeta_regalo' ||
+      name.includes('tarjeta') ||
+      name.includes('cesta');
+
+    if (isHomeOrGift) return false;
+
+    // Aceptar únicamente Catas Presenciales
     return (
-      cat === 'catas' ||
-      cat === 'experiencia' ||
-      name.includes('cata') ||
-      name.includes('taller') ||
-      name.includes('evento') ||
-      desc.includes('aforo') ||
-      desc.includes('fecha & hora')
+      cat === 'cata_presencial' ||
+      name.includes('presencial') ||
+      desc.includes('presencial') ||
+      (desc.includes('fecha & hora') && desc.includes('aforo'))
     );
   });
 

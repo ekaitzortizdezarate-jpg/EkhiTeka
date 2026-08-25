@@ -16,7 +16,6 @@ import {
   Trash2,
   X,
   Check,
-  AlertCircle,
   BellRing,
 } from 'lucide-react';
 
@@ -60,7 +59,6 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
   const [msg, setMsg] = useState<{ text: string; isError: boolean } | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  // Manejar guardado de edición de evento
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!editingEvent) return;
@@ -76,7 +74,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
       setMsg({ text: res.error, isError: true });
     } else {
       setMsg({
-        text: `¡Evento modificado con éxito! Se ha notificado a ${res.notifiedCount} participante(s) por el chat.`,
+        text: `¡Cata modificada con éxito! Se ha notificado a ${res.notifiedCount} participante(s) por el chat.`,
         isError: false,
       });
       setTimeout(() => {
@@ -86,17 +84,16 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
     }
   };
 
-  // Manejar eliminación / baja de participante
   const handleRemoveParticipant = async (
     orderItemId: string,
     eventId: string,
     buyerName: string
   ) => {
     const reason = window.prompt(
-      `¿Deseas dar de baja a "${buyerName}" de este evento? Se cancelará la reserva, se restablecerán las plazas y se le enviará un mensaje automático al chat.\n\nIntroduce el motivo (opcional):`
+      `¿Deseas dar de baja a "${buyerName}" de esta cata presencial? Se cancelará la reserva, se restablecerán las plazas y se le enviará un aviso automático por chat.\n\nMotivo (opcional):`
     );
 
-    if (reason === null) return; // Usuario pulsó cancelar en el prompt
+    if (reason === null) return;
 
     setRemovingId(orderItemId);
     const res = await removeEventParticipant(orderItemId, eventId, reason);
@@ -120,10 +117,10 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
           </Link>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
-              Próximos Eventos & Catas en Tienda
+              Catas Presenciales en Tienda
             </h1>
             <p className="text-xs text-stone-500 dark:text-stone-400">
-              Control de aforo, edición de variables y gestión de asistentes con aviso automático.
+              Control de aforo, edición de variables y gestión de asistentes para catas en Lekeitio.
             </p>
           </div>
         </div>
@@ -133,11 +130,11 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
           className="px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-xs transition-all flex items-center gap-1.5 font-serif hover:scale-102"
         >
           <Wine className="w-4 h-4" />
-          <span>+ Nueva Cata</span>
+          <span>+ Nueva Cata Presencial</span>
         </Link>
       </div>
 
-      {/* Lista de Eventos */}
+      {/* Lista de Catas Presenciales */}
       <div className="space-y-6">
         {events.length > 0 ? (
           events.map((event) => {
@@ -160,12 +157,12 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 key={event.id}
                 className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs"
               >
-                {/* Cabecera del Evento con Botón de Editar */}
+                {/* Cabecera de la Cata Presencial */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
                   <div className="space-y-1.5 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider">
-                        Evento Presencial
+                        Cata Presencial · Tienda Lekeitio
                       </span>
                       {event.origin_region && (
                         <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1">
@@ -193,7 +190,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-black uppercase tracking-wider border border-stone-200 dark:border-stone-700 transition-all cursor-pointer shadow-2xs hover:scale-102"
                     >
                       <Pencil className="w-3.5 h-3.5" />
-                      <span>Editar Evento</span>
+                      <span>Editar Cata</span>
                     </button>
 
                     <div className="grid grid-cols-3 gap-2 text-center">
@@ -212,7 +209,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                       </div>
 
                       <div className="p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700">
-                        <span className="text-[9px] font-bold text-stone-400 uppercase block">Total</span>
+                        <span className="text-[9px] font-bold text-stone-400 uppercase block">Recaudado</span>
                         <span className="text-base font-black text-stone-900 dark:text-stone-100">
                           {recaudacionTotal.toFixed(2)} €
                         </span>
@@ -221,15 +218,15 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                   </div>
                 </div>
 
-                {/* Tabla de Asistentes / Participantes */}
+                {/* Tabla de Asistentes */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300 flex items-center gap-2">
                       <Users className="w-4 h-4 text-[#C68D07]" />
-                      <span>Participantes Registrados ({validReservations.length})</span>
+                      <span>Participantes de la Cata ({validReservations.length})</span>
                     </h3>
                     <span className="text-[10px] text-stone-400 font-medium">
-                      Total plazas ocupadas: {totalPlazasVendidas}
+                      Plazas ocupadas: {totalPlazasVendidas}
                     </span>
                   </div>
 
@@ -316,7 +313,6 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                                       </Link>
                                     )}
 
-                                    {/* Botón Borrar Participante */}
                                     <button
                                       type="button"
                                       disabled={isRemoving}
@@ -342,7 +338,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                     </div>
                   ) : (
                     <div className="p-6 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 text-center text-xs text-stone-400">
-                      Aún no hay reservas registradas para este evento.
+                      Aún no hay reservas registradas para esta cata presencial.
                     </div>
                   )}
                 </div>
@@ -353,22 +349,22 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
           <div className="py-16 text-center bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-8 space-y-4">
             <Wine className="w-14 h-14 text-stone-300 dark:text-stone-700 mx-auto" />
             <h3 className="text-lg font-black font-serif text-stone-800 dark:text-stone-200">
-              No tienes eventos creados todavía
+              No tienes catas presenciales creadas todavía
             </h3>
             <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto">
-              Publica una cata presencial o taller gourmet para gestionar plazas y reservas desde este panel.
+              Publica una cata presencial en la tienda de Lekeitio para gestionar aforo, plazas y asistentes desde este panel.
             </p>
             <Link
               href="/vendedor/productos/nuevo"
               className="inline-block px-6 py-3 bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-full shadow-xs transition-all font-serif hover:scale-105"
             >
-              Publicar Nueva Cata
+              Publicar Nueva Cata Presencial
             </Link>
           </div>
         )}
       </div>
 
-      {/* Modal para Editar Todas las Variables del Evento */}
+      {/* Modal para Editar Todas las Variables de la Cata Presencial */}
       {editingEvent && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl">
@@ -376,7 +372,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
               <div className="flex items-center gap-2">
                 <Wine className="w-5 h-5 text-[#C68D07]" />
                 <h2 className="text-lg font-black font-serif text-stone-900 dark:text-stone-100">
-                  Editar Variables del Evento
+                  Editar Variables de la Cata Presencial
                 </h2>
               </div>
               <button
@@ -388,11 +384,10 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
               </button>
             </div>
 
-            {/* Aviso de notificación automática */}
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-300">
               <BellRing className="w-4 h-4 shrink-0 mt-0.5 text-[#C68D07]" />
               <p>
-                Cualquier cambio en la fecha, hora o condiciones se notificará de forma automática por chat a todos los participantes con plaza reservada.
+                Cualquier cambio en la fecha, hora o condiciones de la cata se notificará automáticamente por el chat a todos los participantes con plaza reservada.
               </p>
             </div>
 
@@ -409,10 +404,9 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
             )}
 
             <form onSubmit={handleEditSubmit} className="space-y-4 text-xs font-serif">
-              {/* Título */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
-                  Título del Evento *
+                  Título de la Cata Presencial *
                 </label>
                 <input
                   type="text"
@@ -423,7 +417,6 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 />
               </div>
 
-              {/* Precio y Plazas Restantes */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
@@ -455,7 +448,6 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 </div>
               </div>
 
-              {/* Ubicación */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
                   Lugar / Ubicación *
@@ -468,17 +460,16 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 />
               </div>
 
-              {/* Descripción, Fecha & Maridaje */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
-                  Descripción, Fecha/Hora & Contenido *
+                  Descripción, Fecha/Hora & Maridaje *
                 </label>
                 <textarea
                   name="description"
                   rows={5}
                   required
                   defaultValue={editingEvent.description || ''}
-                  placeholder="Ej: Fecha: Sábado 20 de Septiembre · 19:30h&#10;Quesos a probar: 5 quesos de afinador y maridaje vasco..."
+                  placeholder="Ej: Fecha: Sábado 20 de Septiembre · 19:30h&#10;Quesos a probar: 5 quesos de autor y maridaje vasco..."
                   className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
                 />
               </div>
