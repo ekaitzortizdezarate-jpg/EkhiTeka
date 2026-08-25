@@ -11,7 +11,6 @@ import {
   Calendar,
   Clock,
   Users,
-  CheckCircle2,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -52,22 +51,32 @@ export default async function ExperienciasPage() {
 
   const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
 
-  // 1. Productos generales de catas / kits
-  const experienceProducts = allProducts.filter((p) => {
+  // 1. Grid superior: Todos los productos de catas/experiencias que NO estén agotados (mismo formato de tarjeta)
+  const availableExperienceProducts = allProducts.filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
-    return (
+    const isExperience =
+      cat === 'cata_presencial' ||
       cat === 'cata_casa' ||
       cat === 'experiencia' ||
       cat === 'catas' ||
-      (cat !== 'cata_presencial' && (name.includes('cata') || name.includes('degustación')))
-    );
+      name.includes('cata') ||
+      name.includes('degustación') ||
+      name.includes('taller');
+
+    if (!isExperience) return false;
+
+    // Solo se muestran si NO están agotados
+    const hasStock = p.is_unlimited_stock || (p.stock !== null && p.stock !== undefined && p.stock > 0);
+    return hasStock;
   });
 
-  // 2. Eventos de Cata Presencial generados por el vendedor
-  const rawEvents = allProducts.filter((p) => (p.category_id || '').toLowerCase() === 'cata_presencial');
+  // 2. Lista inferior de "Próximos Eventos": Todos los eventos presenciales en la tienda (futuros y ordenados por fecha)
+  const rawEvents = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    return cat === 'cata_presencial';
+  });
 
-  // Parsear la información del evento y ordenar por fecha (más cercana a más lejana)
   const parsedEvents: ParsedEvent[] = rawEvents
     .map((p) => {
       const desc = p.description || '';
@@ -141,54 +150,60 @@ export default async function ExperienciasPage() {
         </div>
       </section>
 
-      {/* 2. Productos y Kits de Cata generados */}
-      {experienceProducts.length > 0 && (
+      {/* 2. Productos y Catas NO Agotados (Mismo formato de tarjeta) */}
+      {availableExperienceProducts.length > 0 && (
         <section className="space-y-6 pt-2">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Kits y formatos para disfrutar
+              Disponibles para reserva & compra
             </span>
             <h2 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-              Packs & Catas en Tienda
+              Catas & Experiencias Disponibles
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {experienceProducts.map((p) => (
+            {availableExperienceProducts.map((p) => (
               <ProductCard key={p.id} product={p} isSeller={isSeller} />
             ))}
           </div>
         </section>
       )}
 
-      {/* 3. Lista de Eventos y Catas Presenciales (Ordenados por fecha más cercana a más lejana) */}
+      {/* 3. Próximos Eventos en la Tienda (Ordenados por fecha: disponibles + aforo completo) */}
       {parsedEvents.length > 0 && (
         <section className="space-y-6 pt-2">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Calendario oficial en Lekeitio
+              Calendario de catas presenciales en Lekeitio
             </span>
             <h2 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-              Próximos Eventos & Catas Presenciales
+              Próximos Eventos
             </h2>
           </div>
 
           <div className="space-y-4">
             {parsedEvents.map(({ product: p, dateStr, dateObj, timeStr, tastingDetails }) => {
-              const remainingSeats = p.stock ?? 0;
-              const isSoldOut = remainingSeats <= 0;
+              const currentSeats = p.stock ?? 0;
+              const isSoldOut = !p.is_unlimited_stock && currentSeats <= 0;
 
               return (
                 <div
                   key={p.id}
                   className={`bg-white dark:bg-stone-900 rounded-3xl border-2 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all ${
                     isSoldOut
-                      ? 'border-stone-200 dark:border-stone-800 opacity-70'
+                      ? 'border-stone-200 dark:border-stone-800 opacity-80'
                       : 'border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
                   }`}
                 >
                   <div className="flex items-start gap-4 sm:gap-6 min-w-0 flex-1">
-                    <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-[#FFE259] text-[#1D1D1B] flex flex-col items-center justify-center p-2 shrink-0 font-serif shadow-xs">
+                    <div
+                      className={`w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex flex-col items-center justify-center p-2 shrink-0 font-serif shadow-xs ${
+                        isSoldOut
+                          ? 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                          : 'bg-[#FFE259] text-[#1D1D1B]'
+                      }`}
+                    >
                       <Calendar className="w-5 h-5 mb-0.5" />
                       <span className="text-xs font-black uppercase leading-none">
                         {dateObj
@@ -208,6 +223,11 @@ export default async function ExperienciasPage() {
                         <span className="px-2.5 py-0.5 bg-amber-50 dark:bg-amber-950/60 text-[#C68D07] dark:text-[#FFE259] rounded-md text-[10px] font-black uppercase flex items-center gap-1">
                           <Clock className="w-3 h-3" /> {timeStr}
                         </span>
+                        {isSoldOut && (
+                          <span className="px-2.5 py-0.5 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-md text-[10px] font-black uppercase">
+                            Aforo Completo
+                          </span>
+                        )}
                       </div>
 
                       <h3 className="font-serif font-bold text-xl sm:text-2xl text-stone-900 dark:text-stone-100">
@@ -228,21 +248,33 @@ export default async function ExperienciasPage() {
                       <span className="text-2xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
                         {Number(p.price).toFixed(2)} €
                       </span>
-                      <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block mt-0.5">
-                        {isSoldOut ? 'Plazas agotadas' : `${remainingSeats} plazas disponibles`}
+                      <span
+                        className={`text-[11px] font-bold block mt-0.5 ${
+                          isSoldOut
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-emerald-600 dark:text-emerald-400'
+                        }`}
+                      >
+                        {isSoldOut ? 'Aforo completo (0 plazas)' : `${currentSeats} plazas disponibles`}
                       </span>
                     </div>
 
-                    <Link
-                      href={`/producto/${p.id}`}
-                      className={`px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-wider font-serif transition-all shadow-md ${
-                        isSoldOut
-                          ? 'bg-stone-200 dark:bg-stone-800 text-stone-500 pointer-events-none'
-                          : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:scale-105'
-                      }`}
-                    >
-                      {isSoldOut ? 'Agotado' : 'Reservar Plaza'}
-                    </Link>
+                    {isSoldOut ? (
+                      <button
+                        type="button"
+                        disabled
+                        className="px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-wider font-serif bg-stone-200 dark:bg-stone-800 text-stone-500 cursor-not-allowed shadow-none"
+                      >
+                        Aforo Completo
+                      </button>
+                    ) : (
+                      <Link
+                        href={`/producto/${p.id}`}
+                        className="px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-wider font-serif transition-all shadow-md bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:scale-105 text-center"
+                      >
+                        Reservar Plaza
+                      </Link>
+                    )}
                   </div>
                 </div>
               );
@@ -340,7 +372,7 @@ export default async function ExperienciasPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Creamos mesas de quesos espectaculares para cócteles de bodas y celebraciones con frutas frescas, panes artesanos, confituras y una selección afinada.
+              Creamos mesas de quesos espectaculares para cócteles de bodas y celebraciones con frutas frescas, panes artesanos, confituras y una selección afinada para impresionar a los invitados.
             </p>
             <div className="pt-2">
               <a

@@ -49,24 +49,32 @@ export async function createOrder(payload: CreateOrderPayload) {
     };
   }
 
-  // 1. Descontar plazas / stock inmediatamente al lanzar el pedido
+  // 1. Descontar stock/plazas inmediatamente mediante función RPC (y fallback directo)
   for (const it of payload.items) {
-    const { data: prod } = await supabase
-      .from('products')
-      .select('stock, is_unlimited_stock')
-      .eq('id', it.productId)
-      .single();
+    const { error: rpcError } = await supabase.rpc('decrement_product_stock', {
+      p_product_id: it.productId,
+      p_quantity: it.quantity,
+    });
 
-    if (prod && !prod.is_unlimited_stock && prod.stock !== null && prod.stock !== undefined) {
-      const remainingStock = Math.max(0, prod.stock - it.quantity);
-      await supabase
+    // Fallback por si la función RPC no está disponible
+    if (rpcError) {
+      const { data: prod } = await supabase
         .from('products')
-        .update({ stock: remainingStock })
-        .eq('id', it.productId);
+        .select('stock, is_unlimited_stock')
+        .eq('id', it.productId)
+        .single();
+
+      if (prod && !prod.is_unlimited_stock && typeof prod.stock === 'number') {
+        const remainingStock = Math.max(0, prod.stock - it.quantity);
+        await supabase
+          .from('products')
+          .update({ stock: remainingStock })
+          .eq('id', it.productId);
+      }
     }
   }
 
-  // 2. Crear el registro del pedido
+  // 2. Crear el pedido
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -86,7 +94,7 @@ export async function createOrder(payload: CreateOrderPayload) {
     return { error: orderError?.message || 'Error al crear el pedido' };
   }
 
-  // 3. Insertar las líneas del pedido
+  // 3. Registrar artículos del pedido
   const orderItemsData = payload.items.map((it) => ({
     order_id: order.id,
     product_id: it.productId,
@@ -103,6 +111,7 @@ export async function createOrder(payload: CreateOrderPayload) {
     return { error: itemsError.message };
   }
 
+  revalidatePath('/', 'layout');
   revalidatePath('/experiencias');
   revalidatePath('/regalos-gourmet');
   revalidatePath('/tienda');
@@ -148,7 +157,7 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: 'No autenticado' };
   }
 
-  // Revertir el stock al cancelar
+  // Devolver el stock si se cancela el pedido
   const { data: items } = await supabase
     .from('order_items')
     .select('product_id, quantity')
@@ -162,7 +171,7 @@ export async function cancelOrder(orderId: string, reason: string) {
         .eq('id', it.product_id)
         .single();
 
-      if (prod && !prod.is_unlimited_stock && prod.stock !== null) {
+      if (prod && !prod.is_unlimited_stock && typeof prod.stock === 'number') {
         await supabase
           .from('products')
           .update({ stock: prod.stock + it.quantity })
@@ -184,6 +193,7 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: error.message };
   }
 
+  revalidatePath('/', 'layout');
   revalidatePath('/experiencias');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
