@@ -20,6 +20,13 @@ export interface TranslationDict {
   nav_register: string;
   nav_profile: string;
   nav_logout: string;
+  nav_gourmet_gifts: string;
+  nav_tastings_experiences: string;
+  nav_corporate_gifts: string;
+  nav_events: string;
+  nav_add_product: string;
+  nav_add_product_line1: string;
+  nav_add_product_line2: string;
 
   // Categories
   cat_all: string;
@@ -45,6 +52,7 @@ export interface TranslationDict {
   prod_stock: string;
   prod_unlimited: string;
   prod_add_to_cart: string;
+  prod_added: string;
   prod_ask_artisan: string;
   prod_consult_product: string;
   prod_details: string;
@@ -56,6 +64,49 @@ export interface TranslationDict {
   prod_sort_price_asc: string;
   prod_sort_price_desc: string;
   prod_showing: string;
+  prod_sold_out: string;
+  prod_last_units: string;
+  prod_available: string;
+  prod_availability: string;
+
+  // Events & Tastings
+  event_seats: string;
+  event_seat: string;
+  event_seats_available: string;
+  event_capacity_full: string;
+  event_last_seats: string;
+  event_reserve_seat: string;
+  event_seats_added: string;
+  event_upcoming_title: string;
+  event_upcoming_subtitle: string;
+  event_catalog_title: string;
+  event_catalog_subtitle: string;
+  event_home_catalog_title: string;
+  event_home_catalog_subtitle: string;
+  event_store_catalog_title: string;
+  event_store_catalog_subtitle: string;
+
+  // Experiences Page (Cards & Banners)
+  exp_hero_badge: string;
+  exp_hero_title: string;
+  exp_hero_title_highlight: string;
+  exp_hero_desc: string;
+  exp_home_tasting_title: string;
+  exp_home_tasting_badge: string;
+  exp_home_tasting_desc: string;
+  exp_home_tasting_btn: string;
+  exp_store_tasting_title: string;
+  exp_store_tasting_badge: string;
+  exp_store_tasting_desc: string;
+  exp_store_tasting_btn: string;
+  exp_wedding_title: string;
+  exp_wedding_badge: string;
+  exp_wedding_desc: string;
+  exp_wedding_btn: string;
+  exp_raclette_title: string;
+  exp_raclette_badge: string;
+  exp_raclette_desc: string;
+  exp_raclette_btn: string;
 
   // Cart & Checkout
   cart_title: string;
@@ -67,6 +118,7 @@ export interface TranslationDict {
   cart_checkout: string;
   cart_remove: string;
   cart_quantity: string;
+  cart_continue_shopping: string;
   deliv_choose_mode: string;
   deliv_home: string;
   deliv_home_desc: string;
@@ -117,7 +169,7 @@ export interface TranslationDict {
   status_ready: string;
   status_delivered: string;
 
-  // Seller Dashboard
+  // Seller Dashboard & Events Management
   seller_new_product: string;
   seller_edit_product: string;
   seller_product_name: string;
@@ -131,6 +183,21 @@ export interface TranslationDict {
   seller_save_product: string;
   seller_delete_product: string;
   seller_product_deleted: string;
+  seller_events_title: string;
+  seller_events_subtitle: string;
+  seller_events_edit_btn: string;
+  seller_events_reserved: string;
+  seller_events_available: string;
+  seller_events_collected: string;
+  seller_events_attendees_title: string;
+  seller_events_no_events: string;
+  seller_events_no_events_desc: string;
+  seller_events_col_buyer: string;
+  seller_events_col_contact: string;
+  seller_events_col_seats: string;
+  seller_events_col_date: string;
+  seller_events_col_total: string;
+  seller_events_col_actions: string;
 
   // Chat
   chat_title: string;
@@ -236,6 +303,13 @@ export const translations: Record<Language, TranslationDict> = {
     nav_register: 'Erregistratu',
     nav_profile: 'Profila',
     nav_logout: 'Itxi Saioa',
+    nav_gourmet_gifts: 'Opari Gourmetak',
+    nav_tastings_experiences: 'Dastaketak eta Esperientziak',
+    nav_corporate_gifts: 'Enpresa Opariak',
+    nav_events: 'Ekitaldiak',
+    nav_add_product: 'Gehitu Produktua',
+    nav_add_product_line1: 'Gehitu',
+    nav_add_product_line2: 'Produktua',
 
     cat_all: 'Guztiak',
     cat_queso: 'Gazta',
@@ -259,6 +333,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_stock: 'Stocka',
     prod_unlimited: 'Mugagabea',
     prod_add_to_cart: 'Gehitu saskira',
+    prod_added: 'Gehituta',
     prod_ask_artisan: 'Galdetu artisauari',
     prod_consult_product: 'Produktu honi buruzko kontsulta',
     prod_details: 'Xehetasunak',
@@ -270,6 +345,47 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_asc: 'Prezioa (baxuena lehenik)',
     prod_sort_price_desc: 'Prezioa (altuena lehenik)',
     prod_showing: 'produktu erabilgarri erakusten',
+    prod_sold_out: 'Agortuta',
+    prod_last_units: 'Azken unitateak!',
+    prod_available: 'Eskuragarri',
+    prod_availability: 'Eskuragarritasuna:',
+
+    event_seats: 'leku',
+    event_seat: 'leku',
+    event_seats_available: 'leku libre',
+    event_capacity_full: 'Leku guztiak beteta (Agortuta)',
+    event_last_seats: 'Azken lekuak!',
+    event_reserve_seat: 'Erreserbatu Lekua',
+    event_seats_added: 'Lekua gehituta',
+    event_upcoming_title: 'Dastaketa Presentzialen Hurrengo Ekitaldiak',
+    event_upcoming_subtitle: 'Leku mugatuak · Lekeitioko erdigunean',
+    event_catalog_title: 'Eskuragarri dauden Dastaketak eta Esperientziak',
+    event_catalog_subtitle: 'Dastaketak dendan eta etxerako kit-ak',
+    event_home_catalog_title: 'Etxerako Dastaketa Kit-ak',
+    event_home_catalog_subtitle: 'Kit-ak eta pack-ak etxera eramateko',
+    event_store_catalog_title: 'Dendako Dastaketak Eskuragarri',
+    event_store_catalog_subtitle: 'Presentziala Lekeition',
+
+    exp_hero_badge: 'Esperientzia Gastronomikoak',
+    exp_hero_title: 'Dastaketak &',
+    exp_hero_title_highlight: 'Esperientziak',
+    exp_hero_desc: 'Ezagutu artisau gaztaren artea gure dastaketa gidatuen, ospakizunetarako ekitaldien eta Lekeition zein zuk aukeratutako lekuan gozatzeko zerbitzu esklusiboen bidez.',
+    exp_home_tasting_title: 'Dastaketak Etxean',
+    exp_home_tasting_badge: 'Zure erritmoan',
+    exp_home_tasting_desc: 'Bihur zaitez anfitrioi gure dastaketa-kit osoekin: 6 gazta afinatu intentsitatearen arabera sailkatuta, artisau maridajeak, dastaketa-mantel ilustratua eta fitxa azalpenak.',
+    exp_home_tasting_btn: 'Eskatu Kit-a Etxerako',
+    exp_store_tasting_title: 'Dastaketak Dendan',
+    exp_store_tasting_badge: 'Presentziala Lekeition',
+    exp_store_tasting_desc: 'Esperientzia presentzial esklusiboak Lekeitioko gure gaztategian (Gamarra Kalea 4). Gure gazta-maistruek gidatuta talde txikietan, egile-piezak eta Bizkaiko txakolina dastatuz.',
+    exp_store_tasting_btn: 'Ikusi Datak & Erreserbatu Lekua',
+    exp_wedding_title: 'Ezkontzetarako Mahaia',
+    exp_wedding_badge: 'Ezkontzak & Ekitaldiak',
+    exp_wedding_desc: 'Gazta-mahai ikusgarriak sortzen ditugu ezkontzetako kokteletarako eta ospakizunetarako. Diseinu monumentalekin, fruitu freskoekin, fruitu lehorrekin eta ogi artisauekin.',
+    exp_wedding_btn: 'Eskatu Aurrekontua Ezkontzetarako',
+    exp_raclette_title: 'Raclette Mailegua',
+    exp_raclette_badge: 'Alokairua & Pack-a',
+    exp_raclette_desc: 'Suitzar raclette makina profesionala mailegatzen dizugu, raclette gazta afinatu moztuarekin, txarkuteria artisauarekin eta patatekin, ekipamenduaz kezkatu gabe goza dezazun.',
+    exp_raclette_btn: 'Kontsultatu Raclette Eskuragarritasuna',
 
     cart_title: 'Zure Saskia',
     cart_empty: 'Saskia hutsik dago',
@@ -280,6 +396,7 @@ export const translations: Record<Language, TranslationDict> = {
     cart_checkout: 'Bideratu Eskaera',
     cart_remove: 'Kendu',
     cart_quantity: 'Kopurua',
+    cart_continue_shopping: 'Jarraitu Erosketak',
     deliv_choose_mode: 'Aukeratu jasotzeko modua',
     deliv_home: 'Etxera bidaltzea',
     deliv_home_desc: 'Garraio hoztuan zure atean 24-48 ordutan',
@@ -341,6 +458,22 @@ export const translations: Record<Language, TranslationDict> = {
     seller_save_product: 'Gorde Produktua',
     seller_delete_product: 'Ezabatu Produktua',
     seller_product_deleted: 'Produktua ezabatu da',
+
+    seller_events_title: 'Dastaketa Presentzialak Dendan',
+    seller_events_subtitle: 'Aforoa, aldagaien edizioa eta bertaratuen kudeaketa Lekeitioko dastaketetan.',
+    seller_events_edit_btn: 'Editatu Dastaketa',
+    seller_events_reserved: 'Erreserbatuta',
+    seller_events_available: 'Libre',
+    seller_events_collected: 'Bilketa',
+    seller_events_attendees_title: 'Dastaketako Partaideak',
+    seller_events_no_events: 'Ez duzu dastaketa presentzialik sortu oraindik',
+    seller_events_no_events_desc: 'Argitaratu dastaketa presentzial bat Lekeitioko dendan goiko menutik.',
+    seller_events_col_buyer: 'Eroslea',
+    seller_events_col_contact: 'Kontaktua',
+    seller_events_col_seats: 'Lekuak',
+    seller_events_col_date: 'Erosketa Data',
+    seller_events_col_total: 'Guztira',
+    seller_events_col_actions: 'Ekintzak',
 
     chat_title: 'Txatak eta Mezuak',
     chat_type_message: 'Idatzi mezu bat hemen...',
@@ -432,6 +565,13 @@ export const translations: Record<Language, TranslationDict> = {
     nav_register: 'Registrarse',
     nav_profile: 'Perfil',
     nav_logout: 'Cerrar Sesión',
+    nav_gourmet_gifts: 'Regalos Gourmet',
+    nav_tastings_experiences: 'Catas & Experiencias',
+    nav_corporate_gifts: 'Regalos de Empresa',
+    nav_events: 'Eventos',
+    nav_add_product: 'Añadir Producto',
+    nav_add_product_line1: 'Añadir',
+    nav_add_product_line2: 'Producto',
 
     cat_all: 'Todos',
     cat_queso: 'Queso',
@@ -455,6 +595,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_stock: 'Stock',
     prod_unlimited: 'Ilimitado',
     prod_add_to_cart: 'Añadir a la cesta',
+    prod_added: 'Añadido',
     prod_ask_artisan: 'Preguntar al artesano',
     prod_consult_product: 'Consulta sobre este producto',
     prod_details: 'Detalles',
@@ -466,6 +607,47 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_asc: 'Precio (menor a mayor)',
     prod_sort_price_desc: 'Precio (mayor a menor)',
     prod_showing: 'productos disponibles',
+    prod_sold_out: 'Agotado',
+    prod_last_units: '¡Últimas unidades!',
+    prod_available: 'Disponible',
+    prod_availability: 'Disponibilidad:',
+
+    event_seats: 'plazas',
+    event_seat: 'plaza',
+    event_seats_available: 'plazas disponibles',
+    event_capacity_full: 'Aforo Completo (Sin Plazas)',
+    event_last_seats: '¡Últimas plazas!',
+    event_reserve_seat: 'Reservar Plaza(s)',
+    event_seats_added: 'Plaza(s) Añadida(s)',
+    event_upcoming_title: 'Próximos Eventos de Catas Presenciales',
+    event_upcoming_subtitle: 'Plazas limitadas · Lekeitio Centro',
+    event_catalog_title: 'Catas & Experiencias Disponibles',
+    event_catalog_subtitle: 'Catas en tienda & Kits para casa',
+    event_home_catalog_title: 'Kits de Catas en Casa Disponibles',
+    event_home_catalog_subtitle: 'Kits & Packs para llevar',
+    event_store_catalog_title: 'Catas en Tienda Disponibles',
+    event_store_catalog_subtitle: 'Presencial en Lekeitio',
+
+    exp_hero_badge: 'Experiencias Gastronómicas',
+    exp_hero_title: 'Catas &',
+    exp_hero_title_highlight: 'Experiencias',
+    exp_hero_desc: 'Descubre el arte del queso artesano a través de nuestras catas guiadas, eventos para celebraciones y servicios exclusivos para disfrutar en Lekeitio o donde tú elijas.',
+    exp_home_tasting_title: 'Catas en Casa',
+    exp_home_tasting_badge: 'A tu ritmo',
+    exp_home_tasting_desc: 'Conviértete en anfitrión con nuestros kits completos de cata: selección de 6 quesos afinados clasificados por intensidades, maridajes artesanos de acompañamiento, mantel de cata ilustrado y fichas explicativas con notas de cata y maridajes.',
+    exp_home_tasting_btn: 'Solicitar Kit para Casa',
+    exp_store_tasting_title: 'Catas en la Tienda',
+    exp_store_tasting_badge: 'Presencial en Lekeitio',
+    exp_store_tasting_desc: 'Experiencias presenciales exclusivas en nuestra quesería de Lekeitio (Gamarra Kalea 4). Guiadas por nuestros afinadores queseros en grupos reducidos, probando piezas de autor, txakoli de Bizkaia y maridajes singulares.',
+    exp_store_tasting_btn: 'Ver Fechas & Reservar Plaza',
+    exp_wedding_title: 'Mesa para Bodas',
+    exp_wedding_badge: 'Bodas & Eventos',
+    exp_wedding_desc: 'Creamos mesas de quesos espectaculares para cócteles de bodas y celebraciones. Diseños monumentales con frutas frescas, frutos secos, panes artesanos, confituras y una selección afinada que dejará impresionados a todos los invitados.',
+    exp_wedding_btn: 'Pedir Presupuesto para Bodas',
+    exp_raclette_title: 'Préstamo de Raclette',
+    exp_raclette_badge: 'Alquiler & Pack',
+    exp_raclette_desc: 'Te prestamos la máquina profesional de raclette tradicional suiza junto con el queso de raclette afinado cortado a la perfección, embutidos artesanos y patatas para que disfrutes de una velada única sin preocuparte por el equipamiento.',
+    exp_raclette_btn: 'Consultar Disponibilidad de Raclette',
 
     cart_title: 'Tu Cesta',
     cart_empty: 'Tu cesta está vacía',
@@ -476,6 +658,7 @@ export const translations: Record<Language, TranslationDict> = {
     cart_checkout: 'Tramitar Pedido',
     cart_remove: 'Eliminar',
     cart_quantity: 'Cantidad',
+    cart_continue_shopping: 'Seguir Comprando',
     deliv_choose_mode: 'Elige cómo recibir tu pedido',
     deliv_home: 'Envío a domicilio',
     deliv_home_desc: 'Transporte refrigerado en tu puerta en 24-48 horas',
@@ -537,6 +720,22 @@ export const translations: Record<Language, TranslationDict> = {
     seller_save_product: 'Guardar Producto',
     seller_delete_product: 'Eliminar Producto',
     seller_product_deleted: 'Producto eliminado correctamente',
+
+    seller_events_title: 'Catas Presenciales en Tienda',
+    seller_events_subtitle: 'Control de aforo, edición de variables y gestión de asistentes para catas en Lekeitio.',
+    seller_events_edit_btn: 'Editar Cata',
+    seller_events_reserved: 'Reservadas',
+    seller_events_available: 'Disponibles',
+    seller_events_collected: 'Recaudado',
+    seller_events_attendees_title: 'Participantes de la Cata',
+    seller_events_no_events: 'No tienes catas presenciales creadas todavía',
+    seller_events_no_events_desc: 'Publica una cata presencial en la tienda de Lekeitio desde el menú superior para gestionar aforo, plazas y asistentes.',
+    seller_events_col_buyer: 'Comprador',
+    seller_events_col_contact: 'Contacto',
+    seller_events_col_seats: 'Plazas',
+    seller_events_col_date: 'Fecha Compra',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Acciones',
 
     chat_title: 'Mensajes & Asesoramiento',
     chat_type_message: 'Escribe tu mensaje aquí...',
@@ -628,6 +827,13 @@ export const translations: Record<Language, TranslationDict> = {
     nav_register: 'Sign Up',
     nav_profile: 'Profile',
     nav_logout: 'Log Out',
+    nav_gourmet_gifts: 'Gourmet Gifts',
+    nav_tastings_experiences: 'Tastings & Experiences',
+    nav_corporate_gifts: 'Corporate Gifts',
+    nav_events: 'Events',
+    nav_add_product: 'Add Product',
+    nav_add_product_line1: 'Add',
+    nav_add_product_line2: 'Product',
 
     cat_all: 'All',
     cat_queso: 'Cheese',
@@ -651,6 +857,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_stock: 'Stock',
     prod_unlimited: 'Unlimited',
     prod_add_to_cart: 'Add to Cart',
+    prod_added: 'Added',
     prod_ask_artisan: 'Ask Artisan',
     prod_consult_product: 'Inquiry about this item',
     prod_details: 'Details',
@@ -662,6 +869,47 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_asc: 'Price (Lowest first)',
     prod_sort_price_desc: 'Price (Highest first)',
     prod_showing: 'products available',
+    prod_sold_out: 'Sold Out',
+    prod_last_units: 'Last units available!',
+    prod_available: 'Available',
+    prod_availability: 'Availability:',
+
+    event_seats: 'seats',
+    event_seat: 'seat',
+    event_seats_available: 'seats available',
+    event_capacity_full: 'Full Capacity (Sold Out)',
+    event_last_seats: 'Last seats available!',
+    event_reserve_seat: 'Book Seat(s)',
+    event_seats_added: 'Seat(s) Added',
+    event_upcoming_title: 'Upcoming In-Person Tastings',
+    event_upcoming_subtitle: 'Limited seats · Central Lekeitio',
+    event_catalog_title: 'Available Tastings & Experiences',
+    event_catalog_subtitle: 'In-store tastings & kits for home',
+    event_home_catalog_title: 'Home Tasting Kits Available',
+    event_home_catalog_subtitle: 'Kits & Tasting packs to take home',
+    event_store_catalog_title: 'In-Store Tastings Available',
+    event_store_catalog_subtitle: 'In-person in Lekeitio',
+
+    exp_hero_badge: 'Gourmet Experiences',
+    exp_hero_title: 'Tastings &',
+    exp_hero_title_highlight: 'Experiences',
+    exp_hero_desc: 'Discover the craft of artisan cheese through our guided tastings, celebration events and bespoke services to enjoy in Lekeitio or wherever you choose.',
+    exp_home_tasting_title: 'Tastings at Home',
+    exp_home_tasting_badge: 'At your own pace',
+    exp_home_tasting_desc: 'Host your own tasting with our complete kits: selection of 6 aged artisan cheeses classified by intensity, artisanal pairings, illustrated tasting placemat and tasting notes.',
+    exp_home_tasting_btn: 'Order Home Tasting Kit',
+    exp_store_tasting_title: 'In-Store Tastings',
+    exp_store_tasting_badge: 'In-person in Lekeitio',
+    exp_store_tasting_desc: 'Exclusive in-person experiences in our Lekeitio cheesemonger (Gamarra Kalea 4). Guided by master cheesemongers in small groups with author cheeses and Basque txakoli.',
+    exp_store_tasting_btn: 'View Dates & Book Seat',
+    exp_wedding_title: 'Wedding Cheese Tables',
+    exp_wedding_badge: 'Weddings & Events',
+    exp_wedding_desc: 'We design stunning cheese tables for wedding cocktails and private events. Monumental layouts with fresh fruit, nuts, artisan breads, chutneys and a refined cheese selection.',
+    exp_wedding_btn: 'Request Wedding Quote',
+    exp_raclette_title: 'Raclette Hire',
+    exp_raclette_badge: 'Hire & Pack',
+    exp_raclette_desc: 'We lend you the traditional Swiss raclette machine along with pre-sliced aged raclette cheese, artisan cured meats and potatoes for an unforgettable evening without equipment hassle.',
+    exp_raclette_btn: 'Check Raclette Availability',
 
     cart_title: 'Your Cart',
     cart_empty: 'Your cart is empty',
@@ -672,6 +920,7 @@ export const translations: Record<Language, TranslationDict> = {
     cart_checkout: 'Proceed to Checkout',
     cart_remove: 'Remove',
     cart_quantity: 'Quantity',
+    cart_continue_shopping: 'Continue Shopping',
     deliv_choose_mode: 'Choose delivery method',
     deliv_home: 'Home Delivery',
     deliv_home_desc: 'Refrigerated delivery to your doorstep in 24-48 hours',
@@ -734,6 +983,22 @@ export const translations: Record<Language, TranslationDict> = {
     seller_delete_product: 'Delete Product',
     seller_product_deleted: 'Product deleted successfully',
 
+    seller_events_title: 'In-Store In-Person Tastings',
+    seller_events_subtitle: 'Capacity control, variables edition and attendee management for tastings in Lekeitio.',
+    seller_events_edit_btn: 'Edit Tasting',
+    seller_events_reserved: 'Booked',
+    seller_events_available: 'Available',
+    seller_events_collected: 'Collected',
+    seller_events_attendees_title: 'Tasting Attendees',
+    seller_events_no_events: 'You have no in-person tastings created yet',
+    seller_events_no_events_desc: 'Publish an in-person tasting in our Lekeitio shop from the top menu to manage capacity and attendees.',
+    seller_events_col_buyer: 'Buyer',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Seats',
+    seller_events_col_date: 'Purchase Date',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
+
     chat_title: 'Messages & Support',
     chat_type_message: 'Type your message here...',
     chat_send: 'Send',
@@ -751,7 +1016,7 @@ export const translations: Record<Language, TranslationDict> = {
     auth_phone: 'Contact Phone',
     auth_town: 'City / Town',
     auth_have_account: 'Already have an account? Sign in',
-    auth_no_account: 'Don\'t have an account? Register here',
+    auth_no_account: "Don't have an account? Register here",
 
     legal_terms: 'Terms of Service',
     legal_privacy: 'Privacy Policy',
@@ -824,6 +1089,13 @@ export const translations: Record<Language, TranslationDict> = {
     nav_register: 'Inscription',
     nav_profile: 'Profil',
     nav_logout: 'Déconnexion',
+    nav_gourmet_gifts: 'Cadeaux Gourmets',
+    nav_tastings_experiences: 'Dégustations & Expériences',
+    nav_corporate_gifts: 'Cadeaux d\'Entreprise',
+    nav_events: 'Événements',
+    nav_add_product: 'Ajouter un Produit',
+    nav_add_product_line1: 'Ajouter',
+    nav_add_product_line2: 'Produit',
 
     cat_all: 'Tous',
     cat_queso: 'Fromage',
@@ -847,6 +1119,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_stock: 'Stock',
     prod_unlimited: 'Illimité',
     prod_add_to_cart: 'Ajouter au panier',
+    prod_added: 'Ajouté',
     prod_ask_artisan: 'Contacter l\'artisan',
     prod_consult_product: 'Question sur ce produit',
     prod_details: 'Détails',
@@ -858,6 +1131,47 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_asc: 'Prix (croissant)',
     prod_sort_price_desc: 'Prix (décroissant)',
     prod_showing: 'produits disponibles',
+    prod_sold_out: 'Épuisé',
+    prod_last_units: 'Dernières unités !',
+    prod_available: 'Disponible',
+    prod_availability: 'Disponibilité :',
+
+    event_seats: 'places',
+    event_seat: 'place',
+    event_seats_available: 'places disponibles',
+    event_capacity_full: 'Complet (Plus de places)',
+    event_last_seats: 'Dernières places !',
+    event_reserve_seat: 'Réserver Place(s)',
+    event_seats_added: 'Place(s) Ajoutée(s)',
+    event_upcoming_title: 'Prochains Événements de Dégustation en Boutique',
+    event_upcoming_subtitle: 'Places limitées · Centre de Lekeitio',
+    event_catalog_title: 'Dégustations & Expériences Disponibles',
+    event_catalog_subtitle: 'Dégustations en boutique et kits à emporter',
+    event_home_catalog_title: 'Kits de Dégustation à Domicile',
+    event_home_catalog_subtitle: 'Kits & Packs de dégustation à emporter',
+    event_store_catalog_title: 'Dégustations en Boutique Disponibles',
+    event_store_catalog_subtitle: 'En présentiel à Lekeitio',
+
+    exp_hero_badge: 'Expériences Gastronomiques',
+    exp_hero_title: 'Dégustations &',
+    exp_hero_title_highlight: 'Expériences',
+    exp_hero_desc: 'Découvrez l\'art du fromage fermier à travers nos dégustations guidées, événements de célébration et services exclusifs à Lekeitio ou au lieu de votre choix.',
+    exp_home_tasting_title: 'Dégustations à la Maison',
+    exp_home_tasting_badge: 'À votre rythme',
+    exp_home_tasting_desc: 'Devenez l\'hôte idéal grâce à nos kits complets : sélection de 6 fromages affinés par intensités, accords artisanaux, set de table illustré et fiches de dégustation explicatives.',
+    exp_home_tasting_btn: 'Commander Kit à Domicile',
+    exp_store_tasting_title: 'Dégustations en Boutique',
+    exp_store_tasting_badge: 'En présentiel à Lekeitio',
+    exp_store_tasting_desc: 'Expériences présentielles exclusives dans notre fromagerie de Lekeitio (Gamarra Kalea 4). Guidées par nos maîtres affineurs en petits groupes avec txakoli de Biscaye.',
+    exp_store_tasting_btn: 'Voir les Dates & Réserver',
+    exp_wedding_title: 'Buffets Fromages de Mariage',
+    exp_wedding_badge: 'Mariages & Événements',
+    exp_wedding_desc: 'Nous créons des buffets de fromages spectaculaires pour cocktails de mariage et fêtes. Mises en scène monumentales avec fruits frais, fruits secs, pains et confitures artisanales.',
+    exp_wedding_btn: 'Demander un Devis Mariage',
+    exp_raclette_title: 'Prêt d\'Appareil à Raclette',
+    exp_raclette_badge: 'Location & Pack',
+    exp_raclette_desc: 'Nous vous prêtons l\'appareil traditionnel suisse professionnel avec le fromage à raclette affiné prédécoupé, charcuteries et pommes de terre pour une soirée conviviale sans contrainte.',
+    exp_raclette_btn: 'Consulter la Disponibilité Raclette',
 
     cart_title: 'Votre Panier',
     cart_empty: 'Votre panier est vide',
@@ -868,6 +1182,7 @@ export const translations: Record<Language, TranslationDict> = {
     cart_checkout: 'Valider la commande',
     cart_remove: 'Supprimer',
     cart_quantity: 'Quantité',
+    cart_continue_shopping: 'Continuer les Achats',
     deliv_choose_mode: 'Mode de réception',
     deliv_home: 'Livraison à domicile',
     deliv_home_desc: 'Colis réfrigéré livré à votre porte en 24-48h',
@@ -929,6 +1244,22 @@ export const translations: Record<Language, TranslationDict> = {
     seller_save_product: 'Enregistrer le Produit',
     seller_delete_product: 'Supprimer le Produit',
     seller_product_deleted: 'Produit supprimé avec succès',
+
+    seller_events_title: 'Dégustations en Boutique',
+    seller_events_subtitle: 'Contrôle de jauge, modification des variables et gestion des inscrits à Lekeitio.',
+    seller_events_edit_btn: 'Modifier la Dégustation',
+    seller_events_reserved: 'Réservées',
+    seller_events_available: 'Disponibles',
+    seller_events_collected: 'Encaissé',
+    seller_events_attendees_title: 'Participants à la Dégustation',
+    seller_events_no_events: 'Vous n\'avez pas encore créé de dégustation en boutique',
+    seller_events_no_events_desc: 'Publiez une dégustation en boutique depuis le menu supérieur pour gérer la jauge et les réservations.',
+    seller_events_col_buyer: 'Acheteur',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Places',
+    seller_events_col_date: 'Date d\'Achat',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
 
     chat_title: 'Messagerie & Conseils',
     chat_type_message: 'Écrivez votre message ici...',
