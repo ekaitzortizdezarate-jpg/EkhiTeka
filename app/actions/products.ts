@@ -15,6 +15,33 @@ async function checkSellerPermission(supabase: any, userId: string) {
   return profile?.role === 'vendedor' || profile?.role === 'admin';
 }
 
+// Auto-crear la categoría en la tabla categories si es un tipo especial
+async function ensureCategoryExists(supabase: any, categoryId: string) {
+  const specialCategories: Record<string, { es: string; eu: string; en: string; fr: string; icon: string }> = {
+    cesta_gourmet: { es: 'Cesta Gourmet', eu: 'Gourmet Saskia', en: 'Gourmet Hamper', fr: 'Coffret Gourmet', icon: '🎁' },
+    cata_casa: { es: 'Cata en Casa', eu: 'Etxeko Dastaketa', en: 'Home Tasting', fr: 'Dégustation à Domicile', icon: '🏠' },
+    cata_presencial: { es: 'Cata Presencial', eu: 'Aurrez Aurreko Dastaketa', en: 'In-Person Tasting', fr: 'Dégustation Présentielle', icon: '🍷' },
+    tarjeta_regalo: { es: 'Tarjeta Regalo', eu: 'Opari Txartela', en: 'Gift Card', fr: 'Carte Cadeau', icon: '💳' },
+  };
+
+  if (specialCategories[categoryId]) {
+    const spec = specialCategories[categoryId];
+    await supabase.from('categories').upsert(
+      {
+        id: categoryId,
+        name_es: spec.es,
+        name_eu: spec.eu,
+        name_en: spec.en,
+        name_fr: spec.fr,
+        icon: spec.icon,
+        display_order: 99,
+        is_active: true,
+      },
+      { onConflict: 'id' }
+    );
+  }
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -45,6 +72,9 @@ export async function createProduct(formData: FormData) {
   const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
   const originRegion = formData.get('origin_region') as string;
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
+
+  // Garantizar que la categoría existe en la BD
+  await ensureCategoryExists(supabase, categoryId);
 
   // Gestión de subida de imagen a Supabase Storage
   let imageUrl = (formData.get('image_url_fallback') as string) || null;
@@ -90,6 +120,8 @@ export async function createProduct(formData: FormData) {
   }
 
   revalidatePath('/');
+  revalidatePath('/regalos-gourmet');
+  revalidatePath('/experiencias');
   revalidatePath('/vendedor/productos');
   redirect('/');
 }
@@ -119,6 +151,9 @@ export async function updateProduct(productId: string, formData: FormData) {
   const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
   const originRegion = formData.get('origin_region') as string;
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
+
+  // Garantizar que la categoría existe en la BD
+  await ensureCategoryExists(supabase, categoryId);
 
   let imageUrl = (formData.get('existing_image_url') as string) || (formData.get('image_url_fallback') as string) || null;
   const imageFile = formData.get('image_file') as File | null;
@@ -161,6 +196,8 @@ export async function updateProduct(productId: string, formData: FormData) {
   }
 
   revalidatePath('/');
+  revalidatePath('/regalos-gourmet');
+  revalidatePath('/experiencias');
   revalidatePath(`/producto/${productId}`);
   redirect('/');
 }
@@ -190,7 +227,8 @@ export async function deleteProduct(productId: string) {
   }
 
   revalidatePath('/');
+  revalidatePath('/regalos-gourmet');
+  revalidatePath('/experiencias');
   revalidatePath(`/producto/${productId}`);
   return { success: true };
 }
-

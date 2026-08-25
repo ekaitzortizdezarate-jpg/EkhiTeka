@@ -179,14 +179,14 @@ export function NavbarNavLinks({
 
           {user && (
             <>
-              {/* Añadir Producto (Vendedor) en dos líneas y centrado */}
+              {/* Añadir Producto (Vendedor) con borde amarillo cuando no está activo */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
                   className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
                     pathname === '/vendedor/productos/nuevo'
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                      : 'border-2 border-[#FFE259] text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-[#FFE259]/15'
                   }`}
                 >
                   <span className="block text-center">Añadir</span>
@@ -245,7 +245,7 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO: Orden exacto de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta */}
+      {/* 2. LADO DERECHO: Menú Usuario */}
       <div className="flex items-center gap-2 shrink-0">
         {user ? (
           <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* 3. Mobile Navigation Drawer con createPortal */}
+      {/* 3. Mobile Navigation Drawer */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
