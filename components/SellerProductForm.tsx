@@ -20,9 +20,20 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
 
   const isEdit = !!initialProduct;
 
+  // Detectar tipo inicial si se está editando
+  const detectInitialType = () => {
+    if (!initialProduct) return 'producto_suelto';
+    const cat = initialProduct.category_id;
+    if (cat === 'cesta_gourmet' || cat === 'cesta' || cat === 'cestas') return 'cesta_gourmet';
+    if (cat === 'cata_presencial') return 'cata_presencial';
+    if (cat === 'cata_casa') return 'cata_casa';
+    if (cat === 'tarjeta_regalo') return 'tarjeta_regalo';
+    return 'producto_suelto';
+  };
+
   const [publishingType, setPublishingType] = useState<
     'producto_suelto' | 'cesta_gourmet' | 'cata_casa' | 'tarjeta_regalo' | 'cata_presencial'
-  >('producto_suelto');
+  >(detectInitialType());
 
   const [cestaItems, setCestaItems] = useState('1x Queso Idiazabal Ahumado (500g)\n1x Bonito del Norte de Lekeitio\n1x Txakoli de Bizkaia\n1x Picos artesanos');
   const [cataFecha, setCataFecha] = useState('Sábado 20 de Septiembre · 19:30h');
@@ -54,19 +65,35 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
 
     const formData = new FormData(e.currentTarget);
 
-    let customDesc = formData.get('description') as string;
+    let customDesc = (formData.get('description') as string) || '';
     let fallbackImg = '/images/secciones/Quesos.JPG';
 
     if (publishingType === 'cesta_gourmet') {
+      formData.set('category_id', 'cesta_gourmet');
+      formData.set('format', 'pack');
+      formData.set('stock', '999');
+      formData.set('origin_region', 'Lekeitio / Bizkaia');
       customDesc = `${customDesc}\n\n🎁 CONTENIDO DEL LOTE / CESTA:\n${cestaItems}`;
       fallbackImg = '/images/secciones/Cestas.JPG';
     } else if (publishingType === 'cata_presencial') {
+      formData.set('category_id', 'cata_presencial');
+      formData.set('format', 'unidad');
+      formData.set('stock', '999');
+      formData.set('origin_region', 'Lekeitio / Bizkaia');
       customDesc = `${customDesc}\n\n📅 FECHA & HORA: ${cataFecha}\n👥 AFORO: ${cataAforo}\n🍷 QUESOS & MARIDAJE A DEGUSTAR:\n${cataProductos}`;
       fallbackImg = '/images/secciones/Catas.JPG';
     } else if (publishingType === 'cata_casa') {
+      formData.set('category_id', 'cata_casa');
+      formData.set('format', 'pack');
+      formData.set('stock', '999');
+      formData.set('origin_region', 'Lekeitio / Bizkaia');
       customDesc = `${customDesc}\n\n🏠 INCLUYE PACK EN CASA:\n${cestaItems || 'Tabla de quesos afinados, fichas guiadas de cata y maridaje'}`;
       fallbackImg = '/images/secciones/Catas.JPG';
     } else if (publishingType === 'tarjeta_regalo') {
+      formData.set('category_id', 'tarjeta_regalo');
+      formData.set('format', 'unidad');
+      formData.set('stock', '999');
+      formData.set('origin_region', 'Lekeitio / Bizkaia');
       customDesc = `${customDesc}\n\n💳 TARJETA REGALO VIRTUAL:\nOpciones canjeables: ${tarjetaImportes}`;
       fallbackImg = '/images/secciones/Mesas.JPG';
     }
@@ -98,6 +125,8 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
     return cat.name_es;
   };
 
+  const isLooseProduct = publishingType === 'producto_suelto';
+
   return (
     <div className="max-w-3xl mx-auto py-6 space-y-6">
       <div className="flex items-center gap-3">
@@ -109,7 +138,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
         </Link>
         <div>
           <h1 className="text-xl sm:text-2xl font-black font-serif text-stone-900 dark:text-stone-100">
-            {isEdit ? t.seller_edit_product : t.seller_new_product}
+            {isEdit ? t.seller_edit_product : 'Añadir Producto'}
           </h1>
           <p className="text-xs text-stone-500 dark:text-stone-400">
             Publica productos, cestas gourmet, catas o tarjetas regalo para EkhiTeka.
@@ -123,7 +152,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
         </div>
       )}
 
-      {/* Selector de Tipo de Publicación (Sin iconos emoji y con tipografía de títulos) */}
+      {/* Selector de Tipo de Publicación */}
       {!isEdit && (
         <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-4 sm:p-6 space-y-3 shadow-xs">
           <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
@@ -195,59 +224,49 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
           />
         </div>
 
-        {/* 2. Categoría y Formato */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {t.seller_product_category} *
-            </label>
-            <select
-              name="category_id"
-              required
-              defaultValue={
-                initialProduct?.category_id ||
-                (publishingType === 'cesta_gourmet'
-                  ? 'queso'
-                  : publishingType === 'cata_presencial' || publishingType === 'cata_casa'
-                  ? 'queso'
-                  : categories[0]?.id)
-              }
-              className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259] cursor-pointer font-serif"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {getCategoryName(cat)}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* 2. Categoría y Formato (SOLO PARA PRODUCTO SUELTO) */}
+        {isLooseProduct && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
+                {t.seller_product_category} *
+              </label>
+              <select
+                name="category_id"
+                required
+                defaultValue={initialProduct?.category_id || categories[0]?.id}
+                className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259] cursor-pointer font-serif"
+              >
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {getCategoryName(cat)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="space-y-1.5">
-            <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {t.seller_product_format} *
-            </label>
-            <select
-              name="format"
-              required
-              defaultValue={
-                initialProduct?.format ||
-                (publishingType === 'cesta_gourmet' || publishingType === 'cata_casa'
-                  ? 'pack'
-                  : 'unidad')
-              }
-              className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259] cursor-pointer font-serif"
-            >
-              <option value="unidad">Unidad / Entrada</option>
-              <option value="pack">Pack / Cesta / Lote</option>
-              <option value="peso_kg">Por Kg</option>
-              <option value="botella">Botella</option>
-              <option value="lata">Lata</option>
-              <option value="tarro">Tarro</option>
-            </select>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
+                {t.seller_product_format} *
+              </label>
+              <select
+                name="format"
+                required
+                defaultValue={initialProduct?.format || 'unidad'}
+                className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259] cursor-pointer font-serif"
+              >
+                <option value="unidad">Unidad / Pieza</option>
+                <option value="pack">Pack / Lote</option>
+                <option value="peso_kg">Por Kg</option>
+                <option value="botella">Botella</option>
+                <option value="lata">Lata</option>
+                <option value="tarro">Tarro</option>
+              </select>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* 3. Campos dinámicos según el tipo */}
+        {/* 3. Campos dinámicos según el tipo de publicación */}
         {publishingType === 'cesta_gourmet' && (
           <div className="p-4 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-2">
             <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
@@ -275,7 +294,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
                   value={cataFecha}
                   onChange={(e) => setCataFecha(e.target.value)}
                   placeholder="Ej: Sábado 20 de Septiembre · 19:30h"
-                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold"
+                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
                 />
               </div>
               <div className="space-y-1">
@@ -287,7 +306,7 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
                   value={cataAforo}
                   onChange={(e) => setCataAforo(e.target.value)}
                   placeholder="Ej: 12 plazas"
-                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold"
+                  className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
                 />
               </div>
             </div>
@@ -300,9 +319,24 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
                 value={cataProductos}
                 onChange={(e) => setCataProductos(e.target.value)}
                 placeholder="5 quesos de afinador, 2 txakolis de Bizkaia..."
-                className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold"
+                className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
               />
             </div>
+          </div>
+        )}
+
+        {publishingType === 'cata_casa' && (
+          <div className="p-4 rounded-2xl bg-[#FAF7F2] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-2">
+            <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
+              Contenido del Pack de Cata en Casa:
+            </label>
+            <textarea
+              rows={3}
+              value={cestaItems}
+              onChange={(e) => setCestaItems(e.target.value)}
+              placeholder="Tabla de 6 quesos clasificados, fichas de cata, maridaje..."
+              className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
+            />
           </div>
         )}
 
@@ -316,13 +350,13 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
               value={tarjetaImportes}
               onChange={(e) => setTarjetaImportes(e.target.value)}
               placeholder="30€, 60€, 75€ o Canjeable por Cata Presencial"
-              className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold"
+              className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100"
             />
           </div>
         )}
 
-        {/* 4. Precio y Stock */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* 4. Precio y Stock (Stock solo visible para Producto Suelto) */}
+        <div className={`grid gap-4 ${isLooseProduct ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
           <div className="space-y-1.5">
             <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
               {publishingType === 'cata_presencial' ? 'Precio por persona / plaza *' : `${t.seller_product_price} *`}
@@ -339,33 +373,37 @@ export function SellerProductForm({ categories, initialProduct }: SellerProductF
             />
           </div>
 
+          {isLooseProduct && (
+            <div className="space-y-1.5">
+              <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
+                {t.seller_product_stock}
+              </label>
+              <input
+                type="number"
+                name="stock"
+                min="0"
+                defaultValue={initialProduct?.stock ?? 12}
+                className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* 5. Origen (SOLO PARA PRODUCTO SUELTO) */}
+        {isLooseProduct && (
           <div className="space-y-1.5">
             <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {publishingType === 'cata_presencial' ? 'Plazas disponibles (Stock)' : t.seller_product_stock}
+              {t.seller_product_origin}
             </label>
             <input
-              type="number"
-              name="stock"
-              min="0"
-              defaultValue={initialProduct?.stock ?? 12}
+              type="text"
+              name="origin_region"
+              defaultValue={initialProduct?.origin_region || 'Lekeitio / Bizkaia'}
+              placeholder="Ej: Lekeitio, Idiazabal, Bermeo, Getaria..."
               className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
             />
           </div>
-        </div>
-
-        {/* 5. Origen */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-            {t.seller_product_origin}
-          </label>
-          <input
-            type="text"
-            name="origin_region"
-            defaultValue={initialProduct?.origin_region || 'Lekeitio / Bizkaia'}
-            placeholder="Ej: Lekeitio, Idiazabal, Bermeo, Getaria..."
-            className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-          />
-        </div>
+        )}
 
         {/* 6. Descripción */}
         <div className="space-y-1.5">

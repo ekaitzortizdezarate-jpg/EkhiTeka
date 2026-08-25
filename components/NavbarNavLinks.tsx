@@ -179,6 +179,21 @@ export function NavbarNavLinks({
 
           {user && (
             <>
+              {/* Añadir Producto (Vendedor) en dos líneas y centrado */}
+              {isSeller && (
+                <Link
+                  href="/vendedor/productos/nuevo"
+                  className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
+                    pathname === '/vendedor/productos/nuevo'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <span className="block text-center">Añadir</span>
+                  <span className="block text-center">Producto</span>
+                </Link>
+              )}
+
               {/* Pedidos */}
               <Link
                 href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
@@ -215,17 +230,6 @@ export function NavbarNavLinks({
                 )}
               </Link>
 
-              {/* Vendedor: Añadir Producto */}
-              {isSeller && (
-                <Link
-                  href="/vendedor/productos/nuevo"
-                  className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102 whitespace-nowrap"
-                >
-                  <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>+ {t.seller_new_product}</span>
-                </Link>
-              )}
-
               {/* Admin */}
               {isAdmin && (
                 <Link
@@ -241,7 +245,7 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO: Menú Usuario (Orden de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta) */}
+      {/* 2. LADO DERECHO: Orden exacto de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta */}
       <div className="flex items-center gap-2 shrink-0">
         {user ? (
           <div className="flex items-center gap-2">
@@ -271,7 +275,7 @@ export function NavbarNavLinks({
             </form>
           </div>
         ) : (
-          /* Sin sesión: la cesta no aparece */
+          /* Sin sesión: La cesta no se muestra */
           <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/login"
@@ -292,16 +296,13 @@ export function NavbarNavLinks({
       {/* 3. Mobile Navigation Drawer con createPortal */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
-          {/* Overlay */}
           <div
             className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Drawer Content */}
           <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
-              {/* Header Drawer */}
               <div className="flex items-center justify-between pb-4 border-b border-stone-800">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5]">
@@ -330,7 +331,6 @@ export function NavbarNavLinks({
                 </button>
               </div>
 
-              {/* Navigation Links */}
               <div className="space-y-2 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Explorar Selección
@@ -381,7 +381,6 @@ export function NavbarNavLinks({
                 </Link>
               </div>
 
-              {/* User Links */}
               <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Tu Cuenta
@@ -395,7 +394,7 @@ export function NavbarNavLinks({
                         className="flex items-center justify-center gap-2 p-3.5 rounded-full font-black text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all"
                       >
                         <PlusCircle className="w-4 h-4 stroke-[2.5]" />
-                        <span>+ {t.seller_new_product}</span>
+                        <span>Añadir Producto</span>
                       </Link>
                     )}
                     <Link
@@ -472,7 +471,6 @@ export function NavbarNavLinks({
               </div>
             </div>
 
-            {/* Información de Contacto en Pie del Drawer */}
             <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
               <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
                 <Store className="w-3.5 h-3.5 text-[#FFE259]" />

@@ -1,8 +1,7 @@
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductWithSeller } from '@/types/database';
-import { Gift, Sparkles, MessageCircle, ArrowRight, Package, Wine, CreditCard } from 'lucide-react';
+import { Gift, MessageCircle, ArrowRight, Package, Wine, CreditCard } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -31,15 +30,24 @@ export default async function RegalosGourmetPage() {
   }
 
   const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
-  const giftProducts = allProducts.filter(
-    (p) =>
-      p.category_id === 'cestas' ||
-      p.category_id === 'catas' ||
-      p.name.toLowerCase().includes('cesta') ||
-      p.name.toLowerCase().includes('regalo') ||
-      p.name.toLowerCase().includes('pack') ||
-      p.name.toLowerCase().includes('cata')
-  );
+  
+  // Incluye cestas gourmet, tarjetas regalo y packs de cata en casa generados
+  const giftProducts = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    return (
+      cat === 'tarjeta_regalo' ||
+      cat === 'cesta_gourmet' ||
+      cat === 'cata_casa' ||
+      cat === 'cesta' ||
+      cat === 'cestas' ||
+      name.includes('cesta') ||
+      name.includes('regalo') ||
+      name.includes('tarjeta') ||
+      name.includes('lote') ||
+      name.includes('pack')
+    );
+  });
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -198,25 +206,16 @@ export default async function RegalosGourmetPage() {
         </div>
       </section>
 
-      {/* Catálogo de Cestas y Regalos Disponibles */}
+      {/* Catálogo de Cestas, Tarjetas y Regalos Generados */}
       {giftProducts.length > 0 && (
         <section className="space-y-6 pt-4">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
-            <div>
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-                Disponibles para envío o recogida
-              </span>
-              <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-                Cestas & Packs en Tienda
-              </h3>
-            </div>
-            <Link
-              href="/tienda"
-              className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-amber-600 flex items-center gap-1"
-            >
-              <span>Ver todo el catálogo</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+              Disponibles para envío o recogida
+            </span>
+            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Cestas & Packs en Tienda
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">

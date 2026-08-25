@@ -1,8 +1,51 @@
+import { createClient } from '@/lib/supabase/server';
+import { ProductCard } from '@/components/ProductCard';
+import type { ProductWithSeller } from '@/types/database';
 import { UtensilsCrossed, Wine, Store, HeartHandshake, Sparkles, MessageCircle, Calendar, Users, Flame } from 'lucide-react';
 
 export const revalidate = 0;
 
-export default function ExperienciasPage() {
+export default async function ExperienciasPage() {
+  const supabase = await createClient();
+
+  const [{ data: { user } }, productsRes] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('products')
+      .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false }),
+  ]);
+
+  let isSeller = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+      isSeller = true;
+    }
+  }
+
+  const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
+  
+  // Filtra catas presenciales y catas en casa creadas
+  const experienceProducts = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    return (
+      cat === 'cata_presencial' ||
+      cat === 'cata_casa' ||
+      cat === 'experiencia' ||
+      cat === 'catas' ||
+      name.includes('cata') ||
+      name.includes('degustación') ||
+      name.includes('taller')
+    );
+  });
+
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
       {/* Header Banner */}
@@ -42,6 +85,26 @@ export default function ExperienciasPage() {
           </div>
         </div>
       </section>
+
+      {/* Catas y Experiencias Creadas Disponibles */}
+      {experienceProducts.length > 0 && (
+        <section className="space-y-6 pt-2">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+              Catas presenciales y kits para casa
+            </span>
+            <h2 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Catas & Experiencias Disponibles
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {experienceProducts.map((p) => (
+              <ProductCard key={p.id} product={p} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Grid de las 4 Experiencias */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
