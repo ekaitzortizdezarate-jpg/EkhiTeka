@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductWithSeller } from '@/types/database';
@@ -9,7 +8,6 @@ import {
   Sparkles,
   MessageCircle,
   Flame,
-  ArrowRight,
   Calendar,
 } from 'lucide-react';
 
@@ -210,22 +208,13 @@ export default async function ExperienciasPage() {
       {/* 3. Productos generados de tipo cata en casa y cata presencial */}
       {tastingProducts.length > 0 && (
         <section className="space-y-6 pt-2">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
-            <div>
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-                Catálogo de Catas & Packs
-              </span>
-              <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-                Catas & Experiencias Disponibles
-              </h3>
-            </div>
-            <Link
-              href="/tienda"
-              className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-[#C68D07] dark:hover:text-[#FFE259] flex items-center gap-1 font-serif uppercase tracking-wider"
-            >
-              <span>Ver todo el catálogo</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              Catálogo de Catas & Packs
+            </span>
+            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Catas & Experiencias Disponibles
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -239,16 +228,14 @@ export default async function ExperienciasPage() {
       {/* 4. Próximos eventos de catas presenciales que haya */}
       {presencialEvents.length > 0 && (
         <section className="space-y-6 pt-4">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
-            <div>
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Plazas limitadas · Lekeitio Centro</span>
-              </span>
-              <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-                Próximos Eventos de Catas Presenciales
-              </h3>
-            </div>
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Plazas limitadas · Lekeitio Centro</span>
+            </span>
+            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              Próximos Eventos de Catas Presenciales
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
