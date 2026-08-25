@@ -1,21 +1,22 @@
 import { createClient } from '@/lib/supabase/server';
-import { ProductCard } from '@/components/ProductCard';
-import type { ProductWithSeller } from '@/types/database';
-import { Building2, Users2, Gift, TreePine, MessageCircle, ArrowRight } from 'lucide-react';
+import {
+  Briefcase,
+  Building2,
+  Sparkles,
+  MessageCircle,
+  Truck,
+  CheckCircle2,
+  Users,
+  ShieldCheck,
+} from 'lucide-react';
 
 export const revalidate = 0;
 
 export default async function RegalosEmpresaPage() {
   const supabase = await createClient();
-
-  const [{ data: { user } }, productsRes] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase
-      .from('products')
-      .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false }),
-  ]);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   let isSeller = false;
   if (user) {
@@ -29,38 +30,22 @@ export default async function RegalosEmpresaPage() {
     }
   }
 
-  const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
-
-  // Filtra productos dirigidos a empresas o lotes corporativos
-  const companyProducts = allProducts.filter((p) => {
-    const cat = (p.category_id || '').toLowerCase();
-    const name = (p.name || '').toLowerCase();
-    return (
-      cat === 'empresa' ||
-      cat === 'regalos_empresa' ||
-      name.includes('empresa') ||
-      name.includes('corporativ') ||
-      name.includes('teambuilding') ||
-      name.includes('navidad')
-    );
-  });
-
   return (
-    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Header Banner Regalos de Empresa */}
+    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* 1. Hero Editorial Regalos de Empresa */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/secciones/Mesas.JPG"
+            src="/images/secciones/Empresas.JPG"
             alt="Regalos de Empresa EkhiTeka"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/30 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
         </div>
 
         <div className="relative z-10 max-w-2xl space-y-4 text-white">
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md">
-            <Building2 className="w-3.5 h-3.5" /> Servicios Corporativos
+            <Building2 className="w-3.5 h-3.5" /> Soluciones Corporativas & Lotes Navideños
           </span>
 
           <h1 className="text-3xl sm:text-5xl font-black font-serif tracking-tight leading-tight">
@@ -68,156 +53,98 @@ export default async function RegalosEmpresaPage() {
           </h1>
 
           <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
-            Distingue a tu empresa con experiencias y regalos gastronómicos de autor. Catas de teambuilding, cestas de navidad exclusivas y detalles corporativos a medida para clientes y equipos.
+            Agradece la confianza de tu equipo y clientes con lotes gastronómicos artesanos, detalles corporativos personalizados y experiencias de cata exclusivas.
           </p>
 
-          <div className="pt-2">
-            <a
-              href="https://wa.me/34600000000?text=Hola,%20quisiera%20solicitar%20un%20presupuesto%20para%20Regalos/Eventos%20de%20Empresa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-lg hover:scale-105"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>Solicitar Presupuesto Corporativo por WhatsApp</span>
-            </a>
-          </div>
+          {!isSeller && (
+            <div className="pt-2">
+              <a
+                href="https://wa.me/34600000000?text=Hola,%20quisiera%20solicitar%20un%20presupuesto%20para%20Regalos%20de%20Empresa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-lg hover:scale-105 font-serif"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>Pedir Presupuesto Corporativo por WhatsApp</span>
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* 2. Productos y Lotes para Empresas generados por el vendedor */}
-      {companyProducts.length > 0 && (
-        <section className="space-y-6 pt-2">
-          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Lotes corporativos & experiencias
-            </span>
-            <h2 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-              Packs & Servicios Disponibles
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {companyProducts.map((p) => (
-              <ProductCard key={p.id} product={p} isSeller={isSeller} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 3. Servicios Corporativos Principales */}
+      {/* 2. Pilares de Servicio a Empresas */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Teambuilding */}
-        <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
-          <div>
-            <div className="relative h-56 overflow-hidden">
-              <img
-                src="/images/secciones/Catas.JPG"
-                alt="Teambuilding gastronómico"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                Dinámicas de Equipo
-              </div>
-            </div>
-            <div className="p-6 space-y-3">
-              <div className="flex items-center gap-2 text-[#C68D07] dark:text-[#FFE259]">
-                <Users2 className="w-5 h-5" />
-                <h2 className="font-serif font-bold text-xl text-stone-900 dark:text-stone-100">
-                  Teambuilding
-                </h2>
-              </div>
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Catas guiadas a ciegas, retos de maridaje y talleres sensoriales en torno a la cultura del queso artesano. Diseñado para reforzar la cohesión de equipos.
-              </p>
-            </div>
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+            <Briefcase className="w-6 h-6" />
           </div>
-          <div className="p-6 pt-0">
-            <a
-              href="https://wa.me/34600000000?text=Hola,%20quisiera%20información%20sobre%20actividades%20de%20Teambuilding"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3 px-4 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
-            >
-              <span>Organizar Teambuilding</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
+          <h2 className="text-xl font-bold font-serif text-stone-900 dark:text-stone-100">
+            Lotes y Cestas de Navidad
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+            Composiciones prémium sin intermediarios: quesos de afinador, embutidos ibéricos de bellota, salazones del Cantábrico y maridajes singulares con factura desglosada.
+          </p>
         </div>
 
-        {/* Cesta de Navidad */}
-        <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
-          <div>
-            <div className="relative h-56 overflow-hidden">
-              <img
-                src="/images/secciones/Cestas.JPG"
-                alt="Cesta de Navidad"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                Campaña Navideña
-              </div>
-            </div>
-            <div className="p-6 space-y-3">
-              <div className="flex items-center gap-2 text-[#C68D07] dark:text-[#FFE259]">
-                <TreePine className="w-5 h-5" />
-                <h2 className="font-serif font-bold text-xl text-stone-900 dark:text-stone-100">
-                  Cesta de Navidad
-                </h2>
-              </div>
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Lotes navideños de autor: quesos premiados de afinador, bonito del Cantábrico embotado a mano, salazones selectas, turrones artesanos y txakolis de guarda.
-              </p>
-            </div>
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+            <Users className="w-6 h-6" />
           </div>
-          <div className="p-6 pt-0">
-            <a
-              href="https://wa.me/34600000000?text=Hola,%20quisiera%20el%20catálogo%20de%20Cestas%20de%20Navidad%20para%20Empresas"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3 px-4 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
-            >
-              <span>Catálogo Cestas de Navidad</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
+          <h2 className="text-xl font-bold font-serif text-stone-900 dark:text-stone-100">
+            Catas Privadas & Team Building
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+            Organizamos eventos de empresa y actividades de equipo guiadas en nuestra quesería de Lekeitio o en la sede de tu empresa.
+          </p>
         </div>
 
-        {/* Cestas para Empresas */}
-        <div className="group rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
-          <div>
-            <div className="relative h-56 overflow-hidden">
-              <img
-                src="/images/secciones/Mesas.JPG"
-                alt="Cestas para Empresas"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                Todo el año
-              </div>
-            </div>
-            <div className="p-6 space-y-3">
-              <div className="flex items-center gap-2 text-[#C68D07] dark:text-[#FFE259]">
-                <Gift className="w-5 h-5" />
-                <h2 className="font-serif font-bold text-xl text-stone-900 dark:text-stone-100">
-                  Cestas para Empresas
-                </h2>
-              </div>
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Regalos corporativos para clientes VIP, agradecimiento a colaboradores y bienvenidas. Personalizamos el packaging y las notas con tu identidad corporativa.
-              </p>
-            </div>
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+            <Sparkles className="w-6 h-6" />
           </div>
-          <div className="p-6 pt-0">
-            <a
-              href="https://wa.me/34600000000?text=Hola,%20quisiera%20información%20sobre%20Cestas%20Personalizadas%20para%20Empresas"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3 px-4 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
-            >
-              <span>Pedir Cestas Corporativas</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+          <h2 className="text-xl font-bold font-serif text-stone-900 dark:text-stone-100">
+            Personalización con tu Marca
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+            Incluimos fajas personalizadas, tarjetas con el logotipo de tu empresa y mensajes corporativos dedicados para cada destinatario.
+          </p>
+        </div>
+      </section>
+
+      {/* 3. Garantías de Logística */}
+      <section className="rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 shadow-sm space-y-6">
+        <div className="max-w-2xl space-y-2">
+          <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+            Compromiso EkhiTeka
+          </span>
+          <h3 className="text-2xl sm:text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
+            Logística Impecable y Envíos Múltiples
+          </h3>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+            Nos encargamos de toda la gestión de envíos a múltiples domicilios de empleados o clientes en 24/48 horas con trazabilidad total.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
+            <Truck className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
+              Envíos individuales a cada empleado
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
+            <ShieldCheck className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
+              Transporte refrigerado homologado
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
+            <CheckCircle2 className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
+              Facturación detallada con IVA desglosado
+            </span>
           </div>
         </div>
       </section>
