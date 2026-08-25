@@ -111,7 +111,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:text-stone-900 transition-colors"
+            className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -161,12 +161,12 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
                   <div className="space-y-1.5 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                      <span className="px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-300/60 dark:border-amber-700/60">
                         Cata Presencial · Tienda Lekeitio
                       </span>
                       {event.origin_region && (
                         <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-[#C68D07]" /> {event.origin_region}
+                          <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259]" /> {event.origin_region}
                         </span>
                       )}
                     </div>
@@ -195,21 +195,21 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
 
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700">
-                        <span className="text-[9px] font-bold text-stone-400 uppercase block">Reservadas</span>
-                        <span className="text-base font-black text-amber-600 dark:text-amber-400">
+                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block">Reservadas</span>
+                        <span className="text-base font-black text-amber-600 dark:text-[#FFE259]">
                           {totalPlazasVendidas}
                         </span>
                       </div>
 
                       <div className="p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700">
-                        <span className="text-[9px] font-bold text-stone-400 uppercase block">Disponibles</span>
+                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block">Disponibles</span>
                         <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
                           {aforoActualRestante}
                         </span>
                       </div>
 
                       <div className="p-2.5 bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-200 dark:border-stone-700">
-                        <span className="text-[9px] font-bold text-stone-400 uppercase block">Recaudado</span>
+                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block">Recaudado</span>
                         <span className="text-base font-black text-stone-900 dark:text-stone-100">
                           {recaudacionTotal.toFixed(2)} €
                         </span>
@@ -218,23 +218,23 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                   </div>
                 </div>
 
-                {/* Tabla de Asistentes */}
+                {/* Tabla y Tarjeta de Asistentes con Soporte Total para Modo Oscuro */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-[#C68D07]" />
+                      <Users className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
                       <span>Participantes de la Cata ({validReservations.length})</span>
                     </h3>
-                    <span className="text-[10px] text-stone-400 font-medium">
+                    <span className="text-[10px] text-stone-400 dark:text-stone-500 font-medium">
                       Plazas ocupadas: {totalPlazasVendidas}
                     </span>
                   </div>
 
                   {validReservations.length > 0 ? (
-                    <div className="overflow-x-auto rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-850">
+                    <div className="overflow-x-auto rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/60 shadow-inner">
                       <table className="w-full text-left text-xs">
                         <thead>
-                          <tr className="border-b border-stone-200 dark:border-stone-700 font-serif uppercase tracking-wider text-[10px] text-stone-500 dark:text-stone-400 bg-stone-100/70 dark:bg-stone-800/70">
+                          <tr className="border-b border-stone-200 dark:border-stone-700 font-serif uppercase tracking-wider text-[10px] text-stone-600 dark:text-stone-300 bg-stone-100/90 dark:bg-stone-800">
                             <th className="p-3 sm:p-4">Comprador</th>
                             <th className="p-3 sm:p-4">Contacto</th>
                             <th className="p-3 sm:p-4 text-center">Plazas</th>
@@ -243,7 +243,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                             <th className="p-3 sm:p-4 text-right">Acciones</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-stone-200/60 dark:divide-stone-700/60">
+                        <tbody className="divide-y divide-stone-200 dark:divide-stone-700/60">
                           {validReservations.map((res) => {
                             const buyer = res.orders?.profiles;
                             const purchaseDate = res.orders?.created_at || res.created_at;
@@ -252,12 +252,12 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                             return (
                               <tr
                                 key={res.id}
-                                className="hover:bg-stone-100/50 dark:hover:bg-stone-800/50 transition-colors"
+                                className="hover:bg-stone-100/70 dark:hover:bg-stone-700/40 transition-colors bg-white/40 dark:bg-stone-900/40"
                               >
                                 <td className="p-3 sm:p-4 font-bold text-stone-900 dark:text-stone-100">
                                   {buyer?.full_name || 'Usuario EkhiTeka'}
                                   {buyer?.town && (
-                                    <span className="block text-[10px] font-normal text-stone-400">
+                                    <span className="block text-[10px] font-normal text-stone-500 dark:text-stone-400">
                                       {buyer.town}
                                     </span>
                                   )}
@@ -266,12 +266,12 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                                 <td className="p-3 sm:p-4 text-stone-600 dark:text-stone-300 space-y-0.5">
                                   {buyer?.phone && (
                                     <div className="flex items-center gap-1">
-                                      <Phone className="w-3 h-3 text-stone-400" />
+                                      <Phone className="w-3 h-3 text-stone-400 dark:text-stone-500" />
                                       <span>{buyer.phone}</span>
                                     </div>
                                   )}
                                   {buyer?.email && (
-                                    <div className="flex items-center gap-1 text-[11px] text-stone-400">
+                                    <div className="flex items-center gap-1 text-[11px] text-stone-500 dark:text-stone-400">
                                       <Mail className="w-3 h-3" />
                                       <span>{buyer.email}</span>
                                     </div>
@@ -306,7 +306,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                                     {buyer?.id && (
                                       <Link
                                         href={`/chat/${buyer.id}?product_id=${event.id}`}
-                                        className="inline-flex items-center gap-1 p-2 bg-stone-200 dark:bg-stone-700 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-700 dark:text-stone-200 rounded-xl transition-all"
+                                        className="inline-flex items-center gap-1 p-2 bg-stone-200 dark:bg-stone-700 hover:bg-[#FFE259] dark:hover:bg-[#FFE259] hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] text-stone-700 dark:text-stone-200 rounded-xl transition-all"
                                         title="Abrir chat con el comprador"
                                       >
                                         <MessageCircle className="w-3.5 h-3.5" />
@@ -323,7 +323,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                                           buyer?.full_name || 'este participante'
                                         )
                                       }
-                                      className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors disabled:opacity-40 cursor-pointer"
+                                      className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors disabled:opacity-40 cursor-pointer border border-red-200 dark:border-red-800"
                                       title="Dar de baja participante y notificar por chat"
                                     >
                                       <Trash2 className="w-3.5 h-3.5" />
@@ -337,7 +337,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                       </table>
                     </div>
                   ) : (
-                    <div className="p-6 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 text-center text-xs text-stone-400">
+                    <div className="p-6 rounded-2xl bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 text-center text-xs text-stone-500 dark:text-stone-400">
                       Aún no hay reservas registradas para esta cata presencial.
                     </div>
                   )}
@@ -370,7 +370,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
           <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
               <div className="flex items-center gap-2">
-                <Wine className="w-5 h-5 text-[#C68D07]" />
+                <Wine className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259]" />
                 <h2 className="text-lg font-black font-serif text-stone-900 dark:text-stone-100">
                   Editar Variables de la Cata Presencial
                 </h2>
@@ -385,7 +385,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
             </div>
 
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-300">
-              <BellRing className="w-4 h-4 shrink-0 mt-0.5 text-[#C68D07]" />
+              <BellRing className="w-4 h-4 shrink-0 mt-0.5 text-[#C68D07] dark:text-[#FFE259]" />
               <p>
                 Cualquier cambio en la fecha, hora o condiciones de la cata se notificará automáticamente por el chat a todos los participantes con plaza reservada.
               </p>
@@ -395,8 +395,8 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
               <div
                 className={`p-3.5 rounded-2xl text-xs font-bold text-center ${
                   msg.isError
-                    ? 'bg-red-100 text-red-900 dark:bg-red-950/70 dark:text-red-200 border border-red-300'
-                    : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-200 border border-emerald-300'
+                    ? 'bg-red-100 text-red-900 dark:bg-red-950/70 dark:text-red-200 border border-red-300 dark:border-red-800'
+                    : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
                 }`}
               >
                 {msg.text}
@@ -478,7 +478,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 <button
                   type="button"
                   onClick={() => setEditingEvent(null)}
-                  className="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-stone-500 hover:text-stone-900 rounded-xl"
+                  className="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 rounded-xl"
                 >
                   Cancelar
                 </button>
