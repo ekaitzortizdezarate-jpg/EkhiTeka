@@ -1,554 +1,168 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { createProduct, updateProduct } from '@/app/actions/products';
 import type { Category, Product } from '@/types/database';
-import { Upload, Check, ArrowLeft, Trash2, Plus, Minus } from 'lucide-react';
+import { Package, Check, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 interface SellerProductFormProps {
   categories: Category[];
-  initialProduct?: Product | null;
-  availableSingleProducts?: Product[];
+  product?: Product;
 }
 
-export function SellerProductForm({
-  categories,
-  initialProduct,
-  availableSingleProducts = [],
-}: SellerProductFormProps) {
-  const { t, language } = useLanguage();
+export function SellerProductForm({ categories, product }: SellerProductFormProps) {
+  const { t } = useLanguage();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(initialProduct?.image_url || null);
-
-  const isEdit = !!initialProduct;
-
-  const [publishingType, setPublishingType] = useState<
-    'producto_suelto' | 'cesta_gourmet' | 'cata_casa' | 'tarjeta_regalo' | 'cata_presencial'
-  >('producto_suelto');
-
-  // Composición basada estrictamente en productos sueltos
-  const [selectedItemsMap, setSelectedItemsMap] = useState<Record<string, number>>({});
-  const [cataFecha, setCataFecha] = useState('Sábado 20 de Septiembre · 19:30h');
-  const [cataAforo, setCataAforo] = useState(12);
-  const [tarjetaImportes, setTarjetaImportes] = useState('30€, 60€, 75€ o Canjeable por Cata Presencial');
-  const [notesExtra, setNotesExtra] = useState('');
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
-
-  const handleTypeSelect = (type: typeof publishingType) => {
-    setPublishingType(type);
-    if (!previewUrl) {
-      if (type === 'cesta_gourmet') setPreviewUrl('/images/secciones/Cestas.JPG');
-      else if (type === 'cata_presencial' || type === 'cata_casa') setPreviewUrl('/images/secciones/Catas.JPG');
-      else if (type === 'tarjeta_regalo') setPreviewUrl('/images/secciones/Mesas.JPG');
-      else setPreviewUrl('/images/secciones/Quesos.JPG');
-    }
-  };
-
-  const handleItemQuantityChange = (productId: string, delta: number) => {
-    setSelectedItemsMap((prev) => {
-      const current = prev[productId] || 0;
-      const next = Math.max(0, current + delta);
-      const updated = { ...prev };
-      if (next === 0) {
-        delete updated[productId];
-      } else {
-        updated[productId] = next;
-      }
-      return updated;
-    });
-  };
-
-  const buildComposedProductsText = () => {
-    const lines = Object.entries(selectedItemsMap).map(([prodId, qty]) => {
-      const p = availableSingleProducts.find((item) => item.id === prodId);
-      return p ? `${qty}x ${p.name} (${p.format || 'unidad'})` : '';
-    }).filter(Boolean);
-
-    return lines.join('\n');
-  };
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg(null);
+    setError(null);
 
     const formData = new FormData(e.currentTarget);
-    let customDesc = (formData.get('description') as string) || '';
-    let fallbackImg = '/images/secciones/Quesos.JPG';
-    const composedItemsText = buildComposedProductsText();
+    const res = product
+      ? await updateProduct(product.id, formData)
+      : await createProduct(formData);
 
-    if (publishingType === 'cesta_gourmet') {
-      if (!composedItemsText && !notesExtra.trim()) {
-        setErrorMsg('Selecciona al menos un producto suelto para componer la Cesta Gourmet.');
-        setLoading(false);
-        return;
-      }
-      customDesc = `${customDesc}\n\n🎁 CONTENIDO DEL LOTE / CESTA:\n${composedItemsText}${notesExtra ? `\n${notesExtra}` : ''}`;
-      fallbackImg = '/images/secciones/Cestas.JPG';
-    } else if (publishingType === 'cata_presencial') {
-      customDesc = `${customDesc}\n\n📅 FECHA & HORA: ${cataFecha}\n👥 AFORO: ${cataAforo} plazas\n🍷 PRODUCTOS A DEGUSTAR:\n${composedItemsText || notesExtra || 'Selección especial de quesos y maridajes'}`;
-      fallbackImg = '/images/secciones/Catas.JPG';
-      formData.set('stock', String(cataAforo));
-    } else if (publishingType === 'cata_casa') {
-      if (!composedItemsText && !notesExtra.trim()) {
-        setErrorMsg('Selecciona al menos un producto suelto para componer el Pack de Cata en Casa.');
-        setLoading(false);
-        return;
-      }
-      customDesc = `${customDesc}\n\n🏠 INCLUYE PACK EN CASA:\n${composedItemsText}${notesExtra ? `\n${notesExtra}` : ''}`;
-      fallbackImg = '/images/secciones/Catas.JPG';
-    } else if (publishingType === 'tarjeta_regalo') {
-      customDesc = `${customDesc}\n\n💳 TARJETA REGALO VIRTUAL:\nOpciones canjeables: ${tarjetaImportes}`;
-      fallbackImg = '/images/secciones/Mesas.JPG';
-    }
+    setLoading(false);
 
-    formData.set('description', customDesc.trim());
-    if (!formData.get('image_file') || (formData.get('image_file') as File).size === 0) {
-      formData.set('image_url_fallback', previewUrl || fallbackImg);
-    }
-
-    if (isEdit && initialProduct) {
-      const res = await updateProduct(initialProduct.id, formData);
-      if (res?.error) {
-        setErrorMsg(res.error);
-        setLoading(false);
-      }
+    if (res?.error) {
+      setError(res.error);
     } else {
-      const res = await createProduct(formData);
-      if (res?.error) {
-        setErrorMsg(res.error);
-        setLoading(false);
-      }
+      router.push('/tienda');
+      router.refresh();
     }
-  };
-
-  const getCategoryName = (cat: Category) => {
-    if (language === 'eu') return cat.name_eu;
-    if (language === 'fr') return cat.name_fr;
-    if (language === 'en') return cat.name_en;
-    return cat.name_es;
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <Link
-          href="/"
-          className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:text-stone-900 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black font-serif text-stone-900 dark:text-stone-100">
-            {isEdit ? t.seller_edit_product : t.seller_new_product}
+    <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 space-y-6 font-serif">
+      <Link
+        href="/tienda"
+        className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-500 hover:text-stone-900 dark:hover:text-stone-100"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>{t.common_back}</span>
+      </Link>
+
+      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+          <h1 className="text-2xl font-black text-stone-900 dark:text-stone-100">
+            {product ? t.seller_edit_product : t.seller_new_product}
           </h1>
-          <p className="text-xs text-stone-500 dark:text-stone-400">
-            Publica productos, cestas gourmet, catas o tarjetas regalo para EkhiTeka.
-          </p>
-        </div>
-      </div>
-
-      {errorMsg && (
-        <div className="p-3 bg-red-100 dark:bg-red-950/60 border border-red-300 dark:border-red-700 text-red-900 dark:text-red-200 text-xs font-bold rounded-2xl">
-          {errorMsg}
-        </div>
-      )}
-
-      {/* Selector de Tipo de Publicación */}
-      {!isEdit && (
-        <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-4 sm:p-6 space-y-3 shadow-xs">
-          <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-            ¿Qué tipo de publicación deseas crear?
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 font-serif">
-            {[
-              { id: 'producto_suelto', label: 'Producto Suelto' },
-              { id: 'cesta_gourmet', label: 'Cesta Gourmet' },
-              { id: 'cata_casa', label: 'Cata en Casa' },
-              { id: 'tarjeta_regalo', label: 'Tarjeta Regalo' },
-              { id: 'cata_presencial', label: 'Cata Presencial' },
-            ].map((tItem) => (
-              <button
-                key={tItem.id}
-                type="button"
-                onClick={() => handleTypeSelect(tItem.id as any)}
-                className={`py-3.5 px-3 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
-                  publishingType === tItem.id
-                    ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 font-black shadow-xs scale-102'
-                    : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-[#FFE259]'
-                }`}
-              >
-                <span className="text-xs uppercase tracking-[0.12em] font-bold leading-tight">
-                  {tItem.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-5 sm:p-8 space-y-5 shadow-sm">
-        {isEdit && initialProduct?.image_url && (
-          <input type="hidden" name="existing_image_url" value={initialProduct.image_url} />
-        )}
-
-        {/* 1. Nombre */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-            {publishingType === 'cesta_gourmet'
-              ? 'Nombre de la Cesta Gourmet *'
-              : publishingType === 'cata_presencial'
-              ? 'Título de la Cata Presencial (Evento) *'
-              : publishingType === 'tarjeta_regalo'
-              ? 'Nombre de la Tarjeta Regalo *'
-              : publishingType === 'cata_casa'
-              ? 'Nombre del Pack de Cata *'
-              : 'Nombre del Producto *'}
-          </label>
-          <input
-            type="text"
-            name="name"
-            required
-            defaultValue={
-              initialProduct?.name ||
-              (publishingType === 'cesta_gourmet'
-                ? 'Cesta Degustación Gourmet Lekeitio'
-                : publishingType === 'cata_presencial'
-                ? 'Cata de Quesos & Maridaje Vasco en Tienda Lekeitio'
-                : publishingType === 'tarjeta_regalo'
-                ? 'Tarjeta Regalo Virtual EkhiTeka'
-                : publishingType === 'cata_casa'
-                ? 'Pack Experiencia Cata en Casa (2-4 personas)'
-                : '')
-            }
-            placeholder="Ej: Queso Idiazabal Ahumado de Pastor"
-            className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-          />
         </div>
 
-        {/* 2. Categoría y Formato */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {t.seller_product_category} *
-            </label>
-            <select
-              name="category_id"
-              required
-              defaultValue={
-                initialProduct?.category_id ||
-                (publishingType === 'cesta_gourmet'
-                  ? 'cesta'
-                  : publishingType === 'cata_presencial' || publishingType === 'cata_casa'
-                  ? 'experiencia'
-                  : categories[0]?.id)
-              }
-              className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259] cursor-pointer font-serif"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {getCategoryName(cat)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {t.seller_product_format} *
-            </label>
-            <select
-              name="format"
-              required
-              defaultValue={
-                initialProduct?.format ||
-                (publishingType === 'cesta_gourmet' || publishingType === 'cata_casa'
-                  ? 'pack'
-                  : 'unidad')
-              }
-              className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259] cursor-pointer font-serif"
-            >
-              <option value="unidad">Unidad / Entrada (Plaza)</option>
-              <option value="pack">Pack / Cesta / Lote</option>
-              <option value="peso_kg">Por Kg</option>
-              <option value="botella">Botella</option>
-              <option value="lata">Lata</option>
-              <option value="tarro">Tarro</option>
-            </select>
-          </div>
-        </div>
-
-        {/* 3. Selector de Productos Sueltos para Cestas y Catas */}
-        {(publishingType === 'cesta_gourmet' ||
-          publishingType === 'cata_casa' ||
-          publishingType === 'cata_presencial') && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-stone-50 dark:bg-stone-800/70 border border-stone-200 dark:border-stone-700 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <label className="block text-xs font-black font-serif text-stone-900 dark:text-stone-100 uppercase tracking-wider">
-                  Selecciona los productos sueltos incluidos ({Object.values(selectedItemsMap).reduce((a, b) => a + b, 0)})
-                </label>
-                <p className="text-[11px] text-stone-500 dark:text-stone-400">
-                  Solo se pueden añadir productos sueltos individuales disponibles en el catálogo.
-                </p>
-              </div>
-            </div>
-
-            {availableSingleProducts.length > 0 ? (
-              <div className="max-h-56 overflow-y-auto divide-y divide-stone-200 dark:divide-stone-700 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900">
-                {availableSingleProducts.map((p) => {
-                  const qty = selectedItemsMap[p.id] || 0;
-                  return (
-                    <div
-                      key={p.id}
-                      className="p-2.5 sm:p-3 flex items-center justify-between gap-3 text-xs"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <span className="font-bold text-stone-900 dark:text-stone-100 block truncate">
-                          {p.name}
-                        </span>
-                        <span className="text-[10px] text-stone-500 dark:text-stone-400">
-                          {Number(p.price).toFixed(2)} € · {p.format} {p.origin_region ? `· ${p.origin_region}` : ''}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center border border-stone-300 dark:border-stone-700 rounded-lg overflow-hidden bg-stone-50 dark:bg-stone-800">
-                        <button
-                          type="button"
-                          onClick={() => handleItemQuantityChange(p.id, -1)}
-                          className="px-2 py-1 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 cursor-pointer"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="px-2.5 font-black text-xs text-stone-900 dark:text-stone-100">
-                          {qty}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleItemQuantityChange(p.id, 1)}
-                          className="px-2 py-1 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 cursor-pointer"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-xs text-stone-500 dark:text-stone-400 italic">
-                No hay productos sueltos registrados todavía.
-              </p>
-            )}
-
-            {/* Fecha y Aforo específico para Catas Presenciales */}
-            {publishingType === 'cata_presencial' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-stone-200 dark:border-stone-700">
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-                    Fecha y Hora del Evento:
-                  </label>
-                  <input
-                    type="text"
-                    value={cataFecha}
-                    onChange={(e) => setCataFecha(e.target.value)}
-                    placeholder="Ej: Sábado 20 de Septiembre · 19:30h"
-                    className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-                    Aforo / Plazas Máximas Totales:
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={cataAforo}
-                    onChange={(e) => setCataAforo(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Notas opcionales */}
-            <div className="space-y-1">
-              <label className="block text-[11px] font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-                Notas extras de maridaje o presentación (opcional):
-              </label>
-              <textarea
-                rows={2}
-                value={notesExtra}
-                onChange={(e) => setNotesExtra(e.target.value)}
-                placeholder="Ej: Incluye fichas de cata y caja de madera artesana..."
-                className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-              />
-            </div>
+        {error && (
+          <div className="p-3.5 bg-red-100 dark:bg-red-950/70 border border-red-300 dark:border-red-800 rounded-2xl text-xs font-bold text-red-800 dark:text-red-200 text-center">
+            {error}
           </div>
         )}
 
-        {publishingType === 'tarjeta_regalo' && (
-          <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-800/70 border border-stone-200 dark:border-stone-700 space-y-2">
-            <label className="block text-xs font-black font-serif text-stone-800 dark:text-stone-200 uppercase tracking-wider">
-              Opciones de importes y canje:
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+          <div className="space-y-1">
+            <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+              {t.seller_product_name} *
             </label>
             <input
               type="text"
-              value={tarjetaImportes}
-              onChange={(e) => setTarjetaImportes(e.target.value)}
-              placeholder="30€, 60€, 75€ o Canjeable por Cata Presencial"
-              className="w-full px-3 py-2 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-            />
-          </div>
-        )}
-
-        {/* 4. Precio y Stock / Plazas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {publishingType === 'cata_presencial' ? 'Precio por persona / plaza *' : `${t.seller_product_price} *`}
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0.10"
-              name="price"
+              name="name"
               required
-              defaultValue={initialProduct?.price || (publishingType === 'tarjeta_regalo' ? 60 : '')}
-              placeholder="0.00"
-              className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              defaultValue={product?.name || ''}
+              className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-              {publishingType === 'cata_presencial' ? 'Plazas Disponibles (Aforo Inicial) *' : t.seller_product_stock}
-            </label>
-            <input
-              type="number"
-              name="stock"
-              min="0"
-              defaultValue={initialProduct?.stock ?? (publishingType === 'cata_presencial' ? cataAforo : 12)}
-              className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-            />
-          </div>
-        </div>
-
-        {/* 5. Origen */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-            {t.seller_product_origin}
-          </label>
-          <input
-            type="text"
-            name="origin_region"
-            defaultValue={initialProduct?.origin_region || 'Lekeitio / Bizkaia'}
-            placeholder="Ej: Lekeitio, Idiazabal, Bermeo, Getaria..."
-            className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-          />
-        </div>
-
-        {/* 6. Descripción */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-            {t.seller_product_desc}
-          </label>
-          <textarea
-            name="description"
-            rows={3}
-            defaultValue={initialProduct?.description || ''}
-            placeholder="Notas de cata, elaboración artesanal, maridaje sugerido..."
-            className="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-800 border-2 border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
-          />
-        </div>
-
-        {/* 7. Subida de Imagen */}
-        <div className="space-y-2">
-          <label className="block text-xs font-black font-serif text-stone-700 dark:text-stone-300 uppercase tracking-wider">
-            {t.seller_product_image}
-          </label>
-          <div className="flex items-center gap-4">
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-[#FFE259] shadow-xs"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-2xl bg-stone-100 dark:bg-stone-800 border-2 border-dashed border-stone-300 dark:border-stone-700 flex items-center justify-center text-stone-400">
-                <Upload className="w-6 h-6" />
-              </div>
-            )}
-            <div className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+                {t.seller_product_price} *
+              </label>
               <input
-                type="file"
-                name="image_file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="text-xs text-stone-600 dark:text-stone-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-[#FFE259] file:text-[#1D1D1B] hover:file:bg-[#F5D742] cursor-pointer font-serif uppercase tracking-wider"
+                type="number"
+                step="0.01"
+                min="0.10"
+                name="price"
+                required
+                defaultValue={product?.price || ''}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
               />
-              <p className="text-[10px] text-stone-400 mt-1">
-                Formatos soportados: PNG, JPG, WebP. Si no subes foto, se asignará automáticamente la imagen temática correspondiente.
-              </p>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+                {t.seller_product_stock} *
+              </label>
+              <input
+                type="number"
+                min="0"
+                name="stock"
+                required
+                defaultValue={product?.stock ?? 10}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
             </div>
           </div>
-        </div>
 
-        {/* Botones de Acción */}
-        <div className="pt-4 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between gap-3 font-serif">
-          {isEdit && initialProduct ? (
-            <button
-              type="button"
-              onClick={async () => {
-                if (confirm(`¿Estás seguro de que deseas eliminar "${initialProduct.name}" del catálogo de EkhiTeka?`)) {
-                  setLoading(true);
-                  const { deleteProduct } = await import('@/app/actions/products');
-                  await deleteProduct(initialProduct.id);
-                  window.location.href = '/';
-                }
-              }}
-              className="px-4 py-2.5 bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 font-bold text-xs uppercase tracking-wider rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4" />
-              <span>Eliminar Producto</span>
-            </button>
-          ) : (
-            <div />
-          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+                {t.seller_product_category} *
+              </label>
+              <select
+                name="category_id"
+                required
+                defaultValue={product?.category_id || categories[0]?.id || ''}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              >
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name_es}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 hover:text-stone-900 rounded-xl"
-            >
-              {t.common_cancel}
-            </Link>
+            <div className="space-y-1">
+              <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+                {t.seller_product_origin}
+              </label>
+              <input
+                type="text"
+                name="origin_region"
+                defaultValue={product?.origin_region || 'Lekeitio / Bizkaia'}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+              {t.seller_product_desc}
+            </label>
+            <textarea
+              name="description"
+              rows={4}
+              defaultValue={product?.description || ''}
+              className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+            />
+          </div>
+
+          <div className="pt-3 border-t border-stone-200 dark:border-stone-800 flex justify-end">
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] active:bg-[#E5C428] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer hover:scale-102"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
             >
-              {loading ? (
-                <span>{t.common_loading}</span>
-              ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>{isEdit ? t.common_save : t.seller_save_product}</span>
-                </>
-              )}
+              <Check className="w-4 h-4" />
+              <span>{loading ? 'Guardando...' : t.seller_save_product}</span>
             </button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
