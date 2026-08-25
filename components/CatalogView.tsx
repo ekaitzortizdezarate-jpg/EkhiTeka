@@ -227,8 +227,10 @@ export function CatalogView({
           </div>
         ) : (
           <div className="py-16 text-center bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-8 space-y-3">
-            <div className="text-5xl">🧀</div>
-            <h3 className="text-base font-black text-stone-800 dark:text-stone-200">
+            <div className="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 mx-auto">
+              <Search className="w-6 h-6 text-stone-400" />
+            </div>
+            <h3 className="text-base font-black font-serif text-stone-800 dark:text-stone-200">
               {t.prod_no_results}
             </h3>
             <p className="text-xs text-stone-500 dark:text-stone-400">

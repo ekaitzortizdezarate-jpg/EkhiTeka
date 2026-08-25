@@ -1,13 +1,22 @@
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { Wine, Store, HeartHandshake, Sparkles, MessageCircle, Flame } from 'lucide-react';
+import { ProductCard } from '@/components/ProductCard';
+import type { ProductWithSeller } from '@/types/database';
+import { Wine, Store, HeartHandshake, Sparkles, MessageCircle, Flame, ArrowRight } from 'lucide-react';
 
 export const revalidate = 0;
 
 export default async function ExperienciasPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  const [{ data: { user } }, productsRes] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('products')
+      .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false }),
+  ]);
 
   let isSeller = false;
   if (user) {
@@ -20,6 +29,32 @@ export default async function ExperienciasPage() {
       isSeller = true;
     }
   }
+
+  const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
+
+  // Filtrar estrictamente solo catas presenciales en tienda
+  const presencialEvents = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    const desc = (p.description || '').toLowerCase();
+
+    const isHomeOrGift =
+      name.includes('casa') ||
+      cat.includes('casa') ||
+      cat === 'cesta' ||
+      cat === 'tarjeta_regalo' ||
+      name.includes('tarjeta') ||
+      name.includes('cesta');
+
+    if (isHomeOrGift) return false;
+
+    return (
+      cat === 'cata_presencial' ||
+      name.includes('presencial') ||
+      desc.includes('presencial') ||
+      (desc.includes('fecha & hora') && desc.includes('aforo'))
+    );
+  });
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -213,6 +248,35 @@ export default async function ExperienciasPage() {
           </div>
         </div>
       </section>
+
+      {/* Sección Próximas Catas Presenciales Disponibles */}
+      {presencialEvents.length > 0 && (
+        <section className="space-y-6 pt-6">
+          <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
+            <div>
+              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+                Plazas limitadas · Tienda Lekeitio
+              </span>
+              <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+                Próximas Catas Presenciales
+              </h3>
+            </div>
+            <Link
+              href="/tienda"
+              className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-[#C68D07] dark:hover:text-[#FFE259] flex items-center gap-1 font-serif uppercase tracking-wider"
+            >
+              <span>Ver todo el catálogo</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {presencialEvents.map((event) => (
+              <ProductCard key={event.id} product={event} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
