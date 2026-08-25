@@ -117,12 +117,12 @@ export function NavbarNavLinks({
               Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
             </span>
             <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              Quesería & Selección Gourmet · Lekeitio
+              Quesería & Selección Gourmet
             </span>
           </div>
         </Link>
 
-        {/* Enlaces Principales con tamaño ampliado y sin solapamiento */}
+        {/* Enlaces Principales */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 font-serif">
           <Link
             href="/tienda"
@@ -204,7 +204,7 @@ export function NavbarNavLinks({
                 </Link>
               )}
 
-              {/* Vendedor: Añadir Producto en 2 líneas justificado en el centro */}
+              {/* Vendedor: Añadir Producto */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
@@ -238,7 +238,7 @@ export function NavbarNavLinks({
               <CartNavButton />
             )}
 
-            {/* Mensajes (Icono a la izquierda de Perfil) */}
+            {/* Mensajes */}
             <Link
               href="/chat"
               className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
