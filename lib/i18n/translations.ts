@@ -210,7 +210,6 @@ export interface TranslationDict {
   common_select_language: string;
 }
 
-// Helper: locale string for date formatting
 export const LOCALE_MAP: Record<Language, string> = {
   eu: 'eu',
   es: 'es-ES',
@@ -752,7 +751,7 @@ export const translations: Record<Language, TranslationDict> = {
     auth_phone: 'Contact Phone',
     auth_town: 'City / Town',
     auth_have_account: 'Already have an account? Sign in',
-    auth_no_account: "Don't have an account? Register here",
+    auth_no_account: 'Don\'t have an account? Register here',
 
     legal_terms: 'Terms of Service',
     legal_privacy: 'Privacy Policy',
@@ -812,7 +811,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_tagline: 'Épicerie Fine & Produits Artisanaux',
     brand_subtitle: 'Fromages fermiers, thon blanc, salaisons, gildas, bière artisanale, vin txakoli et cidre basque.',
     top_refrigerated_shipping: 'Livraison réfrigérée 24/48h',
-    top_custom_orders: 'Coffrets sur mesure et conseils d'experts',
+    top_custom_orders: 'Coffrets sur mesure et conseils d\'experts',
     top_store_pickup: 'Retrait gratuit en boutique',
 
     nav_shop: 'Boutique',
@@ -848,7 +847,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_stock: 'Stock',
     prod_unlimited: 'Illimité',
     prod_add_to_cart: 'Ajouter au panier',
-    prod_ask_artisan: 'Contacter l'artisan',
+    prod_ask_artisan: 'Contacter l\'artisan',
     prod_consult_product: 'Question sur ce produit',
     prod_details: 'Détails',
     prod_search_placeholder: 'Rechercher fromages, thon, vins...',
@@ -880,7 +879,7 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_pickup_address: 'Adresse boutique : Gamarra Kalea 4, Lekeitio',
     deliv_confirm_order: 'Confirmer la commande',
     deliv_order_success: 'Commande validée avec succès !',
-    deliv_order_success_desc: 'L'artisan a reçu votre commande et prépare vos produits.',
+    deliv_order_success_desc: 'L\'artisan a reçu votre commande et prépare vos produits.',
 
     orders_title: 'Mes Commandes',
     orders_title_seller: 'Gestion des Commandes',
@@ -895,15 +894,15 @@ export const translations: Record<Language, TranslationDict> = {
     orders_cancelled: 'Annulée',
     orders_change_status: 'Changer le statut',
     orders_cancel_order: 'Annuler la commande',
-    orders_cancel_reason: 'Motif d'annulation',
+    orders_cancel_reason: 'Motif d\'annulation',
     orders_chat_with_buyer: 'Chat avec le client',
-    orders_chat_with_seller: 'Chat avec l'artisan',
-    orders_no_orders: 'Vous n'avez aucune commande pour le moment',
+    orders_chat_with_seller: 'Chat avec l\'artisan',
+    orders_no_orders: 'Vous n\'avez aucune commande pour le moment',
     orders_no_orders_seller: 'Aucune commande reçue pour le moment',
     orders_no_orders_seller_sub: 'Les nouvelles commandes de vos clients apparaîtront ici automatiquement.',
     orders_products_label: 'Articles de la commande',
     orders_products_to_prepare: 'Articles à préparer',
-    orders_purchase_date: 'Date d'achat',
+    orders_purchase_date: 'Date d\'achat',
     orders_date_time: 'Date & Heure',
     orders_order_number: 'Commande :',
     orders_total_to_charge: 'Total à encaisser :',
@@ -960,7 +959,7 @@ export const translations: Record<Language, TranslationDict> = {
     cookie_settings: 'Personnaliser',
 
     footer_club_title: 'Club des Amis du Bon Fromage',
-    footer_club_subtitle: 'Vous souhaitez rester informé des actualités d'EkhiTeka ?',
+    footer_club_subtitle: 'Vous souhaitez rester informé des actualités d\'EkhiTeka ?',
     footer_club_desc: 'Nouvelles arrivées de fromages de saison, dégustations exclusives à Lekeitio et lots limités avant tout le monde.',
     footer_join_whatsapp: 'Rejoindre par WhatsApp',
     footer_cheese_desc: 'Fromages affinés, poissons salés du Cantabrique et conserves artisanales sélectionnées à la main.',
@@ -981,7 +980,7 @@ export const translations: Record<Language, TranslationDict> = {
 
     shop_specialty: 'Notre Spécialité',
     shop_hero_title: 'Fromages et cadeaux gastronomiques à Lekeitio',
-    shop_hero_desc: 'Fromages affinés d'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
+    shop_hero_desc: 'Fromages affinés d\'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
     shop_see_cheeses: 'VOIR NOS FROMAGES',
     shop_whatsapp_orders: 'Commandes sur WhatsApp',
     shop_visit_title: 'Notre Fromagerie & Espace Gourmet',
