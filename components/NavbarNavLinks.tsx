@@ -204,7 +204,7 @@ export function NavbarNavLinks({
                 </Link>
               )}
 
-              {/* Vendedor: Añadir Producto (Solo reborde cuando NO está seleccionado) */}
+              {/* Vendedor: Añadir Producto */}
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
@@ -390,39 +390,14 @@ export function NavbarNavLinks({
                 </Link>
               </div>
 
-              {/* Enlaces de Usuario Móvil */}
+              {/* Enlaces de Usuario Móvil (Orden estricto a partir de Tu Cuenta: Pedidos, Eventos, Añadir Producto, Mensajes, Perfil, Cerrar Sesión) */}
               <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
                   Tu Cuenta
                 </p>
                 {user ? (
                   <>
-                    {isSeller && (
-                      <>
-                        <Link
-                          href="/vendedor/productos/nuevo"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all ${
-                            pathname === '/vendedor/productos/nuevo'
-                              ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
-                              : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
-                          }`}
-                        >
-                          <span>Añadir Producto</span>
-                        </Link>
-                        <Link
-                          href="/vendedor/eventos"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
-                            pathname === '/vendedor/eventos'
-                              ? 'bg-[#FFE259] text-[#1D1D1B]'
-                              : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                          }`}
-                        >
-                          <span>Eventos & Catas</span>
-                        </Link>
-                      </>
-                    )}
+                    {/* 1. Pedidos */}
                     <Link
                       href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                       onClick={() => setMobileMenuOpen(false)}
@@ -441,6 +416,38 @@ export function NavbarNavLinks({
                         </span>
                       )}
                     </Link>
+
+                    {/* 2. Eventos (solo vendedor) */}
+                    {isSeller && (
+                      <Link
+                        href="/vendedor/eventos"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                          pathname === '/vendedor/eventos'
+                            ? 'bg-[#FFE259] text-[#1D1D1B]'
+                            : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                        }`}
+                      >
+                        <span>Eventos</span>
+                      </Link>
+                    )}
+
+                    {/* 3. Añadir Producto (solo vendedor) */}
+                    {isSeller && (
+                      <Link
+                        href="/vendedor/productos/nuevo"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all ${
+                          pathname === '/vendedor/productos/nuevo'
+                            ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
+                            : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                        }`}
+                      >
+                        <span>Añadir Producto</span>
+                      </Link>
+                    )}
+
+                    {/* 4. Mensajes */}
                     <Link
                       href="/chat"
                       onClick={() => setMobileMenuOpen(false)}
@@ -457,6 +464,8 @@ export function NavbarNavLinks({
                         </span>
                       )}
                     </Link>
+
+                    {/* 5. Perfil */}
                     <Link
                       href="/perfil"
                       onClick={() => setMobileMenuOpen(false)}
@@ -468,6 +477,8 @@ export function NavbarNavLinks({
                     >
                       <span>{t.nav_profile}</span>
                     </Link>
+
+                    {/* 6. Cerrar Sesión */}
                     <form action={signout} className="pt-2">
                       <button
                         type="submit"
