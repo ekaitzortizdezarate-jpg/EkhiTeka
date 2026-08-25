@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Calendar, Users, Wine, MapPin, Mail, Phone, MessageCircle, ArrowLeft, Ticket } from 'lucide-react';
+import { Users, Wine, MapPin, Mail, Phone, MessageCircle, ArrowLeft, Ticket } from 'lucide-react';
 
-interface AttendeeReservation {
+export interface AttendeeReservation {
   id: string;
   quantity: number;
   subtotal: number;
@@ -23,7 +23,7 @@ interface AttendeeReservation {
   } | null;
 }
 
-interface EventProduct {
+export interface EventProduct {
   id: string;
   name: string;
   description?: string | null;
@@ -33,7 +33,7 @@ interface EventProduct {
   order_items?: AttendeeReservation[];
 }
 
-interface SellerEventsViewProps {
+export interface SellerEventsViewProps {
   events: EventProduct[];
 }
 
@@ -72,14 +72,12 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
       <div className="space-y-6">
         {events.length > 0 ? (
           events.map((event) => {
-            // Filtrar reservas válidas (excluyendo canceladas)
             const validReservations = (event.order_items || []).filter(
               (it) => it.orders && it.orders.status !== 'cancelado'
             );
 
             const totalPlazasVendidas = validReservations.reduce((sum, it) => sum + it.quantity, 0);
             const aforoActualRestante = event.stock ?? 0;
-            const aforoTotalEstimado = totalPlazasVendidas + aforoActualRestante;
             const recaudacionTotal = validReservations.reduce((sum, it) => sum + Number(it.subtotal || 0), 0);
 
             return (
@@ -135,7 +133,7 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                   </div>
                 </div>
 
-                {/* Tabla de Asistentes / Plazas Compradas */}
+                {/* Tabla de Asistentes */}
                 <div className="space-y-3">
                   <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300 flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#C68D07]" />
@@ -256,3 +254,5 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
     </div>
   );
 }
+
+export default SellerEventsView;

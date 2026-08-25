@@ -20,7 +20,6 @@ export default async function SellerEventsPage() {
     redirect('/');
   }
 
-  // Obtener eventos y catas del vendedor junto con sus pedidos de compradores
   const { data: rawEvents } = await supabase
     .from('products')
     .select(`
@@ -50,7 +49,6 @@ export default async function SellerEventsPage() {
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
-  // Filtrar productos que corresponden a eventos/catas
   const events = (rawEvents || []).filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
