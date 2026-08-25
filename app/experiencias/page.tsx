@@ -6,7 +6,6 @@ import {
   Store,
   HeartHandshake,
   Sparkles,
-  MessageCircle,
   Flame,
   Calendar,
 } from 'lucide-react';
@@ -88,7 +87,7 @@ export default async function ExperienciasPage() {
 
   return (
     <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Tarjeta de presentación de la ventana (Hero Banner) */}
+      {/* 1. Tarjeta de presentación de la ventana (Hero Banner sin botón de consulta) */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
@@ -111,20 +110,6 @@ export default async function ExperienciasPage() {
           <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
             Descubre el arte del queso artesano a través de nuestras catas guiadas, eventos para celebraciones y servicios exclusivos para disfrutar en Lekeitio o donde tú elijas.
           </p>
-
-          {!isSeller && (
-            <div className="pt-2">
-              <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20fechas%20y%20reservas%20para%20Catas%20y%20Experiencias"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-lg hover:scale-105"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Consultar Fechas & Reservas por WhatsApp</span>
-              </a>
-            </div>
-          )}
         </div>
       </section>
 
