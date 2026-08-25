@@ -7,7 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
 import { getProductImage } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, MessageCircle, MapPin, Sparkles, Check, Pencil, Trash2 } from 'lucide-react';
+import { ShoppingBag, MessageCircle, MapPin, Check, Pencil, Trash2 } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductWithSeller;
@@ -43,9 +43,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const imageUrl = getProductImage(product);
 
   return (
-    <article aria-label={product.name} className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col overflow-hidden ${isDeleting ? 'opacity-40 pointer-events-none' : ''}`}>
+    <article
+      aria-label={product.name}
+      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col overflow-hidden h-full ${
+        isDeleting ? 'opacity-40 pointer-events-none' : ''
+      }`}
+    >
       {/* 1. Imagen y Badges */}
-      <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden">
+      <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden shrink-0">
         <img
           src={imageUrl}
           alt={product.name}
@@ -57,9 +62,9 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
         {/* Badge de Origen */}
         {product.origin_region && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/80 backdrop-blur-xs text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-xs">
-            <MapPin className="w-3 h-3 text-[#FFE259]" />
-            {product.origin_region}
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 bg-[#1D1D1B]/85 backdrop-blur-xs text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-xs max-w-[70%] truncate">
+            <MapPin className="w-3 h-3 text-[#FFE259] shrink-0" />
+            <span className="truncate">{product.origin_region}</span>
           </span>
         )}
 
@@ -68,47 +73,51 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           Artisau
         </span>
 
-        {/* Badge de Formato */}
+        {/* Badge de Formato y Peso */}
         <span className="absolute bottom-3 left-3 px-2.5 py-0.5 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] font-bold rounded-lg uppercase tracking-tight shadow-xs border border-stone-200/60 dark:border-stone-700/60">
           {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
         </span>
       </div>
 
-      {/* 2. Información del Producto */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
-        <div className="space-y-1">
-          <p className="text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider truncate">
+      {/* 2. Información Completa y Legible */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
+        <div className="space-y-1.5">
+          <p className="text-[10px] sm:text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider">
             {sellerName}
           </p>
-          <Link href={`/producto/${product.id}`} className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
-            <h2 className="font-black text-stone-900 dark:text-stone-100 text-sm sm:text-base leading-snug line-clamp-2">
+
+          <Link
+            href={`/producto/${product.id}`}
+            className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors"
+          >
+            <h2 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-sm sm:text-base leading-snug break-words">
               {product.name}
             </h2>
           </Link>
+
           {product.description && (
-            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed pt-0.5 font-medium">
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium whitespace-pre-line break-words pt-1">
               {product.description}
             </p>
           )}
         </div>
 
-        {/* 3. Precio y Botones de Acción */}
-        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between gap-2">
+        {/* 3. Precio y Acciones */}
+        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between gap-2 shrink-0">
           <div>
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
               {t.prod_price}
             </span>
-            <span className="text-base sm:text-lg font-black text-[#1D1D1B] dark:text-stone-100">
+            <span className="text-base sm:text-lg font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
               {Number(product.price).toFixed(2)} €
             </span>
           </div>
 
           {isSeller ? (
-            /* Botones de gestión para el Vendedor de EkhiTeka */
             <div className="flex items-center gap-1.5">
               <Link
                 href={`/vendedor/productos/${product.id}/editar`}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-102"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-102 font-serif uppercase tracking-wider"
                 title="Editar Producto"
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -124,7 +133,6 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               </button>
             </div>
           ) : (
-            /* Botones normales para Compradores */
             <div className="flex items-center gap-1.5">
               <Link
                 href={`/chat/${sellerId}?product_id=${product.id}`}
@@ -137,7 +145,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               <button
                 type="button"
                 onClick={handleQuickAdd}
-                className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs transition-all shadow-xs active:scale-95 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs font-serif uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer ${
                   added
                     ? 'bg-emerald-700 text-white'
                     : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-102'

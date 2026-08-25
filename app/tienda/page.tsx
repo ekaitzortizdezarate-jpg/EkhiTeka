@@ -13,6 +13,7 @@ export default async function TiendaPage() {
       .from('categories')
       .select('*')
       .eq('is_active', true)
+      .not('id', 'in', '("cata_presencial","cata_casa","tarjeta_regalo","experiencia")')
       .order('display_order', { ascending: true }),
     supabase
       .from('products')
@@ -33,13 +34,27 @@ export default async function TiendaPage() {
     }
   }
 
-  const categories = (categoriesRes.data || []) as Category[];
-  const products = (productsRes.data || []) as unknown as ProductWithSeller[];
+  const rawCategories = (categoriesRes.data || []) as Category[];
+  const rawProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
+
+  // La tienda muestra únicamente productos sueltos y cestas (excluyendo catas presenciales, catas en casa y tarjetas de regalo)
+  const storeProducts = rawProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    const isExcluded =
+      cat === 'cata_presencial' ||
+      cat === 'cata_casa' ||
+      cat === 'tarjeta_regalo' ||
+      cat === 'experiencia' ||
+      name.includes('cata presencial') ||
+      name.includes('tarjeta regalo');
+    return !isExcluded;
+  });
 
   return (
     <CatalogView
-      categories={categories}
-      products={products}
+      categories={rawCategories}
+      products={storeProducts}
       initialCategory="all"
       isSeller={isSeller}
     />
