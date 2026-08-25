@@ -25,7 +25,7 @@ export default async function NewProductPage() {
     redirect('/perfil');
   }
 
-  const [{ data: categories }, { data: products }] = await Promise.all([
+  const [categoriesRes, singleProductsRes] = await Promise.all([
     supabase
       .from('categories')
       .select('*')
@@ -35,13 +35,14 @@ export default async function NewProductPage() {
       .from('products')
       .select('*')
       .eq('is_active', true)
+      .neq('format', 'pack')
       .order('name', { ascending: true }),
   ]);
 
   return (
     <SellerProductForm
-      categories={(categories || []) as Category[]}
-      storeProducts={(products || []) as Product[]}
+      categories={(categoriesRes.data || []) as Category[]}
+      availableSingleProducts={(singleProductsRes.data || []) as Product[]}
     />
   );
 }

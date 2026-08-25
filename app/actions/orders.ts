@@ -36,45 +36,38 @@ export async function createOrder(payload: CreateOrderPayload) {
     .single();
 
   if (profile?.role === 'vendedor') {
-    return {
-      error:
-        'Los vendedores de EkhiTeka no pueden realizar compras con la cuenta de vendedor. Utiliza una cuenta de comprador.',
-    };
+    return { error: 'Los vendedores de EkhiTeka no pueden realizar compras con la cuenta de vendedor. Utiliza una cuenta de comprador.' };
   }
 
   if (!isProfileComplete(profile)) {
-    return {
-      error:
-        'Debes completar tu perfil con todos tus datos personales antes de realizar un pedido.',
-    };
+    return { error: 'Debes completar tu perfil con todos tus datos personales y de dirección antes de realizar un pedido.' };
   }
 
-  // 1. Descontar stock/plazas inmediatamente mediante función RPC (y fallback directo)
+  // 1. Verificar disponibilidad de plazas y stock para cada producto/evento
   for (const it of payload.items) {
-    const { error: rpcError } = await supabase.rpc('decrement_product_stock', {
-      p_product_id: it.productId,
-      p_quantity: it.quantity,
-    });
+    const { data: prod, error: prodErr } = await supabase
+      .from('products')
+      .select('id, name, stock, is_unlimited_stock')
+      .eq('id', it.productId)
+      .single();
 
-    // Fallback por si la función RPC no está disponible
-    if (rpcError) {
-      const { data: prod } = await supabase
-        .from('products')
-        .select('stock, is_unlimited_stock')
-        .eq('id', it.productId)
-        .single();
+    if (prodErr || !prod) {
+      return { error: `Uno de los productos seleccionados ya no está disponible.` };
+    }
 
-      if (prod && !prod.is_unlimited_stock && typeof prod.stock === 'number') {
-        const remainingStock = Math.max(0, prod.stock - it.quantity);
-        await supabase
-          .from('products')
-          .update({ stock: remainingStock })
-          .eq('id', it.productId);
+    if (!prod.is_unlimited_stock) {
+      const currentStock = prod.stock ?? 0;
+      if (currentStock < it.quantity) {
+        return {
+          error: currentStock <= 0
+            ? `Lo sentimos, ya no quedan plazas o existencias disponibles para "${prod.name}".`
+            : `Solo quedan ${currentStock} plaza(s) disponible(s) para "${prod.name}". Por favor, reduce la cantidad.`,
+        };
       }
     }
   }
 
-  // 2. Crear el pedido
+  // 2. Crear el registro del pedido
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -94,7 +87,7 @@ export async function createOrder(payload: CreateOrderPayload) {
     return { error: orderError?.message || 'Error al crear el pedido' };
   }
 
-  // 3. Registrar artículos del pedido
+  // 3. Crear los items del pedido
   const orderItemsData = payload.items.map((it) => ({
     order_id: order.id,
     product_id: it.productId,
@@ -111,12 +104,30 @@ export async function createOrder(payload: CreateOrderPayload) {
     return { error: itemsError.message };
   }
 
-  revalidatePath('/', 'layout');
+  // 4. Descontar las plazas / stock adquirido en la base de datos
+  for (const it of payload.items) {
+    const { data: prod } = await supabase
+      .from('products')
+      .select('stock, is_unlimited_stock')
+      .eq('id', it.productId)
+      .single();
+
+    if (prod && !prod.is_unlimited_stock) {
+      const newStock = Math.max(0, (prod.stock ?? 0) - it.quantity);
+      await supabase
+        .from('products')
+        .update({ stock: newStock })
+        .eq('id', it.productId);
+    }
+  }
+
+  revalidatePath('/');
+  revalidatePath('/tienda');
   revalidatePath('/experiencias');
   revalidatePath('/regalos-gourmet');
-  revalidatePath('/tienda');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
+  revalidatePath('/vendedor/eventos');
   return { success: true, orderId: order.id };
 }
 
@@ -144,6 +155,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
 
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
+  revalidatePath('/vendedor/eventos');
   return { success: true };
 }
 
@@ -157,7 +169,7 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: 'No autenticado' };
   }
 
-  // Devolver el stock si se cancela el pedido
+  // 1. Restaurar stock al cancelar el pedido
   const { data: items } = await supabase
     .from('order_items')
     .select('product_id, quantity')
@@ -171,10 +183,10 @@ export async function cancelOrder(orderId: string, reason: string) {
         .eq('id', it.product_id)
         .single();
 
-      if (prod && !prod.is_unlimited_stock && typeof prod.stock === 'number') {
+      if (prod && !prod.is_unlimited_stock) {
         await supabase
           .from('products')
-          .update({ stock: prod.stock + it.quantity })
+          .update({ stock: (prod.stock ?? 0) + it.quantity })
           .eq('id', it.product_id);
       }
     }
@@ -193,9 +205,10 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: error.message };
   }
 
-  revalidatePath('/', 'layout');
-  revalidatePath('/experiencias');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
+  revalidatePath('/vendedor/eventos');
+  revalidatePath('/tienda');
+  revalidatePath('/');
   return { success: true };
 }

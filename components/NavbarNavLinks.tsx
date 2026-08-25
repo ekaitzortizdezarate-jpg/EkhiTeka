@@ -20,7 +20,7 @@ import {
   Sparkles,
   Phone,
   Store,
-  ChevronRight,
+  Wine,
 } from 'lucide-react';
 
 interface NavbarNavLinksProps {
@@ -97,7 +97,7 @@ export function NavbarNavLinks({
 
   return (
     <div className="flex items-center justify-between w-full min-w-0">
-      {/* 1. LADO IZQUIERDO: Botón Móvil, Logotipo y Enlaces */}
+      {/* 1. LADO IZQUIERDO */}
       <div className="flex items-center gap-4 sm:gap-8 min-w-0">
         {/* Botón Menú Móvil */}
         <button
@@ -179,21 +179,6 @@ export function NavbarNavLinks({
 
           {user && (
             <>
-              {/* Añadir Producto (Vendedor) con borde amarillo cuando no está activo */}
-              {isSeller && (
-                <Link
-                  href="/vendedor/productos/nuevo"
-                  className={`flex flex-col items-center justify-center text-center px-3.5 py-1 rounded-2xl tracking-[0.16em] uppercase text-[10px] font-semibold transition-all leading-tight whitespace-nowrap ${
-                    pathname === '/vendedor/productos/nuevo'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                      : 'border-2 border-[#FFE259] text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-[#FFE259]/15'
-                  }`}
-                >
-                  <span className="block text-center">Añadir</span>
-                  <span className="block text-center">Producto</span>
-                </Link>
-              )}
-
               {/* Pedidos */}
               <Link
                 href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
@@ -211,6 +196,21 @@ export function NavbarNavLinks({
                   <span className="w-2.5 h-2.5 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
                 )}
               </Link>
+
+              {/* Eventos (solo para Vendedor) */}
+              {isSeller && (
+                <Link
+                  href="/vendedor/eventos"
+                  className={`flex items-center justify-center text-center gap-1.5 px-3.5 py-2 rounded-full tracking-[0.18em] uppercase text-[11px] font-semibold transition-all ${
+                    pathname === '/vendedor/eventos'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <Wine className="w-3.5 h-3.5 text-[#C68D07]" />
+                  <span>Eventos</span>
+                </Link>
+              )}
 
               {/* Mensajes / Chat */}
               <Link
@@ -230,6 +230,17 @@ export function NavbarNavLinks({
                 )}
               </Link>
 
+              {/* Vendedor: Añadir Producto */}
+              {isSeller && (
+                <Link
+                  href="/vendedor/productos/nuevo"
+                  className="flex items-center justify-center text-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-full transition-all shadow-xs font-bold uppercase tracking-[0.16em] text-[11px] hover:scale-102 whitespace-nowrap"
+                >
+                  <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>+ {t.seller_new_product}</span>
+                </Link>
+              )}
+
               {/* Admin */}
               {isAdmin && (
                 <Link
@@ -245,16 +256,16 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO: Menú Usuario */}
+      {/* 2. LADO DERECHO (Orden de derecha a izquierda: Cerrar Sesión -> Perfil -> Cesta) */}
       <div className="flex items-center gap-2 shrink-0">
         {user ? (
           <div className="flex items-center gap-2">
-            {/* 3º de derecha a izquierda: Cesta */}
+            {/* 3º: Cesta */}
             {(!profile || profile.role === 'comprador') && (
               <CartNavButton />
             )}
 
-            {/* 2º de derecha a izquierda: Perfil */}
+            {/* 2º: Perfil */}
             <Link
               href="/perfil"
               className="p-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
@@ -263,7 +274,7 @@ export function NavbarNavLinks({
               <User className="w-4 h-4" />
             </Link>
 
-            {/* 1º de derecha a izquierda (Extremo Derecho): Cerrar Sesión */}
+            {/* 1º: Cerrar Sesión */}
             <form action={signout}>
               <button
                 type="submit"
@@ -275,7 +286,6 @@ export function NavbarNavLinks({
             </form>
           </div>
         ) : (
-          /* Sin sesión: La cesta no se muestra */
           <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/login"
@@ -293,7 +303,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* 3. Mobile Navigation Drawer */}
+      {/* 3. Mobile Navigation Drawer con createPortal */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
@@ -388,14 +398,28 @@ export function NavbarNavLinks({
                 {user ? (
                   <>
                     {isSeller && (
-                      <Link
-                        href="/vendedor/productos/nuevo"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 p-3.5 rounded-full font-black text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all"
-                      >
-                        <PlusCircle className="w-4 h-4 stroke-[2.5]" />
-                        <span>Añadir Producto</span>
-                      </Link>
+                      <>
+                        <Link
+                          href="/vendedor/productos/nuevo"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center justify-center gap-2 p-3.5 rounded-full font-black text-xs bg-[#FFE259] text-[#1D1D1B] tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all"
+                        >
+                          <PlusCircle className="w-4 h-4 stroke-[2.5]" />
+                          <span>+ {t.seller_new_product}</span>
+                        </Link>
+                        <Link
+                          href="/vendedor/eventos"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                            pathname === '/vendedor/eventos'
+                              ? 'bg-[#FFE259] text-[#1D1D1B]'
+                              : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                          }`}
+                        >
+                          <Wine className="w-4 h-4" />
+                          <span>Eventos & Catas</span>
+                        </Link>
+                      </>
                     )}
                     <Link
                       href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
