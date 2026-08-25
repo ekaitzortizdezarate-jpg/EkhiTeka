@@ -8,6 +8,7 @@ export interface TranslationDict {
   top_custom_orders: string;
   top_store_pickup: string;
 
+  // Nav
   nav_shop: string;
   nav_cart: string;
   nav_orders: string;
@@ -19,11 +20,22 @@ export interface TranslationDict {
   nav_profile: string;
   nav_logout: string;
   nav_gourmet_gifts: string;
+  nav_gourmet_gifts_line1: string;
+  nav_gourmet_gifts_line2: string;
   nav_tastings_experiences: string;
+  nav_tastings_line1: string;
+  nav_tastings_line2: string;
   nav_corporate_gifts: string;
+  nav_corporate_line1: string;
+  nav_corporate_line2: string;
   nav_events: string;
   nav_add_product: string;
+  nav_add_product_line1: string;
+  nav_add_product_line2: string;
+  nav_explore_selection: string;
+  nav_your_account: string;
 
+  // Categories & Grid
   cat_all: string;
   cat_queso: string;
   cat_atun: string;
@@ -34,7 +46,16 @@ export interface TranslationDict {
   cat_sidra: string;
   cat_new_badge: string;
   cat_explore: string;
+  cat_section_title: string;
+  sub_quesos: string;
+  sub_atun: string;
+  sub_salazones: string;
+  sub_gildas: string;
+  sub_cerveza: string;
+  sub_txakoli: string;
+  sub_sidra: string;
 
+  // Product Card & Details
   prod_price: string;
   prod_unit: string;
   prod_kg: string;
@@ -59,12 +80,29 @@ export interface TranslationDict {
   prod_sort_price_desc: string;
   prod_showing: string;
   prod_sold_out: string;
+  prod_last_units: string;
   prod_available: string;
   prod_availability: string;
+  prod_format_label: string;
+  prod_weight_label: string;
+  prod_price_per_seat: string;
+  prod_vat_included: string;
+  prod_doubt_title: string;
+  prod_doubt_desc: string;
+  prod_ask_btn: string;
+  prod_guarantee_cold: string;
+  prod_guarantee_pickup: string;
+  prod_guarantee_km0: string;
+  prod_related_subtitle: string;
+  prod_related_title: string;
+  prod_back_to_selection: string;
 
+  // Events & Tastings
   event_seats: string;
+  event_seat: string;
   event_seats_available: string;
   event_capacity_full: string;
+  event_last_seats: string;
   event_reserve_seat: string;
   event_seats_added: string;
   event_upcoming_title: string;
@@ -76,6 +114,51 @@ export interface TranslationDict {
   event_store_catalog_title: string;
   event_store_catalog_subtitle: string;
 
+  // Home Pillars & Banners
+  home_hero_badge: string;
+  home_hero_title: string;
+  home_hero_subtitle: string;
+  home_hero_desc: string;
+  home_explore_btn: string;
+  home_gourmet_gifts_btn: string;
+  home_pillars_badge: string;
+  home_pillars_title: string;
+  home_pillars_desc: string;
+  home_card1_badge: string;
+  home_card1_sub: string;
+  home_card1_title: string;
+  home_card1_desc: string;
+  home_card1_btn: string;
+  home_card2_badge: string;
+  home_card2_sub: string;
+  home_card2_title: string;
+  home_card2_desc: string;
+  home_card2_btn: string;
+  home_card3_badge: string;
+  home_card3_sub: string;
+  home_card3_title: string;
+  home_card3_desc: string;
+  home_card3_btn: string;
+  home_card4_badge: string;
+  home_card4_sub: string;
+  home_card4_title: string;
+  home_card4_desc: string;
+  home_card4_btn: string;
+
+  // Experience Banners (Home)
+  exp_banner_badge: string;
+  exp_banner_title: string;
+  exp_b1_title: string;
+  exp_b1_desc: string;
+  exp_b1_btn: string;
+  exp_b2_title: string;
+  exp_b2_desc: string;
+  exp_b2_btn: string;
+  exp_b3_title: string;
+  exp_b3_desc: string;
+  exp_b3_btn: string;
+
+  // Experience Page Hero
   exp_hero_badge: string;
   exp_hero_title: string;
   exp_hero_title_highlight: string;
@@ -97,6 +180,56 @@ export interface TranslationDict {
   exp_raclette_desc: string;
   exp_raclette_btn: string;
 
+  // Gourmet Gifts Page
+  gifts_hero_badge: string;
+  gifts_hero_title: string;
+  gifts_hero_title_highlight: string;
+  gifts_hero_desc: string;
+  gifts_whatsapp_btn: string;
+  gifts_card1_title: string;
+  gifts_card1_desc: string;
+  gifts_card1_feature: string;
+  gifts_card2_title: string;
+  gifts_card2_desc: string;
+  gifts_card2_feature: string;
+  gifts_card3_title: string;
+  gifts_card3_desc: string;
+  gifts_card3_feature: string;
+  gifts_catalog_badge: string;
+  gifts_catalog_title: string;
+
+  // Corporate Gifts Page
+  corp_hero_badge: string;
+  corp_hero_title: string;
+  corp_hero_title_highlight: string;
+  corp_hero_desc: string;
+  corp_whatsapp_btn: string;
+  corp_card1_title: string;
+  corp_card1_desc: string;
+  corp_card2_title: string;
+  corp_card2_desc: string;
+  corp_card3_title: string;
+  corp_card3_desc: string;
+  corp_logistics_badge: string;
+  corp_logistics_title: string;
+  corp_logistics_desc: string;
+  corp_logistics_feat1: string;
+  corp_logistics_feat2: string;
+  corp_logistics_feat3: string;
+
+  // Customer Reviews
+  reviews_badge: string;
+  reviews_title: string;
+  reviews_subtitle: string;
+  reviews_verified_buyer: string;
+  rev1_comment: string;
+  rev1_date: string;
+  rev2_comment: string;
+  rev2_date: string;
+  rev3_comment: string;
+  rev3_date: string;
+
+  // Cart & Checkout
   cart_title: string;
   cart_empty: string;
   cart_empty_sub: string;
@@ -120,6 +253,7 @@ export interface TranslationDict {
   deliv_order_success: string;
   deliv_order_success_desc: string;
 
+  // Orders & Statuses
   orders_title: string;
   orders_title_seller: string;
   orders_subtitle_buyer: string;
@@ -155,6 +289,7 @@ export interface TranslationDict {
   status_ready: string;
   status_delivered: string;
 
+  // Seller Dashboard
   seller_new_product: string;
   seller_edit_product: string;
   seller_product_name: string;
@@ -177,7 +312,14 @@ export interface TranslationDict {
   seller_events_attendees_title: string;
   seller_events_no_events: string;
   seller_events_no_events_desc: string;
+  seller_events_col_buyer: string;
+  seller_events_col_contact: string;
+  seller_events_col_seats: string;
+  seller_events_col_date: string;
+  seller_events_col_total: string;
+  seller_events_col_actions: string;
 
+  // Chat
   chat_title: string;
   chat_type_message: string;
   chat_send: string;
@@ -186,6 +328,7 @@ export interface TranslationDict {
   chat_no_messages: string;
   chat_conversations: string;
 
+  // Roles & Auth
   role_buyer: string;
   role_seller: string;
   role_admin: string;
@@ -197,6 +340,7 @@ export interface TranslationDict {
   auth_have_account: string;
   auth_no_account: string;
 
+  // Legal & Cookies
   legal_terms: string;
   legal_privacy: string;
   legal_cookies: string;
@@ -206,6 +350,7 @@ export interface TranslationDict {
   cookie_reject: string;
   cookie_settings: string;
 
+  // Footer
   footer_club_title: string;
   footer_club_subtitle: string;
   footer_club_desc: string;
@@ -226,6 +371,7 @@ export interface TranslationDict {
   footer_exp_gifts: string;
   footer_exp_consult: string;
 
+  // Shop Hero
   shop_specialty: string;
   shop_hero_title: string;
   shop_hero_desc: string;
@@ -236,6 +382,7 @@ export interface TranslationDict {
   shop_visit_desc: string;
   shop_visit_contact: string;
 
+  // Common
   common_save: string;
   common_cancel: string;
   common_delete: string;
@@ -277,10 +424,20 @@ export const translations: Record<Language, TranslationDict> = {
     nav_profile: 'Profila',
     nav_logout: 'Itxi Saioa',
     nav_gourmet_gifts: 'Opari Gourmetak',
-    nav_tastings_experiences: 'Dastaketak eta Esperientziak',
+    nav_gourmet_gifts_line1: 'Opari',
+    nav_gourmet_gifts_line2: 'Gourmetak',
+    nav_tastings_experiences: 'Dastaketak & Esperientziak',
+    nav_tastings_line1: 'Dastaketak &',
+    nav_tastings_line2: 'Esperientziak',
     nav_corporate_gifts: 'Enpresa Opariak',
+    nav_corporate_line1: 'Enpresa',
+    nav_corporate_line2: 'Opariak',
     nav_events: 'Ekitaldiak',
     nav_add_product: 'Gehitu Produktua',
+    nav_add_product_line1: 'Gehitu',
+    nav_add_product_line2: 'Produktua',
+    nav_explore_selection: 'Arakatu Hautaketa',
+    nav_your_account: 'Zure Kontua',
 
     cat_all: 'Guztiak',
     cat_queso: 'Gazta',
@@ -292,6 +449,14 @@ export const translations: Record<Language, TranslationDict> = {
     cat_sidra: 'Sagardoa',
     cat_new_badge: 'Berritasuna',
     cat_explore: 'Arakatu atala',
+    cat_section_title: 'EkhiTeka Hautaketaren Kategoriak',
+    sub_quesos: 'Artisau & Afinatuak',
+    sub_atun: 'Kantauri Kostaldea',
+    sub_salazones: 'Antxoak & Gatzadurak',
+    sub_gildas: 'Gildas & Ozpinetakoak',
+    sub_cerveza: 'Garagardo Bereziak',
+    sub_txakoli: 'Bizkaiko Txakolina',
+    sub_sidra: 'Euskal Sagardoa',
 
     prod_price: 'Prezioa',
     prod_unit: 'unitate',
@@ -317,12 +482,28 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_desc: 'Prezioa (altuena lehenik)',
     prod_showing: 'produktu erabilgarri erakusten',
     prod_sold_out: 'Agortuta',
+    prod_last_units: 'Azken unitateak!',
     prod_available: 'Eskuragarri',
     prod_availability: 'Eskuragarritasuna:',
+    prod_format_label: 'Formatua',
+    prod_weight_label: 'Pisua',
+    prod_price_per_seat: '/ lekua',
+    prod_vat_included: 'BEZ barne',
+    prod_doubt_title: 'Produktu honi buruzko zalantzarik duzu?',
+    prod_doubt_desc: 'Kontsultatu zuzenean gure gazta maisu eta adituekin.',
+    prod_ask_btn: 'Galdetu',
+    prod_guarantee_cold: 'Hotz bermatua 24/48h',
+    prod_guarantee_pickup: 'Jasotzea Lekeition',
+    prod_guarantee_km0: 'Artisau kalitatea km0',
+    prod_related_subtitle: 'Afinatzailearen gomendioak',
+    prod_related_title: 'Zuretzat interesgarria izan daiteke',
+    prod_back_to_selection: 'Itzuli hautaketara',
 
     event_seats: 'leku',
+    event_seat: 'leku',
     event_seats_available: 'leku libre',
     event_capacity_full: 'Leku guztiak beteta (Agortuta)',
+    event_last_seats: 'Azken lekuak!',
     event_reserve_seat: 'Erreserbatu Lekua',
     event_seats_added: 'Lekua gehituta',
     event_upcoming_title: 'Dastaketa Presentzialen Hurrengo Ekitaldiak',
@@ -333,6 +514,48 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kit-ak eta pack-ak etxera eramateko',
     event_store_catalog_title: 'Dendako Dastaketak Eskuragarri',
     event_store_catalog_subtitle: 'Presentziala Lekeition',
+
+    home_hero_badge: 'Gaztategi Gourmet & Gune Gastronomikoa',
+    home_hero_title: 'Egile-gaztak & Esperientziak Lekeition',
+    home_hero_subtitle: 'Egile-gaztak & Esperientziak Lekeition',
+    home_hero_desc: 'Gazta berezien artisau afinatzea, Kantauri itsasoko altxorrak eta hautatutako maridajeak. Ezagutu gure online denda, opari saskiak eta neurrira egindako esperientziak Bizkaiaren bihotzean.',
+    home_explore_btn: 'Arakatu Online Denda',
+    home_gourmet_gifts_btn: 'Opari Gourmetak',
+    home_pillars_badge: 'Gure Etxea · EkhiTeka Unibertsoa',
+    home_pillars_title: 'Ezagutu Gure Atalak',
+    home_pillars_desc: 'Hautatu bilatzen duzun esperientzia eta utzi gure artisau afinatzeak gidatzen.',
+    home_card1_badge: 'Online & Bidalketa',
+    home_card1_sub: 'Katalogo Osoa',
+    home_card1_title: 'Denda Gourmet',
+    home_card1_desc: 'Gazta afinatuak, Kantauriko hegaluzea, gatzadurak, artisau gildak, txakolina, sagardoa eta egile-garagardoa.',
+    home_card1_btn: 'Sartu Dendara',
+    home_card2_badge: 'Oparitzeko',
+    home_card2_sub: 'Xehetasunak & Saskiak',
+    home_card2_title: 'Opari Gourmetak',
+    home_card2_desc: 'Pertsonalizatutako saski gourmetak, etxerako dastaketa kit-ak eta opari txartel birtual zein fisikoak.',
+    home_card2_btn: 'Ikusi Opari Aukerak',
+    home_card3_badge: 'Sentsoriala',
+    home_card3_sub: 'Dendan & Ekitaldietan',
+    home_card3_title: 'Dastaketak & Esperientziak',
+    home_card3_desc: 'Dastaketak etxean, aurrez aurreko dastaketak Lekeitioko dendan, ezkontzetarako mahaiak eta raclette mailegua.',
+    home_card3_btn: 'Ezagutu Esperientziak',
+    home_card4_badge: 'Korporatiboa',
+    home_card4_sub: 'Taldeak & Bezeroak',
+    home_card4_title: 'Enpresa Opariak',
+    home_card4_desc: 'Teambuilding gastronomikoa, egile-gabonetako saskiak eta neurrira egindako enpresa xehetasunak.',
+    home_card4_btn: 'Ikusi Enpresa Zerbitzuak',
+
+    exp_banner_badge: 'Hemen gauzak gertatzen dira...',
+    exp_banner_title: 'Dastaketak, Ekitaldiak & EkhiTeka Esperientziak',
+    exp_b1_title: 'Dastaketa Presentzialak & Tailerrak',
+    exp_b1_desc: 'Ikasi nazioarteko eta tokiko artisau gaztak dastatzen, sagardo naturalekin, txakolinekin eta egile-ardoekin uztartuta Lekeition.',
+    exp_b1_btn: 'Kontsultatu Hurrengo Datak',
+    exp_b2_title: 'Gazta Mahaiak Ezkontza & Festetarako',
+    exp_b2_desc: 'Cheese Corner ikusgarriak prestatzen ditugu lore jangarriekin, artisau ogiekin eta uztartzeekin zure ospakizunerako.',
+    exp_b2_btn: 'Eskatu Ekitaldi Aurrekontua',
+    exp_b3_title: 'Gourmet Saskiak & Enpresa Opariak',
+    exp_b3_desc: 'Kaxa gastronomiko esklusiboak diseinatzen ditugu ontzi premiumarekin, kaligrafia oharrekin eta hautatutako gaztekin.',
+    exp_b3_btn: 'Konfiguratu Saskia Neurrirako',
 
     exp_hero_badge: 'Esperientzia Gastronomikoak',
     exp_hero_title: 'Dastaketak &',
@@ -354,6 +577,52 @@ export const translations: Record<Language, TranslationDict> = {
     exp_raclette_badge: 'Alokairua & Pack-a',
     exp_raclette_desc: 'Suitzar raclette makina profesionala mailegatzen dizugu, raclette gazta afinatu moztuarekin, txarkuteria artisauarekin eta patatekin, ekipamenduaz kezkatu gabe goza dezazun.',
     exp_raclette_btn: 'Kontsultatu Raclette Eskuragarritasuna',
+
+    gifts_hero_badge: 'Oparitzeko Hautaketa Esklusiboa',
+    gifts_hero_title: 'Opari',
+    gifts_hero_title_highlight: 'Gourmetak',
+    gifts_hero_desc: 'Harritu neurrira egindako artisau saskiekin, gazta afinatuen estutxeekin, egile-maridajeekin eta une ahaztezinetarako opari txartelekin.',
+    gifts_whatsapp_btn: 'Eskari Pertsonalizatua WhatsApp Bidez',
+    gifts_card1_title: 'Gourmet Saskiak Neurrirako',
+    gifts_card1_desc: 'Artisau saskiak diseinatzen ditugu zati afinatuak, Kantauriko kontserbak, txakolina eta euskal gozoak konbinatuz zure aurrekontuaren arabera.',
+    gifts_card1_feature: 'Bidalpen hoztua dedikatoria txartelarekin',
+    gifts_card2_title: 'Dastaketa & Maridaje Pack-ak',
+    gifts_card2_desc: 'Ireki eta gozatzeko prestatutako estutxe tematikoak: gazta hautaketak intentsitatearen arabera artisau marmeladekin, intxaurrekin eta pikuekin.',
+    gifts_card2_feature: 'Aurkezpena egurrezko kaxa prémiumean',
+    gifts_card3_title: 'Opari Txartelak & Dastaketak',
+    gifts_card3_desc: 'Opari aproposa beren gazta gogokoenak aukera ditzaten edo Lekeitioko gure dendan dastaketa gidatu batez goza dezaten.',
+    gifts_card3_feature: 'Baliozkoa online eta denda fisikoan',
+    gifts_catalog_badge: 'Bidalpenerako edo jasotzeko eskuragarri',
+    gifts_catalog_title: 'Oparitzeko Prest dauden Saskiak & Pack-ak',
+
+    corp_hero_badge: 'Enpresa Irtenbideak & Gabonetako Loteak',
+    corp_hero_title: 'Enpresa',
+    corp_hero_title_highlight: 'Opariak',
+    corp_hero_desc: 'Eskerrak eman zure talde eta bezeroen konfiantzagatik lote gastronomiko artisauekin, enpresa xehetasun pertsonalizatuekin eta dastaketa esklusiboekin.',
+    corp_whatsapp_btn: 'Eskatu Enpresa Aurrekontua WhatsApp Bidez',
+    corp_card1_title: 'Gabonetako Loteak eta Saskiak',
+    corp_card1_desc: 'Tartekaririk gabeko konposizio premiumak: afinatzailearen gaztak, ezkur-urdaiazpiko iberikoak, Kantauriko gatzadurak eta maridaje bereziak faktura zehatzarekin.',
+    corp_card2_title: 'Dastaketa Pribatuak & Team Building',
+    corp_card2_desc: 'Enpresa ekitaldiak eta talde jarduera gidatuak antolatzen ditugu Lekeitioko gure gaztategian edo zure enpresaren egoitzan.',
+    corp_card3_title: 'Pertsonalizazioa Zure Markarekin',
+    corp_card3_desc: 'Faja pertsonalizatuak, zure enpresaren logotipoa duten txartelak eta hartzaile bakoitzarentzako mezu korporatibo dedikatuak sartzen ditugu.',
+    corp_logistics_badge: 'EkhiTeka Konpromisoa',
+    corp_logistics_title: 'Logistika Bikaina eta Bidalpen Anitzak',
+    corp_logistics_desc: 'Langile edo bezeroen hainbat helbidetara 24/48 ordutan bidaltzeko kudeaketa osoaz arduratzen gara trazabilitate osoarekin.',
+    corp_logistics_feat1: 'Bidalpen indibidualak langile bakoitzari',
+    corp_logistics_feat2: 'Garraio hoztu homologatua',
+    corp_logistics_feat3: 'Fakturazio zehatza BEZ bananduta',
+
+    reviews_badge: 'Konfiantza & Gastronomia Pasioa',
+    reviews_title: 'Gure Bezeroen Iritziak',
+    reviews_subtitle: 'Gure hautaketa probatu duten gazta-zaleek diotena',
+    reviews_verified_buyer: 'Erosle egiaztatua',
+    rev1_comment: 'Gaztak benetako zoramena dira. Afinatze perfektua eta bidalketa hoztua 24 ordutan iritsi zen ezin hobeto. Bizkaiko gaztategirik onena.',
+    rev1_date: 'Duela 3 egun',
+    rev2_comment: 'Urtebetetze baterako gazta eta kontserba taula bat eskatu nuen eta gonbidatu guztiak txundituta geratu ziren. Tratu gertukoa eta aholkua bikaina.',
+    rev2_date: 'Duela astebete',
+    rev3_comment: 'Hilero erosten dut gazta eta antxoa hautaketa. Ontzi termikoak produktua fresko mantentzen du denda fisikoan egongo bazina bezala.',
+    rev3_date: 'Duela 2 aste',
 
     cart_title: 'Zure Saskia',
     cart_empty: 'Saskia hutsik dago',
@@ -436,6 +705,12 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_attendees_title: 'Dastaketako Partaideak',
     seller_events_no_events: 'Ez duzu dastaketa presentzialik sortu oraindik',
     seller_events_no_events_desc: 'Argitaratu dastaketa presentzial bat Lekeitioko dendan goiko menutik.',
+    seller_events_col_buyer: 'Eroslea',
+    seller_events_col_contact: 'Kontaktua',
+    seller_events_col_seats: 'Lekuak',
+    seller_events_col_date: 'Erosketa Data',
+    seller_events_col_total: 'Guztira',
+    seller_events_col_actions: 'Ekintzak',
 
     chat_title: 'Txatak eta Mezuak',
     chat_type_message: 'Idatzi mezu bat hemen...',
@@ -528,10 +803,20 @@ export const translations: Record<Language, TranslationDict> = {
     nav_profile: 'Perfil',
     nav_logout: 'Cerrar Sesión',
     nav_gourmet_gifts: 'Regalos Gourmet',
+    nav_gourmet_gifts_line1: 'Regalos',
+    nav_gourmet_gifts_line2: 'Gourmet',
     nav_tastings_experiences: 'Catas & Experiencias',
+    nav_tastings_line1: 'Catas &',
+    nav_tastings_line2: 'Experiencias',
     nav_corporate_gifts: 'Regalos de Empresa',
+    nav_corporate_line1: 'Regalos de',
+    nav_corporate_line2: 'Empresa',
     nav_events: 'Eventos',
     nav_add_product: 'Añadir Producto',
+    nav_add_product_line1: 'Añadir',
+    nav_add_product_line2: 'Producto',
+    nav_explore_selection: 'Explorar Selección',
+    nav_your_account: 'Tu Cuenta',
 
     cat_all: 'Todos',
     cat_queso: 'Queso',
@@ -543,6 +828,14 @@ export const translations: Record<Language, TranslationDict> = {
     cat_sidra: 'Sidra',
     cat_new_badge: 'Novedad',
     cat_explore: 'Explorar sección',
+    cat_section_title: 'Categorías Selección EkhiTeka',
+    sub_quesos: 'Artesanos & Afinados',
+    sub_atun: 'Cantábrico Costera',
+    sub_salazones: 'Anchoas & Salazón',
+    sub_gildas: 'Gildas & Encurtidos',
+    sub_cerveza: 'Craft & Especiales',
+    sub_txakoli: 'Bizkaiko Txakolina',
+    sub_sidra: 'Euskal Sagardoa',
 
     prod_price: 'Precio',
     prod_unit: 'ud',
@@ -568,12 +861,28 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_desc: 'Precio (mayor a menor)',
     prod_showing: 'productos disponibles',
     prod_sold_out: 'Agotado',
+    prod_last_units: '¡Últimas unidades!',
     prod_available: 'Disponible',
     prod_availability: 'Disponibilidad:',
+    prod_format_label: 'Formato',
+    prod_weight_label: 'Peso',
+    prod_price_per_seat: '/ plaza',
+    prod_vat_included: 'IVA incl.',
+    prod_doubt_title: '¿Tienes alguna duda sobre este producto?',
+    prod_doubt_desc: 'Consulta directamente con nuestros afinadores y expertos.',
+    prod_ask_btn: 'Preguntar',
+    prod_guarantee_cold: 'Frío garantizado 24/48h',
+    prod_guarantee_pickup: 'Recogida en Lekeitio',
+    prod_guarantee_km0: 'Calidad artesanal km0',
+    prod_related_subtitle: 'Recomendaciones del afinador',
+    prod_related_title: 'También te puede interesar',
+    prod_back_to_selection: 'Volver a la selección',
 
     event_seats: 'plazas',
+    event_seat: 'plaza',
     event_seats_available: 'plazas disponibles',
     event_capacity_full: 'Aforo Completo (Sin Plazas)',
+    event_last_seats: '¡Últimas plazas!',
     event_reserve_seat: 'Reservar Plaza(s)',
     event_seats_added: 'Plaza(s) Añadida(s)',
     event_upcoming_title: 'Próximos Eventos de Catas Presenciales',
@@ -584,6 +893,48 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kits & Packs para llevar',
     event_store_catalog_title: 'Catas en Tienda Disponibles',
     event_store_catalog_subtitle: 'Presencial en Lekeitio',
+
+    home_hero_badge: 'Quesería Gourmet & Espacio Gastronómico',
+    home_hero_title: 'Quesos de autor & Experiencias en Lekeitio',
+    home_hero_subtitle: 'Quesos de autor & Experiencias en Lekeitio',
+    home_hero_desc: 'Afinado artesanal de quesos singulares, tesoros del Cantábrico y maridajes selectos. Descubre nuestra tienda online, cestas de regalo y experiencias a medida en el corazón de Bizkaia.',
+    home_explore_btn: 'Explorar Tienda Online',
+    home_gourmet_gifts_btn: 'Regalos Gourmet',
+    home_pillars_badge: 'Nuestra Casa · El Universo EkhiTeka',
+    home_pillars_title: 'Descubre Nuestras Secciones',
+    home_pillars_desc: 'Selecciona la experiencia que buscas y déjate guiar por nuestro afinado artesanal.',
+    home_card1_badge: 'Online & Envío',
+    home_card1_sub: 'Catálogo Completo',
+    home_card1_title: 'Tienda Gourmet',
+    home_card1_desc: 'Quesos afinados, bonito del Cantábrico, salazones, gildas artesanas, txakoli, sidra y cerveza de autor.',
+    home_card1_btn: 'Entrar a la Tienda',
+    home_card2_badge: 'Para Regalar',
+    home_card2_sub: 'Detalles & Cestas',
+    home_card2_title: 'Regalos Gourmet',
+    home_card2_desc: 'Cestas gourmet personalizadas, kits de cata para casa y tarjetas regalo virtuales o físicas.',
+    home_card2_btn: 'Ver Opciones de Regalo',
+    home_card3_badge: 'Sensorial',
+    home_card3_sub: 'En Tienda & Eventos',
+    home_card3_title: 'Catas & Experiencias',
+    home_card3_desc: 'Catas en casa, catas presenciales en tienda de Lekeitio, mesas para bodas y préstamo de raclette.',
+    home_card3_btn: 'Descubrir Experiencias',
+    home_card4_badge: 'Corporativo',
+    home_card4_sub: 'Equipos & Clientes',
+    home_card4_title: 'Regalos de Empresa',
+    home_card4_desc: 'Teambuilding gastronómico, cestas de navidad de autor y detalles corporativos a medida.',
+    home_card4_btn: 'Ver Servicios de Empresa',
+
+    exp_banner_badge: 'Aquí pasan cosas...',
+    exp_banner_title: 'Catas, Eventos & Experiencias EkhiTeka',
+    exp_b1_title: 'Catas Presenciales & Talleres',
+    exp_b1_desc: 'Aprende a degustar quesos artesanales internacionales y locales, maridados con sidras naturales, txakolis y vinos de autor en Lekeitio.',
+    exp_b1_btn: 'Consultar Próximas Fechas',
+    exp_b2_title: 'Mesas de Quesos para Bodas & Fiestas',
+    exp_b2_desc: 'Montamos impresionantes Cheese Corners personalizados con flores comestibles, panes artesanos y maridajes para tu celebración.',
+    exp_b2_btn: 'Pedir Presupuesto Evento',
+    exp_b3_title: 'Cestas Gourmet & Regalos de Empresa',
+    exp_b3_desc: 'Diseñamos cajas gastronómicas exclusivas con embalaje premium, notas caligráficas y la mejor selección de quesos afinados y salazones.',
+    exp_b3_btn: 'Configurar Cesta a Medida',
 
     exp_hero_badge: 'Experiencias Gastronómicas',
     exp_hero_title: 'Catas &',
@@ -605,6 +956,52 @@ export const translations: Record<Language, TranslationDict> = {
     exp_raclette_badge: 'Alquiler & Pack',
     exp_raclette_desc: 'Te prestamos la máquina profesional de raclette tradicional suiza junto con el queso de raclette afinado cortado a la perfección, embutidos artesanos y patatas para que disfrutes de una velada única sin preocuparte por el equipamiento.',
     exp_raclette_btn: 'Consultar Disponibilidad de Raclette',
+
+    gifts_hero_badge: 'Selección Exclusiva para Regalar',
+    gifts_hero_title: 'Regalos',
+    gifts_hero_title_highlight: 'Gourmet',
+    gifts_hero_desc: 'Sorprende con cestas artesanales a medida, estuches de quesos afinados, maridajes de autor y tarjetas regalo para ocasiones inolvidables.',
+    gifts_whatsapp_btn: 'Encargo Personalizado por WhatsApp',
+    gifts_card1_title: 'Cestas Gourmet a Medida',
+    gifts_card1_desc: 'Diseñamos cestas artesanales combinando cuñas afinadas, conservas selectas del Cantábrico, txakoli y dulces vascos según tu presupuesto.',
+    gifts_card1_feature: 'Envío refrigerado con tarjeta dedicatoria',
+    gifts_card2_title: 'Packs Degustación & Maridaje',
+    gifts_card2_desc: 'Estuches temáticos preparados para abrir y disfrutar: selecciones de quesos por intensidad con confituras artesanas, nueces y picos gourmet.',
+    gifts_card2_feature: 'Presentación en caja prémium de madera',
+    gifts_card3_title: 'Tarjetas & Catas de Regalo',
+    gifts_card3_desc: 'El obsequio perfecto para que elijan sus quesos preferidos o disfruten de una cata guiada presencial en nuestra quesería de Lekeitio.',
+    gifts_card3_feature: 'Válido online y en tienda física',
+    gifts_catalog_badge: 'Disponibles para envío o recogida',
+    gifts_catalog_title: 'Cestas & Packs Listos para Regalar',
+
+    corp_hero_badge: 'Soluciones Corporativas & Lotes Navideños',
+    corp_hero_title: 'Regalos de',
+    corp_hero_title_highlight: 'Empresa',
+    corp_hero_desc: 'Agradece la confianza de tu equipo y clientes con lotes gastronómicos artesanos, detalles corporativos personalizados y experiencias de cata exclusivas.',
+    corp_whatsapp_btn: 'Pedir Presupuesto Corporativo por WhatsApp',
+    corp_card1_title: 'Lotes y Cestas de Navidad',
+    corp_card1_desc: 'Composiciones prémium sin intermediarios: quesos de afinador, embutidos ibéricos de bellota, salazones del Cantábrico y maridajes singulares con factura desglosada.',
+    corp_card2_title: 'Catas Privadas & Team Building',
+    corp_card2_desc: 'Organizamos eventos de empresa y actividades de equipo guiadas en nuestra quesería de Lekeitio o en la sede de tu empresa.',
+    corp_card3_title: 'Personalización con tu Marca',
+    corp_card3_desc: 'Incluimos fajas personalizadas, tarjetas con el logotipo de tu empresa y mensajes corporativos dedicados para cada destinatario.',
+    corp_logistics_badge: 'Compromiso EkhiTeka',
+    corp_logistics_title: 'Logística Impecable y Envíos Múltiples',
+    corp_logistics_desc: 'Nos encargamos de toda la gestión de envíos a múltiples domicilios de empleados o clientes en 24/48 horas con trazabilidad total.',
+    corp_logistics_feat1: 'Envíos individuales a cada empleado',
+    corp_logistics_feat2: 'Transporte refrigerado homologado',
+    corp_logistics_feat3: 'Facturación detallada con IVA desglosado',
+
+    reviews_badge: 'Confianza & Pasión Gastronómica',
+    reviews_title: 'Opiniones de Nuestros Clientes',
+    reviews_subtitle: 'Lo que dicen los amantes del buen queso que ya han probado nuestra selección',
+    reviews_verified_buyer: 'Comprador verificado',
+    rev1_comment: 'Los quesos son una auténtica locura. El afinado perfecto y el envío refrigerado llegó impecable en 24h. La mejor quesería de Bizkaia con diferencia.',
+    rev1_date: 'Hace 3 días',
+    rev2_comment: 'Encargué una tabla de quesos y conservas para un cumpleaños y todos los invitados quedaron fascinados. El trato cercano y la recomendación por WhatsApp un 10.',
+    rev2_date: 'Hace 1 semana',
+    rev3_comment: 'Compro la selección de quesos y anchoas todos los meses. El empaquetado térmico mantiene el producto fresco como si estuvieras en la tienda física.',
+    rev3_date: 'Hace 2 semanas',
 
     cart_title: 'Tu Cesta',
     cart_empty: 'Tu cesta está vacía',
@@ -687,6 +1084,12 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_attendees_title: 'Participantes de la Cata',
     seller_events_no_events: 'No tienes catas presenciales creadas todavía',
     seller_events_no_events_desc: 'Publica una cata presencial en la tienda de Lekeitio desde el menú superior para gestionar aforo, plazas y asistentes.',
+    seller_events_col_buyer: 'Comprador',
+    seller_events_col_contact: 'Contacto',
+    seller_events_col_seats: 'Plazas',
+    seller_events_col_date: 'Fecha Compra',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Acciones',
 
     chat_title: 'Mensajes & Asesoramiento',
     chat_type_message: 'Escribe tu mensaje aquí...',
@@ -779,10 +1182,20 @@ export const translations: Record<Language, TranslationDict> = {
     nav_profile: 'Profile',
     nav_logout: 'Log Out',
     nav_gourmet_gifts: 'Gourmet Gifts',
+    nav_gourmet_gifts_line1: 'Gourmet',
+    nav_gourmet_gifts_line2: 'Gifts',
     nav_tastings_experiences: 'Tastings & Experiences',
+    nav_tastings_line1: 'Tastings &',
+    nav_tastings_line2: 'Experiences',
     nav_corporate_gifts: 'Corporate Gifts',
+    nav_corporate_line1: 'Corporate',
+    nav_corporate_line2: 'Gifts',
     nav_events: 'Events',
     nav_add_product: 'Add Product',
+    nav_add_product_line1: 'Add',
+    nav_add_product_line2: 'Product',
+    nav_explore_selection: 'Explore Selection',
+    nav_your_account: 'Your Account',
 
     cat_all: 'All',
     cat_queso: 'Cheese',
@@ -794,6 +1207,14 @@ export const translations: Record<Language, TranslationDict> = {
     cat_sidra: 'Natural Cider',
     cat_new_badge: 'New',
     cat_explore: 'Explore category',
+    cat_section_title: 'EkhiTeka Selection Categories',
+    sub_quesos: 'Artisan & Aged',
+    sub_atun: 'Cantabrian Tuna',
+    sub_salazones: 'Anchovies & Salted Fish',
+    sub_gildas: 'Gildas & Pickles',
+    sub_cerveza: 'Craft & Specials',
+    sub_txakoli: 'Bizkaiko Txakolina',
+    sub_sidra: 'Basque Cider',
 
     prod_price: 'Price',
     prod_unit: 'unit',
@@ -819,12 +1240,28 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_desc: 'Price (Highest first)',
     prod_showing: 'products available',
     prod_sold_out: 'Sold Out',
+    prod_last_units: 'Last units available!',
     prod_available: 'Available',
     prod_availability: 'Availability:',
+    prod_format_label: 'Format',
+    prod_weight_label: 'Weight',
+    prod_price_per_seat: '/ seat',
+    prod_vat_included: 'VAT included',
+    prod_doubt_title: 'Do you have questions about this product?',
+    prod_doubt_desc: 'Ask directly our master cheesemongers and experts.',
+    prod_ask_btn: 'Ask',
+    prod_guarantee_cold: 'Cold chain 24/48h',
+    prod_guarantee_pickup: 'Pickup in Lekeitio',
+    prod_guarantee_km0: 'Artisan km0 quality',
+    prod_related_subtitle: 'Cheesemonger Recommendations',
+    prod_related_title: 'You Might Also Like',
+    prod_back_to_selection: 'Back to selection',
 
     event_seats: 'seats',
+    event_seat: 'seat',
     event_seats_available: 'seats available',
     event_capacity_full: 'Full Capacity (Sold Out)',
+    event_last_seats: 'Last seats available!',
     event_reserve_seat: 'Book Seat(s)',
     event_seats_added: 'Seat(s) Added',
     event_upcoming_title: 'Upcoming In-Person Tastings',
@@ -835,6 +1272,48 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kits & Tasting packs to take home',
     event_store_catalog_title: 'In-Store Tastings Available',
     event_store_catalog_subtitle: 'In-person in Lekeitio',
+
+    home_hero_badge: 'Gourmet Cheesemonger & Gastro Space',
+    home_hero_title: 'Author Cheeses & Experiences in Lekeitio',
+    home_hero_subtitle: 'Author Cheeses & Experiences in Lekeitio',
+    home_hero_desc: 'Artisan cheese ageing, Cantabrian treasures and curated pairings. Explore our online store, gift hampers and custom experiences in the heart of Biscay.',
+    home_explore_btn: 'Explore Online Shop',
+    home_gourmet_gifts_btn: 'Gourmet Gifts',
+    home_pillars_badge: 'Our House · EkhiTeka Universe',
+    home_pillars_title: 'Discover Our Sections',
+    home_pillars_desc: 'Choose your preferred experience and let our artisan ageing guide you.',
+    home_card1_badge: 'Online & Shipping',
+    home_card1_sub: 'Full Catalogue',
+    home_card1_title: 'Gourmet Shop',
+    home_card1_desc: 'Aged cheeses, Cantabrian white tuna, salted anchovies, artisan gildas, txakoli, cider and craft beer.',
+    home_card1_btn: 'Enter Shop',
+    home_card2_badge: 'For Gifting',
+    home_card2_sub: 'Gifts & Hampers',
+    home_card2_title: 'Gourmet Gifts',
+    home_card2_desc: 'Bespoke gourmet hampers, home tasting kits and virtual or physical gift cards.',
+    home_card2_btn: 'View Gift Options',
+    home_card3_badge: 'Sensory',
+    home_card3_sub: 'In-Store & Events',
+    home_card3_title: 'Tastings & Experiences',
+    home_card3_desc: 'Home tasting kits, in-person tastings in Lekeitio, wedding tables and raclette machine rental.',
+    home_card3_btn: 'Discover Experiences',
+    home_card4_badge: 'Corporate',
+    home_card4_sub: 'Teams & Clients',
+    home_card4_title: 'Corporate Gifts',
+    home_card4_desc: 'Gourmet team-building, artisan Christmas hampers and bespoke corporate delicacies.',
+    home_card4_btn: 'View Corporate Services',
+
+    exp_banner_badge: 'Things happen here...',
+    exp_banner_title: 'Tastings, Events & EkhiTeka Experiences',
+    exp_b1_title: 'In-Person Tastings & Workshops',
+    exp_b1_desc: 'Learn how to taste local and international artisan cheeses paired with natural cider, txakoli and author wines in Lekeitio.',
+    exp_b1_btn: 'Check Upcoming Dates',
+    exp_b2_title: 'Cheese Boards for Weddings & Parties',
+    exp_b2_desc: 'We set up impressive bespoke Cheese Corners with edible flowers, artisan breads and pairings for your event.',
+    exp_b2_btn: 'Request Event Quote',
+    exp_b3_title: 'Gourmet Hampers & Corporate Gifts',
+    exp_b3_desc: 'Exclusive gastronomic boxes with premium packaging, calligraphic notes and the finest cheeses.',
+    exp_b3_btn: 'Configure Custom Hamper',
 
     exp_hero_badge: 'Gourmet Experiences',
     exp_hero_title: 'Tastings &',
@@ -856,6 +1335,52 @@ export const translations: Record<Language, TranslationDict> = {
     exp_raclette_badge: 'Hire & Pack',
     exp_raclette_desc: 'We lend you the traditional Swiss raclette machine along with pre-sliced aged raclette cheese, artisan cured meats and potatoes for an unforgettable evening without equipment hassle.',
     exp_raclette_btn: 'Check Raclette Availability',
+
+    gifts_hero_badge: 'Exclusive Gifting Selection',
+    gifts_hero_title: 'Gourmet',
+    gifts_hero_title_highlight: 'Gifts',
+    gifts_hero_desc: 'Surprise loved ones with bespoke artisan hampers, aged cheese boxes, gourmet pairings and gift cards for unforgettable occasions.',
+    gifts_whatsapp_btn: 'Custom Order via WhatsApp',
+    gifts_card1_title: 'Bespoke Gourmet Hampers',
+    gifts_card1_desc: 'We create custom hampers combining aged wedges, Cantabrian preserves, txakoli wine and Basque sweets tailored to your budget.',
+    gifts_card1_feature: 'Refrigerated delivery with custom gift note',
+    gifts_card2_title: 'Tasting & Pairing Packs',
+    gifts_card2_desc: 'Themed gift boxes ready to open and enjoy: selections of cheeses classified by intensity with jams, nuts and picos.',
+    gifts_card2_feature: 'Delivered in a premium wooden box',
+    gifts_card3_title: 'Gift Cards & Tasting Vouchers',
+    gifts_card3_desc: 'The perfect gift so they can pick their favourite cheeses or enjoy a guided in-person tasting in our Lekeitio shop.',
+    gifts_card3_feature: 'Valid online and in our store',
+    gifts_catalog_badge: 'Available for delivery or pickup',
+    gifts_catalog_title: 'Hampers & Packs Ready for Gifting',
+
+    corp_hero_badge: 'Corporate Solutions & Christmas Hampers',
+    corp_hero_title: 'Corporate',
+    corp_hero_title_highlight: 'Gifts',
+    corp_hero_desc: 'Reward your team and clients with artisan gastronomic packs, personalised corporate gifts and exclusive tasting events.',
+    corp_whatsapp_btn: 'Request Corporate Quote via WhatsApp',
+    corp_card1_title: 'Christmas Hampers & Boxes',
+    corp_card1_desc: 'Direct premium compositions: aged cheeses, acorn-fed Iberian ham, Cantabrian salted fish and pairings with itemised invoice.',
+    corp_card2_title: 'Private Tastings & Team Building',
+    corp_card2_desc: 'We organise corporate events and team-building tasting activities in our Lekeitio shop or at your office.',
+    corp_card3_title: 'Branding Customisation',
+    corp_card3_desc: 'We include custom sleeves, cards with your company logo and dedicated corporate messages for each recipient.',
+    corp_logistics_badge: 'EkhiTeka Commitment',
+    corp_logistics_title: 'Flawless Logistics & Multi-Address Shipping',
+    corp_logistics_desc: 'We handle shipments to individual employee or client addresses in 24/48 hours with full temperature tracking.',
+    corp_logistics_feat1: 'Individual shipping to each employee',
+    corp_logistics_feat2: 'Certified refrigerated transport',
+    corp_logistics_feat3: 'Itemised invoice with VAT breakdown',
+
+    reviews_badge: 'Trust & Gastronomic Passion',
+    reviews_title: 'What Our Customers Say',
+    reviews_subtitle: 'Feedback from cheese lovers who have tasted our artisan selection',
+    reviews_verified_buyer: 'Verified Buyer',
+    rev1_comment: 'The cheeses are absolutely incredible. Perfect ageing and refrigerated shipping arrived in 24h. By far the best cheesemonger in Biscay.',
+    rev1_date: '3 days ago',
+    rev2_comment: 'I ordered a cheese and preserve board for a birthday and every guest was delighted. Friendly service and top WhatsApp advice.',
+    rev2_date: '1 week ago',
+    rev3_comment: 'I order the cheese and anchovy selection every month. The thermal packaging keeps everything as fresh as visiting the shop.',
+    rev3_date: '2 weeks ago',
 
     cart_title: 'Your Cart',
     cart_empty: 'Your cart is empty',
@@ -938,6 +1463,12 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_attendees_title: 'Tasting Attendees',
     seller_events_no_events: 'You have no in-person tastings created yet',
     seller_events_no_events_desc: 'Publish an in-person tasting in our Lekeitio shop from the top menu to manage capacity and attendees.',
+    seller_events_col_buyer: 'Buyer',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Seats',
+    seller_events_col_date: 'Purchase Date',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
 
     chat_title: 'Messages & Support',
     chat_type_message: 'Type your message here...',
@@ -1030,10 +1561,20 @@ export const translations: Record<Language, TranslationDict> = {
     nav_profile: 'Profil',
     nav_logout: 'Déconnexion',
     nav_gourmet_gifts: 'Cadeaux Gourmets',
+    nav_gourmet_gifts_line1: 'Cadeaux',
+    nav_gourmet_gifts_line2: 'Gourmets',
     nav_tastings_experiences: 'Dégustations & Expériences',
+    nav_tastings_line1: 'Dégustations &',
+    nav_tastings_line2: 'Expériences',
     nav_corporate_gifts: 'Cadeaux d\'Entreprise',
+    nav_corporate_line1: 'Cadeaux',
+    nav_corporate_line2: 'd\'Entreprise',
     nav_events: 'Événements',
     nav_add_product: 'Ajouter un Produit',
+    nav_add_product_line1: 'Ajouter',
+    nav_add_product_line2: 'Produit',
+    nav_explore_selection: 'Explorer la Sélection',
+    nav_your_account: 'Votre Compte',
 
     cat_all: 'Tous',
     cat_queso: 'Fromage',
@@ -1045,6 +1586,14 @@ export const translations: Record<Language, TranslationDict> = {
     cat_sidra: 'Cidre naturel',
     cat_new_badge: 'Nouveau',
     cat_explore: 'Explorer la catégorie',
+    cat_section_title: 'Catégories Sélection EkhiTeka',
+    sub_quesos: 'Fermiers & Affinés',
+    sub_atun: 'Thon Cantabrique',
+    sub_salazones: 'Anchois & Salaisons',
+    sub_gildas: 'Gildas & Condiments',
+    sub_cerveza: 'Craft & Spéciales',
+    sub_txakoli: 'Vin Txakoli Basque',
+    sub_sidra: 'Cidre du Pays Basque',
 
     prod_price: 'Prix',
     prod_unit: 'pièce',
@@ -1070,12 +1619,28 @@ export const translations: Record<Language, TranslationDict> = {
     prod_sort_price_desc: 'Prix (décroissant)',
     prod_showing: 'produits disponibles',
     prod_sold_out: 'Épuisé',
+    prod_last_units: 'Dernières unités !',
     prod_available: 'Disponible',
     prod_availability: 'Disponibilité :',
+    prod_format_label: 'Format',
+    prod_weight_label: 'Poids',
+    prod_price_per_seat: '/ place',
+    prod_vat_included: 'TTC',
+    prod_doubt_title: 'Une question sur ce produit ?',
+    prod_doubt_desc: 'Consultez directement nos maîtres affineurs et experts.',
+    prod_ask_btn: 'Demander',
+    prod_guarantee_cold: 'Froid garanti 24/48h',
+    prod_guarantee_pickup: 'Retrait à Lekeitio',
+    prod_guarantee_km0: 'Qualité artisanale km0',
+    prod_related_subtitle: 'Recommandations de l\'affineur',
+    prod_related_title: 'Vous pourriez aussi aimer',
+    prod_back_to_selection: 'Retour à la sélection',
 
     event_seats: 'places',
+    event_seat: 'place',
     event_seats_available: 'places disponibles',
     event_capacity_full: 'Complet (Plus de places)',
+    event_last_seats: 'Dernières places !',
     event_reserve_seat: 'Réserver Place(s)',
     event_seats_added: 'Place(s) Ajoutée(s)',
     event_upcoming_title: 'Prochains Événements de Dégustation en Boutique',
@@ -1086,6 +1651,48 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kits & Packs de dégustation à emporter',
     event_store_catalog_title: 'Dégustations en Boutique Disponibles',
     event_store_catalog_subtitle: 'En présentiel à Lekeitio',
+
+    home_hero_badge: 'Fromagerie Fine & Espace Gourmand',
+    home_hero_title: 'Fromages d\'Auteur & Dégustations à Lekeitio',
+    home_hero_subtitle: 'Fromages d\'Auteur & Dégustations à Lekeitio',
+    home_hero_desc: 'Affinage artisanal de fromages uniques, trésors du Cantabrique et accords fins. Découvrez notre boutique en ligne, coffrets cadeaux et expériences au cœur de Biscaye.',
+    home_explore_btn: 'Explorer la Boutique',
+    home_gourmet_gifts_btn: 'Cadeaux Gourmets',
+    home_pillars_badge: 'Notre Maison · L\'Univers EkhiTeka',
+    home_pillars_title: 'Découvrez Nos Univers',
+    home_pillars_desc: 'Choisissez l\'expérience souhaitée et laissez-vous guider par notre savoir-faire.',
+    home_card1_badge: 'En Ligne & Livraison',
+    home_card1_sub: 'Catalogue Complet',
+    home_card1_title: 'Boutique Fine',
+    home_card1_desc: 'Fromages affinés, thon blanc, anchois, gildas artisanales, vin txakoli, cidre et bières basques.',
+    home_card1_btn: 'Entrer dans la Boutique',
+    home_card2_badge: 'À Offrir',
+    home_card2_sub: 'Coffrets & Paniers',
+    home_card2_title: 'Cadeaux Gourmets',
+    home_card2_desc: 'Paniers gourmets sur mesure, kits de dégustation à domicile et cartes cadeaux.',
+    home_card2_btn: 'Voir les Idées Cadeaux',
+    home_card3_badge: 'Sensoriel',
+    home_card3_sub: 'En Boutique & Événements',
+    home_card3_title: 'Dégustations & Ateliers',
+    home_card3_desc: 'Kits à la maison, dégustations guidées en boutique à Lekeitio, buffets de mariage et prêt d\'appareil à raclette.',
+    home_card3_btn: 'Découvrir les Expériences',
+    home_card4_badge: 'Entreprises',
+    home_card4_sub: 'Équipes & Clients',
+    home_card4_title: 'Cadeaux d\'Entreprise',
+    home_card4_desc: 'Team building gourmand, coffrets de Noël artisanaux et attentions d\'entreprise sur mesure.',
+    home_card4_btn: 'Voir les Offres Pro',
+
+    exp_banner_badge: 'Ici il se passe des choses...',
+    exp_banner_title: 'Dégustations, Événements & Expériences EkhiTeka',
+    exp_b1_title: 'Dégustations Présentielles & Ateliers',
+    exp_b1_desc: 'Apprenez à déguster des fromages fermiers locaux et internationaux, associés aux cidres naturels et txakolis à Lekeitio.',
+    exp_b1_btn: 'Consulter les Prochaines Dates',
+    exp_b2_title: 'Buffets Fromages de Mariage & Fêtes',
+    exp_b2_desc: 'Nous créons des Cheese Corners personnalisés avec fleurs comestibles, pains et confitures pour votre événement.',
+    exp_b2_btn: 'Demander un Devis Événement',
+    exp_b3_title: 'Paniers Gourmets & Cadeaux d\'Entreprise',
+    exp_b3_desc: 'Coffrets gastronomiques exclusifs avec emballage soigné, cartes calligraphiées et sélection affinée.',
+    exp_b3_btn: 'Composer un Panier sur Mesure',
 
     exp_hero_badge: 'Expériences Gastronomiques',
     exp_hero_title: 'Dégustations &',
@@ -1107,6 +1714,52 @@ export const translations: Record<Language, TranslationDict> = {
     exp_raclette_badge: 'Location & Pack',
     exp_raclette_desc: 'Nous vous prêtons l\'appareil traditionnel suisse professionnel avec le fromage à raclette affiné prédécoupé, charcuteries et pommes de terre pour une soirée conviviale sans contrainte.',
     exp_raclette_btn: 'Consulter la Disponibilité Raclette',
+
+    gifts_hero_badge: 'Sélection Exclusive à Offrir',
+    gifts_hero_title: 'Cadeaux',
+    gifts_hero_title_highlight: 'Gourmets',
+    gifts_hero_desc: 'Surprenez avec des paniers artisanaux sur mesure, coffrets de fromages affinés, accords d\'auteur et cartes cadeaux pour des moments inoubliables.',
+    gifts_whatsapp_btn: 'Commande Sur Mesure sur WhatsApp',
+    gifts_card1_title: 'Paniers Gourmets Sur Mesure',
+    gifts_card1_desc: 'Nous composons des paniers combinant fromages affinés, conserves du Cantabrique, txakoli et douceurs basques selon votre budget.',
+    gifts_card1_feature: 'Livraison réfrigérée avec carte personnalisée',
+    gifts_card2_title: 'Coffrets Dégustation & Accords',
+    gifts_card2_desc: 'Coffrets prêts à déguster : sélections de fromages par intensité avec confitures artisanales, noix et crackers fins.',
+    gifts_card2_feature: 'Présentation dans une boîte en bois prémium',
+    gifts_card3_title: 'Cartes Cadeaux & Dégustations',
+    gifts_card3_desc: 'Le cadeau parfait pour choisir leurs fromages préférés ou vivre une dégustation guidée en boutique à Lekeitio.',
+    gifts_card3_feature: 'Valable en ligne et en boutique',
+    gifts_catalog_badge: 'Disponibles pour livraison ou retrait',
+    gifts_catalog_title: 'Paniers & Coffrets Prêts à Offrir',
+
+    corp_hero_badge: 'Offres Entreprises & Paniers de Fêtes',
+    corp_hero_title: 'Cadeaux',
+    corp_hero_title_highlight: 'd\'Entreprise',
+    corp_hero_desc: 'Remerciez vos équipes et clients avec des paniers artisanaux, des cadeaux d\'affaires sur mesure et des dégustations privées.',
+    corp_whatsapp_btn: 'Devis Entreprise par WhatsApp',
+    corp_card1_title: 'Coffrets et Paniers de Noël',
+    corp_card1_desc: 'Compositions sans intermédiaires : fromages d\'affineur, charcuterie ibérique, salaisons du Cantabrique et facture détaillée.',
+    corp_card2_title: 'Dégustations Privées & Team Building',
+    corp_card2_desc: 'Nous organisons vos événements d\'équipe guidés dans notre fromagerie à Lekeitio ou dans vos locaux.',
+    corp_card3_title: 'Personnalisation à Vos Couleurs',
+    corp_card3_desc: 'Nous intégrons des bandeaux personnalisés, des cartes avec le logo de votre entreprise et des messages dédiés.',
+    corp_logistics_badge: 'Engagement EkhiTeka',
+    corp_logistics_title: 'Logistique Soignée & Multi-Adresses',
+    corp_logistics_desc: 'Nous gérons les expéditions individuelles vers les domiciles de vos collaborateurs en 24/48h avec suivi garanti.',
+    corp_logistics_feat1: 'Envois individuels à chaque salarié',
+    corp_logistics_feat2: 'Transport frigorifique certifié',
+    corp_logistics_feat3: 'Facturation claire avec TVA détaillée',
+
+    reviews_badge: 'Confiance & Passion Gastronomique',
+    reviews_title: 'Avis de Nos Clients',
+    reviews_subtitle: 'Ce que disent les amateurs de bon fromage ayant testé notre sélection',
+    reviews_verified_buyer: 'Acheteur vérifié',
+    rev1_comment: 'Les fromages sont extraordinaires. Affinage impeccable et colis frais reçu en 24h. De loin la meilleure fromagerie de Biscaye.',
+    rev1_date: 'Il y a 3 jours',
+    rev2_comment: 'J\'ai commandé un plateau pour un anniversaire, les invités étaient conquis. Accueil chaleureux et conseils parfaits sur WhatsApp.',
+    rev2_date: 'Il y a 1 semaine',
+    rev3_comment: 'Je commande ma sélection tous les mois. L\'emballage thermique garde le produit aussi frais qu\'en boutique.',
+    rev3_date: 'Il y a 2 semaines',
 
     cart_title: 'Votre Panier',
     cart_empty: 'Votre panier est vide',
@@ -1189,6 +1842,12 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_attendees_title: 'Participants à la Dégustation',
     seller_events_no_events: 'Vous n\'avez pas encore créé de dégustation en boutique',
     seller_events_no_events_desc: 'Publiez une dégustation en boutique depuis le menu supérieur pour gérer la jauge et les réservations.',
+    seller_events_col_buyer: 'Acheteur',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Places',
+    seller_events_col_date: 'Date d\'Achat',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
 
     chat_title: 'Messagerie & Conseils',
     chat_type_message: 'Écrivez votre message ici...',

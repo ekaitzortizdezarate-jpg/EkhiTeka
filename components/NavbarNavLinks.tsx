@@ -91,7 +91,7 @@ export function NavbarNavLinks({
 
   return (
     <div className="flex items-center justify-between w-full min-w-0 gap-3">
-      {/* LADO IZQUIERDO */}
+      {/* 1. LADO IZQUIERDO */}
       <div className="flex items-center gap-3 xl:gap-5 min-w-0">
         <button
           type="button"
@@ -141,8 +141,8 @@ export function NavbarNavLinks({
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
             }`}
           >
-            <span className="block text-center">Regalos</span>
-            <span className="block text-center">Gourmet</span>
+            <span className="block text-center">{t.nav_gourmet_gifts_line1}</span>
+            <span className="block text-center">{t.nav_gourmet_gifts_line2}</span>
           </Link>
 
           <Link
@@ -153,8 +153,8 @@ export function NavbarNavLinks({
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
             }`}
           >
-            <span className="block text-center">Catas &</span>
-            <span className="block text-center">Experiencias</span>
+            <span className="block text-center">{t.nav_tastings_line1}</span>
+            <span className="block text-center">{t.nav_tastings_line2}</span>
           </Link>
 
           <Link
@@ -165,8 +165,8 @@ export function NavbarNavLinks({
                 : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
             }`}
           >
-            <span className="block text-center">Regalos de</span>
-            <span className="block text-center">Empresa</span>
+            <span className="block text-center">{t.nav_corporate_line1}</span>
+            <span className="block text-center">{t.nav_corporate_line2}</span>
           </Link>
 
           {user && (
@@ -209,8 +209,8 @@ export function NavbarNavLinks({
                       : 'border-2 border-[#FFE259] bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
                   }`}
                 >
-                  <span className="block text-center">Añadir</span>
-                  <span className="block text-center">Producto</span>
+                  <span className="block text-center">{t.nav_add_product_line1}</span>
+                  <span className="block text-center">{t.nav_add_product_line2}</span>
                 </Link>
               )}
 
@@ -227,7 +227,7 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* LADO DERECHO */}
+      {/* 2. LADO DERECHO */}
       <div className="flex items-center gap-2 shrink-0">
         {user ? (
           <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* DRAWER MÓVIL (Orden estricto a partir de Tu Cuenta: Pedidos, Eventos, Añadir Producto, Mensajes, Perfil, Cerrar Sesión) */}
+      {/* 3. MENÚ MÓVIL */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
@@ -330,7 +330,7 @@ export function NavbarNavLinks({
 
               <div className="space-y-2 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  Explorar Selección
+                  {t.nav_explore_selection}
                 </p>
                 <Link
                   href="/tienda"
@@ -352,7 +352,7 @@ export function NavbarNavLinks({
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
                 >
-                  <span>Regalos Gourmet</span>
+                  <span>{t.nav_gourmet_gifts}</span>
                 </Link>
                 <Link
                   href="/experiencias"
@@ -363,7 +363,7 @@ export function NavbarNavLinks({
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
                 >
-                  <span>Catas & Experiencias</span>
+                  <span>{t.nav_tastings_experiences}</span>
                 </Link>
                 <Link
                   href="/regalos-empresa"
@@ -374,14 +374,14 @@ export function NavbarNavLinks({
                       : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
                   }`}
                 >
-                  <span>Regalos de Empresa</span>
+                  <span>{t.nav_corporate_gifts}</span>
                 </Link>
               </div>
 
               {/* SECCIÓN TU CUENTA */}
               <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
                 <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  Tu Cuenta
+                  {t.nav_your_account}
                 </p>
                 {user ? (
                   <>
@@ -431,7 +431,7 @@ export function NavbarNavLinks({
                             : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
                         }`}
                       >
-                        <span>Añadir Producto</span>
+                        <span>{t.nav_add_product}</span>
                       </Link>
                     )}
 

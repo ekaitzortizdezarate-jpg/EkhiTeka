@@ -1,25 +1,21 @@
+'use client';
+
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   Sparkles,
   ShoppingBag,
   Gift,
-  Wine,
-  Building2,
-  ArrowRight,
-  MessageCircle,
-  Store,
   ChevronRight,
-  ShieldCheck,
-  Heart,
-  Award,
+  MessageCircle,
 } from 'lucide-react';
 
-export const revalidate = 0;
-
 export default function HomePage() {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero Principal de Bienvenida a EkhiTeka Lekeitio */}
+      {/* 1. Hero Principal de Bienvenida */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-18 border-2 border-stone-800 shadow-2xl min-h-[460px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
@@ -32,19 +28,19 @@ export default function HomePage() {
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
           <div className="lg:col-span-8 space-y-6">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md">
-              <Sparkles className="w-3.5 h-3.5" /> Quesería Gourmet & Espacio Gastronómico
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
+              <Sparkles className="w-3.5 h-3.5" /> {t.home_hero_badge}
             </span>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif text-white drop-shadow-md">
               Ekhi<span className="text-[#FFE259]">Teka</span>
               <span className="block text-2xl sm:text-3xl lg:text-4xl font-light text-stone-200 mt-2">
-                Quesos de autor & Experiencias en Lekeitio
+                {t.home_hero_subtitle}
               </span>
             </h1>
 
             <p className="text-sm sm:text-base text-white/95 leading-relaxed max-w-xl font-medium drop-shadow-md">
-              Afinado artesanal de quesos singulares, tesoros del Cantábrico y maridajes selectos. Descubre nuestra tienda online, cestas de regalo y experiencias a medida en el corazón de Bizkaia.
+              {t.home_hero_desc}
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -53,7 +49,7 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 uppercase tracking-wider font-serif"
               >
                 <ShoppingBag className="w-4 h-4" />
-                <span>Explorar Tienda Online</span>
+                <span>{t.home_explore_btn}</span>
               </Link>
 
               <Link
@@ -61,7 +57,7 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105 uppercase tracking-wider font-serif"
               >
                 <Gift className="w-4 h-4 text-[#FFE259]" />
-                <span>Regalos Gourmet</span>
+                <span>{t.home_gourmet_gifts_btn}</span>
               </Link>
             </div>
           </div>
@@ -78,17 +74,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. Los 4 Pilares de EkhiTeka (Navegación Visual) */}
-      <section className="space-y-6">
+      {/* 2. Los 4 Pilares de EkhiTeka */}
+      <section className="space-y-6 font-serif">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-            Nuestra Casa · El Universo EkhiTeka
+            {t.home_pillars_badge}
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase tracking-tight">
-            Descubre Nuestras Secciones
+          <h2 className="text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-100 uppercase tracking-tight">
+            {t.home_pillars_title}
           </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400">
-            Selecciona la experiencia que buscas y déjate guiar por nuestro afinado artesanal.
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans">
+            {t.home_pillars_desc}
           </p>
         </div>
 
@@ -101,28 +97,28 @@ export default function HomePage() {
             <div className="relative h-52 overflow-hidden">
               <img
                 src="/images/secciones/Quesos.JPG"
-                alt="Tienda de Quesos EkhiTeka"
+                alt={t.home_card1_title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                Online & Envío
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.home_card1_badge}
               </div>
               <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block">
-                  Catálogo Completo
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
+                  {t.home_card1_sub}
                 </span>
                 <h3 className="font-serif font-bold text-xl leading-tight">
-                  Tienda Gourmet
+                  {t.home_card1_title}
                 </h3>
               </div>
             </div>
             <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Quesos afinados, bonito del Cantábrico, salazones, gildas artesanas, txakoli, sidra y cerveza de autor.
+              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.home_card1_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 font-serif uppercase tracking-wider">
-                <span>Entrar a la Tienda</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
+                <span>{t.home_card1_btn}</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -136,28 +132,28 @@ export default function HomePage() {
             <div className="relative h-52 overflow-hidden">
               <img
                 src="/images/secciones/Cestas.JPG"
-                alt="Regalos Gourmet"
+                alt={t.home_card2_title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                Para Regalar
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.home_card2_badge}
               </div>
               <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block">
-                  Detalles & Cestas
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
+                  {t.home_card2_sub}
                 </span>
                 <h3 className="font-serif font-bold text-xl leading-tight">
-                  Regalos Gourmet
+                  {t.home_card2_title}
                 </h3>
               </div>
             </div>
             <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Cestas gourmet personalizadas, kits de cata para casa y tarjetas regalo virtuales o físicas.
+              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.home_card2_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 font-serif uppercase tracking-wider">
-                <span>Ver Opciones de Regalo</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
+                <span>{t.home_card2_btn}</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -171,28 +167,28 @@ export default function HomePage() {
             <div className="relative h-52 overflow-hidden">
               <img
                 src="/images/secciones/Catas.JPG"
-                alt="Catas & Experiencias"
+                alt={t.home_card3_title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                Sensorial
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.home_card3_badge}
               </div>
               <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block">
-                  En Tienda & Eventos
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
+                  {t.home_card3_sub}
                 </span>
                 <h3 className="font-serif font-bold text-xl leading-tight">
-                  Catas & Experiencias
+                  {t.home_card3_title}
                 </h3>
               </div>
             </div>
             <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Catas en casa, catas presenciales en tienda de Lekeitio, mesas para bodas y préstamo de raclette.
+              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.home_card3_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 font-serif uppercase tracking-wider">
-                <span>Descubrir Experiencias</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
+                <span>{t.home_card3_btn}</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -205,29 +201,29 @@ export default function HomePage() {
           >
             <div className="relative h-52 overflow-hidden">
               <img
-                src="/images/secciones/Mesas.JPG"
-                alt="Regalos de Empresa"
+                src="/images/secciones/Empresas.JPG"
+                alt={t.home_card4_title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md">
-                Corporativo
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.home_card4_badge}
               </div>
               <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block">
-                  Equipos & Clientes
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
+                  {t.home_card4_sub}
                 </span>
                 <h3 className="font-serif font-bold text-xl leading-tight">
-                  Regalos de Empresa
+                  {t.home_card4_title}
                 </h3>
               </div>
             </div>
             <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-                Teambuilding gastronómico, cestas de navidad de autor y detalles corporativos a medida.
+              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.home_card4_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 font-serif uppercase tracking-wider">
-                <span>Ver Servicios de Empresa</span>
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
+                <span>{t.home_card4_btn}</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -240,13 +236,13 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-4">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Visítanos en Lekeitio · Km0
+              {t.shop_visit_subtitle}
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif">
-              Nuestra Quesería & Espacio Gourmet
+              {t.shop_visit_title}
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              En nuestra tienda de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
+              {t.shop_visit_desc}
             </p>
             <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
               <div className="flex items-center gap-2">
@@ -255,10 +251,10 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-base">🕒</span>
-                <span>Lun-Vie: 10:00 - 20:30 | Sáb: 10:30 - 15:00</span>
+                <span>{t.footer_schedule_weekdays}</span>
               </div>
             </div>
-            <div className="pt-2 flex flex-wrap gap-3">
+            <div className="pt-2 flex flex-wrap gap-3 font-serif">
               <a
                 href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
                 target="_blank"
@@ -266,14 +262,14 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-                <span>Contactar con la Tienda</span>
+                <span>{t.shop_visit_contact}</span>
               </a>
               <Link
                 href="/tienda"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
               >
                 <ShoppingBag className="w-4 h-4" />
-                <span>Comprar Online</span>
+                <span>{t.nav_shop}</span>
               </Link>
             </div>
           </div>
