@@ -20,9 +20,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const [added, setAdded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
+  const isLowStock = !product.is_unlimited_stock && (product.stock ?? 0) > 0 && (product.stock ?? 0) <= 5;
+  const isEvent = product.category_id === 'catas' || product.category_id === 'experiencia' || product.name.toLowerCase().includes('cata');
+
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isSoldOut) return;
     addToCart(product, 'EkhiTeka Selección');
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -43,14 +48,9 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const imageUrl = getProductImage(product);
 
   return (
-    <article
-      aria-label={product.name}
-      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col overflow-hidden h-full ${
-        isDeleting ? 'opacity-40 pointer-events-none' : ''
-      }`}
-    >
+    <article aria-label={product.name} className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col overflow-hidden ${isDeleting ? 'opacity-40 pointer-events-none' : ''}`}>
       {/* 1. Imagen y Badges */}
-      <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden shrink-0">
+      <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden">
         <img
           src={imageUrl}
           alt={product.name}
@@ -62,53 +62,58 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
         {/* Badge de Origen */}
         {product.origin_region && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 bg-[#1D1D1B]/85 backdrop-blur-xs text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-xs max-w-[70%] truncate">
-            <MapPin className="w-3 h-3 text-[#FFE259] shrink-0" />
-            <span className="truncate">{product.origin_region}</span>
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/80 backdrop-blur-xs text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-xs">
+            <MapPin className="w-3 h-3 text-[#FFE259]" />
+            {product.origin_region}
           </span>
         )}
 
-        {/* Badge de Selección Artesana */}
-        <span className="absolute top-3 right-3 px-2 py-0.5 bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black rounded-lg uppercase tracking-tight shadow-xs">
-          Artisau
-        </span>
+        {/* Badge de Plazas / Stock / Agotado */}
+        {isSoldOut ? (
+          <span className="absolute top-3 right-3 px-2.5 py-1 bg-red-600 text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-md animate-pulse">
+            {isEvent ? 'Sin Plazas' : 'Agotado'}
+          </span>
+        ) : isLowStock ? (
+          <span className="absolute top-3 right-3 px-2 py-0.5 bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black rounded-lg uppercase tracking-tight shadow-xs">
+            {isEvent ? `¡Últimas ${product.stock} plazas!` : `¡Últimas ${product.stock} uds!`}
+          </span>
+        ) : (
+          <span className="absolute top-3 right-3 px-2 py-0.5 bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black rounded-lg uppercase tracking-tight shadow-xs">
+            {isEvent ? `${product.stock} plazas` : 'Artisau'}
+          </span>
+        )}
 
-        {/* Badge de Formato y Peso */}
+        {/* Badge de Formato */}
         <span className="absolute bottom-3 left-3 px-2.5 py-0.5 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] font-bold rounded-lg uppercase tracking-tight shadow-xs border border-stone-200/60 dark:border-stone-700/60">
           {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
         </span>
       </div>
 
-      {/* 2. Información Completa y Legible */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
-        <div className="space-y-1.5">
-          <p className="text-[10px] sm:text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider">
+      {/* 2. Información del Producto */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+        <div className="space-y-1">
+          <p className="text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider truncate">
             {sellerName}
           </p>
-
-          <Link
-            href={`/producto/${product.id}`}
-            className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors"
-          >
-            <h2 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-sm sm:text-base leading-snug break-words">
+          <Link href={`/producto/${product.id}`} className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+            <h2 className="font-black text-stone-900 dark:text-stone-100 text-sm sm:text-base leading-snug line-clamp-2">
               {product.name}
             </h2>
           </Link>
-
           {product.description && (
-            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium whitespace-pre-line break-words pt-1">
+            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed pt-0.5 font-medium">
               {product.description}
             </p>
           )}
         </div>
 
-        {/* 3. Precio y Acciones */}
-        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between gap-2 shrink-0">
+        {/* 3. Precio y Botones de Acción */}
+        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between gap-2">
           <div>
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
               {t.prod_price}
             </span>
-            <span className="text-base sm:text-lg font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
+            <span className="text-base sm:text-lg font-black text-[#1D1D1B] dark:text-stone-100">
               {Number(product.price).toFixed(2)} €
             </span>
           </div>
@@ -144,14 +149,19 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
               <button
                 type="button"
+                disabled={isSoldOut}
                 onClick={handleQuickAdd}
-                className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs font-serif uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer ${
-                  added
+                className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs transition-all shadow-xs active:scale-95 cursor-pointer ${
+                  isSoldOut
+                    ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed'
+                    : added
                     ? 'bg-emerald-700 text-white'
                     : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-102'
                 }`}
               >
-                {added ? (
+                {isSoldOut ? (
+                  <span className="text-[11px] uppercase font-serif">{isEvent ? 'Sin plazas' : 'Agotado'}</span>
+                ) : added ? (
                   <>
                     <Check className="w-4 h-4" />
                     <span className="hidden sm:inline">Añadido</span>
