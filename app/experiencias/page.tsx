@@ -2,7 +2,16 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductWithSeller } from '@/types/database';
-import { Wine, Store, HeartHandshake, Sparkles, MessageCircle, Flame, ArrowRight } from 'lucide-react';
+import {
+  Wine,
+  Store,
+  HeartHandshake,
+  Sparkles,
+  MessageCircle,
+  Flame,
+  ArrowRight,
+  Calendar,
+} from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -32,45 +41,56 @@ export default async function ExperienciasPage() {
 
   const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
 
-  // Filtrar productos de tipo Cata Presencial y Cata en Casa
+  // 1. Productos de tipo Cata en Casa y Cata Presencial (Catálogo completo de catas)
   const tastingProducts = allProducts.filter((p) => {
     const cat = (p.category_id || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
     const desc = (p.description || '').toLowerCase();
 
-    // Descartar tarjetas de regalo o cestas puras que no sean catas
     if (cat === 'tarjeta_regalo' || (name.includes('tarjeta') && name.includes('regalo'))) {
       return false;
     }
 
-    const isCataPresencial =
-      cat === 'cata_presencial' ||
-      name.includes('presencial') ||
-      desc.includes('presencial') ||
-      (desc.includes('fecha & hora') && desc.includes('aforo'));
-
-    const isCataCasa =
+    return (
       cat === 'cata_casa' ||
-      name.includes('cata en casa') ||
-      name.includes('pack de cata') ||
-      name.includes('pack experiencia') ||
-      desc.includes('pack en casa') ||
-      desc.includes('en casa') ||
-      desc.includes('incluye pack en casa');
-
-    const isGeneralCata =
+      cat === 'cata_presencial' ||
       cat === 'catas' ||
       cat === 'experiencia' ||
       name.includes('cata') ||
       name.includes('degustación') ||
-      name.includes('taller');
+      name.includes('taller') ||
+      desc.includes('cata')
+    );
+  });
 
-    return isCataPresencial || isCataCasa || isGeneralCata;
+  // 2. Próximos Eventos: Única y exclusivamente Catas Presenciales en tienda
+  const presencialEvents = allProducts.filter((p) => {
+    const cat = (p.category_id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    const desc = (p.description || '').toLowerCase();
+
+    if (
+      name.includes('casa') ||
+      cat.includes('casa') ||
+      cat === 'cesta' ||
+      cat === 'tarjeta_regalo' ||
+      name.includes('tarjeta') ||
+      name.includes('cesta')
+    ) {
+      return false;
+    }
+
+    return (
+      cat === 'cata_presencial' ||
+      name.includes('presencial') ||
+      desc.includes('presencial') ||
+      (desc.includes('fecha & hora') && desc.includes('aforo'))
+    );
   });
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* Header Banner */}
+    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* 1. Tarjeta de presentación de la ventana (Hero Banner) */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
@@ -110,9 +130,9 @@ export default async function ExperienciasPage() {
         </div>
       </section>
 
-      {/* Grid de las 4 Experiencias Informativas */}
+      {/* 2. Información de Catas en Casa e Información de Catas en la Tienda */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* 1. Catas en Casa */}
+        {/* Catas en Casa */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -140,7 +160,7 @@ export default async function ExperienciasPage() {
                   href="https://wa.me/34600000000?text=Hola,%20quisiera%20reservar%20un%20Kit%20de%20Cata%20en%20Casa"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
                 >
                   <span>Solicitar Kit para Casa</span>
                 </a>
@@ -149,7 +169,7 @@ export default async function ExperienciasPage() {
           </div>
         </div>
 
-        {/* 2. Catas en la Tienda */}
+        {/* Catas en la Tienda */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -177,7 +197,7 @@ export default async function ExperienciasPage() {
                   href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20el%20calendario%20de%20Catas%20en%20la%20Tienda%20de%20Lekeitio"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
                 >
                   <span>Ver Fechas & Reservar Plaza</span>
                 </a>
@@ -185,8 +205,63 @@ export default async function ExperienciasPage() {
             )}
           </div>
         </div>
+      </section>
 
-        {/* 3. Mesa para Bodas */}
+      {/* 3. Productos generados de tipo cata en casa y cata presencial */}
+      {tastingProducts.length > 0 && (
+        <section className="space-y-6 pt-2">
+          <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
+            <div>
+              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+                Catálogo de Catas & Packs
+              </span>
+              <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+                Catas & Experiencias Disponibles
+              </h3>
+            </div>
+            <Link
+              href="/tienda"
+              className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-[#C68D07] dark:hover:text-[#FFE259] flex items-center gap-1 font-serif uppercase tracking-wider"
+            >
+              <span>Ver todo el catálogo</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {tastingProducts.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 4. Próximos eventos de catas presenciales que haya */}
+      {presencialEvents.length > 0 && (
+        <section className="space-y-6 pt-4">
+          <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
+            <div>
+              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Plazas limitadas · Lekeitio Centro</span>
+              </span>
+              <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+                Próximos Eventos de Catas Presenciales
+              </h3>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {presencialEvents.map((event) => (
+              <ProductCard key={event.id} product={event} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 5. Información de Mesa para Bodas e Información de Préstamo de Raclette */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+        {/* Mesa para Bodas */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -214,7 +289,7 @@ export default async function ExperienciasPage() {
                   href="https://wa.me/34600000000?text=Hola,%20quisiera%20presupuesto%20para%20Mesa%20de%20Quesos%20para%20Boda/Evento"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
                 >
                   <span>Pedir Presupuesto para Bodas</span>
                 </a>
@@ -223,7 +298,7 @@ export default async function ExperienciasPage() {
           </div>
         </div>
 
-        {/* 4. Préstamo de Raclette */}
+        {/* Préstamo de Raclette */}
         <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
           <div className="relative h-64 overflow-hidden">
             <img
@@ -251,7 +326,7 @@ export default async function ExperienciasPage() {
                   href="https://wa.me/34600000000?text=Hola,%20quisiera%20información%20sobre%20el%20Préstamo%20de%20Raclette%20y%20pack%20de%20queso"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
                 >
                   <span>Consultar Disponibilidad de Raclette</span>
                 </a>
@@ -260,35 +335,6 @@ export default async function ExperienciasPage() {
           </div>
         </div>
       </section>
-
-      {/* Sección Catas Disponibles (Presenciales en Tienda y Kits para Casa) */}
-      {tastingProducts.length > 0 && (
-        <section className="space-y-6 pt-6">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
-            <div>
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-                Catas en tienda & Kits para casa
-              </span>
-              <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-                Catas & Experiencias Disponibles
-              </h3>
-            </div>
-            <Link
-              href="/tienda"
-              className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-[#C68D07] dark:hover:text-[#FFE259] flex items-center gap-1 font-serif uppercase tracking-wider"
-            >
-              <span>Ver todo el catálogo</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {tastingProducts.map((product) => (
-              <ProductCard key={product.id} product={product} isSeller={isSeller} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
