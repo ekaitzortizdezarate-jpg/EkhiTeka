@@ -40,7 +40,7 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <ProfileForm userProfile={userProfile} />
+      <ProfileForm userProfile={userProfile} profile={userProfile} />
     </div>
   );
 }

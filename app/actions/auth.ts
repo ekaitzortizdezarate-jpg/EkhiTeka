@@ -63,8 +63,9 @@ export async function register(formData: FormData) {
   redirect('/');
 }
 
-// Exportación requerida por app/register/page.tsx
-export const signup = register;
+export async function signup(formData: FormData) {
+  return register(formData);
+}
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const files = {
-  // 1. DICCIONARIO COMPLETO (Euskara, Castellano, English, Français)
+  // 1. DICCIONARIO I18N COMPLETO (Euskara, Castellano, English, Français)
   'lib/i18n/translations.ts': `export type Language = 'eu' | 'es' | 'en' | 'fr';
 
 export interface TranslationDict {
@@ -1552,7 +1552,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_tagline: 'Épicerie Fine & Produits Artisanaux',
     brand_subtitle: 'Fromages fermiers, thon blanc, salaisons, gildas, bière artisanale, vin txakoli et cidre basque.',
     top_refrigerated_shipping: 'Livraison réfrigérée 24/48h',
-    top_custom_orders: 'Coffrets sur mesure et conseils d\'experts',
+    top_custom_orders: 'Coffrets sur mesure et conseils d\\'experts',
     top_store_pickup: 'Retrait gratuit en boutique',
 
     nav_shop: 'Boutique',
@@ -1571,9 +1571,9 @@ export const translations: Record<Language, TranslationDict> = {
     nav_tastings_experiences: 'Dégustations & Expériences',
     nav_tastings_line1: 'Dégustations &',
     nav_tastings_line2: 'Expériences',
-    nav_corporate_gifts: 'Cadeaux d\'Entreprise',
+    nav_corporate_gifts: 'Cadeaux d\\'Entreprise',
     nav_corporate_line1: 'Cadeaux',
-    nav_corporate_line2: 'd\'Entreprise',
+    nav_corporate_line2: 'd\\'Entreprise',
     nav_events: 'Événements',
     nav_add_product: 'Ajouter un Produit',
     nav_add_product_line1: 'Ajouter',
@@ -1612,7 +1612,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_unlimited: 'Illimité',
     prod_add_to_cart: 'Ajouter au panier',
     prod_added: 'Ajouté',
-    prod_ask_artisan: 'Contacter l\'artisan',
+    prod_ask_artisan: 'Contacter l\\'artisan',
     prod_consult_product: 'Question sur ce produit',
     prod_details: 'Détails',
     prod_search_placeholder: 'Rechercher fromages, thon, vins...',
@@ -1637,7 +1637,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_guarantee_cold: 'Froid garanti 24/48h',
     prod_guarantee_pickup: 'Retrait à Lekeitio',
     prod_guarantee_km0: 'Qualité artisanale km0',
-    prod_related_subtitle: 'Recommandations de l\'affineur',
+    prod_related_subtitle: 'Recommandations de l\\'affineur',
     prod_related_title: 'Vous pourriez aussi aimer',
     prod_back_to_selection: 'Retour à la sélection',
 
@@ -1658,14 +1658,14 @@ export const translations: Record<Language, TranslationDict> = {
     event_store_catalog_subtitle: 'En présentiel à Lekeitio',
 
     home_hero_badge: 'Fromagerie Fine & Espace Gourmand',
-    home_hero_title: 'Fromages d\'Auteur & Dégustations à Lekeitio',
-    home_hero_subtitle: 'Fromages d\'Auteur & Dégustations à Lekeitio',
+    home_hero_title: 'Fromages d\\'Auteur & Dégustations à Lekeitio',
+    home_hero_subtitle: 'Fromages d\\'Auteur & Dégustations à Lekeitio',
     home_hero_desc: 'Affinage artisanal de fromages uniques, trésors du Cantabrique et accords fins. Découvrez notre boutique en ligne, coffrets cadeaux et expériences au cœur de Biscaye.',
     home_explore_btn: 'Explorer la Boutique',
     home_gourmet_gifts_btn: 'Cadeaux Gourmets',
-    home_pillars_badge: 'Notre Maison · L\'Univers EkhiTeka',
+    home_pillars_badge: 'Notre Maison · L\\'Univers EkhiTeka',
     home_pillars_title: 'Découvrez Nos Univers',
-    home_pillars_desc: 'Choisissez l\'expérience souhaitée et laissez-vous guider par notre savoir-faire.',
+    home_pillars_desc: 'Choisissez l\\'expérience souhaitée et laissez-vous guider par notre savoir-faire.',
     home_card1_badge: 'En Ligne & Livraison',
     home_card1_sub: 'Catalogue Complet',
     home_card1_title: 'Boutique Fine',
@@ -1679,12 +1679,12 @@ export const translations: Record<Language, TranslationDict> = {
     home_card3_badge: 'Sensoriel',
     home_card3_sub: 'En Boutique & Événements',
     home_card3_title: 'Dégustations & Ateliers',
-    home_card3_desc: 'Kits à la maison, dégustations guidées en boutique à Lekeitio, buffets de mariage et prêt d\'appareil à raclette.',
+    home_card3_desc: 'Kits à la maison, dégustations guidées en boutique à Lekeitio, buffets de mariage et prêt d\\'appareil à raclette.',
     home_card3_btn: 'Découvrir les Expériences',
     home_card4_badge: 'Entreprises',
     home_card4_sub: 'Équipes & Clients',
-    home_card4_title: 'Cadeaux d\'Entreprise',
-    home_card4_desc: 'Team building gourmand, coffrets de Noël artisanaux et attentions d\'entreprise sur mesure.',
+    home_card4_title: 'Cadeaux d\\'Entreprise',
+    home_card4_desc: 'Team building gourmand, coffrets de Noël artisanaux et attentions d\\'entreprise sur mesure.',
     home_card4_btn: 'Voir les Offres Pro',
 
     exp_banner_badge: 'Ici il se passe des choses...',
@@ -1695,17 +1695,17 @@ export const translations: Record<Language, TranslationDict> = {
     exp_b2_title: 'Buffets Fromages de Mariage & Fêtes',
     exp_b2_desc: 'Nous créons des Cheese Corners personnalisés avec fleurs comestibles, pains et confitures pour votre événement.',
     exp_b2_btn: 'Demander un Devis Événement',
-    exp_b3_title: 'Paniers Gourmets & Cadeaux d\'Entreprise',
+    exp_b3_title: 'Paniers Gourmets & Cadeaux d\\'Entreprise',
     exp_b3_desc: 'Coffrets gastronomiques exclusifs avec emballage soigné, cartes calligraphiées et sélection affinée.',
     exp_b3_btn: 'Composer un Panier sur Mesure',
 
     exp_hero_badge: 'Expériences Gastronomiques',
     exp_hero_title: 'Dégustations &',
     exp_hero_title_highlight: 'Expériences',
-    exp_hero_desc: 'Découvrez l\'art du fromage fermier à travers nos dégustations guidées, événements de célébration et services exclusifs à Lekeitio ou au lieu de votre choix.',
+    exp_hero_desc: 'Découvrez l\\'art du fromage fermier à travers nos dégustations guidées, événements de célébration et services exclusifs à Lekeitio ou au lieu de votre choix.',
     exp_home_tasting_title: 'Dégustations à la Maison',
     exp_home_tasting_badge: 'À votre rythme',
-    exp_home_tasting_desc: 'Devenez l\'hôte idéal grâce à nos kits complets : sélection de 6 fromages affinés par intensités, accords artisanaux, set de table illustré et fiches de dégustation explicatives.',
+    exp_home_tasting_desc: 'Devenez l\\'hôte idéal grâce à nos kits complets : sélection de 6 fromages affinés par intensités, accords artisanaux, set de table illustré et fiches de dégustation explicatives.',
     exp_home_tasting_btn: 'Commander Kit à Domicile',
     exp_store_tasting_title: 'Dégustations en Boutique',
     exp_store_tasting_badge: 'En présentiel à Lekeitio',
@@ -1715,15 +1715,15 @@ export const translations: Record<Language, TranslationDict> = {
     exp_wedding_badge: 'Mariages & Événements',
     exp_wedding_desc: 'Nous créons des buffets de fromages spectaculaires pour cocktails de mariage et fêtes. Mises en scène monumentales avec fruits frais, fruits secs, pains et confitures artisanales.',
     exp_wedding_btn: 'Demander un Devis Mariage',
-    exp_raclette_title: 'Prêt d\'Appareil à Raclette',
+    exp_raclette_title: 'Prêt d\\'Appareil à Raclette',
     exp_raclette_badge: 'Location & Pack',
-    exp_raclette_desc: 'Nous vous prêtons l\'appareil traditionnel suisse professionnel avec le fromage à raclette affiné prédécoupé, charcuteries et pommes de terre pour une soirée conviviale sans contrainte.',
+    exp_raclette_desc: 'Nous vous prêtons l\\'appareil traditionnel suisse professionnel avec le fromage à raclette affiné prédécoupé, charcuteries et pommes de terre pour une soirée conviviale sans contrainte.',
     exp_raclette_btn: 'Consulter la Disponibilité Raclette',
 
     gifts_hero_badge: 'Sélection Exclusive à Offrir',
     gifts_hero_title: 'Cadeaux',
     gifts_hero_title_highlight: 'Gourmets',
-    gifts_hero_desc: 'Surprenez avec des paniers artisanaux sur mesure, coffrets de fromages affinés, accords d\'auteur et cartes cadeaux pour des moments inoubliables.',
+    gifts_hero_desc: 'Surprenez avec des paniers artisanaux sur mesure, coffrets de fromages affinés, accords d\\'auteur et cartes cadeaux pour des moments inoubliables.',
     gifts_whatsapp_btn: 'Commande Sur Mesure sur WhatsApp',
     gifts_card1_title: 'Paniers Gourmets Sur Mesure',
     gifts_card1_desc: 'Nous composons des paniers combinant fromages affinés, conserves du Cantabrique, txakoli et douceurs basques selon votre budget.',
@@ -1739,13 +1739,13 @@ export const translations: Record<Language, TranslationDict> = {
 
     corp_hero_badge: 'Offres Entreprises & Paniers de Fêtes',
     corp_hero_title: 'Cadeaux',
-    corp_hero_title_highlight: 'd\'Entreprise',
-    corp_hero_desc: 'Remerciez vos équipes et clients avec des paniers artisanaux, des cadeaux d\'affaires sur mesure et des dégustations privées.',
+    corp_hero_title_highlight: 'd\\'Entreprise',
+    corp_hero_desc: 'Remerciez vos équipes et clients avec des paniers artisanaux, des cadeaux d\\'affaires sur mesure et des dégustations privées.',
     corp_whatsapp_btn: 'Devis Entreprise par WhatsApp',
     corp_card1_title: 'Coffrets et Paniers de Noël',
-    corp_card1_desc: 'Compositions sans intermédiaires : fromages d\'affineur, charcuterie ibérique, salaisons du Cantabrique et facture détaillée.',
+    corp_card1_desc: 'Compositions sans intermédiaires : fromages d\\'affineur, charcuterie ibérique, salaisons du Cantabrique et facture détaillée.',
     corp_card2_title: 'Dégustations Privées & Team Building',
-    corp_card2_desc: 'Nous organisons vos événements d\'équipe guidés dans notre fromagerie à Lekeitio ou dans vos locaux.',
+    corp_card2_desc: 'Nous organisons vos événements d\\'équipe guidés dans notre fromagerie à Lekeitio ou dans vos locaux.',
     corp_card3_title: 'Personnalisation à Vos Couleurs',
     corp_card3_desc: 'Nous intégrons des bandeaux personnalisés, des cartes avec le logo de votre entreprise et des messages dédiés.',
     corp_logistics_badge: 'Engagement EkhiTeka',
@@ -1759,11 +1759,11 @@ export const translations: Record<Language, TranslationDict> = {
     reviews_title: 'Avis de Nos Clients',
     reviews_subtitle: 'Ce que disent les amateurs de bon fromage ayant testé notre sélection',
     reviews_verified_buyer: 'Acheteur vérifié',
-    rev1_comment: 'Les fromages sont extraordinaires. Affinage impeccable et colis frais reçu en 24h. De loin la meilleure fromagerie de Biscaye.',
+    rev1_comment: 'Les fromages sont extraordinaires. Affinage缩peccable et colis frais reçu en 24h. De loin la meilleure fromagerie de Biscaye.',
     rev1_date: 'Il y a 3 jours',
-    rev2_comment: 'J\'ai commandé un plateau pour un anniversaire, les invités étaient conquis. Accueil chaleureux et conseils parfaits sur WhatsApp.',
+    rev2_comment: 'J\\'ai commandé un plateau pour un anniversaire, les invités étaient conquis. Accueil chaleureux et conseils parfaits sur WhatsApp.',
     rev2_date: 'Il y a 1 semaine',
-    rev3_comment: 'Je commande ma sélection tous les mois. L\'emballage thermique garde le produit aussi frais qu\'en boutique.',
+    rev3_comment: 'Je commande ma sélection tous les mois. L\\'emballage thermique garde le produit aussi frais qu\\'en boutique.',
     rev3_date: 'Il y a 2 semaines',
 
     cart_title: 'Votre Panier',
@@ -1787,7 +1787,7 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_pickup_address: 'Adresse boutique : Gamarra Kalea 4, Lekeitio',
     deliv_confirm_order: 'Confirmer la commande',
     deliv_order_success: 'Commande validée avec succès !',
-    deliv_order_success_desc: 'L\'artisan a reçu votre commande et prépare vos produits.',
+    deliv_order_success_desc: 'L\\'artisan a reçu votre commande et prépare vos produits.',
 
     orders_title: 'Mes Commandes',
     orders_title_seller: 'Gestion des Commandes',
@@ -1802,15 +1802,15 @@ export const translations: Record<Language, TranslationDict> = {
     orders_cancelled: 'Annulée',
     orders_change_status: 'Changer le statut',
     orders_cancel_order: 'Annuler la commande',
-    orders_cancel_reason: 'Motif d\'annulation',
+    orders_cancel_reason: 'Motif d\\'annulation',
     orders_chat_with_buyer: 'Chat avec le client',
-    orders_chat_with_seller: 'Chat avec l\'artisan',
-    orders_no_orders: 'Vous n\'avez aucune commande pour le moment',
+    orders_chat_with_seller: 'Chat avec l\\'artisan',
+    orders_no_orders: 'Vous n\\'avez aucune commande pour le moment',
     orders_no_orders_seller: 'Aucune commande reçue pour le moment',
     orders_no_orders_seller_sub: 'Les nouvelles commandes de vos clients apparaîtront ici automatiquement.',
     orders_products_label: 'Articles de la commande',
     orders_products_to_prepare: 'Articles à préparer',
-    orders_purchase_date: 'Date d\'achat',
+    orders_purchase_date: 'Date d\\'achat',
     orders_date_time: 'Date & Heure',
     orders_order_number: 'Commande :',
     orders_total_to_charge: 'Total à encaisser :',
@@ -1845,12 +1845,12 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_available: 'Disponibles',
     seller_events_collected: 'Encaissé',
     seller_events_attendees_title: 'Participants à la Dégustation',
-    seller_events_no_events: 'Vous n\'avez pas encore créé de dégustation en boutique',
+    seller_events_no_events: 'Vous n\\'avez pas encore créé de dégustation en boutique',
     seller_events_no_events_desc: 'Publiez une dégustation en boutique depuis le menu supérieur pour gérer la jauge et les réservations.',
     seller_events_col_buyer: 'Acheteur',
     seller_events_col_contact: 'Contact',
     seller_events_col_seats: 'Places',
-    seller_events_col_date: 'Date d\'Achat',
+    seller_events_col_date: 'Date d\\'Achat',
     seller_events_col_total: 'Total',
     seller_events_col_actions: 'Actions',
 
@@ -1883,7 +1883,7 @@ export const translations: Record<Language, TranslationDict> = {
     cookie_settings: 'Personnaliser',
 
     footer_club_title: 'Club des Amis du Bon Fromage',
-    footer_club_subtitle: 'Vous souhaitez rester informé des actualités d\'EkhiTeka ?',
+    footer_club_subtitle: 'Vous souhaitez rester informé des actualités d\\'EkhiTeka ?',
     footer_club_desc: 'Nouvelles arrivées de fromages de saison, dégustations exclusives à Lekeitio et lots limités avant tout le monde.',
     footer_join_whatsapp: 'Rejoindre par WhatsApp',
     footer_cheese_desc: 'Fromages affinés, poissons salés du Cantabrique et conserves artisanales sélectionnées à la main.',
@@ -1904,7 +1904,7 @@ export const translations: Record<Language, TranslationDict> = {
 
     shop_specialty: 'Notre Spécialité',
     shop_hero_title: 'Fromages et cadeaux gastronomiques à Lekeitio',
-    shop_hero_desc: 'Fromages affinés d\'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
+    shop_hero_desc: 'Fromages affinés d\\'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
     shop_see_cheeses: 'VOIR NOS FROMAGES',
     shop_whatsapp_orders: 'Commandes sur WhatsApp',
     shop_visit_title: 'Notre Fromagerie & Espace Gourmet',
@@ -1928,1713 +1928,736 @@ export const translations: Record<Language, TranslationDict> = {
 };
 `,
 
-  // 2. NAVBAR (Traducción 100% en Desktop & Móvil)
-  'components/NavbarNavLinks.tsx': `'use client';
+  // 2. SERVER ACTIONS DE AUTH (Corrección de export signup y updateProfile)
+  'app/actions/auth.ts': `'use server';
 
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useLanguage } from '@/context/LanguageContext';
-import { signout } from '@/app/actions/auth';
-import type { Profile } from '@/types/database';
-import { CartNavButton } from '@/components/CartNavButton';
-import {
-  User,
-  LogOut,
-  Menu,
-  X,
-  Store,
-  MessageCircle,
-} from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
-interface NavbarNavLinksProps {
-  user: { id: string } | null;
-  profile: Profile | null;
-  unreadMessagesCount: number;
-  ordersCount: number;
-  activeOrders?: { id: string; status: string }[];
+export async function login(formData: FormData) {
+  const supabase = await createClient();
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath('/', 'layout');
+  redirect('/');
 }
 
-export function NavbarNavLinks({
-  user,
-  profile,
-  unreadMessagesCount,
-  ordersCount,
-  activeOrders = [],
-}: NavbarNavLinksProps) {
-  const pathname = usePathname();
+export async function register(formData: FormData) {
+  const supabase = await createClient();
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const fullName = (formData.get('full_name') as string) || '';
+  const role = (formData.get('role') as string) || 'comprador';
+  const phone = (formData.get('phone') as string) || '';
+  const town = (formData.get('town') as string) || '';
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        role,
+        phone,
+        town,
+      },
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  if (data.user) {
+    await supabase.from('profiles').upsert({
+      id: data.user.id,
+      full_name: fullName,
+      email,
+      role: role as any,
+      phone,
+      town,
+    });
+  }
+
+  revalidatePath('/', 'layout');
+  redirect('/');
+}
+
+export async function signup(formData: FormData) {
+  return register(formData);
+}
+
+export async function updateProfile(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'No autenticado' };
+
+  const fullName = (formData.get('full_name') as string)?.trim() || '';
+  const phone = (formData.get('phone') as string)?.trim() || '';
+  const town = (formData.get('town') as string)?.trim() || '';
+
+  if (!fullName) {
+    return { error: 'Por favor, introduce tu nombre completo.' };
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      full_name: fullName,
+      phone,
+      town,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', user.id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath('/perfil');
+  revalidatePath('/');
+  return { success: true };
+}
+
+export async function signout() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
+  redirect('/');
+}
+`,
+
+  // 3. PROFILE FORM COMPONENT (Soporte flexible de props y traducciones)
+  'components/ProfileForm.tsx': `'use client';
+
+import { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
+import { updateProfile } from '@/app/actions/auth';
+import type { Profile } from '@/types/database';
+import { User, Phone, MapPin, Check } from 'lucide-react';
+
+interface ProfileFormProps {
+  profile?: Profile;
+  userProfile?: Profile;
+}
+
+export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
+  const currentProfile = profile || userProfile || ({} as Profile);
   const { t } = useLanguage();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<{ text: string; isError: boolean } | null>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setMsg(null);
 
-  const isSeller = profile?.role === 'vendedor';
-  const isAdmin = profile?.role === 'admin';
+    const formData = new FormData(e.currentTarget);
+    const res = await updateProfile(formData);
+    setLoading(false);
 
-  useEffect(() => {
-    function checkUnseenOrders() {
-      if (!user || !activeOrders || activeOrders.length === 0) {
-        setHasUnseenOrderUpdates(false);
-        return;
-      }
-      const storageKey = isSeller ? 'ekhiteka_seen_orders_seller' : 'ekhiteka_seen_orders_buyer';
-      let seenMap: Record<string, string> = {};
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) seenMap = JSON.parse(stored);
-      } catch {}
-
-      const unseen = activeOrders.some((order) => {
-        const lastSeen = seenMap[order.id];
-        if (lastSeen) {
-          return lastSeen !== order.status;
-        }
-        return isSeller ? order.status === 'pendiente' : order.status !== 'pendiente';
-      });
-
-      setHasUnseenOrderUpdates(unseen);
-    }
-
-    checkUnseenOrders();
-    window.addEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
-    window.addEventListener('storage', checkUnseenOrders);
-    return () => {
-      window.removeEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
-      window.removeEventListener('storage', checkUnseenOrders);
-    };
-  }, [user, activeOrders, isSeller]);
-
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+    if (res?.error) {
+      setMsg({ text: res.error, isError: true });
     } else {
-      document.body.style.overflow = '';
+      setMsg({ text: t.common_success, isError: false });
+      setTimeout(() => setMsg(null), 3000);
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
+  };
 
   return (
-    <div className="flex items-center justify-between w-full min-w-0 gap-3">
-      {/* 1. LADO IZQUIERDO */}
-      <div className="flex items-center gap-3 xl:gap-5 min-w-0">
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
-          aria-label="Menu"
+    <form onSubmit={handleSubmit} className="space-y-6 font-serif">
+      {msg && (
+        <div
+          className={\`p-4 rounded-2xl text-xs font-bold text-center \${
+            msg.isError
+              ? 'bg-red-100 dark:bg-red-950/70 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800'
+              : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
+          }\`}
         >
-          <Menu className="w-6 h-6" />
-        </button>
+          {msg.text}
+        </div>
+      )}
 
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
-            <img
-              src="/Logo.jpg"
-              alt="EkhiTeka Logo"
-              className="w-full h-full object-cover"
+      <div className="space-y-4">
+        <div className="space-y-1.5">
+          <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+            {t.auth_full_name} *
+          </label>
+          <div className="relative">
+            <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              name="full_name"
+              required
+              defaultValue={currentProfile.full_name || ''}
+              className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
             />
           </div>
-          <div className="flex flex-col min-w-0">
-            <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
-              Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
-            </span>
-            <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              Quesería & Selección Gourmet
-            </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+              {t.auth_phone}
+            </label>
+            <div className="relative">
+              <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="tel"
+                name="phone"
+                defaultValue={currentProfile.phone || ''}
+                placeholder="600 000 000"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
+            </div>
           </div>
-        </Link>
 
-        {/* Enlaces Desktop */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 font-serif">
-          <Link
-            href="/tienda"
-            className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-bold transition-all whitespace-nowrap min-h-[38px] ${
-              pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }`}
-          >
-            <span>{t.nav_shop}</span>
-          </Link>
-
-          <Link
-            href="/regalos-gourmet"
-            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
-              pathname === '/regalos-gourmet'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }`}
-          >
-            <span className="block text-center">{t.nav_gourmet_gifts_line1}</span>
-            <span className="block text-center">{t.nav_gourmet_gifts_line2}</span>
-          </Link>
-
-          <Link
-            href="/experiencias"
-            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
-              pathname === '/experiencias'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }`}
-          >
-            <span className="block text-center">{t.nav_tastings_line1}</span>
-            <span className="block text-center">{t.nav_tastings_line2}</span>
-          </Link>
-
-          <Link
-            href="/regalos-empresa"
-            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
-              pathname === '/regalos-empresa'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }`}
-          >
-            <span className="block text-center">{t.nav_corporate_line1}</span>
-            <span className="block text-center">{t.nav_corporate_line2}</span>
-          </Link>
-
-          {user && (
-            <>
-              <Link
-                href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                className={`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
-                  pathname.includes('/pedidos')
-                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                    : hasUnseenOrderUpdates
-                    ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
-                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                }`}
-              >
-                <span>{t.nav_orders}</span>
-                {hasUnseenOrderUpdates && (
-                  <span className="w-2 h-2 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
-                )}
-              </Link>
-
-              {isSeller && (
-                <Link
-                  href="/vendedor/eventos"
-                  className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
-                    pathname === '/vendedor/eventos'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                  }`}
-                >
-                  <span>{t.nav_events}</span>
-                </Link>
-              )}
-
-              {isSeller && (
-                <Link
-                  href="/vendedor/productos/nuevo"
-                  className={`flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 rounded-2xl transition-all font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px] ${
-                    pathname === '/vendedor/productos/nuevo'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] shadow-xs border border-stone-800/10'
-                      : 'border-2 border-[#FFE259] bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
-                  }`}
-                >
-                  <span className="block text-center">{t.nav_add_product_line1}</span>
-                  <span className="block text-center">{t.nav_add_product_line2}</span>
-                </Link>
-              )}
-
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="flex items-center justify-center text-center px-3 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-2xl transition-all font-semibold uppercase tracking-[0.14em] text-[11px] whitespace-nowrap min-h-[38px]"
-                >
-                  <span>{t.nav_admin}</span>
-                </Link>
-              )}
-            </>
-          )}
-        </nav>
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+              {t.auth_town}
+            </label>
+            <div className="relative">
+              <MapPin className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                name="town"
+                defaultValue={currentProfile.town || ''}
+                placeholder="Lekeitio / Bizkaia"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* 2. LADO DERECHO */}
-      <div className="flex items-center gap-2 shrink-0">
-        {user ? (
-          <div className="flex items-center gap-2">
-            {(!profile || profile.role === 'comprador') && <CartNavButton />}
+      <div className="pt-2 flex justify-end">
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
+        >
+          <Check className="w-4 h-4" />
+          <span>{loading ? 'Guardando...' : t.common_save}</span>
+        </button>
+      </div>
+    </form>
+  );
+}
+`,
 
-            <Link
-              href="/chat"
-              className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
-                pathname.startsWith('/chat')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
-              }`}
-              title={t.nav_chats}
+  // 4. CART CONTEXT (Compatibilidad completa de métodos y estado)
+  'context/CartContext.tsx': `'use client';
+
+import React, { createContext, useContext, useSyncExternalStore, useMemo, useState, useCallback } from 'react';
+import type { Product } from '@/types/database';
+import { getProductImage } from '@/lib/productHelpers';
+
+export interface CartItem {
+  productId: string;
+  sellerId: string;
+  sellerName?: string;
+  name: string;
+  category?: string;
+  format?: string;
+  price: number;
+  imageUrl?: string | null;
+  originRegion?: string | null;
+  quantity: number;
+  product?: Product;
+}
+
+interface CartContextType {
+  items: CartItem[];
+  cart: CartItem[];
+  addToCart: (product: Product, sellerName?: string, quantity?: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  openCart: () => void;
+  closeCart: () => void;
+  totalItems: number;
+  totalPrice: number;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
+}
+
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+const CART_STORAGE_KEY = 'ekhiteka_cart';
+
+let cachedItems: CartItem[] = [];
+let cachedString = '';
+
+function subscribe(callback: () => void) {
+  window.addEventListener('ekhiteka_cart_updated', callback);
+  window.addEventListener('storage', callback);
+  return () => {
+    window.removeEventListener('ekhiteka_cart_updated', callback);
+    window.removeEventListener('storage', callback);
+  };
+}
+
+function getSnapshot(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY) || '[]';
+    if (raw !== cachedString) {
+      cachedString = raw;
+      cachedItems = JSON.parse(raw);
+    }
+    return cachedItems;
+  } catch {
+    return cachedItems;
+  }
+}
+
+const EMPTY_CART: CartItem[] = [];
+function getServerSnapshot(): CartItem[] {
+  return EMPTY_CART;
+}
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const saveItems = (newItems: CartItem[]) => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(newItems));
+      window.dispatchEvent(new Event('ekhiteka_cart_updated'));
+    } catch {
+      // Ignore
+    }
+  };
+
+  const addToCart = useCallback((product: Product, sellerName?: string, quantity = 1) => {
+    const existingIdx = items.findIndex((i) => (i.productId || i.product?.id) === product.id);
+    if (existingIdx > -1) {
+      const updated = [...items];
+      updated[existingIdx].quantity += quantity;
+      saveItems(updated);
+    } else {
+      const newItem: CartItem = {
+        productId: product.id,
+        sellerId: product.seller_id,
+        sellerName: sellerName || 'EkhiTeka Selección',
+        name: product.name,
+        category: product.category_id,
+        format: product.format,
+        price: Number(product.price),
+        imageUrl: getProductImage(product),
+        originRegion: product.origin_region,
+        quantity,
+        product,
+      };
+      saveItems([...items, newItem]);
+    }
+    setIsCartOpen(true);
+  }, [items]);
+
+  const removeFromCart = useCallback((productId: string) => {
+    saveItems(items.filter((i) => (i.productId || i.product?.id) !== productId));
+  }, [items]);
+
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+    const updated = items.map((i) =>
+      (i.productId || i.product?.id) === productId ? { ...i, quantity } : i
+    );
+    saveItems(updated);
+  }, [items, removeFromCart]);
+
+  const clearCart = useCallback(() => {
+    saveItems([]);
+  }, []);
+
+  const openCart = useCallback(() => setIsCartOpen(true), []);
+  const closeCart = useCallback(() => setIsCartOpen(false), []);
+
+  const totalItems = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
+  const totalPrice = useMemo(() => items.reduce((sum, i) => sum + Number(i.price || i.product?.price || 0) * i.quantity, 0), [items]);
+
+  return (
+    <CartContext.Provider
+      value={{
+        items,
+        cart: items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        openCart,
+        closeCart,
+        totalItems,
+        totalPrice,
+        isCartOpen,
+        setIsCartOpen,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+export function useCart() {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
+}
+`,
+
+  // 5. CART DRAWER COMPONENT (Soporta items y cart de forma robusta)
+  'components/CartDrawer.tsx': `'use client';
+
+import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
+import Link from 'next/link';
+import { X, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
+
+export function CartDrawer() {
+  const { items, isCartOpen, closeCart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+  const { t } = useLanguage();
+
+  if (!isCartOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[999999] overflow-hidden" style={{ zIndex: 999999 }}>
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+        onClick={closeCart}
+      />
+
+      <div className="fixed inset-y-0 right-0 max-w-md w-full bg-white dark:bg-stone-900 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto border-l border-stone-200 dark:border-stone-800 animate-in slide-in-from-right duration-300">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259]" />
+              <h2 className="font-serif font-black text-lg text-stone-900 dark:text-stone-100">
+                {t.cart_title} ({totalItems})
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={closeCart}
+              className="p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors cursor-pointer"
             >
-              <MessageCircle className="w-4 h-4" />
-              {unreadMessagesCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
-                  {unreadMessagesCount}
-                </span>
-              )}
-            </Link>
-
-            <Link
-              href="/perfil"
-              className={`p-2.5 rounded-2xl border transition-colors shrink-0 ${
-                pathname === '/perfil'
-                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
-              }`}
-              title={t.nav_profile}
-            >
-              <User className="w-4 h-4" />
-            </Link>
-
-            <form action={signout} className="shrink-0">
-              <button
-                type="submit"
-                className="p-2.5 rounded-2xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
-                title={t.nav_logout}
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </form>
+              <X className="w-5 h-5" />
+            </button>
           </div>
-        ) : (
-          <div className="hidden sm:flex items-center gap-2">
+
+          {items.length > 0 ? (
+            <div className="space-y-4 divide-y divide-stone-100 dark:divide-stone-800">
+              {items.map((item) => {
+                const id = item.productId || item.product?.id || '';
+                const name = item.name || item.product?.name || 'Producto';
+                const price = Number(item.price || item.product?.price || 0);
+                const img = item.imageUrl || item.product?.image_url || '/images/secciones/Quesos.JPG';
+
+                return (
+                  <div key={id} className="pt-4 first:pt-0 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200 dark:border-stone-700">
+                        <img
+                          src={img}
+                          alt={name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 truncate">
+                          {name}
+                        </p>
+                        <p className="text-[11px] text-stone-500 dark:text-stone-400 font-serif">
+                          {price.toFixed(2)} €
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 font-serif shrink-0">
+                      <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-800 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(id, Math.max(1, item.quantity - 1))}
+                          className="w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="w-5 text-center text-xs font-black">
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(id, item.quantity + 1)}
+                          className="w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => removeFromCart(id)}
+                        className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="py-12 text-center space-y-3">
+              <ShoppingBag className="w-12 h-12 text-stone-300 dark:text-stone-700 mx-auto" />
+              <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">
+                {t.cart_empty}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {items.length > 0 && (
+          <div className="pt-6 border-t border-stone-200 dark:border-stone-800 space-y-4 font-serif">
+            <div className="flex justify-between items-center text-base font-black text-stone-900 dark:text-stone-100">
+              <span>{t.cart_total}</span>
+              <span>{totalPrice.toFixed(2)} €</span>
+            </div>
+
             <Link
-              href="/login"
-              className="px-4 py-2.5 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              href="/cesta"
+              onClick={closeCart}
+              className="w-full py-3.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 hover:scale-102"
             >
-              {t.nav_login}
-            </Link>
-            <Link
-              href="/register"
-              className="px-4 py-2.5 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
-            >
-              {t.nav_register}
+              <span>{t.cart_checkout}</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         )}
       </div>
-
-      {/* 3. MENÚ MÓVIL */}
-      {mounted && mobileMenuOpen && createPortal(
-        <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-
-          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-stone-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5]">
-                    <img
-                      src="/Logo.jpg"
-                      alt="EkhiTeka"
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-serif font-bold text-lg text-white tracking-wider">
-                      Ekhi<span className="text-[#FFE259]">Teka</span>
-                    </span>
-                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400">
-                      Lekeitio · Bizkaia
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full text-stone-300 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
-                  aria-label="Close"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="space-y-2 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  {t.nav_explore_selection}
-                </p>
-                <Link
-                  href="/tienda"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
-                    pathname === '/tienda'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }`}
-                >
-                  <span>{t.nav_shop}</span>
-                </Link>
-                <Link
-                  href="/regalos-gourmet"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
-                    pathname === '/regalos-gourmet'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }`}
-                >
-                  <span>{t.nav_gourmet_gifts}</span>
-                </Link>
-                <Link
-                  href="/experiencias"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
-                    pathname === '/experiencias'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }`}
-                >
-                  <span>{t.nav_tastings_experiences}</span>
-                </Link>
-                <Link
-                  href="/regalos-empresa"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
-                    pathname === '/regalos-empresa'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }`}
-                >
-                  <span>{t.nav_corporate_gifts}</span>
-                </Link>
-              </div>
-
-              {/* SECCIÓN TU CUENTA */}
-              <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  {t.nav_your_account}
-                </p>
-                {user ? (
-                  <>
-                    {/* 1. Pedidos */}
-                    <Link
-                      href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
-                        pathname.includes('/pedidos')
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : hasUnseenOrderUpdates
-                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }`}
-                    >
-                      <span>{t.nav_orders}</span>
-                      {hasUnseenOrderUpdates && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black uppercase">
-                          Nuevo
-                        </span>
-                      )}
-                    </Link>
-
-                    {/* 2. Eventos */}
-                    {isSeller && (
-                      <Link
-                        href="/vendedor/eventos"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
-                          pathname === '/vendedor/eventos'
-                            ? 'bg-[#FFE259] text-[#1D1D1B]'
-                            : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                        }`}
-                      >
-                        <span>{t.nav_events}</span>
-                      </Link>
-                    )}
-
-                    {/* 3. Añadir Producto */}
-                    {isSeller && (
-                      <Link
-                        href="/vendedor/productos/nuevo"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all ${
-                          pathname === '/vendedor/productos/nuevo'
-                            ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
-                            : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
-                        }`}
-                      >
-                        <span>{t.nav_add_product}</span>
-                      </Link>
-                    )}
-
-                    {/* 4. Mensajes */}
-                    <Link
-                      href="/chat"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
-                        pathname.startsWith('/chat')
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }`}
-                    >
-                      <span>{t.nav_chats}</span>
-                      {unreadMessagesCount > 0 && (
-                        <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
-                          {unreadMessagesCount}
-                        </span>
-                      )}
-                    </Link>
-
-                    {/* 5. Perfil */}
-                    <Link
-                      href="/perfil"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
-                        pathname === '/perfil'
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }`}
-                    >
-                      <span>{t.nav_profile}</span>
-                    </Link>
-
-                    {/* 6. Cerrar Sesión */}
-                    <form action={signout} className="pt-2">
-                      <button
-                        type="submit"
-                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
-                      >
-                        <span>{t.nav_logout}</span>
-                      </button>
-                    </form>
-                  </>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2 pt-1 font-serif">
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-white hover:border-[#FFE259] hover:text-[#FFE259] transition-all bg-stone-850"
-                    >
-                      {t.nav_login}
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#FFE259] font-black text-xs tracking-[0.14em] uppercase text-[#1D1D1B] shadow-md hover:scale-102 transition-all"
-                    >
-                      {t.nav_register}
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
-              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
-                <Store className="w-3.5 h-3.5 text-[#FFE259]" />
-                <span>Quesería & Tienda en Lekeitio</span>
-              </div>
-              <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
-              <p className="font-semibold text-[#FFE259]">WhatsApp: +34 600 000 000</p>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
     </div>
   );
 }
 `,
 
-  // 3. CATEGORY CIRCLE GRID (Títulos y subtítulos dinámicos)
-  'components/CategoryCircleGrid.tsx': `'use client';
+  // 6. REGISTER PAGE (Llamada limpia a la action signup)
+  'app/register/page.tsx': `'use client';
 
+import { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import type { Category } from '@/types/database';
+import { signup } from '@/app/actions/auth';
+import { UserPlus, Mail, Lock, User, Phone, MapPin, AlertCircle } from 'lucide-react';
 
-interface CategoryCircleGridProps {
-  categories: Category[];
-  selectedCategory?: string;
-  onSelectCategory?: (categoryId: string) => void;
-}
+export default function RegisterPage() {
+  const { t } = useLanguage();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-export function CategoryCircleGrid({
-  categories,
-  selectedCategory = 'all',
-  onSelectCategory,
-}: CategoryCircleGridProps) {
-  const { t, language } = useLanguage();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-  const getCategoryName = (cat: Category) => {
-    if (language === 'eu') return cat.name_eu;
-    if (language === 'fr') return cat.name_fr;
-    if (language === 'en') return cat.name_en;
-    return cat.name_es;
-  };
+    const formData = new FormData(e.currentTarget);
+    const res = await signup(formData);
+    setLoading(false);
 
-  const getCategorySubtitle = (slug: string) => {
-    switch (slug) {
-      case 'quesos': return t.sub_quesos;
-      case 'atun': return t.sub_atun;
-      case 'salazones': return t.sub_salazones;
-      case 'gildas': return t.sub_gildas;
-      case 'cerveza': return t.sub_cerveza;
-      case 'txakoli': return t.sub_txakoli;
-      case 'sidra': return t.sub_sidra;
-      default: return 'Gourmet Selection';
+    if (res?.error) {
+      setError(res.error);
     }
   };
 
   return (
-    <section className="space-y-6 pt-2">
-      <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-        <div>
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-            {t.cat_explore}
-          </span>
-          <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 uppercase font-serif tracking-tight">
-            {t.cat_section_title}
-          </h2>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
-        {categories.map((cat) => {
-          const isSelected = selectedCategory === cat.id;
-          return (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => onSelectCategory?.(cat.id)}
-              className={`group relative p-3 sm:p-4 rounded-3xl border-2 text-center transition-all flex flex-col items-center justify-between cursor-pointer hover:scale-103 shadow-xs ${
-                isSelected
-                  ? 'bg-[#FFE259] border-stone-900 dark:border-white shadow-md'
-                  : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259]'
-              }`}
-            >
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] mb-2 p-0.5 bg-[#FAF8F5]">
-                <img
-                  src={cat.image_url || '/images/secciones/Quesos.JPG'}
-                  alt={getCategoryName(cat)}
-                  className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-
-              <div className="space-y-0.5 min-w-0 w-full">
-                <span className={`block font-serif font-black text-xs sm:text-[13px] truncate leading-tight ${
-                  isSelected ? 'text-[#1D1D1B]' : 'text-stone-900 dark:text-stone-100 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259]'
-                }`}>
-                  {getCategoryName(cat)}
-                </span>
-                <span className={`block text-[9.5px] font-sans font-bold uppercase tracking-wider truncate ${
-                  isSelected ? 'text-stone-800' : 'text-stone-400 dark:text-stone-500'
-                }`}>
-                  {getCategorySubtitle(cat.slug)}
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-`,
-
-  // 4. EXPERIENCE BANNERS (Banners en Home 100% traducidos)
-  'components/ExperienceBanners.tsx': `'use client';
-
-import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
-import { MessageCircle, Sparkles, Gift } from 'lucide-react';
-
-export function ExperienceBanners() {
-  const { t } = useLanguage();
-
-  return (
-    <section id="experiencias" className="space-y-8 pt-8">
-      <div>
-        <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-          {t.exp_banner_badge}
-        </span>
-        <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif">
-          {t.exp_banner_title}
-        </h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
-        {/* Banner 1: Catas en Lekeitio */}
-        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Catas.JPG"
-                alt={t.exp_b1_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
-                {t.exp_b1_title}
-              </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
-                {t.exp_b1_desc}
-              </p>
-            </div>
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
+      <div className="max-w-md w-full bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-8 sm:p-10 space-y-8 shadow-xl font-serif">
+        <div className="text-center space-y-2">
+          <div className="w-12 h-12 rounded-2xl bg-[#FFE259] text-[#1D1D1B] flex items-center justify-center mx-auto shadow-xs">
+            <UserPlus className="w-6 h-6" />
           </div>
-
-          <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20información%20sobre%20las%20catas%20presenciales%20de%20EkhiTeka"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>{t.exp_b1_btn}</span>
-          </a>
-        </div>
-
-        {/* Banner 2: Cheese Corners */}
-        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Mesas.JPG"
-                alt={t.exp_b2_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
-                {t.exp_b2_title}
-              </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
-                {t.exp_b2_desc}
-              </p>
-            </div>
-          </div>
-
-          <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20presupuesto%20para%20un%20evento/boda%20con%20mesa%20de%20quesos"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 font-black text-xs transition-all shadow-xs"
-          >
-            <Sparkles className="w-4 h-4 text-[#FFE259]" />
-            <span>{t.exp_b2_btn}</span>
-          </a>
-        </div>
-
-        {/* Banner 3: Cestas y Regalos */}
-        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Cestas.JPG"
-                alt={t.exp_b3_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
-                {t.exp_b3_title}
-              </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
-                {t.exp_b3_desc}
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/regalos-gourmet"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
-          >
-            <Gift className="w-4 h-4" />
-            <span>{t.exp_b3_btn}</span>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-`,
-
-  // 5. CUSTOMER REVIEWS (Iritziak & Testimonios en 4 idiomas)
-  'components/CustomerReviews.tsx': `'use client';
-
-import { useLanguage } from '@/context/LanguageContext';
-import { Star, Quote } from 'lucide-react';
-
-export function CustomerReviews() {
-  const { t } = useLanguage();
-
-  const reviews = [
-    {
-      name: 'Miren Agirre',
-      town: 'Lekeitio',
-      rating: 5,
-      comment: t.rev1_comment,
-      date: t.rev1_date,
-    },
-    {
-      name: 'Iñigo Goikoetxea',
-      town: 'Donostia',
-      rating: 5,
-      comment: t.rev2_comment,
-      date: t.rev2_date,
-    },
-    {
-      name: 'Elena Fernández',
-      town: 'Madrid',
-      rating: 5,
-      comment: t.rev3_comment,
-      date: t.rev3_date,
-    },
-  ];
-
-  return (
-    <section id="opiniones" className="space-y-6 pt-8 pb-4">
-      <div className="text-center max-w-xl mx-auto space-y-2">
-        <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-          {t.reviews_badge}
-        </span>
-        <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight font-serif">
-          {t.reviews_title}
-        </h2>
-        <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">
-          {t.reviews_subtitle}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
-        {reviews.map((rev, i) => (
-          <div
-            key={i}
-            className="manduca-card bg-white dark:bg-[#1C1B19] p-6 rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] shadow-xs flex flex-col justify-between space-y-4"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  {[...Array(rev.rating)].map((_, idx) => (
-                    <Star key={idx} className="w-4 h-4 fill-[#FFE259] text-[#C68D07]" />
-                  ))}
-                </div>
-                <span className="text-[10px] font-bold text-stone-400">{rev.date}</span>
-              </div>
-              <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed font-medium italic">
-                "{rev.comment}"
-              </p>
-            </div>
-
-            <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
-              <div>
-                <span className="font-black text-xs text-stone-900 dark:text-stone-100 block">
-                  {rev.name}
-                </span>
-                <span className="text-[10px] font-bold text-stone-500">
-                  {rev.town} · {t.reviews_verified_buyer}
-                </span>
-              </div>
-              <Quote className="w-5 h-5 text-stone-300 dark:text-stone-700 opacity-60" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-`,
-
-  // 6. HOME PAGE (Página de Inicio con soporte completo a los 4 idiomas)
-  'app/page.tsx': `'use client';
-
-import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
-import {
-  Sparkles,
-  ShoppingBag,
-  Gift,
-  ChevronRight,
-  MessageCircle,
-} from 'lucide-react';
-
-export default function HomePage() {
-  const { t } = useLanguage();
-
-  return (
-    <div className="space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero Principal de Bienvenida */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-18 border-2 border-stone-800 shadow-2xl min-h-[460px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/secciones/Tienda.JPG"
-            alt="EkhiTeka Quesería Gourmet Lekeitio"
-            className="w-full h-full object-cover object-center scale-100"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
-        </div>
-
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-          <div className="lg:col-span-8 space-y-6">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
-              <Sparkles className="w-3.5 h-3.5" /> {t.home_hero_badge}
-            </span>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif text-white drop-shadow-md">
-              Ekhi<span className="text-[#FFE259]">Teka</span>
-              <span className="block text-2xl sm:text-3xl lg:text-4xl font-light text-stone-200 mt-2">
-                {t.home_hero_subtitle}
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-white/95 leading-relaxed max-w-xl font-medium drop-shadow-md">
-              {t.home_hero_desc}
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link
-                href="/tienda"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 uppercase tracking-wider font-serif"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>{t.home_explore_btn}</span>
-              </Link>
-
-              <Link
-                href="/regalos-gourmet"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105 uppercase tracking-wider font-serif"
-              >
-                <Gift className="w-4 h-4 text-[#FFE259]" />
-                <span>{t.home_gourmet_gifts_btn}</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] hover:scale-105 transition-transform duration-500">
-              <img
-                src="/Logo.jpg"
-                alt="EkhiTeka Lekeitio"
-                className="w-full h-full object-cover rounded-full"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Los 4 Pilares de EkhiTeka */}
-      <section className="space-y-6 font-serif">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-            {t.home_pillars_badge}
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-100 uppercase tracking-tight">
-            {t.home_pillars_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans">
-            {t.home_pillars_desc}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Tarjeta 1: Tienda */}
-          <Link
-            href="/tienda"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Quesos.JPG"
-                alt={t.home_card1_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card1_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card1_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card1_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card1_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card1_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Tarjeta 2: Regalos Gourmet */}
-          <Link
-            href="/regalos-gourmet"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Cestas.JPG"
-                alt={t.home_card2_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card2_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card2_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card2_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card2_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card2_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Tarjeta 3: Catas & Experiencias */}
-          <Link
-            href="/experiencias"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Catas.JPG"
-                alt={t.home_card3_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card3_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card3_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card3_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card3_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card3_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Tarjeta 4: Regalos de Empresa */}
-          <Link
-            href="/regalos-empresa"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Empresas.JPG"
-                alt={t.home_card4_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card4_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card4_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card4_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card4_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card4_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* 3. Nuestra Tienda Física en Lekeitio */}
-      <section className="relative rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border-2 border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 overflow-hidden shadow-sm">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-6 space-y-4">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              {t.shop_visit_subtitle}
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif">
-              {t.shop_visit_title}
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              {t.shop_visit_desc}
-            </p>
-            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
-              <div className="flex items-center gap-2">
-                <span className="text-base">📍</span>
-                <span>Gamarra Kalea 4, Lekeitio · Bizkaia</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-base">🕒</span>
-                <span>{t.footer_schedule_weekdays}</span>
-              </div>
-            </div>
-            <div className="pt-2 flex flex-wrap gap-3 font-serif">
-              <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
-              >
-                <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-                <span>{t.shop_visit_contact}</span>
-              </a>
-              <Link
-                href="/tienda"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>{t.nav_shop}</span>
-              </Link>
-            </div>
-          </div>
-          <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 h-64 sm:h-80 group">
-              <img
-                src="/images/secciones/Tienda.JPG"
-                alt="Tienda EkhiTeka Lekeitio"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute top-4 right-4 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black rounded-full uppercase tracking-wider shadow-md">
-                Lekeitio Centro
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-`,
-
-  // 7. REGALOS GOURMET (Página 100% traducida)
-  'app/regalos-gourmet/page.tsx': `'use client';
-
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useLanguage } from '@/context/LanguageContext';
-import { ProductCard } from '@/components/ProductCard';
-import type { ProductWithSeller } from '@/types/database';
-import {
-  Gift,
-  Sparkles,
-  Package,
-  CreditCard,
-  MessageCircle,
-  Truck,
-  HeartHandshake,
-} from 'lucide-react';
-
-export default function RegalosGourmetPage() {
-  const { t } = useLanguage();
-  const [products, setProducts] = useState<ProductWithSeller[]>([]);
-  const [isSeller, setIsSeller] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    async function loadData() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-        if (profile?.role === 'vendedor' || profile?.role === 'admin') {
-          setIsSeller(true);
-        }
-      }
-      const { data } = await supabase
-        .from('products')
-        .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (data) {
-        const filtered = (data as unknown as ProductWithSeller[]).filter((p) => {
-          const cat = (p.category_id || '').toLowerCase();
-          const name = (p.name || '').toLowerCase();
-          const desc = (p.description || '').toLowerCase();
-          return (
-            cat === 'cesta' ||
-            cat === 'tarjeta_regalo' ||
-            cat === 'regalos_gourmet' ||
-            cat === 'pack' ||
-            name.includes('regalo') ||
-            name.includes('cesta') ||
-            name.includes('pack') ||
-            name.includes('lote') ||
-            name.includes('tarjeta') ||
-            desc.includes('regalo') ||
-            desc.includes('cesta')
-          );
-        });
-        setProducts(filtered);
-      }
-    }
-    loadData();
-  }, []);
-
-  return (
-    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/secciones/Cestas.JPG"
-            alt={t.gifts_hero_title}
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/30 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
-        </div>
-
-        <div className="relative z-10 max-w-2xl space-y-4 text-white">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
-            <Sparkles className="w-3.5 h-3.5" /> {t.gifts_hero_badge}
-          </span>
-
-          <h1 className="text-3xl sm:text-5xl font-black font-serif tracking-tight leading-tight">
-            {t.gifts_hero_title} <span className="text-[#FFE259]">{t.gifts_hero_title_highlight}</span>
+          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100">
+            {t.nav_register}
           </h1>
-
-          <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
-            {t.gifts_hero_desc}
+          <p className="text-xs text-stone-500 dark:text-stone-400">
+            Crea tu cuenta para disfrutar de nuestros quesos y experiencias.
           </p>
-
-          {!isSeller && (
-            <div className="pt-2 flex flex-wrap gap-3">
-              <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20encargar%20un%20regalo%20gourmet%20personalizado"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-lg hover:scale-105 font-serif"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>{t.gifts_whatsapp_btn}</span>
-              </a>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 2. Tres Bloques de Experiencias de Regalo */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-              <Package className="w-6 h-6" />
-            </div>
-            <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-              {t.gifts_card1_title}
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              {t.gifts_card1_desc}
-            </p>
-          </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2">
-            <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
-            <span>{t.gifts_card1_feature}</span>
-          </div>
         </div>
 
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-              <Gift className="w-6 h-6" />
+        {error && (
+          <div className="p-3.5 bg-red-100 dark:bg-red-950/70 border border-red-300 dark:border-red-800 rounded-2xl text-xs font-bold text-red-800 dark:text-red-200 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+              {t.auth_full_name} *
+            </label>
+            <div className="relative">
+              <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                name="full_name"
+                required
+                placeholder="Nombre y Apellidos"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
             </div>
-            <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-              {t.gifts_card2_title}
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              {t.gifts_card2_desc}
-            </p>
           </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
-            <span>{t.gifts_card2_feature}</span>
-          </div>
-        </div>
 
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-              <CreditCard className="w-6 h-6" />
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+              {t.auth_email} *
+            </label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="tu@email.com"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
             </div>
-            <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-              {t.gifts_card3_title}
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              {t.gifts_card3_desc}
-            </p>
           </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2">
-            <HeartHandshake className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
-            <span>{t.gifts_card3_feature}</span>
+
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+              {t.auth_password} *
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="password"
+                name="password"
+                required
+                placeholder="Mínimo 6 caracteres"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
+            </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+                {t.auth_phone}
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="600 000 000"
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-black uppercase text-stone-700 dark:text-stone-300">
+                {t.auth_town}
+              </label>
+              <input
+                type="text"
+                name="town"
+                placeholder="Lekeitio / Bilbao"
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
+          >
+            {loading ? 'Creando cuenta...' : t.nav_register}
+          </button>
+        </form>
+
+        <div className="text-center pt-2 border-t border-stone-100 dark:border-stone-800">
+          <Link
+            href="/login"
+            className="text-xs font-bold text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100"
+          >
+            {t.auth_have_account}
+          </Link>
         </div>
-      </section>
-
-      {/* 3. Catálogo */}
-      {products.length > 0 && (
-        <section className="space-y-6 pt-2 font-serif">
-          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              {t.gifts_catalog_badge}
-            </span>
-            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
-              {t.gifts_catalog_title}
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} isSeller={isSeller} />
-            ))}
-          </div>
-        </section>
-      )}
+      </div>
     </div>
   );
 }
 `,
 
-  // 8. REGALOS DE EMPRESA (Página 100% traducida)
-  'app/regalos-empresa/page.tsx': `'use client';
-
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useLanguage } from '@/context/LanguageContext';
-import {
-  Briefcase,
-  Building2,
-  Sparkles,
-  MessageCircle,
-  Truck,
-  CheckCircle2,
-  Users,
-  ShieldCheck,
-} from 'lucide-react';
-
-export default function RegalosEmpresaPage() {
-  const { t } = useLanguage();
-  const [isSeller, setIsSeller] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    async function checkUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-        if (profile?.role === 'vendedor' || profile?.role === 'admin') {
-          setIsSeller(true);
-        }
-      }
-    }
-    checkUser();
-  }, []);
-
-  return (
-    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/secciones/Empresas.JPG"
-            alt={t.corp_hero_title}
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/30 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
-        </div>
-
-        <div className="relative z-10 max-w-2xl space-y-4 text-white">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
-            <Building2 className="w-3.5 h-3.5" /> {t.corp_hero_badge}
-          </span>
-
-          <h1 className="text-3xl sm:text-5xl font-black font-serif tracking-tight leading-tight">
-            {t.corp_hero_title} <span className="text-[#FFE259]">{t.corp_hero_title_highlight}</span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
-            {t.corp_hero_desc}
-          </p>
-
-          {!isSeller && (
-            <div className="pt-2">
-              <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20solicitar%20un%20presupuesto%20para%20Regalos%20de%20Empresa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-lg hover:scale-105 font-serif"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>{t.corp_whatsapp_btn}</span>
-              </a>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 2. Pilares */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-            <Briefcase className="w-6 h-6" />
-          </div>
-          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-            {t.corp_card1_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-            {t.corp_card1_desc}
-          </p>
-        </div>
-
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-            <Users className="w-6 h-6" />
-          </div>
-          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-            {t.corp_card2_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-            {t.corp_card2_desc}
-          </p>
-        </div>
-
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-            {t.corp_card3_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-            {t.corp_card3_desc}
-          </p>
-        </div>
-      </section>
-
-      {/* 3. Garantías de Logística */}
-      <section className="rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 shadow-sm space-y-6 font-serif">
-        <div className="max-w-2xl space-y-2">
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-            {t.corp_logistics_badge}
-          </span>
-          <h3 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100">
-            {t.corp_logistics_title}
-          </h3>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-            {t.corp_logistics_desc}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
-            <Truck className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
-              {t.corp_logistics_feat1}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
-            <ShieldCheck className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
-              {t.corp_logistics_feat2}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
-            <CheckCircle2 className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
-              {t.corp_logistics_feat3}
-            </span>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-`,
-
-  // 9. PRODUCT DETAIL (Ficha de Producto con traducciones)
-  'app/producto/[id]/page.tsx': `'use client';
-
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { useLanguage } from '@/context/LanguageContext';
+  // 7. PROFILE PAGE (Pasa userProfile de forma segura al componente)
+  'app/perfil/page.tsx': `import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { ProfileForm } from '@/components/ProfileForm';
+import type { Profile } from '@/types/database';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { ProductCard } from '@/components/ProductCard';
-import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
-import { getProductImage } from '@/lib/productHelpers';
-import type { ProductWithSeller } from '@/types/database';
-import {
-  ArrowLeft,
-  MapPin,
-  Truck,
-  Store,
-  ShieldCheck,
-  MessageCircle,
-  Ticket,
-} from 'lucide-react';
 
-export default function ProductDetailPage() {
-  const params = useParams();
-  const id = params?.id as string;
-  const { t } = useLanguage();
+export default async function ProfilePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const [product, setProduct] = useState<ProductWithSeller | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<ProductWithSeller[]>([]);
-  const [isSeller, setIsSeller] = useState(false);
-  const [loading, setLoading] = useState(true);
+  if (!user) redirect('/login');
 
-  useEffect(() => {
-    if (!id) return;
-    const supabase = createClient();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
 
-    async function fetchData() {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-        if (profile?.role === 'vendedor' || profile?.role === 'admin') {
-          setIsSeller(true);
-        }
-      }
-
-      const { data: prod } = await supabase
-        .from('products')
-        .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone, role)')
-        .eq('id', id)
-        .single();
-
-      if (prod) {
-        setProduct(prod as unknown as ProductWithSeller);
-
-        const { data: rel } = await supabase
-          .from('products')
-          .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
-          .eq('category_id', prod.category_id)
-          .neq('id', prod.id)
-          .eq('is_active', true)
-          .limit(4);
-
-        setRelatedProducts((rel || []) as unknown as ProductWithSeller[]);
-      }
-      setLoading(false);
-    }
-
-    fetchData();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto py-20 text-center font-serif text-xs text-stone-400">
-        {t.common_loading}
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="max-w-7xl mx-auto py-20 text-center space-y-4 font-serif">
-        <h2 className="text-xl font-bold">{t.prod_no_results}</h2>
-        <Link href="/tienda" className="text-xs underline text-[#C68D07]">
-          {t.prod_back_to_selection}
-        </Link>
-      </div>
-    );
-  }
-
-  const isEvent =
-    product.category_id === 'catas' ||
-    product.category_id === 'cata_presencial' ||
-    product.category_id === 'experiencia' ||
-    product.name.toLowerCase().includes('cata');
-
-  const imageUrl = getProductImage(product);
+  const userProfile = profile as Profile;
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
-      <div>
+    <div className="max-w-xl mx-auto py-6 space-y-6">
+      <div className="flex items-center gap-3">
         <Link
-          href="/tienda"
-          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 hover:text-stone-950 dark:hover:text-stone-100 transition-colors p-2 rounded-xl bg-stone-100 dark:bg-stone-850 border border-stone-200 dark:border-stone-700"
+          href="/"
+          className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:text-stone-900 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>{t.prod_back_to_selection}</span>
+          <ArrowLeft className="w-5 h-5" />
         </Link>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        <div className="lg:col-span-6 space-y-4">
-          <div className="relative aspect-4/3 sm:aspect-square w-full rounded-3xl overflow-hidden border-2 border-stone-200 dark:border-stone-800 bg-[#FAF7F2] dark:bg-stone-850 shadow-lg">
-            <img
-              src={imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-            {product.origin_region && (
-              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-xs text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-md">
-                <MapPin className="w-3.5 h-3.5 text-[#FFE259]" />
-                <span>{product.origin_region}</span>
-              </span>
-            )}
-            {isEvent && (
-              <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-xl uppercase tracking-wider shadow-md">
-                <Ticket className="w-3.5 h-3.5" />
-                <span>{product.stock} {t.event_seats_available}</span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="lg:col-span-6 space-y-6">
-          <div className="space-y-2 border-b border-stone-200 dark:border-stone-800 pb-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              EkhiTeka Gourmet · Lekeitio
-            </span>
-            <h1 className="text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-100 leading-tight">
-              {product.name}
-            </h1>
-            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-bold text-stone-500 dark:text-stone-400">
-              {product.format && (
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
-                  {t.prod_format_label}: {product.format}
-                </span>
-              )}
-              {product.weight_g && (
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
-                  {t.prod_weight_label}: {product.weight_g}g
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100">
-                {Number(product.price).toFixed(2)} €
-              </span>
-              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
-                {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
-              </span>
-            </div>
-
-            <ProductDetailAddToCart
-              product={product}
-              isSeller={isSeller}
-            />
-          </div>
-
-          {product.description && (
-            <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-              <h3 className="text-xs font-black uppercase tracking-wider text-stone-800 dark:text-stone-200">
-                {t.prod_details}
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium whitespace-pre-line font-sans">
-                {product.description}
-              </p>
-            </div>
-          )}
-
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 flex items-center justify-between gap-4">
-            <div className="space-y-0.5">
-              <p className="text-xs font-bold text-stone-900 dark:text-stone-100">
-                {t.prod_doubt_title}
-              </p>
-              <p className="text-[11px] text-stone-500 dark:text-stone-400">
-                {t.prod_doubt_desc}
-              </p>
-            </div>
-            <Link
-              href={`/chat/${product.seller_id}?product_id=${product.id}`}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-stone-900 dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 text-xs font-black uppercase tracking-wider transition-all shrink-0 shadow-xs"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>{t.prod_ask_btn}</span>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-600 dark:text-stone-400">
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
-              <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-              <span>{t.prod_guarantee_cold}</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
-              <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-              <span>{t.prod_guarantee_pickup}</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
-              <ShieldCheck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-              <span>{t.prod_guarantee_km0}</span>
-            </div>
-          </div>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
+            Mi Perfil
+          </h1>
+          <p className="text-xs text-stone-500 dark:text-stone-400">
+            Gestiona tus datos de contacto y preferencias.
+          </p>
         </div>
       </div>
 
-      {relatedProducts.length > 0 && (
-        <section className="space-y-6 pt-10 border-t border-stone-200 dark:border-stone-800">
-          <div className="pb-2">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              {t.prod_related_subtitle}
-            </span>
-            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
-              {t.prod_related_title}
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {relatedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} isSeller={isSeller} />
-            ))}
-          </div>
-        </section>
-      )}
+      <ProfileForm userProfile={userProfile} profile={userProfile} />
     </div>
   );
 }
-`
+`,
 };
 
-console.log('📦 Actualizando traducciones cuatrilingües completas en EkhiTeka...');
-
+// Generar todos los archivos en disco
 Object.entries(files).forEach(([filePath, content]) => {
   const fullPath = path.join(process.cwd(), filePath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-  fs.writeFileSync(fullPath, content.trim(), 'utf8');
-  console.log(`✅ Archivo actualizado: ${filePath}`);
+  fs.writeFileSync(fullPath, content.trimStart(), 'utf8');
+  console.log(`✓ Actualizado: ${filePath}`);
 });
 
-console.log('\n🎉 ¡Todos los textos, menús, tarjetas e información están 100% traducidos a los 4 idiomas!');
+console.log('\n🎉 ¡Todos los componentes, acciones y páginas se han generado y corregido con éxito!');

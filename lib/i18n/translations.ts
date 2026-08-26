@@ -158,7 +158,7 @@ export interface TranslationDict {
   exp_b3_desc: string;
   exp_b3_btn: string;
 
-  // Experience Page Hero
+  // Experiences Page (Cards & Banners)
   exp_hero_badge: string;
   exp_hero_title: string;
   exp_hero_title_highlight: string;
@@ -453,7 +453,7 @@ export const translations: Record<Language, TranslationDict> = {
     sub_quesos: 'Artisau & Afinatuak',
     sub_atun: 'Kantauri Kostaldea',
     sub_salazones: 'Antxoak & Gatzadurak',
-    sub_gildas: 'Gildas & Ozpinetakoak',
+    sub_gildas: 'Gildak & Ozpinetakoak',
     sub_cerveza: 'Garagardo Bereziak',
     sub_txakoli: 'Bizkaiko Txakolina',
     sub_sidra: 'Euskal Sagardoa',
@@ -1754,7 +1754,7 @@ export const translations: Record<Language, TranslationDict> = {
     reviews_title: 'Avis de Nos Clients',
     reviews_subtitle: 'Ce que disent les amateurs de bon fromage ayant testé notre sélection',
     reviews_verified_buyer: 'Acheteur vérifié',
-    rev1_comment: 'Les fromages sont extraordinaires. Affinage impeccable et colis frais reçu en 24h. De loin la meilleure fromagerie de Biscaye.',
+    rev1_comment: 'Les fromages sont extraordinaires. Affinage缩peccable et colis frais reçu en 24h. De loin la meilleure fromagerie de Biscaye.',
     rev1_date: 'Il y a 3 jours',
     rev2_comment: 'J\'ai commandé un plateau pour un anniversaire, les invités étaient conquis. Accueil chaleureux et conseils parfaits sur WhatsApp.',
     rev2_date: 'Il y a 1 semaine',

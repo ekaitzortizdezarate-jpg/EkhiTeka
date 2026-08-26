@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { X, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 
 export function CartDrawer() {
-  const { cart, isCartOpen, closeCart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+  const { items, isCartOpen, closeCart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
   const { t } = useLanguage();
 
   if (!isCartOpen) return null;
@@ -30,65 +30,72 @@ export function CartDrawer() {
             <button
               type="button"
               onClick={closeCart}
-              className="p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+              className="p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {cart.length > 0 ? (
+          {items.length > 0 ? (
             <div className="space-y-4 divide-y divide-stone-100 dark:divide-stone-800">
-              {cart.map((item) => (
-                <div key={item.product.id} className="pt-4 first:pt-0 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-stone-100 shrink-0 border border-stone-200 dark:border-stone-700">
-                      <img
-                        src={item.product.image_url || '/images/secciones/Quesos.JPG'}
-                        alt={item.product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 truncate">
-                        {item.product.name}
-                      </p>
-                      <p className="text-[11px] text-stone-500 dark:text-stone-400 font-serif">
-                        {Number(item.product.price).toFixed(2)} €
-                      </p>
-                    </div>
-                  </div>
+              {items.map((item) => {
+                const id = item.productId || item.product?.id || '';
+                const name = item.name || item.product?.name || 'Producto';
+                const price = Number(item.price || item.product?.price || 0);
+                const img = item.imageUrl || item.product?.image_url || '/images/secciones/Quesos.JPG';
 
-                  <div className="flex items-center gap-2 font-serif shrink-0">
-                    <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-800 p-0.5">
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
-                        className="w-5 h-5 flex items-center justify-center text-xs font-bold"
-                      >
-                        -
-                      </button>
-                      <span className="w-5 text-center text-xs font-black">
-                        {item.quantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        className="w-5 h-5 flex items-center justify-center text-xs font-bold"
-                      >
-                        +
-                      </button>
+                return (
+                  <div key={id} className="pt-4 first:pt-0 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200 dark:border-stone-700">
+                        <img
+                          src={img}
+                          alt={name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 truncate">
+                          {name}
+                        </p>
+                        <p className="text-[11px] text-stone-500 dark:text-stone-400 font-serif">
+                          {price.toFixed(2)} €
+                        </p>
+                      </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart(item.product.id)}
-                      className="p-1 text-stone-400 hover:text-red-500"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-2 font-serif shrink-0">
+                      <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-stone-800 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(id, Math.max(1, item.quantity - 1))}
+                          className="w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="w-5 text-center text-xs font-black">
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(id, item.quantity + 1)}
+                          className="w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => removeFromCart(id)}
+                        className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="py-12 text-center space-y-3">
@@ -100,7 +107,7 @@ export function CartDrawer() {
           )}
         </div>
 
-        {cart.length > 0 && (
+        {items.length > 0 && (
           <div className="pt-6 border-t border-stone-200 dark:border-stone-800 space-y-4 font-serif">
             <div className="flex justify-between items-center text-base font-black text-stone-900 dark:text-stone-100">
               <span>{t.cart_total}</span>

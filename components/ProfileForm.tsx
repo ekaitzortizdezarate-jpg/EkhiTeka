@@ -4,9 +4,15 @@ import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
-import { User, Phone, MapPin, Check, AlertCircle } from 'lucide-react';
+import { User, Phone, MapPin, Check } from 'lucide-react';
 
-export function ProfileForm({ profile }: { profile: Profile }) {
+interface ProfileFormProps {
+  profile?: Profile;
+  userProfile?: Profile;
+}
+
+export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
+  const currentProfile = profile || userProfile || ({} as Profile);
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ text: string; isError: boolean } | null>(null);
@@ -53,7 +59,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
               type="text"
               name="full_name"
               required
-              defaultValue={profile.full_name || ''}
+              defaultValue={currentProfile.full_name || ''}
               className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
             />
           </div>
@@ -69,7 +75,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
               <input
                 type="tel"
                 name="phone"
-                defaultValue={profile.phone || ''}
+                defaultValue={currentProfile.phone || ''}
                 placeholder="600 000 000"
                 className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
               />
@@ -85,7 +91,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
               <input
                 type="text"
                 name="town"
-                defaultValue={profile.town || ''}
+                defaultValue={currentProfile.town || ''}
                 placeholder="Lekeitio / Bizkaia"
                 className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
               />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useSyncExternalStore, useMemo } from 'react';
+import React, { createContext, useContext, useSyncExternalStore, useMemo, useState, useCallback } from 'react';
 import type { Product } from '@/types/database';
 import { getProductImage } from '@/lib/productHelpers';
 
@@ -9,20 +9,24 @@ export interface CartItem {
   sellerId: string;
   sellerName?: string;
   name: string;
-  category: string;
-  format: string;
+  category?: string;
+  format?: string;
   price: number;
   imageUrl?: string | null;
   originRegion?: string | null;
   quantity: number;
+  product?: Product;
 }
 
 interface CartContextType {
   items: CartItem[];
+  cart: CartItem[];
   addToCart: (product: Product, sellerName?: string, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  openCart: () => void;
+  closeCart: () => void;
   totalItems: number;
   totalPrice: number;
   isCartOpen: boolean;
@@ -65,7 +69,7 @@ function getServerSnapshot(): CartItem[] {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const [isCartOpen, setIsCartOpen] = React.useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const saveItems = (newItems: CartItem[]) => {
     try {
@@ -76,8 +80,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addToCart = (product: Product, sellerName?: string, quantity = 1) => {
-    const existingIdx = items.findIndex((i) => i.productId === product.id);
+  const addToCart = useCallback((product: Product, sellerName?: string, quantity = 1) => {
+    const existingIdx = items.findIndex((i) => (i.productId || i.product?.id) === product.id);
     if (existingIdx > -1) {
       const updated = [...items];
       updated[existingIdx].quantity += quantity;
@@ -86,7 +90,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const newItem: CartItem = {
         productId: product.id,
         sellerId: product.seller_id,
-        sellerName: sellerName || 'EkhiTeka Artesano',
+        sellerName: sellerName || 'EkhiTeka Selección',
         name: product.name,
         category: product.category_id,
         format: product.format,
@@ -94,42 +98,49 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         imageUrl: getProductImage(product),
         originRegion: product.origin_region,
         quantity,
+        product,
       };
       saveItems([...items, newItem]);
     }
     setIsCartOpen(true);
-  };
+  }, [items]);
 
-  const removeFromCart = (productId: string) => {
-    saveItems(items.filter((i) => i.productId !== productId));
-  };
+  const removeFromCart = useCallback((productId: string) => {
+    saveItems(items.filter((i) => (i.productId || i.product?.id) !== productId));
+  }, [items]);
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
     }
     const updated = items.map((i) =>
-      i.productId === productId ? { ...i, quantity } : i
+      (i.productId || i.product?.id) === productId ? { ...i, quantity } : i
     );
     saveItems(updated);
-  };
+  }, [items, removeFromCart]);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     saveItems([]);
-  };
+  }, []);
+
+  const openCart = useCallback(() => setIsCartOpen(true), []);
+  const closeCart = useCallback(() => setIsCartOpen(false), []);
 
   const totalItems = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
-  const totalPrice = useMemo(() => items.reduce((sum, i) => sum + i.price * i.quantity, 0), [items]);
+  const totalPrice = useMemo(() => items.reduce((sum, i) => sum + Number(i.price || i.product?.price || 0) * i.quantity, 0), [items]);
 
   return (
     <CartContext.Provider
       value={{
         items,
+        cart: items,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+        openCart,
+        closeCart,
         totalItems,
         totalPrice,
         isCartOpen,
