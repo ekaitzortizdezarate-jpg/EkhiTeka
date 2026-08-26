@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { createProduct, updateProduct, deleteProduct } from '@/app/actions/products';
-import type { Category, Product, StoreAddress, EventAddress, ProductWithSeller } from '@/types/database';
-import { getProductImage } from '@/lib/productHelpers';
+import type { Category, Product, StoreAddress, EventAddress } from '@/types/database';
 import {
   Package,
   ArrowLeft,
@@ -15,14 +14,12 @@ import {
   Gift,
   Wine,
   CreditCard,
-  Store,
   Calendar,
   Image as ImageIcon,
   Truck,
   AlertCircle,
-  Search,
-  CheckSquare,
-  Square,
+  Plus,
+  X,
   UserCheck,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -56,7 +53,6 @@ export function SellerProductForm({
 
   const isEditing = Boolean(initialProduct);
 
-  // Determinar tipología inicial
   const inferInitialType = (): PublishingType => {
     if (!initialProduct) return 'producto_suelto';
     const cat = (initialProduct.category_id || '').toLowerCase();
@@ -88,7 +84,7 @@ export function SellerProductForm({
     }
   };
 
-  // Direcciones de recogida
+  // Puntos de entrega
   const activePickupList = pickupAddresses.filter((a) => a.is_active);
   const activeEventList = eventAddresses.filter((a) => a.is_active);
 
@@ -102,22 +98,38 @@ export function SellerProductForm({
     initialProduct?.event_address_id || activeEventList[0]?.id || ''
   );
 
-  // Selector de productos sueltos incluidos (Cestas y Catas)
-  const [includedProductIds, setIncludedProductIds] = useState<string[]>([]);
-  const [singleSearch, setSingleSearch] = useState('');
+  // 1. Productos seleccionados del catálogo (vía dropdown)
+  const [catalogProductIds, setCatalogProductIds] = useState<string[]>([]);
+  const [selectedCatalogIdToAdd, setSelectedCatalogIdToAdd] = useState<string>(
+    availableSingleProducts[0]?.id || ''
+  );
 
-  const filteredSingleProducts = useMemo(() => {
-    if (!singleSearch.trim()) return availableSingleProducts;
-    const q = singleSearch.toLowerCase();
-    return availableSingleProducts.filter((p) => p.name.toLowerCase().includes(q));
-  }, [availableSingleProducts, singleSearch]);
-
-  const toggleIncludedProduct = (id: string) => {
-    if (includedProductIds.includes(id)) {
-      setIncludedProductIds(includedProductIds.filter((pId) => pId !== id));
-    } else {
-      setIncludedProductIds([...includedProductIds, id]);
+  const handleAddCatalogProduct = () => {
+    if (!selectedCatalogIdToAdd) return;
+    if (!catalogProductIds.includes(selectedCatalogIdToAdd)) {
+      setCatalogProductIds([...catalogProductIds, selectedCatalogIdToAdd]);
     }
+  };
+
+  const handleRemoveCatalogProduct = (id: string) => {
+    setCatalogProductIds(catalogProductIds.filter((pId) => pId !== id));
+  };
+
+  // 2. Productos sueltos creados manualmente sólo para este lote/evento
+  const [customItems, setCustomItems] = useState<string[]>([]);
+  const [newCustomInput, setNewCustomInput] = useState('');
+
+  const handleAddCustomItem = () => {
+    const trimmed = newCustomInput.trim();
+    if (!trimmed) return;
+    if (!customItems.includes(trimmed)) {
+      setCustomItems([...customItems, trimmed]);
+      setNewCustomInput('');
+    }
+  };
+
+  const handleRemoveCustomItem = (indexToRemove: number) => {
+    setCustomItems(customItems.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleTogglePickup = (id: string) => {
@@ -143,17 +155,14 @@ export function SellerProductForm({
 
     const formData = new FormData(e.currentTarget);
 
-    // Adjuntar métodos de entrega seleccionados
     formData.delete('delivery_methods');
     deliveryMethods.forEach((m) => formData.append('delivery_methods', m));
 
-    // Adjuntar puntos de recogida seleccionados
     formData.delete('pickup_address_ids');
     if (hasPickup) {
       selectedPickupIds.forEach((id) => formData.append('pickup_address_ids', id));
     }
 
-    // Ajustar categoría y tipología
     if (publishingType === 'cata_presencial') {
       formData.set('category_id', 'cata_presencial');
       formData.set('format', 'unidad');
@@ -174,20 +183,23 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
-    // Si se han seleccionado productos sueltos, adjuntar la lista en la descripción
+    // Componer descripción unificada si hay artículos incluidos (del catálogo o manuales)
+    const catalogSelectedNames = availableSingleProducts
+      .filter((p) => catalogProductIds.includes(p.id))
+      .map((p) => `• ${p.name}`);
+
+    const manualItemNames = customItems.map((it) => `• ${it}`);
+    const allIncluded = [...catalogSelectedNames, ...manualItemNames];
+
     if (
       (publishingType === 'cesta_gourmet' ||
         publishingType === 'cata_presencial' ||
         publishingType === 'cata_casa') &&
-      includedProductIds.length > 0
+      allIncluded.length > 0
     ) {
       const rawDesc = (formData.get('description') as string) || '';
-      const selectedNames = availableSingleProducts
-        .filter((p) => includedProductIds.includes(p.id))
-        .map((p) => `• ${p.name}`);
-
-      if (selectedNames.length > 0 && !rawDesc.includes('Artículos incluidos')) {
-        const fullDesc = `${rawDesc.trim()}\n\n📦 Artículos incluidos en esta selección:\n${selectedNames.join('\n')}`;
+      if (!rawDesc.includes('Artículos incluidos')) {
+        const fullDesc = `${rawDesc.trim()}\n\n📦 Artículos incluidos en esta selección:\n${allIncluded.join('\n')}`;
         formData.set('description', fullDesc);
       }
     }
@@ -210,6 +222,11 @@ export function SellerProductForm({
     setLoading(false);
     if (res?.error) alert(res.error);
   };
+
+  const isPackOrEvent =
+    publishingType === 'cesta_gourmet' ||
+    publishingType === 'cata_presencial' ||
+    publishingType === 'cata_casa';
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 space-y-8 font-serif">
@@ -244,7 +261,6 @@ export function SellerProductForm({
         )}
       </div>
 
-      {/* Banner de información de edición compartida para vendedores */}
       {isEditing && initialProduct && (
         <div className="p-3.5 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/60 rounded-2xl flex items-center gap-2.5 text-xs text-amber-900 dark:text-amber-200 font-sans">
           <UserCheck className="w-4 h-4 shrink-0 text-[#C68D07] dark:text-[#FFE259]" />
@@ -267,7 +283,7 @@ export function SellerProductForm({
         </div>
       )}
 
-      {/* Selector Visual de Tipología */}
+      {/* 1. Selector de Tipología */}
       <div className="space-y-2">
         <label className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
           1. ¿Qué tipo de artículo deseas publicar?
@@ -341,12 +357,12 @@ export function SellerProductForm({
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs font-sans text-xs">
-        {/* 2. Datos del Producto */}
         <div className="space-y-4">
           <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
             2. Datos del Producto o Evento
           </span>
 
+          {/* 1. Nombre del Producto */}
           <div>
             <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
               {publishingType === 'cata_presencial' ? 'Título de la Cata Presencial *' : 'Nombre del Producto *'}
@@ -367,48 +383,135 @@ export function SellerProductForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {publishingType === 'producto_suelto' && (
+          {/* 2. Añadir Productos Sueltos del Catálogo a esta Selección (Desplegable) */}
+          {isPackOrEvent && (
+            <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-[#141312] border border-amber-200 dark:border-stone-800 space-y-3">
               <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Categoría del Catálogo *
-                </label>
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] block font-serif">
+                  Añadir Productos Sueltos del Catálogo a esta Selección
+                </span>
+                <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
+                  Selecciona en la lista desplegable los artículos de la tienda que componen este pack o experiencia.
+                </p>
+              </div>
+
+              <div className="flex gap-2">
                 <select
-                  name="category_id"
-                  required
-                  defaultValue={initialProduct?.category_id || categories[0]?.id || 'queso'}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  value={selectedCatalogIdToAdd}
+                  onChange={(e) => setSelectedCatalogIdToAdd(e.target.value)}
+                  className="flex-1 px-3.5 py-2 bg-white dark:bg-[#1F1E1C] border border-stone-300 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name_es} / {c.name_eu}
-                    </option>
+                  {availableSingleProducts.length > 0 ? (
+                    availableSingleProducts.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} ({Number(p.price).toFixed(2)} €)
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">No hay productos individuales en catálogo</option>
+                  )}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={handleAddCatalogProduct}
+                  disabled={!selectedCatalogIdToAdd}
+                  className="px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer disabled:opacity-50 shrink-0 flex items-center gap-1 font-serif"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Añadir</span>
+                </button>
+              </div>
+
+              {/* Lista de productos del catálogo agregados */}
+              {catalogProductIds.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  {availableSingleProducts
+                    .filter((p) => catalogProductIds.includes(p.id))
+                    .map((p) => (
+                      <div
+                        key={p.id}
+                        className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700"
+                      >
+                        <span className="font-bold text-stone-800 dark:text-stone-200 truncate">
+                          • {p.name} ({Number(p.price).toFixed(2)} €)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCatalogProduct(p.id)}
+                          className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 3. Meter productos sueltos, uno a uno, generados sólo para este producto/evento */}
+          {isPackOrEvent && (
+            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 space-y-3">
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-stone-700 dark:text-stone-300 block font-serif">
+                  Meter productos sueltos específicos (uno a uno)
+                </span>
+                <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
+                  Escribe artículos o complementos exclusivos que se generarán únicamente para esta selección.
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newCustomInput}
+                  onChange={(e) => setNewCustomInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddCustomItem();
+                    }
+                  }}
+                  placeholder="Ej: Cuña Queso Ahumado de Caserío 250g..."
+                  className="flex-1 px-3.5 py-2 bg-white dark:bg-[#1F1E1C] border border-stone-300 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100 font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomItem}
+                  className="px-4 py-2 bg-stone-800 dark:bg-stone-200 hover:bg-stone-900 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer shrink-0 flex items-center gap-1 font-serif"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Meter</span>
+                </button>
+              </div>
+
+              {/* Lista de productos específicos agregados */}
+              {customItems.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  {customItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700"
+                    >
+                      <span className="font-bold text-stone-800 dark:text-stone-200 truncate">
+                        • {item}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCustomItem(idx)}
+                        className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   ))}
-                </select>
-              </div>
-            )}
+                </div>
+              )}
+            </div>
+          )}
 
-            {publishingType === 'producto_suelto' && (
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Formato / Unidad de Venta
-                </label>
-                <select
-                  name="format"
-                  defaultValue={initialProduct?.format || 'unidad'}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-                >
-                  <option value="unidad">Unidad / Pieza</option>
-                  <option value="peso_kg">Peso (Kg / Cuña)</option>
-                  <option value="tarro">Tarro / Bote</option>
-                  <option value="lata">Lata Conserva</option>
-                  <option value="botella">Botella</option>
-                  <option value="pack">Pack Degustación</option>
-                </select>
-              </div>
-            )}
-          </div>
-
+          {/* 4. Precio y Campos siguientes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
@@ -455,6 +558,48 @@ export function SellerProductForm({
             </div>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {publishingType === 'producto_suelto' && (
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  Categoría del Catálogo *
+                </label>
+                <select
+                  name="category_id"
+                  required
+                  defaultValue={initialProduct?.category_id || categories[0]?.id || 'queso'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name_es} / {c.name_eu}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {publishingType === 'producto_suelto' && (
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  Formato / Unidad de Venta
+                </label>
+                <select
+                  name="format"
+                  defaultValue={initialProduct?.format || 'unidad'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                >
+                  <option value="unidad">Unidad / Pieza</option>
+                  <option value="peso_kg">Peso (Kg / Cuña)</option>
+                  <option value="tarro">Tarro / Bote</option>
+                  <option value="lata">Lata Conserva</option>
+                  <option value="botella">Botella</option>
+                  <option value="pack">Pack Degustación</option>
+                </select>
+              </div>
+            )}
+          </div>
+
           {publishingType !== 'cata_presencial' && (
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
@@ -491,87 +636,12 @@ export function SellerProductForm({
           </div>
         </div>
 
-        {/* 3. Selección de Productos Sueltos Incluidos (Cestas, Cata Presencial y Cata en Casa) */}
-        {(publishingType === 'cesta_gourmet' ||
-          publishingType === 'cata_presencial' ||
-          publishingType === 'cata_casa') && (
-          <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-black uppercase tracking-wider text-amber-600 dark:text-[#FFE259] block font-serif flex items-center gap-1.5">
-                  <Gift className="w-4 h-4" />
-                  <span>Añadir Productos Sueltos del Catálogo a esta Selección (Opcional)</span>
-                </span>
-                <p className="text-[11px] text-stone-500 dark:text-stone-400">
-                  Elige los quesos, conservas o botellas sueltas que componen este pack o experiencia.
-                </p>
-              </div>
-              <span className="px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 font-bold text-[11px]">
-                {includedProductIds.length} seleccionados
-              </span>
-            </div>
-
-            {availableSingleProducts.length > 0 ? (
-              <div className="space-y-2">
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={singleSearch}
-                    onChange={(e) => setSingleSearch(e.target.value)}
-                    placeholder="Filtrar productos individuales..."
-                    className="w-full pl-8 pr-3 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-[11px]"
-                  />
-                </div>
-
-                <div className="max-h-48 overflow-y-auto rounded-2xl border border-stone-200 dark:border-stone-800 p-2 space-y-1 bg-stone-50/50 dark:bg-[#141312]/60 divide-y divide-stone-100 dark:divide-stone-800">
-                  {filteredSingleProducts.map((p) => {
-                    const isSelected = includedProductIds.includes(p.id);
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => toggleIncludedProduct(p.id)}
-                        className={`flex items-center justify-between p-2 rounded-xl transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-[#FFE259]/20 text-stone-900 dark:text-stone-100 font-bold'
-                            : 'hover:bg-stone-100 dark:hover:bg-stone-850 text-stone-700 dark:text-stone-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          {isSelected ? (
-                            <CheckSquare className="w-4 h-4 text-amber-600 dark:text-[#FFE259] shrink-0" />
-                          ) : (
-                            <Square className="w-4 h-4 text-stone-400 shrink-0" />
-                          )}
-                          <img
-                            src={getProductImage(p)}
-                            alt={p.name}
-                            className="w-7 h-7 rounded-lg object-cover border border-stone-200 dark:border-stone-700 shrink-0"
-                          />
-                          <span className="truncate text-xs">{p.name}</span>
-                        </div>
-                        <span className="text-[11px] font-black shrink-0 font-serif">
-                          {Number(p.price).toFixed(2)} €
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <p className="text-[11px] text-stone-400 italic">
-                No hay productos individuales registrados todavía en el catálogo.
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* 4. Ubicación de Evento (Catas Presenciales) */}
+        {/* Ubicación de Evento (Catas Presenciales) */}
         {publishingType === 'cata_presencial' && (
           <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 block font-serif flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
-              <span>4. Punto de Evento (Ubicación única)</span>
+              <span>3. Punto de Evento (Ubicación única)</span>
             </span>
 
             {activeEventList.length > 0 ? (
@@ -601,15 +671,15 @@ export function SellerProductForm({
           </div>
         )}
 
-        {/* 5. Métodos de Entrega & Puntos de Recogida (Modo Oscuro Corregido) */}
+        {/* Métodos de Entrega & Puntos de Recogida (Estilo unificado) */}
         {publishingType !== 'cata_presencial' && (
           <div className="space-y-4 pt-4 border-t border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] block font-serif flex items-center gap-1.5">
               <Truck className="w-4 h-4" />
-              <span>4. Métodos de Entrega & Puntos de Recogida en Tienda</span>
+              <span>3. Métodos de Entrega & Puntos de Recogida en Tienda</span>
             </span>
 
-            {/* Opciones con Modo Oscuro Nítido */}
+            {/* Opciones con diseño idéntico */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div
                 onClick={() => toggleDeliveryMethod('domicilio')}
@@ -622,7 +692,7 @@ export function SellerProductForm({
                 <input
                   type="checkbox"
                   checked={hasDomicilio}
-                  onChange={() => {}} // Controlled by parent div
+                  onChange={() => {}}
                   className="w-4 h-4 accent-[#FFE259] rounded cursor-pointer"
                 />
                 <span className="font-bold text-xs">Envio a Domicilio</span>
@@ -639,42 +709,50 @@ export function SellerProductForm({
                 <input
                   type="checkbox"
                   checked={hasPickup}
-                  onChange={() => {}} // Controlled by parent div
+                  onChange={() => {}}
                   className="w-4 h-4 accent-[#FFE259] rounded cursor-pointer"
                 />
                 <span className="font-bold text-xs">Recogida en tienda</span>
               </div>
             </div>
 
-            {/* Puntos de Entrega (Se muestra SOLO si se selecciona Recogida en Tienda) */}
+            {/* Puntos de Entrega con el MISMO ESTILO que las opciones de arriba */}
             {hasPickup && (
               <div className="space-y-2 pt-2 animate-fadeIn">
                 <label className="font-bold text-stone-700 dark:text-stone-300 block">
                   Selecciona en qué puntos de entrega/tienda dar la opción de recogida:
                 </label>
                 {activePickupList.length > 0 ? (
-                  <div className="space-y-1.5">
-                    {activePickupList.map((addr) => (
-                      <label
-                        key={addr.id}
-                        className="flex items-center gap-2.5 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-[#141312] hover:bg-stone-100 dark:hover:bg-stone-850 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          name="pickup_address_ids"
-                          value={addr.id}
-                          checked={selectedPickupIds.includes(addr.id)}
-                          onChange={() => handleTogglePickup(addr.id)}
-                          className="w-4 h-4 accent-[#FFE259] rounded"
-                        />
-                        <div className="min-w-0">
-                          <span className="font-bold text-stone-900 dark:text-stone-100 block">{addr.title}</span>
-                          <span className="text-[10px] text-stone-500 dark:text-stone-400 block truncate">
-                            {addr.street} {addr.number || ''}, {addr.town} ({addr.province})
-                          </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {activePickupList.map((addr) => {
+                      const isSelected = selectedPickupIds.includes(addr.id);
+                      return (
+                        <div
+                          key={addr.id}
+                          onClick={() => handleTogglePickup(addr.id)}
+                          className={`flex items-start gap-3 p-3.5 rounded-2xl border-2 transition-all cursor-pointer ${
+                            isSelected
+                              ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0]'
+                              : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-600 dark:text-stone-400'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            name="pickup_address_ids"
+                            value={addr.id}
+                            checked={isSelected}
+                            onChange={() => {}}
+                            className="w-4 h-4 accent-[#FFE259] rounded mt-0.5"
+                          />
+                          <div className="min-w-0">
+                            <span className="font-bold text-xs block truncate">{addr.title}</span>
+                            <span className="text-[10px] opacity-75 block truncate">
+                              {addr.street} {addr.number || ''}, {addr.town} ({addr.province})
+                            </span>
+                          </div>
                         </div>
-                      </label>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-[11px] text-amber-600 dark:text-amber-400">
@@ -686,11 +764,11 @@ export function SellerProductForm({
           </div>
         )}
 
-        {/* 6. Fotografía del Producto */}
+        {/* 5. Fotografía del Producto */}
         <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
           <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif flex items-center gap-1.5">
             <ImageIcon className="w-4 h-4" />
-            <span>5. Fotografía del Producto / Evento</span>
+            <span>4. Fotografía del Producto / Evento</span>
           </span>
 
           <div className="flex flex-col sm:flex-row items-center gap-4">
