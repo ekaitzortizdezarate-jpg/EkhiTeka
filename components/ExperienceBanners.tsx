@@ -21,7 +21,7 @@ export function ExperienceBanners() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
-        {/* Banner 1 */}
+        {/* Banner 1: Catas Presenciales */}
         <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
           <div className="space-y-4">
             <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
@@ -56,7 +56,7 @@ export function ExperienceBanners() {
           </a>
         </div>
 
-        {/* Banner 2 */}
+        {/* Banner 2: Mesas de Quesos (Botón Amarillo unificado) */}
         <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
           <div className="space-y-4">
             <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
@@ -84,14 +84,14 @@ export function ExperienceBanners() {
             href={getWhatsAppUrl('Hola, quisiera presupuesto para un evento o boda con mesa de quesos')}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 font-black text-xs transition-all shadow-xs"
+            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
           >
-            <Sparkles className="w-4 h-4 text-[#FFE259]" />
+            <Sparkles className="w-4 h-4" />
             <span>{t.exp_b2_btn}</span>
           </a>
         </div>
 
-        {/* Banner 3 */}
+        {/* Banner 3: Cestas y Regalos */}
         <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
           <div className="space-y-4">
             <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">

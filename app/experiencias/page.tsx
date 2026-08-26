@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductWithSeller } from '@/types/database';
 import {
@@ -17,6 +18,7 @@ import {
 
 export default function ExperienciasPage() {
   const { t } = useLanguage();
+  const { getWhatsAppUrl } = useStoreConfig();
   const [storeTastings, setStoreTastings] = useState<ProductWithSeller[]>([]);
   const [homeTastingKits, setHomeTastingKits] = useState<ProductWithSeller[]>([]);
   const [isSeller, setIsSeller] = useState(false);
@@ -102,7 +104,7 @@ export default function ExperienciasPage() {
         </div>
       </section>
 
-      {/* 2. Cuatro Tarjetas de Experiencias con Imagen */}
+      {/* 2. Cuatro Tarjetas de Experiencias con Botones Amarillos Unificados */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-serif">
         {/* Tarjeta 1: Catas en Casa */}
         <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
@@ -133,10 +135,10 @@ export default function ExperienciasPage() {
             </p>
           </div>
           <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20solicitar%20un%20Kit%20de%20Cata%20en%20Casa"
+            href={getWhatsAppUrl('Hola, quisiera solicitar un Kit de Cata en Casa')}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             <span>{t.exp_home_tasting_btn}</span>
@@ -209,10 +211,10 @@ export default function ExperienciasPage() {
             </p>
           </div>
           <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20pedir%20presupuesto%20para%20Mesa%20de%20Quesos%20de%20Boda"
+            href={getWhatsAppUrl('Hola, quisiera pedir presupuesto para Mesa de Quesos de Boda')}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             <span>{t.exp_wedding_btn}</span>
@@ -248,10 +250,10 @@ export default function ExperienciasPage() {
             </p>
           </div>
           <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20para%20préstamo%20de%20Raclette"
+            href={getWhatsAppUrl('Hola, quisiera consultar disponibilidad para préstamo de Raclette')}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             <span>{t.exp_raclette_btn}</span>

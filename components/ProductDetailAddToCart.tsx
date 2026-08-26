@@ -58,25 +58,25 @@ export function ProductDetailAddToCart({
   return (
     <div className="space-y-3 font-serif">
       <div className="flex items-center gap-3">
-        {/* Selector de cantidad */}
+        {/* Selector de cantidad con modo oscuro nítido */}
         {!isSoldOut && (
-          <div className="flex items-center rounded-2xl border-2 border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-850 p-1">
+          <div className="flex items-center rounded-2xl border-2 border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-[#1F1E1C] p-1 shadow-inner">
             <button
               type="button"
               disabled={quantity <= 1}
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-stone-700 dark:text-stone-200 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer"
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-stone-700 dark:text-stone-200 font-bold hover:bg-stone-200 dark:hover:bg-stone-800 disabled:opacity-30 cursor-pointer transition-colors"
             >
               -
             </button>
-            <span className="w-10 text-center text-xs font-black text-stone-900 dark:text-stone-100">
+            <span className="w-10 text-center text-xs font-black text-stone-900 dark:text-[#F5F5F0]">
               {quantity}
             </span>
             <button
               type="button"
               disabled={quantity >= maxStock}
               onClick={() => setQuantity((q) => Math.min(maxStock, q + 1))}
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-stone-700 dark:text-stone-200 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer"
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-stone-700 dark:text-stone-200 font-bold hover:bg-stone-200 dark:hover:bg-stone-800 disabled:opacity-30 cursor-pointer transition-colors"
             >
               +
             </button>

@@ -11,7 +11,6 @@ import {
   MapPin,
   Lock,
   Check,
-  ShieldCheck,
   Home,
   Pencil,
   Plus,
@@ -59,7 +58,6 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const isSeller = p.role === 'vendedor' || p.role === 'admin';
   const isComplete = isProfileComplete(p);
 
-  // Gestión de puntos de recogida del vendedor
   const handleSetActiveAddress = (id: string) => {
     const updated = pickupAddresses.map((addr) => ({
       ...addr,
@@ -164,7 +162,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   return (
     <div className="space-y-8 font-serif">
       {/* 1. TARJETA PRINCIPAL DE PERFIL */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
+      <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
         {/* Cabecera con Estado y Botón Editar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100 dark:border-stone-800">
           <div className="flex items-center gap-3">
@@ -224,77 +222,77 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
           </div>
         )}
 
-        {/* MODO VISTA: CADA CAMPO VISIBLE UNO A UNO */}
+        {/* ----------------- MODO VISTA CON MODO OSCURO NÍTIDO ----------------- */}
         {!isEditing ? (
           <div className="space-y-6 font-sans text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_first_name} & {t.profile_last_name_1}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {[p.first_name, p.last_name_1, p.last_name_2].filter(Boolean).join(' ') || p.full_name || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_dni}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm uppercase">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm uppercase">
                   {p.dni || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_birth_date}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.birth_date || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_phone}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.phone || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.auth_email}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.email || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_town} · {t.profile_province}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.town || 'Lekeitio'} ({p.province || 'Bizkaia'})
                 </p>
               </div>
             </div>
 
-            {/* Dirección Personal */}
-            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-2">
+            {/* Dirección Personal con Modo Oscuro */}
+            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-2">
               <span className="text-[10px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
                 <Home className="w-3.5 h-3.5" />
                 <span>{t.profile_address_data}</span>
               </span>
-              <p className="text-sm font-bold text-stone-800 dark:text-stone-200">
+              <p className="text-sm font-bold text-stone-800 dark:text-[#F5F5F0]">
                 {formattedAddress || t.profile_not_specified}
               </p>
             </div>
 
-            {/* SECCIÓN VENDEDOR: WHATSAPP Y TIENDAS (MODO VISTA) */}
+            {/* SECCIÓN VENDEDOR: WHATSAPP Y TIENDAS */}
             {isSeller && (
               <div className="space-y-4 pt-4 border-t border-stone-200/60 dark:border-stone-800">
                 {/* WhatsApp Tienda */}
@@ -305,7 +303,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                       <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block font-serif">
                         WhatsApp Oficial de la Tienda
                       </span>
-                      <p className="text-sm font-black text-stone-900 dark:text-stone-100">
+                      <p className="text-sm font-black text-stone-900 dark:text-[#F5F5F0]">
                         +{p.whatsapp_phone || p.phone || '34600000000'}
                       </p>
                     </div>
@@ -314,7 +312,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
 
                 {/* Direcciones de Recogida en Tienda */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block font-serif">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block font-serif">
                     Puntos de Entrega & Recogida en Tienda ({pickupAddresses.length})
                   </span>
                   <div className="space-y-2">
@@ -324,20 +322,20 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                         className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
                           addr.is_active
                             ? 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700'
-                            : 'bg-stone-50 dark:bg-stone-850 border-stone-200 dark:border-stone-700'
+                            : 'bg-stone-50 dark:bg-[#1F1E1C] border-stone-200 dark:border-stone-800'
                         }`}
                       >
                         <div className="space-y-0.5 min-w-0">
                           <div className="flex items-center gap-2">
                             <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                            <h4 className="font-bold text-stone-900 dark:text-stone-100 truncate">{addr.title}</h4>
+                            <h4 className="font-bold text-stone-900 dark:text-[#F5F5F0] truncate">{addr.title}</h4>
                             {addr.is_active && (
                               <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase">
                                 Activa
                               </span>
                             )}
                           </div>
-                          <p className="text-stone-600 dark:text-stone-400 text-[11px] truncate">
+                          <p className="text-stone-600 dark:text-stone-300 text-[11px] truncate">
                             {addr.street} {addr.number || ''}, {addr.town} ({addr.province}) · {addr.schedule || ''}
                           </p>
                         </div>
@@ -362,7 +360,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="first_name"
                   required
                   defaultValue={p.first_name || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -374,7 +372,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="last_name_1"
                   required
                   defaultValue={p.last_name_1 || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -385,7 +383,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   type="text"
                   name="last_name_2"
                   defaultValue={p.last_name_2 || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -402,7 +400,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   required
                   defaultValue={p.dni || ''}
                   placeholder="12345678Z"
-                  className="w-full px-3.5 py-2.5 rounded-xl border uppercase"
+                  className="w-full px-3.5 py-2.5 rounded-xl border uppercase bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -414,7 +412,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="birth_date"
                   required
                   defaultValue={p.birth_date || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -427,7 +425,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   required
                   defaultValue={p.phone || ''}
                   placeholder="600 000 000"
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -447,7 +445,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="province"
                     required
                     defaultValue={p.province || 'Bizkaia'}
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -459,7 +457,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="town"
                     required
                     defaultValue={p.town || 'Lekeitio'}
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -472,7 +470,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.postal_code || ''}
                     placeholder="48280"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
               </div>
@@ -488,7 +486,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.street || ''}
                     placeholder="Gamarra Kalea"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -501,7 +499,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.number || ''}
                     placeholder="4"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -513,7 +511,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="stair"
                     defaultValue={p.stair || ''}
                     placeholder="A"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -526,7 +524,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.floor || ''}
                     placeholder="2"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -539,7 +537,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.door || ''}
                     placeholder="B"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
               </div>
@@ -549,7 +547,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
             {isSeller && (
               <div className="space-y-6 pt-4 border-t border-stone-200 dark:border-stone-800">
                 {/* WhatsApp Config */}
-                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-3">
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 space-y-3">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-emerald-600" />
                     <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 font-serif">
@@ -588,7 +586,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                           value={customWhatsApp}
                           onChange={(e) => setCustomWhatsApp(e.target.value)}
                           placeholder="Ej: 34600000000"
-                          className="w-full sm:max-w-xs px-3.5 py-2 rounded-xl border font-bold"
+                          className="w-full sm:max-w-xs px-3.5 py-2 rounded-xl border font-bold bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                         />
                       </div>
                     )}
@@ -615,13 +613,13 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   </div>
 
                   <div className="space-y-4">
-                    {pickupAddresses.map((addr, idx) => (
+                    {pickupAddresses.map((addr) => (
                       <div
                         key={addr.id}
                         className={`p-4 rounded-2xl border-2 space-y-3 ${
                           addr.is_active
                             ? 'border-[#FFE259] bg-amber-50/40 dark:bg-amber-950/20'
-                            : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-850'
+                            : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#1F1E1C]'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
@@ -631,7 +629,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                               value={addr.title}
                               onChange={(e) => handleUpdateAddress(addr.id, 'title', e.target.value)}
                               placeholder="Nombre de la tienda / sede"
-                              className="font-bold px-2 py-1 rounded-lg border text-xs"
+                              className="font-bold px-2 py-1 rounded-lg border text-xs bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                             />
                             {addr.is_active ? (
                               <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase">
@@ -664,28 +662,28 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                             value={addr.street}
                             onChange={(e) => handleUpdateAddress(addr.id, 'street', e.target.value)}
                             placeholder="Calle"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                           <input
                             type="text"
                             value={addr.number || ''}
                             onChange={(e) => handleUpdateAddress(addr.id, 'number', e.target.value)}
                             placeholder="Nº"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                           <input
                             type="text"
                             value={addr.town}
                             onChange={(e) => handleUpdateAddress(addr.id, 'town', e.target.value)}
                             placeholder="Municipio"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                           <input
                             type="text"
                             value={addr.province}
                             onChange={(e) => handleUpdateAddress(addr.id, 'province', e.target.value)}
                             placeholder="Provincia"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                         </div>
 
@@ -694,7 +692,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                           value={addr.schedule || ''}
                           onChange={(e) => handleUpdateAddress(addr.id, 'schedule', e.target.value)}
                           placeholder="Horario de atención (Ej: Lun-Vie 10:00-14:30 | 17:00-20:30)"
-                          className="w-full px-2.5 py-1.5 rounded-lg border text-[11px]"
+                          className="w-full px-2.5 py-1.5 rounded-lg border text-[11px] bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                         />
                       </div>
                     ))}
@@ -725,7 +723,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
       </div>
 
       {/* 2. TARJETA CAMBIAR CONTRASEÑA */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
+      <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
         <button
           type="button"
           onClick={() => setIsPasswordOpen(!isPasswordOpen)}
@@ -775,7 +773,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="current_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -791,7 +789,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="new_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -807,7 +805,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="confirm_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>

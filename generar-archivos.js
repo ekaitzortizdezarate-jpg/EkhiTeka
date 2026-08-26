@@ -3,981 +3,443 @@ const path = require('path');
 
 const files = {
   // =========================================================================
-  // 1. TIPOS DE BASE DE DATOS (Direcciones de recogida y WhatsApp del vendedor)
+  // 1. BANNERS DE EXPERIENCIAS (Botón de Mesas de Quesos con color unificado)
   // =========================================================================
-  'types/database.ts': `export type Role = 'comprador' | 'vendedor' | 'admin';
+  'components/ExperienceBanners.tsx': `'use client';
 
-export type ProductFormat =
-  | 'unidad'
-  | 'peso_kg'
-  | 'pack'
-  | 'botella'
-  | 'lata'
-  | 'tarro';
-
-export type DeliveryType = 'domicilio' | 'recogida_tienda';
-
-export type OrderStatus =
-  | 'pendiente'
-  | 'confirmado'
-  | 'preparando'
-  | 'listo_entrega'
-  | 'entregado'
-  | 'cancelado';
-
-export interface PickupAddress {
-  id: string;
-  title: string;
-  street: string;
-  number?: string;
-  town: string;
-  province: string;
-  postal_code?: string;
-  schedule?: string;
-  is_active: boolean;
-}
-
-export interface ProfileDetails {
-  first_name?: string | null;
-  last_name_1?: string | null;
-  last_name_2?: string | null;
-  birth_date?: string | null;
-  dni?: string | null;
-  phone?: string | null;
-  province?: string | null;
-  town?: string | null;
-  postal_code?: string | null;
-  street?: string | null;
-  number?: string | null;
-  stair?: string | null;
-  floor?: string | null;
-  door?: string | null;
-  whatsapp_phone?: string | null;
-  pickup_addresses?: PickupAddress[];
-}
-
-export interface Profile extends ProfileDetails {
-  id: string;
-  role: Role;
-  full_name: string;
-  email?: string | null;
-  phone?: string | null;
-  town?: string | null;
-  address?: string | null;
-  avatar_url?: string | null;
-  bio?: string | null;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export function parseProfile(raw?: any): Profile {
-  if (!raw) {
-    return {
-      id: '',
-      role: 'comprador',
-      full_name: '',
-      first_name: '',
-      last_name_1: '',
-      last_name_2: '',
-      birth_date: '',
-      dni: '',
-      phone: '',
-      province: 'Bizkaia',
-      town: 'Lekeitio',
-      postal_code: '48280',
-      street: 'Gamarra Kalea',
-      number: '4',
-      stair: '',
-      floor: '',
-      door: '',
-      whatsapp_phone: '34600000000',
-      pickup_addresses: [],
-    };
-  }
-
-  let details: Partial<ProfileDetails> = {};
-  if (raw.bio) {
-    try {
-      const parsed = JSON.parse(raw.bio);
-      if (typeof parsed === 'object' && parsed !== null) {
-        details = parsed;
-      }
-    } catch {
-      // bio text fallback
-    }
-  }
-
-  const defaultAddresses: PickupAddress[] = [
-    {
-      id: 'default_store_1',
-      title: 'Quesería & Tienda Principal Lekeitio',
-      street: details.street || raw.street || 'Gamarra Kalea',
-      number: details.number || raw.number || '4',
-      town: details.town || raw.town || 'Lekeitio',
-      province: details.province || raw.province || 'Bizkaia',
-      postal_code: details.postal_code || raw.postal_code || '48280',
-      schedule: 'Lun-Vie: 10:00 - 14:30 | 17:00 - 20:30 · Sáb: 10:30 - 15:00',
-      is_active: true,
-    },
-  ];
-
-  return {
-    ...raw,
-    first_name: details.first_name || raw.first_name || raw.full_name?.split(' ')[0] || '',
-    last_name_1: details.last_name_1 || raw.last_name_1 || raw.full_name?.split(' ')[1] || '',
-    last_name_2: details.last_name_2 || raw.last_name_2 || raw.full_name?.split(' ').slice(2).join(' ') || '',
-    birth_date: details.birth_date || raw.birth_date || '',
-    dni: details.dni || raw.dni || '',
-    phone: details.phone || raw.phone || '',
-    province: details.province || raw.province || (raw.town?.toLowerCase().includes('lekeitio') ? 'Bizkaia' : ''),
-    town: details.town || raw.town || '',
-    postal_code: details.postal_code || raw.postal_code || '',
-    street: details.street || raw.street || '',
-    number: details.number || raw.number || '',
-    stair: details.stair || raw.stair || '',
-    floor: details.floor || raw.floor || '',
-    door: details.door || raw.door || '',
-    whatsapp_phone: details.whatsapp_phone || raw.phone || '34600000000',
-    pickup_addresses: details.pickup_addresses && details.pickup_addresses.length > 0 ? details.pickup_addresses : defaultAddresses,
-  };
-}
-
-export function isProfileComplete(raw?: any): boolean {
-  if (!raw) return false;
-  const p = parseProfile(raw);
-
-  const requiredKeys: (keyof ProfileDetails)[] = [
-    'first_name',
-    'last_name_1',
-    'birth_date',
-    'dni',
-    'phone',
-    'province',
-    'town',
-    'postal_code',
-    'street',
-    'number',
-    'floor',
-    'door',
-  ];
-
-  return requiredKeys.every((key) => {
-    const val = p[key];
-    return val !== undefined && val !== null && String(val).trim().length > 0;
-  });
-}
-
-export interface Category {
-  id: string;
-  slug?: string;
-  name_es: string;
-  name_eu: string;
-  name_en: string;
-  name_fr: string;
-  icon: string;
-  image_url?: string;
-  display_order?: number;
-  is_active?: boolean;
-  created_at?: string;
-}
-
-export interface Product {
-  id: string;
-  seller_id: string;
-  category_id: string;
-  name: string;
-  description?: string | null;
-  price: number;
-  format: ProductFormat;
-  weight_g?: number | null;
-  stock: number;
-  is_unlimited_stock: boolean;
-  is_active: boolean;
-  image_url?: string | null;
-  origin_region?: string | null;
-  delivery_methods: string[];
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ProductWithSeller extends Product {
-  profiles?: Profile | null;
-  categories?: Category | null;
-}
-
-export interface OrderItem {
-  id: string;
-  order_id: string;
-  product_id: string;
-  quantity: number;
-  unit_price: number;
-  subtotal: number;
-  created_at?: string;
-  products?: Product | null;
-}
-
-export interface Order {
-  id: string;
-  buyer_id: string;
-  seller_id: string;
-  status: OrderStatus;
-  delivery_type: DeliveryType;
-  delivery_method?: string | null;
-  shipping_address?: string | null;
-  shipping_notes?: string | null;
-  pickup_schedule?: string | null;
-  total_price: number;
-  total_amount?: number;
-  cancel_reason?: string | null;
-  created_at: string;
-  updated_at?: string;
-  profiles?: Profile | null;
-  order_items?: OrderItem[];
-}
-
-export interface ChatMessage {
-  id: string;
-  sender_id: string;
-  receiver_id: string;
-  product_id?: string | null;
-  order_id?: string | null;
-  message: string;
-  is_read: boolean;
-  created_at: string;
-  sender?: Profile;
-  receiver?: Profile;
-  product?: Product;
-  order?: Order;
-}
-`,
-
-  // =========================================================================
-  // 2. CONTEXTO GLOBAL DE CONFIGURACIÓN DE TIENDA (WhatsApp y Puntos de Recogida)
-  // =========================================================================
-  'context/StoreConfigContext.tsx': `'use client';
-
-import React, { createContext, useContext, useMemo } from 'react';
-import type { Profile, PickupAddress } from '@/types/database';
-import { parseProfile } from '@/types/database';
-
-interface StoreConfigContextType {
-  whatsappPhone: string;
-  storeAddress: string;
-  activePickupAddress: PickupAddress | null;
-  pickupAddresses: PickupAddress[];
-  getWhatsAppUrl: (message?: string) => string;
-}
-
-const StoreConfigContext = createContext<StoreConfigContextType | undefined>(undefined);
-
-export function StoreConfigProvider({
-  children,
-  initialSellerProfile,
-}: {
-  children: React.ReactNode;
-  initialSellerProfile?: Profile | null;
-}) {
-  const seller = useMemo(() => parseProfile(initialSellerProfile), [initialSellerProfile]);
-
-  const whatsappPhone = useMemo(() => {
-    const raw = seller.whatsapp_phone || seller.phone || '34600000000';
-    return raw.replace(/[^0-9]/g, '');
-  }, [seller]);
-
-  const activePickupAddress = useMemo(() => {
-    const addresses = seller.pickup_addresses || [];
-    return addresses.find((a) => a.is_active) || addresses[0] || null;
-  }, [seller]);
-
-  const storeAddress = useMemo(() => {
-    if (activePickupAddress) {
-      return \`\${activePickupAddress.street}\${activePickupAddress.number ? \` \${activePickupAddress.number}\` : ''}, \${activePickupAddress.town} · \${activePickupAddress.province}\`;
-    }
-    return 'Gamarra Kalea 4, Lekeitio · Bizkaia';
-  }, [activePickupAddress]);
-
-  const getWhatsAppUrl = useMemo(() => {
-    return (message?: string) => {
-      const cleanNumber = whatsappPhone.startsWith('34') || whatsappPhone.length > 10 ? whatsappPhone : \`34\${whatsappPhone}\`;
-      const encodedMsg = message ? encodeURIComponent(message) : '';
-      return \`https://wa.me/\${cleanNumber}\${encodedMsg ? \`?text=\${encodedMsg}\` : ''}\`;
-    };
-  }, [whatsappPhone]);
-
-  return (
-    <StoreConfigContext.Provider
-      value={{
-        whatsappPhone,
-        storeAddress,
-        activePickupAddress,
-        pickupAddresses: seller.pickup_addresses || [],
-        getWhatsAppUrl,
-      }}
-    >
-      {children}
-    </StoreConfigContext.Provider>
-  );
-}
-
-export function useStoreConfig() {
-  const context = useContext(StoreConfigContext);
-  if (!context) {
-    return {
-      whatsappPhone: '34600000000',
-      storeAddress: 'Gamarra Kalea 4, Lekeitio · Bizkaia',
-      activePickupAddress: null,
-      pickupAddresses: [],
-      getWhatsAppUrl: (message?: string) => \`https://wa.me/34600000000\${message ? \`?text=\${encodeURIComponent(message)}\` : ''}\`,
-    };
-  }
-  return context;
-}
-`,
-
-  // =========================================================================
-  // 3. ESTILOS GLOBALES (Modo oscuro en TODOS los inputs, selects y textareas)
-  // =========================================================================
-  'app/globals.css': `@import "tailwindcss";
-
-/* Tailwind v4: activar modo oscuro mediante clase CSS en <html> */
-@variant dark (&:where(.dark, .dark *));
-
-@theme {
-  --font-sans: var(--font-dm-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-serif: var(--font-cormorant), 'Playfair Display', Georgia, Cambria, serif;
-  --color-manduca-yellow: #FFE259;
-  --color-manduca-yellow-hover: #F5D742;
-  --color-manduca-yellow-light: #FFF9DE;
-  --color-manduca-dark: #1D1D1B;
-  --color-manduca-cream: #FAF7F2;
-  --color-manduca-border: #E8E5DF;
-}
-
-@layer base {
-  :root {
-    --background: #FAF8F5;
-    --foreground: #1D1D1B;
-    --card-bg: #FFFFFF;
-    --accent-yellow: #FFE259;
-  }
-
-  .dark {
-    --background: #141312;
-    --foreground: #F5F5F0;
-    --card-bg: #1F1E1C;
-    --accent-yellow: #FFE259;
-  }
-
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-dm-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    letter-spacing: -0.01em;
-  }
-
-  /* FORZAR ESTILOS CLAROS/OSCUROS EN TODOS LOS CAMPOS DE ENTRADA */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="tel"],
-  input[type="number"],
-  input[type="date"],
-  textarea,
-  select {
-    background-color: #FAF8F5;
-    color: #1D1D1B;
-    border-color: #D6D3CD;
-  }
-
-  .dark input[type="text"],
-  .dark input[type="email"],
-  .dark input[type="password"],
-  .dark input[type="tel"],
-  .dark input[type="number"],
-  .dark input[type="date"],
-  .dark textarea,
-  .dark select {
-    background-color: #1F1E1C !important;
-    color: #F5F5F0 !important;
-    border-color: #383531 !important;
-  }
-
-  .dark select option {
-    background-color: #1F1E1C;
-    color: #F5F5F0;
-  }
-
-  .dark input::placeholder,
-  .dark textarea::placeholder {
-    color: #78756E !important;
-  }
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.manduca-card {
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
-}
-
-.manduca-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
-}
-
-.manduca-btn-yellow {
-  background-color: #FFE259;
-  color: #1D1D1B;
-  font-weight: 800;
-  transition: all 0.25s ease;
-}
-
-.manduca-btn-yellow:hover {
-  background-color: #F5D742;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 226, 89, 0.35);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-`,
-
-  // =========================================================================
-  // 4. NAVBAR (Icono de Login en Móvil cuando no hay sesión iniciada)
-  // =========================================================================
-  'components/NavbarNavLinks.tsx': `'use client';
-
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useStoreConfig } from '@/context/StoreConfigContext';
-import { signout } from '@/app/actions/auth';
-import type { Profile } from '@/types/database';
-import { CartNavButton } from '@/components/CartNavButton';
-import {
-  User,
-  LogOut,
-  LogIn,
-  Menu,
-  X,
-  Store,
-  MessageCircle,
-} from 'lucide-react';
+import { MessageCircle, Sparkles, Gift } from 'lucide-react';
 
-interface NavbarNavLinksProps {
-  user: { id: string } | null;
-  profile: Profile | null;
-  unreadMessagesCount: number;
-  ordersCount: number;
-  activeOrders?: { id: string; status: string }[];
-}
-
-export function NavbarNavLinks({
-  user,
-  profile,
-  unreadMessagesCount,
-  ordersCount,
-  activeOrders = [],
-}: NavbarNavLinksProps) {
-  const pathname = usePathname();
+export function ExperienceBanners() {
   const { t } = useLanguage();
-  const { whatsappPhone, storeAddress } = useStoreConfig();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isSeller = profile?.role === 'vendedor';
-  const isAdmin = profile?.role === 'admin';
-
-  useEffect(() => {
-    function checkUnseenOrders() {
-      if (!user || !activeOrders || activeOrders.length === 0) {
-        setHasUnseenOrderUpdates(false);
-        return;
-      }
-      const storageKey = isSeller ? 'ekhiteka_seen_orders_seller' : 'ekhiteka_seen_orders_buyer';
-      let seenMap: Record<string, string> = {};
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) seenMap = JSON.parse(stored);
-      } catch {}
-
-      const unseen = activeOrders.some((order) => {
-        const lastSeen = seenMap[order.id];
-        if (lastSeen) {
-          return lastSeen !== order.status;
-        }
-        return isSeller ? order.status === 'pendiente' : order.status !== 'pendiente';
-      });
-
-      setHasUnseenOrderUpdates(unseen);
-    }
-
-    checkUnseenOrders();
-    window.addEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
-    window.addEventListener('storage', checkUnseenOrders);
-    return () => {
-      window.removeEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
-      window.removeEventListener('storage', checkUnseenOrders);
-    };
-  }, [user, activeOrders, isSeller]);
-
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
+  const { getWhatsAppUrl } = useStoreConfig();
 
   return (
-    <div className="flex items-center justify-between w-full min-w-0 gap-3">
-      {/* 1. LADO IZQUIERDO */}
-      <div className="flex items-center gap-3 xl:gap-5 min-w-0">
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
-          aria-label="Menu"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+    <section id="experiencias" className="space-y-8 pt-8">
+      <div>
+        <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+          {t.exp_banner_badge}
+        </span>
+        <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif">
+          {t.exp_banner_title}
+        </h2>
+      </div>
 
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF8F5] shrink-0">
-            <img
-              src="/Logo.jpg"
-              alt="EkhiTeka Logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
-              Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
-            </span>
-            <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              Quesería & Selección Gourmet
-            </span>
-          </div>
-        </Link>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
+        {/* Banner 1: Catas Presenciales */}
+        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Catas.JPG"
+                alt={t.exp_b1_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
 
-        {/* Enlaces Desktop */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 font-serif">
-          <Link
-            href="/tienda"
-            className={\`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-bold transition-all whitespace-nowrap min-h-[38px] \${
-              pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
+            <div className="space-y-2">
+              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
+                {t.exp_b1_title}
+              </h3>
+              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
+                {t.exp_b1_desc}
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={getWhatsAppUrl('Hola, quisiera información sobre las catas presenciales de EkhiTeka')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
           >
-            <span>{t.nav_shop}</span>
-          </Link>
+            <MessageCircle className="w-4 h-4" />
+            <span>{t.exp_b1_btn}</span>
+          </a>
+        </div>
+
+        {/* Banner 2: Mesas de Quesos (Botón Amarillo unificado) */}
+        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Mesas.JPG"
+                alt={t.exp_b2_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
+                {t.exp_b2_title}
+              </h3>
+              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
+                {t.exp_b2_desc}
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={getWhatsAppUrl('Hola, quisiera presupuesto para un evento o boda con mesa de quesos')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{t.exp_b2_btn}</span>
+          </a>
+        </div>
+
+        {/* Banner 3: Cestas y Regalos */}
+        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Cestas.JPG"
+                alt={t.exp_b3_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
+                {t.exp_b3_title}
+              </h3>
+              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
+                {t.exp_b3_desc}
+              </p>
+            </div>
+          </div>
 
           <Link
             href="/regalos-gourmet"
-            className={\`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] \${
-              pathname === '/regalos-gourmet'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
+            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
           >
-            <span className="block text-center">{t.nav_gourmet_gifts_line1}</span>
-            <span className="block text-center">{t.nav_gourmet_gifts_line2}</span>
+            <Gift className="w-4 h-4" />
+            <span>{t.exp_b3_btn}</span>
           </Link>
-
-          <Link
-            href="/experiencias"
-            className={\`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] \${
-              pathname === '/experiencias'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
-          >
-            <span className="block text-center">{t.nav_tastings_line1}</span>
-            <span className="block text-center">{t.nav_tastings_line2}</span>
-          </Link>
-
-          <Link
-            href="/regalos-empresa"
-            className={\`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] \${
-              pathname === '/regalos-empresa'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
-          >
-            <span className="block text-center">{t.nav_corporate_line1}</span>
-            <span className="block text-center">{t.nav_corporate_line2}</span>
-          </Link>
-
-          {user && (
-            <>
-              <Link
-                href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                className={\`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] \${
-                  pathname.includes('/pedidos')
-                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                    : hasUnseenOrderUpdates
-                    ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
-                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                }\`}
-              >
-                <span>{t.nav_orders}</span>
-                {hasUnseenOrderUpdates && (
-                  <span className="w-2 h-2 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
-                )}
-              </Link>
-
-              {isSeller && (
-                <Link
-                  href="/vendedor/eventos"
-                  className={\`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] \${
-                    pathname === '/vendedor/eventos'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                  }\`}
-                >
-                  <span>{t.nav_events}</span>
-                </Link>
-              )}
-
-              {isSeller && (
-                <Link
-                  href="/vendedor/productos/nuevo"
-                  className={\`flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 rounded-2xl transition-all font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px] \${
-                    pathname === '/vendedor/productos/nuevo'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] shadow-xs border border-stone-800/10'
-                      : 'border-2 border-[#FFE259] bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
-                  }\`}
-                >
-                  <span className="block text-center">{t.nav_add_product_line1}</span>
-                  <span className="block text-center">{t.nav_add_product_line2}</span>
-                </Link>
-              )}
-
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="flex items-center justify-center text-center px-3 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-2xl transition-all font-semibold uppercase tracking-[0.14em] text-[11px] whitespace-nowrap min-h-[38px]"
-                >
-                  <span>{t.nav_admin}</span>
-                </Link>
-              )}
-            </>
-          )}
-        </nav>
+        </div>
       </div>
+    </section>
+  );
+}
+`,
 
-      {/* 2. LADO DERECHO */}
-      <div className="flex items-center gap-2 shrink-0">
-        {user ? (
-          <div className="flex items-center gap-2">
-            {(!profile || profile.role === 'comprador') && <CartNavButton />}
+  // =========================================================================
+  // 2. VENTANA CATAS & EXPERIENCIAS (Botones amarillos unificados en todas las tarjetas)
+  // =========================================================================
+  'app/experiencias/page.tsx': `'use client';
 
-            <Link
-              href="/chat"
-              className={\`relative p-2.5 rounded-2xl border transition-all shrink-0 \${
-                pathname.startsWith('/chat')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
-              }\`}
-              title={t.nav_chats}
-            >
-              <MessageCircle className="w-4 h-4" />
-              {unreadMessagesCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
-                  {unreadMessagesCount}
-                </span>
-              )}
-            </Link>
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
+import { ProductCard } from '@/components/ProductCard';
+import type { ProductWithSeller } from '@/types/database';
+import {
+  Sparkles,
+  Wine,
+  Home,
+  HeartHandshake,
+  Flame,
+  MessageCircle,
+  Ticket,
+} from 'lucide-react';
 
-            <Link
-              href="/perfil"
-              className={\`p-2.5 rounded-2xl border transition-colors shrink-0 \${
-                pathname === '/perfil'
-                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
-              }\`}
-              title={t.nav_profile}
-            >
-              <User className="w-4 h-4" />
-            </Link>
+export default function ExperienciasPage() {
+  const { t } = useLanguage();
+  const { getWhatsAppUrl } = useStoreConfig();
+  const [storeTastings, setStoreTastings] = useState<ProductWithSeller[]>([]);
+  const [homeTastingKits, setHomeTastingKits] = useState<ProductWithSeller[]>([]);
+  const [isSeller, setIsSeller] = useState(false);
 
-            <form action={signout} className="shrink-0">
-              <button
-                type="submit"
-                className="p-2.5 rounded-2xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
-                title={t.nav_logout}
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            {/* Icono Iniciar Sesión en Móvil */}
-            <Link
-              href="/login"
-              className="lg:hidden p-2.5 rounded-2xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 text-stone-800 dark:text-stone-200 hover:text-[#1D1D1B] border border-stone-200 dark:border-stone-700 transition-all shadow-2xs"
-              title={t.nav_login}
-            >
-              <LogIn className="w-4 h-4" />
-            </Link>
+  useEffect(() => {
+    const supabase = createClient();
+    async function loadData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+          setIsSeller(true);
+        }
+      }
 
-            <div className="hidden sm:flex items-center gap-2">
-              <Link
-                href="/login"
-                className="px-4 py-2.5 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-              >
-                {t.nav_login}
-              </Link>
-              <Link
-                href="/register"
-                className="px-4 py-2.5 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
-              >
-                {t.nav_register}
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
+      const { data } = await supabase
+        .from('products')
+        .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
-      {/* 3. MENÚ MÓVIL (Con link a inicio en el logo y nombre) */}
-      {mounted && mobileMenuOpen && createPortal(
-        <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
+      if (data) {
+        const prods = data as unknown as ProductWithSeller[];
+        const storeEvents = prods.filter((p) => {
+          const cat = (p.category_id || '').toLowerCase();
+          const name = (p.name || '').toLowerCase();
+          const desc = (p.description || '').toLowerCase();
+          return (
+            cat === 'cata_presencial' ||
+            name.includes('presencial') ||
+            (desc.includes('presencial') && !name.includes('casa'))
+          );
+        });
+
+        const homeKits = prods.filter((p) => {
+          const cat = (p.category_id || '').toLowerCase();
+          const name = (p.name || '').toLowerCase();
+          const desc = (p.description || '').toLowerCase();
+          return (
+            cat === 'cata_casa' ||
+            name.includes('cata en casa') ||
+            name.includes('etxeko dastaketa') ||
+            desc.includes('cata en casa') ||
+            desc.includes('dastaketa-kit')
+          );
+        });
+
+        setStoreTastings(storeEvents);
+        setHomeTastingKits(homeKits);
+      }
+    }
+    loadData();
+  }, []);
+
+  return (
+    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* 1. Hero Editorial */}
+      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/secciones/Catas.JPG"
+            alt={t.exp_hero_title}
+            className="w-full h-full object-cover object-center"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+            }}
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+        </div>
 
-          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-stone-800">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 cursor-pointer group"
-                >
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5] group-hover:scale-105 transition-transform shrink-0">
-                    <img
-                      src="/Logo.jpg"
-                      alt="EkhiTeka"
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-serif font-bold text-lg text-white tracking-wider">
-                      Ekhi<span className="text-[#FFE259]">Teka</span>
-                    </span>
-                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400">
-                      Lekeitio · Bizkaia
-                    </span>
-                  </div>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full text-stone-300 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
-                  aria-label="Close"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
+        <div className="relative z-10 max-w-2xl space-y-4 text-white">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
+            <Sparkles className="w-3.5 h-3.5" /> {t.exp_hero_badge}
+          </span>
 
-              <div className="space-y-2 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  {t.nav_explore_selection}
-                </p>
-                <Link
-                  href="/tienda"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/tienda'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_shop}</span>
-                </Link>
-                <Link
-                  href="/regalos-gourmet"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/regalos-gourmet'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_gourmet_gifts}</span>
-                </Link>
-                <Link
-                  href="/experiencias"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/experiencias'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_tastings_experiences}</span>
-                </Link>
-                <Link
-                  href="/regalos-empresa"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/regalos-empresa'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_corporate_gifts}</span>
-                </Link>
-              </div>
+          <h1 className="text-3xl sm:text-5xl font-black font-serif tracking-tight leading-tight">
+            {t.exp_hero_title} <span className="text-[#FFE259]">{t.exp_hero_title_highlight}</span>
+          </h1>
 
-              {/* SECCIÓN TU CUENTA */}
-              <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  {t.nav_your_account}
-                </p>
-                {user ? (
-                  <>
-                    <Link
-                      href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={\`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                        pathname.includes('/pedidos')
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : hasUnseenOrderUpdates
-                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }\`}
-                    >
-                      <span>{t.nav_orders}</span>
-                      {hasUnseenOrderUpdates && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black uppercase">
-                          Nuevo
-                        </span>
-                      )}
-                    </Link>
+          <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
+            {t.exp_hero_desc}
+          </p>
+        </div>
+      </section>
 
-                    {isSeller && (
-                      <Link
-                        href="/vendedor/eventos"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={\`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                          pathname === '/vendedor/eventos'
-                            ? 'bg-[#FFE259] text-[#1D1D1B]'
-                            : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                        }\`}
-                      >
-                        <span>{t.nav_events}</span>
-                      </Link>
-                    )}
-
-                    {isSeller && (
-                      <Link
-                        href="/vendedor/productos/nuevo"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={\`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all \${
-                          pathname === '/vendedor/productos/nuevo'
-                            ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
-                            : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
-                        }\`}
-                      >
-                        <span>{t.nav_add_product}</span>
-                      </Link>
-                    )}
-
-                    <Link
-                      href="/chat"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={\`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                        pathname.startsWith('/chat')
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }\`}
-                    >
-                      <span>{t.nav_chats}</span>
-                      {unreadMessagesCount > 0 && (
-                        <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
-                          {unreadMessagesCount}
-                        </span>
-                      )}
-                    </Link>
-
-                    <Link
-                      href="/perfil"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={\`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                        pathname === '/perfil'
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }\`}
-                    >
-                      <span>{t.nav_profile}</span>
-                    </Link>
-
-                    <form action={signout} className="pt-2">
-                      <button
-                        type="submit"
-                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
-                      >
-                        <span>{t.nav_logout}</span>
-                      </button>
-                    </form>
-                  </>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2 pt-1 font-serif">
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-white hover:border-[#FFE259] hover:text-[#FFE259] transition-all bg-stone-850"
-                    >
-                      {t.nav_login}
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#FFE259] font-black text-xs tracking-[0.14em] uppercase text-[#1D1D1B] shadow-md hover:scale-102 transition-all"
-                    >
-                      {t.nav_register}
-                    </Link>
-                  </div>
-                )}
-              </div>
+      {/* 2. Cuatro Tarjetas de Experiencias con Botones Amarillos Unificados */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-serif">
+        {/* Tarjeta 1: Catas en Casa */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3">
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Cestas.JPG"
+                alt={t.exp_home_tasting_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
             </div>
-
-            <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
-              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
-                <Store className="w-3.5 h-3.5 text-[#FFE259]" />
-                <span>Quesería & Tienda en Lekeitio</span>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Home className="w-4 h-4" />
               </div>
-              <p>{storeAddress}</p>
-              <p className="font-semibold text-[#FFE259]">WhatsApp: +{whatsappPhone}</p>
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_home_tasting_badge}
+              </span>
             </div>
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_home_tasting_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_home_tasting_desc}
+            </p>
           </div>
-        </div>,
-        document.body
+          <a
+            href={getWhatsAppUrl('Hola, quisiera solicitar un Kit de Cata en Casa')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>{t.exp_home_tasting_btn}</span>
+          </a>
+        </div>
+
+        {/* Tarjeta 2: Catas en la Tienda */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3">
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Catas.JPG"
+                alt={t.exp_store_tasting_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Wine className="w-4 h-4" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_store_tasting_badge}
+              </span>
+            </div>
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_store_tasting_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_store_tasting_desc}
+            </p>
+          </div>
+          <a
+            href="#catas-tienda"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <Ticket className="w-3.5 h-3.5" />
+            <span>{t.exp_store_tasting_btn}</span>
+          </a>
+        </div>
+
+        {/* Tarjeta 3: Mesas para Bodas */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3">
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Mesas.JPG"
+                alt={t.exp_wedding_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <HeartHandshake className="w-4 h-4" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_wedding_badge}
+              </span>
+            </div>
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_wedding_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_wedding_desc}
+            </p>
+          </div>
+          <a
+            href={getWhatsAppUrl('Hola, quisiera pedir presupuesto para Mesa de Quesos de Boda')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>{t.exp_wedding_btn}</span>
+          </a>
+        </div>
+
+        {/* Tarjeta 4: Préstamo de Raclette */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3">
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Quesos.JPG"
+                alt={t.exp_raclette_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Flame className="w-4 h-4" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_raclette_badge}
+              </span>
+            </div>
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_raclette_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_raclette_desc}
+            </p>
+          </div>
+          <a
+            href={getWhatsAppUrl('Hola, quisiera consultar disponibilidad para préstamo de Raclette')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>{t.exp_raclette_btn}</span>
+          </a>
+        </div>
+      </section>
+
+      {/* 3. Catas Presenciales Disponibles */}
+      {storeTastings.length > 0 && (
+        <section id="catas-tienda" className="space-y-6 pt-4 font-serif">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              {t.event_upcoming_subtitle}
+            </span>
+            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
+              {t.event_upcoming_title}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {storeTastings.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 4. Kits de Cata para Casa */}
+      {homeTastingKits.length > 0 && (
+        <section className="space-y-6 pt-4 font-serif">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              {t.event_home_catalog_subtitle}
+            </span>
+            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
+              {t.event_home_catalog_title}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {homeTastingKits.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
@@ -985,186 +447,360 @@ export function NavbarNavLinks({
 `,
 
   // =========================================================================
-  // 5. NAVBAR HEADER (Dirección dinámica desde configuración de tienda)
+  // 3. SELECTOR DE CANTIDAD (Modo Oscuro Corregido)
   // =========================================================================
-  'components/Navbar.tsx': `import { createClient } from '@/lib/supabase/server';
-import { type Profile, parseProfile } from '@/types/database';
-import { NavbarNavLinks } from '@/components/NavbarNavLinks';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import { ThemeSelector } from '@/components/ThemeSelector';
+  'components/ProductDetailAddToCart.tsx': `'use client';
 
-export default async function Navbar() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+import { useState } from 'react';
+import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
+import type { ProductWithSeller } from '@/types/database';
+import { ShoppingBag, Check, Pencil, Ticket } from 'lucide-react';
 
-  let profile: Profile | null = null;
-  let unreadMessagesCount = 0;
-  let ordersCount = 0;
-  let activeOrders: { id: string; status: string }[] = [];
+interface ProductDetailAddToCartProps {
+  product: ProductWithSeller;
+  isSeller?: boolean;
+}
 
-  const { data: sellerRaw } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('role', 'vendedor')
-    .limit(1)
-    .maybeSingle();
+export function ProductDetailAddToCart({
+  product,
+  isSeller = false,
+}: ProductDetailAddToCartProps) {
+  const { addToCart } = useCart();
+  const { t } = useLanguage();
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
 
-  const sellerProfile = parseProfile(sellerRaw);
-  const activeAddr = sellerProfile.pickup_addresses?.find((a) => a.is_active) || sellerProfile.pickup_addresses?.[0];
-  const storeAddress = activeAddr
-    ? \`\${activeAddr.street}\${activeAddr.number ? \` \${activeAddr.number}\` : ''}, \${activeAddr.town} · \${activeAddr.province}\`
-    : 'Gamarra Kalea 4, Lekeitio · Bizkaia';
+  const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
+  const maxStock = product.is_unlimited_stock ? 99 : Math.max(0, product.stock ?? 0);
+  const isEvent =
+    product.category_id === 'catas' ||
+    product.category_id === 'cata_presencial' ||
+    product.category_id === 'experiencia' ||
+    product.name.toLowerCase().includes('cata');
 
-  if (user) {
-    const [profileRes, unreadRes, ordersRes] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', user.id).single(),
-      supabase
-        .from('chat_messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('receiver_id', user.id)
-        .eq('is_read', false),
-      supabase
-        .from('orders')
-        .select('id, status')
-        .or(\`seller_id.eq.\${user.id},buyer_id.eq.\${user.id}\`)
-        .order('updated_at', { ascending: false })
-        .limit(25),
-    ]);
+  const handleAdd = () => {
+    if (isSoldOut || quantity <= 0) return;
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product, 'EkhiTeka Selección');
+    }
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  };
 
-    profile = profileRes.data;
-    unreadMessagesCount = unreadRes.count || 0;
-    activeOrders = ordersRes.data || [];
-    ordersCount = activeOrders.filter((o) =>
-      ['pendiente', 'confirmado', 'preparando', 'listo_entrega'].includes(o.status)
-    ).length;
+  if (isSeller) {
+    return (
+      <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-3">
+        <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
+          Modo Vendedor: Estás previsualizando la ficha de este producto.
+        </p>
+        <Link
+          href={\`/vendedor/productos/\${product.id}/editar\`}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-xs font-serif"
+        >
+          <Pencil className="w-4 h-4" />
+          <span>Editar variables del producto</span>
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-[#FAF8F5]/95 dark:bg-[#141312]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-stone-800 shadow-xs transition-colors">
-      {/* Barra Principal de Navegación */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
-        <NavbarNavLinks
-          user={user}
-          profile={profile}
-          unreadMessagesCount={unreadMessagesCount}
-          ordersCount={ordersCount}
-          activeOrders={activeOrders}
-        />
+    <div className="space-y-3 font-serif">
+      <div className="flex items-center gap-3">
+        {/* Selector de cantidad con modo oscuro nítido */}
+        {!isSoldOut && (
+          <div className="flex items-center rounded-2xl border-2 border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-[#1F1E1C] p-1 shadow-inner">
+            <button
+              type="button"
+              disabled={quantity <= 1}
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-stone-700 dark:text-stone-200 font-bold hover:bg-stone-200 dark:hover:bg-stone-800 disabled:opacity-30 cursor-pointer transition-colors"
+            >
+              -
+            </button>
+            <span className="w-10 text-center text-xs font-black text-stone-900 dark:text-[#F5F5F0]">
+              {quantity}
+            </span>
+            <button
+              type="button"
+              disabled={quantity >= maxStock}
+              onClick={() => setQuantity((q) => Math.min(maxStock, q + 1))}
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-stone-700 dark:text-stone-200 font-bold hover:bg-stone-200 dark:hover:bg-stone-800 disabled:opacity-30 cursor-pointer transition-colors"
+            >
+              +
+            </button>
+          </div>
+        )}
+
+        {/* Botón Principal */}
+        <button
+          type="button"
+          disabled={isSoldOut}
+          onClick={handleAdd}
+          className={\`flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer \${
+            isSoldOut
+              ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed shadow-none'
+              : added
+              ? 'bg-emerald-700 text-white'
+              : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:scale-102 hover:shadow-lg'
+          }\`}
+        >
+          {isSoldOut ? (
+            <span>{isEvent ? t.event_capacity_full : t.prod_sold_out}</span>
+          ) : added ? (
+            <>
+              <Check className="w-5 h-5" />
+              <span>{isEvent ? t.event_seats_added : t.prod_added}</span>
+            </>
+          ) : (
+            <>
+              {isEvent ? <Ticket className="w-5 h-5" /> : <ShoppingBag className="w-5 h-5" />}
+              <span>{isEvent ? t.event_reserve_seat : t.prod_add_to_cart}</span>
+            </>
+          )}
+        </button>
       </div>
 
-      {/* Sub-barra de Utilidades */}
-      <div className="border-t border-[#E8E5DF]/70 dark:border-stone-800/80 bg-[#FAF8F5]/80 dark:bg-[#141312]/80 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
-          <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
-            {storeAddress}
-          </span>
-          <div className="flex items-center gap-2">
-            <ThemeSelector />
-            <LanguageSelector />
+      {/* Aviso de stock / plazas restantes */}
+      {!isSoldOut && product.stock !== null && product.stock <= 5 && !product.is_unlimited_stock && (
+        <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+          {isEvent ? \`¡Atención! Solo quedan \${product.stock} plazas disponibles.\` : \`¡Últimas \${product.stock} unidades en stock!\`}
+        </p>
+      )}
+    </div>
+  );
+}
+`,
+
+  // =========================================================================
+  // 4. FICHA DE PRODUCTO (Caja de dudas con Modo Oscuro Corregido)
+  // =========================================================================
+  'app/producto/[id]/page.tsx': `import { createClient } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { ProductCard } from '@/components/ProductCard';
+import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
+import { getProductImage } from '@/lib/productHelpers';
+import type { ProductWithSeller } from '@/types/database';
+import {
+  ArrowLeft,
+  MapPin,
+  Truck,
+  Store,
+  ShieldCheck,
+  MessageCircle,
+  Ticket,
+} from 'lucide-react';
+
+export const revalidate = 0;
+
+interface ProductPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function ProductDetailPage({ params }: ProductPageProps) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const [{ data: { user } }, { data: product }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('products')
+      .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone, role)')
+      .eq('id', id)
+      .single(),
+  ]);
+
+  if (!product) notFound();
+
+  let isSeller = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+      isSeller = true;
+    }
+  }
+
+  const { data: relatedData } = await supabase
+    .from('products')
+    .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
+    .eq('category_id', product.category_id)
+    .neq('id', product.id)
+    .eq('is_active', true)
+    .limit(4);
+
+  const relatedProducts = (relatedData || []) as unknown as ProductWithSeller[];
+
+  const isEvent =
+    product.category_id === 'catas' ||
+    product.category_id === 'cata_presencial' ||
+    product.category_id === 'experiencia' ||
+    product.name.toLowerCase().includes('cata');
+
+  const imageUrl = getProductImage(product);
+
+  return (
+    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* Botón Volver */}
+      <div>
+        <Link
+          href="/tienda"
+          className="inline-flex items-center gap-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-600 dark:text-stone-400 hover:text-stone-950 dark:hover:text-stone-100 transition-colors p-2 rounded-xl bg-stone-100 dark:bg-stone-850 border border-stone-200 dark:border-stone-700"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Volver a la selección</span>
+        </Link>
+      </div>
+
+      {/* Grid Principal del Producto */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* Imagen */}
+        <div className="lg:col-span-6 space-y-4">
+          <div className="relative aspect-4/3 sm:aspect-square w-full rounded-3xl overflow-hidden border-2 border-stone-200 dark:border-stone-800 bg-[#FAF7F2] dark:bg-stone-850 shadow-lg">
+            <img
+              src={imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+              }}
+            />
+            {product.origin_region && (
+              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-xs text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-md">
+                <MapPin className="w-3.5 h-3.5 text-[#FFE259]" />
+                <span>{product.origin_region}</span>
+              </span>
+            )}
+            {isEvent && (
+              <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-xl uppercase tracking-wider shadow-md">
+                <Ticket className="w-3.5 h-3.5" />
+                <span>{product.stock} plazas disponibles</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Información & Checkout */}
+        <div className="lg:col-span-6 space-y-6">
+          <div className="space-y-2 border-b border-stone-200 dark:border-stone-800 pb-4">
+            <span className="text-xs font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              EkhiTeka Gourmet · Lekeitio
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 dark:text-stone-100 leading-tight">
+              {product.name}
+            </h1>
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-bold text-stone-500 dark:text-stone-400">
+              {product.format && (
+                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
+                  Formato: {product.format}
+                </span>
+              )}
+              {product.weight_g && (
+                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
+                  Peso: {product.weight_g}g
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Precio y Componente de Compra/Reserva */}
+          <div className="space-y-4">
+            <div className="flex items-baseline gap-3">
+              <span className="text-3xl sm:text-4xl font-black font-serif text-[#1D1D1B] dark:text-stone-100">
+                {Number(product.price).toFixed(2)} €
+              </span>
+              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
+                {isEvent ? '/ plaza' : 'IVA incl.'}
+              </span>
+            </div>
+
+            <ProductDetailAddToCart
+              product={product as unknown as ProductWithSeller}
+              isSeller={isSeller}
+            />
+          </div>
+
+          {/* Descripción & Notas de Cata */}
+          {product.description && (
+            <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
+              <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-800 dark:text-stone-200">
+                Descripción & Detalles
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium whitespace-pre-line">
+                {product.description}
+              </p>
+            </div>
+          )}
+
+          {/* Asesoramiento por Chat con Modo Oscuro Corregido */}
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <p className="text-xs font-bold font-serif text-stone-900 dark:text-stone-100">
+                ¿Tienes alguna duda sobre este producto?
+              </p>
+              <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                Consulta directamente con nuestros afinadores y expertos.
+              </p>
+            </div>
+            <Link
+              href={\`/chat/\${product.seller_id}?product_id=\${product.id}\`}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-black uppercase tracking-wider transition-all font-serif shrink-0 shadow-xs hover:scale-105"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Preguntar</span>
+            </Link>
+          </div>
+
+          {/* Garantías de Entrega */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-600 dark:text-stone-400">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
+              <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              <span>Frío garantizado 24/48h</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
+              <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              <span>Recogida en Lekeitio</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
+              <ShieldCheck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              <span>Calidad artesanal km0</span>
+            </div>
           </div>
         </div>
       </div>
-    </header>
+
+      {/* Productos Relacionados */}
+      {relatedProducts.length > 0 && (
+        <section className="space-y-6 pt-10 border-t border-stone-200 dark:border-stone-800">
+          <div className="pb-2">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              Recomendaciones del afinador
+            </span>
+            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
+              También te puede interesar
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {relatedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }
 `,
 
   // =========================================================================
-  // 6. ROOT LAYOUT (Envuelve con StoreConfigProvider y tema anti-flash)
-  // =========================================================================
-  'app/layout.tsx': `import type { Metadata } from 'next';
-import { DM_Sans, Cormorant_Garamond } from 'next/font/google';
-import './globals.css';
-import { LanguageProvider } from '@/context/LanguageContext';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { CartProvider } from '@/context/CartContext';
-import { StoreConfigProvider } from '@/context/StoreConfigContext';
-import Navbar from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { CartDrawer } from '@/components/CartDrawer';
-import { CookieBanner } from '@/components/CookieBanner';
-import { createClient } from '@/lib/supabase/server';
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-cormorant',
-  display: 'swap',
-});
-
-export const metadata: Metadata = {
-  title: 'EkhiTeka | Quesería Gourmet & Tienda Artesana en Lekeitio',
-  description: 'Quesos artesanos, regalos gourmet, catas, salazones del cantábrico, txakoli y selección de autor en Lekeitio y Euskal Herria.',
-  icons: {
-    icon: '/Logo.jpg',
-    apple: '/Logo.jpg',
-  },
-};
-
-const themeScript = \`
-(function() {
-  try {
-    var saved = localStorage.getItem('ekhiteka_theme');
-    var isDark =
-      saved === 'dark' ||
-      ((!saved || saved === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    if (isDark) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  } catch(e) {}
-})();
-\`;
-
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const supabase = await createClient();
-  const { data: sellerRaw } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('role', 'vendedor')
-    .limit(1)
-    .maybeSingle();
-
-  return (
-    <html lang="eu" className={\`\${dmSans.variable} \${cormorant.variable}\`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body className="min-h-screen flex flex-col antialiased selection:bg-[#FFE259] selection:text-[#1D1D1B] bg-[#FAF8F5] dark:bg-[#141312] text-[#1D1D1B] dark:text-[#F5F5F0]">
-        <ThemeProvider>
-          <LanguageProvider>
-            <StoreConfigProvider initialSellerProfile={sellerRaw}>
-              <CartProvider>
-                <Navbar />
-                <main className="flex-1 w-full">
-                  {children}
-                </main>
-                <Footer />
-                <CartDrawer />
-                <CookieBanner />
-              </CartProvider>
-            </StoreConfigProvider>
-          </LanguageProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
-}
-`,
-
-  // =========================================================================
-  // 7. PROFILE FORM (Vista/Edición de bio + Puntos de recogida + WhatsApp + Clave)
+  // 5. PROFILE FORM (Modo Oscuro con contraste perfecto en todos los datos)
   // =========================================================================
   'components/ProfileForm.tsx': `'use client';
 
@@ -1179,7 +815,6 @@ import {
   MapPin,
   Lock,
   Check,
-  ShieldCheck,
   Home,
   Pencil,
   Plus,
@@ -1227,7 +862,6 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const isSeller = p.role === 'vendedor' || p.role === 'admin';
   const isComplete = isProfileComplete(p);
 
-  // Gestión de puntos de recogida del vendedor
   const handleSetActiveAddress = (id: string) => {
     const updated = pickupAddresses.map((addr) => ({
       ...addr,
@@ -1332,7 +966,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   return (
     <div className="space-y-8 font-serif">
       {/* 1. TARJETA PRINCIPAL DE PERFIL */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
+      <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
         {/* Cabecera con Estado y Botón Editar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100 dark:border-stone-800">
           <div className="flex items-center gap-3">
@@ -1392,77 +1026,77 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
           </div>
         )}
 
-        {/* MODO VISTA: CADA CAMPO VISIBLE UNO A UNO */}
+        {/* ----------------- MODO VISTA CON MODO OSCURO NÍTIDO ----------------- */}
         {!isEditing ? (
           <div className="space-y-6 font-sans text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_first_name} & {t.profile_last_name_1}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {[p.first_name, p.last_name_1, p.last_name_2].filter(Boolean).join(' ') || p.full_name || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_dni}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm uppercase">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm uppercase">
                   {p.dni || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_birth_date}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.birth_date || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_phone}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.phone || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.auth_email}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.email || t.profile_not_specified}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block">
                   {t.profile_town} · {t.profile_province}
                 </span>
-                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                   {p.town || 'Lekeitio'} ({p.province || 'Bizkaia'})
                 </p>
               </div>
             </div>
 
-            {/* Dirección Personal */}
-            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-2">
+            {/* Dirección Personal con Modo Oscuro */}
+            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-2">
               <span className="text-[10px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
                 <Home className="w-3.5 h-3.5" />
                 <span>{t.profile_address_data}</span>
               </span>
-              <p className="text-sm font-bold text-stone-800 dark:text-stone-200">
+              <p className="text-sm font-bold text-stone-800 dark:text-[#F5F5F0]">
                 {formattedAddress || t.profile_not_specified}
               </p>
             </div>
 
-            {/* SECCIÓN VENDEDOR: WHATSAPP Y TIENDAS (MODO VISTA) */}
+            {/* SECCIÓN VENDEDOR: WHATSAPP Y TIENDAS */}
             {isSeller && (
               <div className="space-y-4 pt-4 border-t border-stone-200/60 dark:border-stone-800">
                 {/* WhatsApp Tienda */}
@@ -1473,7 +1107,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                       <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block font-serif">
                         WhatsApp Oficial de la Tienda
                       </span>
-                      <p className="text-sm font-black text-stone-900 dark:text-stone-100">
+                      <p className="text-sm font-black text-stone-900 dark:text-[#F5F5F0]">
                         +{p.whatsapp_phone || p.phone || '34600000000'}
                       </p>
                     </div>
@@ -1482,7 +1116,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
 
                 {/* Direcciones de Recogida en Tienda */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block font-serif">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-400 block font-serif">
                     Puntos de Entrega & Recogida en Tienda ({pickupAddresses.length})
                   </span>
                   <div className="space-y-2">
@@ -1492,20 +1126,20 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                         className={\`p-3.5 rounded-2xl border flex items-center justify-between gap-3 \${
                           addr.is_active
                             ? 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700'
-                            : 'bg-stone-50 dark:bg-stone-850 border-stone-200 dark:border-stone-700'
+                            : 'bg-stone-50 dark:bg-[#1F1E1C] border-stone-200 dark:border-stone-800'
                         }\`}
                       >
                         <div className="space-y-0.5 min-w-0">
                           <div className="flex items-center gap-2">
                             <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                            <h4 className="font-bold text-stone-900 dark:text-stone-100 truncate">{addr.title}</h4>
+                            <h4 className="font-bold text-stone-900 dark:text-[#F5F5F0] truncate">{addr.title}</h4>
                             {addr.is_active && (
                               <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase">
                                 Activa
                               </span>
                             )}
                           </div>
-                          <p className="text-stone-600 dark:text-stone-400 text-[11px] truncate">
+                          <p className="text-stone-600 dark:text-stone-300 text-[11px] truncate">
                             {addr.street} {addr.number || ''}, {addr.town} ({addr.province}) · {addr.schedule || ''}
                           </p>
                         </div>
@@ -1530,7 +1164,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="first_name"
                   required
                   defaultValue={p.first_name || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -1542,7 +1176,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="last_name_1"
                   required
                   defaultValue={p.last_name_1 || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -1553,7 +1187,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   type="text"
                   name="last_name_2"
                   defaultValue={p.last_name_2 || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -1570,7 +1204,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   required
                   defaultValue={p.dni || ''}
                   placeholder="12345678Z"
-                  className="w-full px-3.5 py-2.5 rounded-xl border uppercase"
+                  className="w-full px-3.5 py-2.5 rounded-xl border uppercase bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -1582,7 +1216,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="birth_date"
                   required
                   defaultValue={p.birth_date || ''}
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
               <div>
@@ -1595,7 +1229,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   required
                   defaultValue={p.phone || ''}
                   placeholder="600 000 000"
-                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -1615,7 +1249,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="province"
                     required
                     defaultValue={p.province || 'Bizkaia'}
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -1627,7 +1261,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="town"
                     required
                     defaultValue={p.town || 'Lekeitio'}
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -1640,7 +1274,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.postal_code || ''}
                     placeholder="48280"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
               </div>
@@ -1656,7 +1290,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.street || ''}
                     placeholder="Gamarra Kalea"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -1669,7 +1303,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.number || ''}
                     placeholder="4"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -1681,7 +1315,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="stair"
                     defaultValue={p.stair || ''}
                     placeholder="A"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -1694,7 +1328,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.floor || ''}
                     placeholder="2"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
                 <div>
@@ -1707,7 +1341,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.door || ''}
                     placeholder="B"
-                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                    className="w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                   />
                 </div>
               </div>
@@ -1717,7 +1351,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
             {isSeller && (
               <div className="space-y-6 pt-4 border-t border-stone-200 dark:border-stone-800">
                 {/* WhatsApp Config */}
-                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-3">
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 space-y-3">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-emerald-600" />
                     <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 font-serif">
@@ -1756,7 +1390,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                           value={customWhatsApp}
                           onChange={(e) => setCustomWhatsApp(e.target.value)}
                           placeholder="Ej: 34600000000"
-                          className="w-full sm:max-w-xs px-3.5 py-2 rounded-xl border font-bold"
+                          className="w-full sm:max-w-xs px-3.5 py-2 rounded-xl border font-bold bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                         />
                       </div>
                     )}
@@ -1783,13 +1417,13 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   </div>
 
                   <div className="space-y-4">
-                    {pickupAddresses.map((addr, idx) => (
+                    {pickupAddresses.map((addr) => (
                       <div
                         key={addr.id}
                         className={\`p-4 rounded-2xl border-2 space-y-3 \${
                           addr.is_active
                             ? 'border-[#FFE259] bg-amber-50/40 dark:bg-amber-950/20'
-                            : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-850'
+                            : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#1F1E1C]'
                         }\`}
                       >
                         <div className="flex items-center justify-between gap-2">
@@ -1799,7 +1433,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                               value={addr.title}
                               onChange={(e) => handleUpdateAddress(addr.id, 'title', e.target.value)}
                               placeholder="Nombre de la tienda / sede"
-                              className="font-bold px-2 py-1 rounded-lg border text-xs"
+                              className="font-bold px-2 py-1 rounded-lg border text-xs bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                             />
                             {addr.is_active ? (
                               <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase">
@@ -1832,28 +1466,28 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                             value={addr.street}
                             onChange={(e) => handleUpdateAddress(addr.id, 'street', e.target.value)}
                             placeholder="Calle"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                           <input
                             type="text"
                             value={addr.number || ''}
                             onChange={(e) => handleUpdateAddress(addr.id, 'number', e.target.value)}
                             placeholder="Nº"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                           <input
                             type="text"
                             value={addr.town}
                             onChange={(e) => handleUpdateAddress(addr.id, 'town', e.target.value)}
                             placeholder="Municipio"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                           <input
                             type="text"
                             value={addr.province}
                             onChange={(e) => handleUpdateAddress(addr.id, 'province', e.target.value)}
                             placeholder="Provincia"
-                            className="px-2.5 py-1.5 rounded-lg border"
+                            className="px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                           />
                         </div>
 
@@ -1862,7 +1496,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                           value={addr.schedule || ''}
                           onChange={(e) => handleUpdateAddress(addr.id, 'schedule', e.target.value)}
                           placeholder="Horario de atención (Ej: Lun-Vie 10:00-14:30 | 17:00-20:30)"
-                          className="w-full px-2.5 py-1.5 rounded-lg border text-[11px]"
+                          className="w-full px-2.5 py-1.5 rounded-lg border text-[11px] bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                         />
                       </div>
                     ))}
@@ -1893,7 +1527,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
       </div>
 
       {/* 2. TARJETA CAMBIAR CONTRASEÑA */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
+      <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
         <button
           type="button"
           onClick={() => setIsPasswordOpen(!isPasswordOpen)}
@@ -1943,7 +1577,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="current_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -1959,7 +1593,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="new_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -1975,7 +1609,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="confirm_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
                 />
               </div>
             </div>
@@ -1997,302 +1631,6 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   );
 }
 `,
-
-  // =========================================================================
-  // 8. FOOTER (Usa WhatsApp dinámico de la tienda)
-  // =========================================================================
-  'components/Footer.tsx': `'use client';
-
-import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
-import { useStoreConfig } from '@/context/StoreConfigContext';
-import { Truck, Store } from 'lucide-react';
-
-export function Footer() {
-  const { t } = useLanguage();
-  const { storeAddress, whatsappPhone, getWhatsAppUrl } = useStoreConfig();
-
-  return (
-    <footer className="border-t border-stone-200 dark:border-stone-800 bg-[#1D1D1B] text-stone-300 transition-colors pt-0 pb-8">
-      {/* 1. Banner Destacado Amarillo */}
-      <div className="bg-[#FFE259] text-[#1D1D1B] py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-1 text-center md:text-left">
-            <span className="text-[11px] font-black uppercase tracking-widest block text-stone-800">
-              {t.footer_club_title}
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-serif sm:font-sans">
-              {t.footer_club_subtitle}
-            </h3>
-            <p className="text-xs sm:text-sm font-semibold text-stone-800 max-w-xl">
-              {t.footer_club_desc}
-            </p>
-          </div>
-
-          <a
-            href={getWhatsAppUrl('Hola, quisiera unirme a las novedades del Club de Amigos de EkhiTeka')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] text-white hover:bg-stone-800 font-black text-xs uppercase tracking-wider transition-all shadow-md shrink-0 hover:scale-105"
-          >
-            <span>{t.footer_join_whatsapp}</span>
-          </a>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 pt-12">
-        {/* 2. Valores Gourmet */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10 border-b border-stone-800 text-center md:text-left">
-          <div className="flex items-start gap-4 justify-center md:justify-start">
-            <div className="w-12 h-12 rounded-2xl bg-[#FFE259]/15 text-[#FFE259] flex items-center justify-center shrink-0 text-xl border border-[#FFE259]/30">
-              🧀
-            </div>
-            <div className="space-y-1">
-              <h4 className="text-sm font-black text-white">{t.cat_queso} & {t.shop_specialty}</h4>
-              <p className="text-xs text-stone-400 leading-relaxed font-medium">
-                {t.footer_cheese_desc}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 justify-center md:justify-start">
-            <div className="w-12 h-12 rounded-2xl bg-[#FFE259]/15 text-[#FFE259] flex items-center justify-center shrink-0 border border-[#FFE259]/30">
-              <Truck className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <div className="space-y-1">
-              <h4 className="text-sm font-black text-white">{t.deliv_home}</h4>
-              <p className="text-xs text-stone-400 leading-relaxed font-medium">
-                {t.footer_delivery_desc}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 justify-center md:justify-start">
-            <div className="w-12 h-12 rounded-2xl bg-[#FFE259]/15 text-[#FFE259] flex items-center justify-center shrink-0 border border-[#FFE259]/30">
-              <Store className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <div className="space-y-1">
-              <h4 className="text-sm font-black text-white">{t.deliv_store_pickup}</h4>
-              <p className="text-xs text-stone-400 leading-relaxed font-medium">
-                {t.footer_pickup_desc}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* 3. Enlaces & Categorías */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
-          <div className="space-y-3">
-            <h4 className="font-black text-white uppercase tracking-wider text-[11px]">{t.footer_categories}</h4>
-            <ul className="space-y-2 text-stone-400 font-semibold">
-              <li><Link href="/categoria/queso" className="hover:text-[#FFE259] transition-colors">{t.cat_queso}</Link></li>
-              <li><Link href="/categoria/salazon" className="hover:text-[#FFE259] transition-colors">{t.cat_salazon}</Link></li>
-              <li><Link href="/categoria/atun" className="hover:text-[#FFE259] transition-colors">{t.cat_atun}</Link></li>
-              <li><Link href="/categoria/jildas" className="hover:text-[#FFE259] transition-colors">{t.cat_jildas}</Link></li>
-              <li><Link href="/categoria/txakoli" className="hover:text-[#FFE259] transition-colors">{t.cat_txakoli}</Link></li>
-              <li><Link href="/categoria/cerveza" className="hover:text-[#FFE259] transition-colors">{t.cat_cerveza}</Link></li>
-              <li><Link href="/categoria/sidra" className="hover:text-[#FFE259] transition-colors">{t.cat_sidra}</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-black text-white uppercase tracking-wider text-[11px]">{t.footer_experiences}</h4>
-            <ul className="space-y-2 text-stone-400 font-semibold">
-              <li><Link href="/#experiencias" className="hover:text-[#FFE259] transition-colors">{t.footer_exp_tasting}</Link></li>
-              <li><Link href="/#experiencias" className="hover:text-[#FFE259] transition-colors">{t.footer_exp_weddings}</Link></li>
-              <li><Link href="/#experiencias" className="hover:text-[#FFE259] transition-colors">{t.footer_exp_gifts}</Link></li>
-              <li><Link href="/chat" className="hover:text-[#FFE259] transition-colors">{t.footer_exp_consult}</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-black text-white uppercase tracking-wider text-[11px]">{t.footer_legal}</h4>
-            <ul className="space-y-2 text-stone-400 font-semibold">
-              <li><Link href="/terminos" className="hover:text-[#FFE259] transition-colors">{t.legal_terms}</Link></li>
-              <li><Link href="/privacidad" className="hover:text-[#FFE259] transition-colors">{t.legal_privacy}</Link></li>
-              <li><Link href="/cookies" className="hover:text-[#FFE259] transition-colors">{t.legal_cookies}</Link></li>
-              <li><Link href="/aviso-legal" className="hover:text-[#FFE259] transition-colors">{t.legal_notice}</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <img
-                src="/Logo.jpg"
-                alt="EkhiTeka"
-                className="w-10 h-10 rounded-full object-cover border border-[#FFE259]"
-              />
-              <h4 className="font-black text-white uppercase tracking-wider text-[12px]">EkhiTeka Lekeitio</h4>
-            </div>
-
-            <div className="w-full h-24 rounded-2xl overflow-hidden border border-stone-800 relative">
-              <img
-                src="/images/secciones/Tienda.JPG"
-                alt="Quesería EkhiTeka Lekeitio"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <p className="text-stone-400 leading-relaxed font-medium">
-              {storeAddress}
-            </p>
-            <div className="text-stone-400 font-medium space-y-0.5 text-[11px]">
-              <p className="font-bold text-stone-300">{t.footer_schedule_title}</p>
-              <p>{t.footer_schedule_weekdays}</p>
-              <p>{t.footer_schedule_saturday}</p>
-            </div>
-            <p className="text-stone-300 font-bold text-[11px]">
-              WhatsApp: +{whatsappPhone}
-            </p>
-          </div>
-        </div>
-
-        {/* 4. Copyright */}
-        <div className="pt-8 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-stone-500 text-xs font-medium">
-          <p>© {new Date().getFullYear()} EkhiTeka Gourmet S.L. {t.footer_copyright}</p>
-          <div className="flex items-center gap-2">
-            <span>{t.footer_tagline}</span>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-`,
-
-  // =========================================================================
-  // 9. EXPERIENCE BANNERS (Usa WhatsApp dinámico de la tienda)
-  // =========================================================================
-  'components/ExperienceBanners.tsx': `'use client';
-
-import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
-import { useStoreConfig } from '@/context/StoreConfigContext';
-import { MessageCircle, Sparkles, Gift } from 'lucide-react';
-
-export function ExperienceBanners() {
-  const { t } = useLanguage();
-  const { getWhatsAppUrl } = useStoreConfig();
-
-  return (
-    <section id="experiencias" className="space-y-8 pt-8">
-      <div>
-        <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-          {t.exp_banner_badge}
-        </span>
-        <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif">
-          {t.exp_banner_title}
-        </h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
-        {/* Banner 1 */}
-        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Catas.JPG"
-                alt={t.exp_b1_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
-                {t.exp_b1_title}
-              </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
-                {t.exp_b1_desc}
-              </p>
-            </div>
-          </div>
-
-          <a
-            href={getWhatsAppUrl('Hola, quisiera información sobre las catas presenciales de EkhiTeka')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>{t.exp_b1_btn}</span>
-          </a>
-        </div>
-
-        {/* Banner 2 */}
-        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Mesas.JPG"
-                alt={t.exp_b2_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
-                {t.exp_b2_title}
-              </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
-                {t.exp_b2_desc}
-              </p>
-            </div>
-          </div>
-
-          <a
-            href={getWhatsAppUrl('Hola, quisiera presupuesto para un evento o boda con mesa de quesos')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 font-black text-xs transition-all shadow-xs"
-          >
-            <Sparkles className="w-4 h-4 text-[#FFE259]" />
-            <span>{t.exp_b2_btn}</span>
-          </a>
-        </div>
-
-        {/* Banner 3 */}
-        <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Cestas.JPG"
-                alt={t.exp_b3_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                }}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
-                {t.exp_b3_title}
-              </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
-                {t.exp_b3_desc}
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/regalos-gourmet"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
-          >
-            <Gift className="w-4 h-4" />
-            <span>{t.exp_b3_btn}</span>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-`,
 };
 
 Object.entries(files).forEach(([filePath, content]) => {
@@ -2302,4 +1640,4 @@ Object.entries(files).forEach(([filePath, content]) => {
   console.log(`✓ Actualizado: ${filePath}`);
 });
 
-console.log('\n🎉 ¡Todos los cambios implementados y verificados con éxito!');
+console.log('\n🎉 ¡Todos los componentes, estilos oscuros y botones corregidos con éxito!');

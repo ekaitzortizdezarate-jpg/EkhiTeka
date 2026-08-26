@@ -48,7 +48,6 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     }
   }
 
-  // Obtener productos relacionados de la misma categoría
   const { data: relatedData } = await supabase
     .from('products')
     .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
@@ -82,13 +81,16 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
       {/* Grid Principal del Producto */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* Imagen Prémium */}
+        {/* Imagen */}
         <div className="lg:col-span-6 space-y-4">
           <div className="relative aspect-4/3 sm:aspect-square w-full rounded-3xl overflow-hidden border-2 border-stone-200 dark:border-stone-800 bg-[#FAF7F2] dark:bg-stone-850 shadow-lg">
             <img
               src={imageUrl}
               alt={product.name}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+              }}
             />
             {product.origin_region && (
               <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-xs text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-md">
@@ -157,8 +159,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             </div>
           )}
 
-          {/* Asesoramiento por Chat */}
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 flex items-center justify-between gap-4">
+          {/* Asesoramiento por Chat con Modo Oscuro Corregido */}
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-4">
             <div className="space-y-0.5">
               <p className="text-xs font-bold font-serif text-stone-900 dark:text-stone-100">
                 ¿Tienes alguna duda sobre este producto?
@@ -169,7 +171,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             </div>
             <Link
               href={`/chat/${product.seller_id}?product_id=${product.id}`}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-stone-900 dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 text-xs font-black uppercase tracking-wider transition-all font-serif shrink-0 shadow-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-black uppercase tracking-wider transition-all font-serif shrink-0 shadow-xs hover:scale-105"
             >
               <MessageCircle className="w-4 h-4" />
               <span>Preguntar</span>
@@ -178,15 +180,15 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
           {/* Garantías de Entrega */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-600 dark:text-stone-400">
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
               <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
               <span>Frío garantizado 24/48h</span>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
               <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
               <span>Recogida en Lekeitio</span>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
               <ShieldCheck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
               <span>Calidad artesanal km0</span>
             </div>
