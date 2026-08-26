@@ -11,371 +11,823 @@ function saveFile(relativeFilePath, content) {
   console.log(`✓ Archivo actualizado: ${relativeFilePath}`);
 }
 
-// app/cesta/page.tsx
-saveFile('app/cesta/page.tsx', `
+// 1. components/NavbarNavLinks.tsx (Cesta solo visible con sesión iniciada y control de iluminación para vendedor)
+saveFile('components/NavbarNavLinks.tsx', `
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useCart } from '@/context/CartContext';
+import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { useStoreConfig } from '@/context/StoreConfigContext';
-import { createOrder } from '@/app/actions/orders';
-import { ShoppingBag, ArrowLeft, Trash2, Truck, Store, AlertCircle, Clock, MapPin } from 'lucide-react';
+import { signout } from '@/app/actions/auth';
+import type { Profile } from '@/types/database';
+import { CartNavButton } from '@/components/CartNavButton';
+import {
+  User,
+  LogOut,
+  Menu,
+  X,
+  Store,
+  MessageCircle,
+} from 'lucide-react';
 
-export default function CartPage() {
-  const router = useRouter();
-  const { items, updateQuantity, removeFromCart, clearCart, totalPrice, totalItems } = useCart();
+interface NavbarNavLinksProps {
+  user: { id: string } | null;
+  profile: Profile | null;
+  unreadMessagesCount: number;
+  ordersCount: number;
+  activeOrders?: { id: string; status: string }[];
+}
+
+export function NavbarNavLinks({
+  user,
+  profile,
+  unreadMessagesCount,
+  ordersCount,
+  activeOrders = [],
+}: NavbarNavLinksProps) {
+  const pathname = usePathname();
   const { t } = useLanguage();
-  const { activePickupAddresses, storeAddress } = useStoreConfig();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
 
-  const [deliveryType, setDeliveryType] = useState<'domicilio' | 'recogida_tienda'>('domicilio');
-  const [shippingAddress, setShippingAddress] = useState('');
-  const [shippingNotes, setShippingNotes] = useState('');
-  const [pickupSchedule, setPickupSchedule] = useState('');
-  const [selectedPickupAddressId, setSelectedPickupAddressId] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Inicializar con la primera dirección de recogida activa disponible
   useEffect(() => {
-    if (activePickupAddresses && activePickupAddresses.length > 0 && !selectedPickupAddressId) {
-      setSelectedPickupAddressId(activePickupAddresses[0].id);
+    setMounted(true);
+  }, []);
+
+  const isSeller = profile?.role === 'vendedor';
+  const isAdmin = profile?.role === 'admin';
+
+  // Control estricto de iluminación de pedidos (solo se ilumina si hay pedidos nuevos/no vistos)
+  useEffect(() => {
+    function checkUnseenOrders() {
+      if (!user || !activeOrders || activeOrders.length === 0) {
+        setHasUnseenOrderUpdates(false);
+        return;
+      }
+
+      const storageKey = isSeller ? 'ekhiteka_seen_orders_seller' : 'ekhiteka_seen_orders_buyer';
+      let seenMap: Record<string, string> = {};
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) seenMap = JSON.parse(stored);
+      } catch {}
+
+      const unseen = activeOrders.some((order) => {
+        const lastSeen = seenMap[order.id];
+        if (isSeller) {
+          // Para el vendedor: se ilumina únicamente si hay un pedido pendiente que aún no ha sido visto
+          return order.status === 'pendiente' && lastSeen !== 'pendiente';
+        } else {
+          // Para el comprador: se ilumina si el estado del pedido ha cambiado y no ha sido visto
+          if (lastSeen) {
+            return lastSeen !== order.status;
+          }
+          return order.status !== 'pendiente';
+        }
+      });
+
+      setHasUnseenOrderUpdates(unseen);
     }
-  }, [activePickupAddresses, selectedPickupAddressId]);
 
-  const handleSubmitOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (items.length === 0) return;
-
-    setLoading(true);
-    setError(null);
-
-    const firstItem = items[0];
-    const sellerId = firstItem.sellerId || firstItem.product?.seller_id || '';
-
-    // Obtener la dirección física de la tienda seleccionada
-    const chosenPickupAddress = activePickupAddresses.find((a) => a.id === selectedPickupAddressId) || activePickupAddresses[0];
-    const resolvedPickupAddressText = chosenPickupAddress
-      ? \`\${chosenPickupAddress.title} — \${chosenPickupAddress.street} \${chosenPickupAddress.number ? 'Nº ' + chosenPickupAddress.number : ''}, \${chosenPickupAddress.town} (\${chosenPickupAddress.province})\`
-      : storeAddress;
-
-    const orderPayload = {
-      sellerId,
-      seller_id: sellerId,
-      deliveryType,
-      delivery_method: deliveryType,
-      shippingAddress: deliveryType === 'domicilio' ? shippingAddress : resolvedPickupAddressText,
-      shipping_address: deliveryType === 'domicilio' ? shippingAddress : resolvedPickupAddressText,
-      shippingNotes: deliveryType === 'domicilio' ? shippingNotes : undefined,
-      shipping_notes: deliveryType === 'domicilio' ? shippingNotes : undefined,
-      pickupSchedule: deliveryType === 'recogida_tienda' ? pickupSchedule : undefined,
-      pickup_schedule: deliveryType === 'recogida_tienda' ? pickupSchedule : undefined,
-      totalPrice,
-      total_amount: totalPrice,
-      items: items.map((i) => {
-        const pId = i.productId || i.product?.id || '';
-        const price = Number(i.price || i.product?.price || 0);
-        return {
-          productId: pId,
-          product_id: pId,
-          sellerId: i.sellerId || i.product?.seller_id || sellerId,
-          seller_id: i.sellerId || i.product?.seller_id || sellerId,
-          quantity: i.quantity,
-          unitPrice: price,
-          unit_price: price,
-          subtotal: price * i.quantity,
-        };
-      }),
+    checkUnseenOrders();
+    window.addEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
+    window.addEventListener('storage', checkUnseenOrders);
+    return () => {
+      window.removeEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
+      window.removeEventListener('storage', checkUnseenOrders);
     };
+  }, [user, activeOrders, isSeller]);
 
-    const res = await createOrder(orderPayload);
-    setLoading(false);
-
-    if (res?.error) {
-      setError(res.error);
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
     } else {
-      clearCart();
-      router.push('/comprador/pedidos');
+      document.body.style.overflow = '';
     }
-  };
-
-  if (items.length === 0) {
-    return (
-      <div className="max-w-2xl mx-auto py-16 px-4 text-center space-y-6 font-serif">
-        <div className="w-16 h-16 rounded-3xl bg-amber-100 dark:bg-amber-950/60 text-[#C68D07] dark:text-[#FFE259] flex items-center justify-center mx-auto">
-          <ShoppingBag className="w-8 h-8" />
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100">
-          {t.cart_empty}
-        </h1>
-        <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 max-w-md mx-auto font-sans">
-          {t.cart_empty_sub}
-        </p>
-        <div>
-          <Link
-            href="/tienda"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105 cursor-pointer"
-          >
-            <span>{t.cart_explore_btn}</span>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-8 font-serif">
-      <div className="flex items-center gap-3">
-        <Link
-          href="/tienda"
-          className="p-2 rounded-xl bg-stone-100 dark:bg-[#1F1E1C] text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white transition-colors border border-stone-200 dark:border-stone-800"
+    <div className="flex items-center justify-between w-full min-w-0 gap-3">
+      {/* 1. LADO IZQUIERDO */}
+      <div className="flex items-center gap-3 xl:gap-5 min-w-0">
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
+          aria-label="Menu"
         >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100">
-            {t.cart_title} ({totalItems})
-          </h1>
-        </div>
-      </div>
+          <Menu className="w-6 h-6" />
+        </button>
 
-      {error && (
-        <div className="p-4 bg-red-100 dark:bg-red-950/70 border border-red-300 dark:border-red-800 rounded-2xl text-xs font-bold text-red-800 dark:text-red-200 flex items-center gap-2 font-sans">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Lista de productos */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs">
-          <div className="divide-y divide-stone-100 dark:divide-stone-800">
-            {items.map((item) => {
-              const id = item.productId || item.product?.id || '';
-              const name = item.name || item.product?.name || 'Producto';
-              const price = Number(item.price || item.product?.price || 0);
-              const img = item.imageUrl || item.product?.image_url || '/images/secciones/Quesos.JPG';
-
-              return (
-                <div key={id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={img}
-                      alt={name}
-                      className="w-14 h-14 rounded-2xl object-cover border border-stone-200 dark:border-stone-700 shrink-0 bg-stone-100 dark:bg-[#141312]"
-                    />
-                    <div className="min-w-0">
-                      <h2 className="font-bold text-xs sm:text-sm text-stone-900 dark:text-[#F5F5F0] truncate">
-                        {name}
-                      </h2>
-                      <span className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                        {price.toFixed(2)} € / ud
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-xl bg-stone-50 dark:bg-[#141312] p-1">
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(id, Math.max(1, item.quantity - 1))}
-                        className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-lg cursor-pointer transition-colors"
-                      >
-                        -
-                      </button>
-                      <span className="w-6 text-center text-xs font-black text-stone-900 dark:text-[#F5F5F0]">
-                        {item.quantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(id, item.quantity + 1)}
-                        className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-lg cursor-pointer transition-colors"
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart(id)}
-                      className="p-1.5 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
+          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
+            <img
+              src="/Logo.jpg"
+              alt="EkhiTeka Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
-        </div>
+          <div className="flex flex-col min-w-0">
+            <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
+              Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
+            </span>
+            <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
+              Quesería & Selección Gourmet
+            </span>
+          </div>
+        </Link>
 
-        {/* Resumen y Envío */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-6 shadow-xs">
-          <form onSubmit={handleSubmitOrder} className="space-y-4">
-            <h2 className="text-sm font-black uppercase tracking-wider text-stone-900 dark:text-stone-100">
-              {t.deliv_choose_mode}
-            </h2>
+        {/* Enlaces Desktop */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 font-serif">
+          <Link
+            href="/tienda"
+            className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-bold transition-all whitespace-nowrap min-h-[38px] ${
+              pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span>{t.nav_shop}</span>
+          </Link>
 
-            {/* Selector de modo de entrega */}
-            <div className="grid grid-cols-2 gap-2 font-sans">
-              <button
-                type="button"
-                onClick={() => setDeliveryType('domicilio')}
-                className={\`p-3.5 rounded-2xl border-2 text-center text-xs font-bold transition-all cursor-pointer \${
-                  deliveryType === 'domicilio'
-                    ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0] shadow-xs'
-                    : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-600 dark:text-stone-400 hover:border-stone-400'
-                }\`}
+          <Link
+            href="/regalos-gourmet"
+            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
+              pathname === '/regalos-gourmet'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span className="block text-center">{t.nav_gourmet_gifts_line1}</span>
+            <span className="block text-center">{t.nav_gourmet_gifts_line2}</span>
+          </Link>
+
+          <Link
+            href="/experiencias"
+            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
+              pathname === '/experiencias'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span className="block text-center">{t.nav_tastings_line1}</span>
+            <span className="block text-center">{t.nav_tastings_line2}</span>
+          </Link>
+
+          <Link
+            href="/regalos-empresa"
+            className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
+              pathname === '/regalos-empresa'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
+                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <span className="block text-center">{t.nav_corporate_line1}</span>
+            <span className="block text-center">{t.nav_corporate_line2}</span>
+          </Link>
+
+          {user && (
+            <>
+              <Link
+                href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
+                className={`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
+                  pathname.includes('/pedidos')
+                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                    : hasUnseenOrderUpdates
+                    ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
+                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                }`}
               >
-                <Truck className="w-4 h-4 mx-auto mb-1 text-[#C68D07] dark:text-[#FFE259]" />
-                <span>Envio a Domicilio</span>
-              </button>
+                <span>{t.nav_orders}</span>
+                {hasUnseenOrderUpdates && (
+                  <span className="w-2 h-2 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
+                )}
+              </Link>
 
-              <button
-                type="button"
-                onClick={() => setDeliveryType('recogida_tienda')}
-                className={\`p-3.5 rounded-2xl border-2 text-center text-xs font-bold transition-all cursor-pointer \${
-                  deliveryType === 'recogida_tienda'
-                    ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0] shadow-xs'
-                    : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-600 dark:text-stone-400 hover:border-stone-400'
-                }\`}
-              >
-                <Store className="w-4 h-4 mx-auto mb-1 text-[#C68D07] dark:text-[#FFE259]" />
-                <span>Recogida en tienda</span>
-              </button>
-            </div>
+              {isSeller && (
+                <Link
+                  href="/vendedor/eventos"
+                  className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
+                    pathname === '/vendedor/eventos'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <span>{t.nav_events}</span>
+                </Link>
+              )}
 
-            {/* Formulario Envio a Domicilio */}
-            {deliveryType === 'domicilio' ? (
-              <div className="space-y-3 font-sans text-xs animate-fadeIn">
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.deliv_shipping_address} *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={shippingAddress}
-                    onChange={(e) => setShippingAddress(e.target.value)}
-                    placeholder="Calle, número, piso, código postal y localidad"
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0] placeholder:text-stone-400"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.deliv_shipping_notes}
-                  </label>
-                  <input
-                    type="text"
-                    value={shippingNotes}
-                    onChange={(e) => setShippingNotes(e.target.value)}
-                    placeholder="Ej: Horario preferente de mañana, portería..."
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0] placeholder:text-stone-400"
-                  />
-                </div>
-              </div>
-            ) : (
-              /* Formulario Recogida en Tienda con Selector de Puntos de Entrega Disponibles y Modo Oscuro Nítido */
-              <div className="space-y-4 font-sans text-xs animate-fadeIn">
-                {/* Selector de Puntos de Entrega / Tienda */}
-                <div className="space-y-2">
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block">
-                    Selecciona el Punto de Entrega / Tienda donde recogerás:
-                  </label>
+              {isSeller && (
+                <Link
+                  href="/vendedor/productos/nuevo"
+                  className={`flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 rounded-2xl transition-all font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px] ${
+                    pathname === '/vendedor/productos/nuevo'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] shadow-xs border border-stone-800/10'
+                      : 'border-2 border-[#FFE259] bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                  }`}
+                >
+                  <span className="block text-center">{t.nav_add_product_line1}</span>
+                  <span className="block text-center">{t.nav_add_product_line2}</span>
+                </Link>
+              )}
 
-                  {activePickupAddresses && activePickupAddresses.length > 0 ? (
-                    <div className="space-y-2">
-                      {activePickupAddresses.map((addr) => {
-                        const isSelected = selectedPickupAddressId === addr.id;
-                        return (
-                          <div
-                            key={addr.id}
-                            onClick={() => setSelectedPickupAddressId(addr.id)}
-                            className={\`p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3 \${
-                              isSelected
-                                ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0] shadow-xs'
-                                : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-600 dark:text-stone-400 hover:border-stone-400'
-                            }\`}
-                          >
-                            <input
-                              type="radio"
-                              name="pickup_address_choice"
-                              value={addr.id}
-                              checked={isSelected}
-                              onChange={() => setSelectedPickupAddressId(addr.id)}
-                              className="w-4 h-4 accent-[#FFE259] mt-0.5 cursor-pointer"
-                            />
-                            <div className="min-w-0 flex-1 space-y-0.5">
-                              <span className="font-bold text-xs block text-stone-900 dark:text-[#F5F5F0]">
-                                {addr.title}
-                              </span>
-                              <span className="text-[11px] block opacity-85 text-stone-600 dark:text-stone-300">
-                                {addr.street} {addr.number ? 'Nº ' + addr.number : ''} {addr.stair ? 'Esc ' + addr.stair : ''} {addr.floor ? 'Piso ' + addr.floor : ''} {addr.door ? 'Pta ' + addr.door : ''}, {addr.postal_code || ''} {addr.town} ({addr.province})
-                              </span>
-                              {addr.schedule && (
-                                <span className="text-[10.5px] font-bold text-[#C68D07] dark:text-[#FFE259] block pt-0.5">
-                                  Horario: {addr.schedule}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    /* Fallback si no hay puntos adicionales cargados */
-                    <div className="p-3.5 rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-800 dark:text-[#F5F5F0] space-y-1">
-                      <div className="flex items-center gap-2 font-bold">
-                        <MapPin className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
-                        <span>Quesería & Tienda Principal Lekeitio</span>
-                      </div>
-                      <p className="text-[11px] text-stone-600 dark:text-stone-400">{storeAddress}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Hora estimada de recogida */}
-                <div className="p-3.5 bg-stone-50 dark:bg-[#141312] rounded-2xl border border-stone-200 dark:border-stone-800 space-y-2">
-                  <div className="flex items-center gap-1.5 text-stone-800 dark:text-[#F5F5F0] font-bold">
-                    <Clock className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
-                    <label htmlFor="pickup_schedule_input">Hora aproximada de recogida:</label>
-                  </div>
-                  <input
-                    id="pickup_schedule_input"
-                    type="text"
-                    value={pickupSchedule}
-                    onChange={(e) => setPickupSchedule(e.target.value)}
-                    placeholder="Ej: Hoy a las 18:30h o Mañana por la mañana"
-                    className="w-full px-3.5 py-2 bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0] placeholder:text-stone-400"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Total */}
-            <div className="pt-4 border-t border-stone-100 dark:border-stone-800 space-y-2">
-              <div className="flex justify-between text-base font-black text-stone-900 dark:text-stone-100">
-                <span>{t.cart_total}</span>
-                <span>{totalPrice.toFixed(2)} €</span>
-              </div>
-              <p className="text-[10px] text-stone-400 font-sans">{t.prod_vat_included}</p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
-            >
-              {loading ? t.common_loading : t.deliv_confirm_order}
-            </button>
-          </form>
-        </div>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="flex items-center justify-center text-center px-3 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-2xl transition-all font-semibold uppercase tracking-[0.14em] text-[11px] whitespace-nowrap min-h-[38px]"
+                >
+                  <span>{t.nav_admin}</span>
+                </Link>
+              )}
+            </>
+          )}
+        </nav>
       </div>
+
+      {/* 2. LADO DERECHO (Botón de Cesta SOLO VISIBLE SI HAY SESIÓN INICIADA COMO COMPRADOR) */}
+      <div className="flex items-center gap-2 shrink-0">
+        {user && (!profile || profile.role === 'comprador') && <CartNavButton />}
+
+        {user ? (
+          <div className="flex items-center gap-2">
+            <Link
+              href="/chat"
+              className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
+                pathname.startsWith('/chat')
+                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
+                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
+              }`}
+              title={t.nav_chats}
+            >
+              <MessageCircle className="w-4 h-4" />
+              {unreadMessagesCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
+                  {unreadMessagesCount}
+                </span>
+              )}
+            </Link>
+
+            <Link
+              href="/perfil"
+              className={`p-2.5 rounded-2xl border transition-colors shrink-0 ${
+                pathname === '/perfil'
+                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
+                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
+              }`}
+              title={t.nav_profile}
+            >
+              <User className="w-4 h-4" />
+            </Link>
+
+            <form action={signout} className="shrink-0">
+              <button
+                type="submit"
+                className="p-2.5 rounded-2xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
+                title={t.nav_logout}
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="px-3 sm:px-4 py-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            >
+              {t.nav_login}
+            </Link>
+            <Link
+              href="/register"
+              className="hidden sm:inline-flex px-4 py-2 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
+            >
+              {t.nav_register}
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* 3. MENÚ MÓVIL */}
+      {mounted && mobileMenuOpen && createPortal(
+        <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-stone-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5]">
+                    <img
+                      src="/Logo.jpg"
+                      alt="EkhiTeka"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-serif font-bold text-lg text-white tracking-wider">
+                      Ekhi<span className="text-[#FFE259]">Teka</span>
+                    </span>
+                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400">
+                      Lekeitio · Bizkaia
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 rounded-full text-stone-300 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-2 font-serif">
+                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
+                  {t.nav_explore_selection}
+                </p>
+                <Link
+                  href="/tienda"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/tienda'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
+                >
+                  <span>{t.nav_shop}</span>
+                </Link>
+                <Link
+                  href="/regalos-gourmet"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/regalos-gourmet'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
+                >
+                  <span>{t.nav_gourmet_gifts}</span>
+                </Link>
+                <Link
+                  href="/experiencias"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/experiencias'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
+                >
+                  <span>{t.nav_tastings_experiences}</span>
+                </Link>
+                <Link
+                  href="/regalos-empresa"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                    pathname === '/regalos-empresa'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
+                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                  }`}
+                >
+                  <span>{t.nav_corporate_gifts}</span>
+                </Link>
+              </div>
+
+              {/* SECCIÓN TU CUENTA */}
+              <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
+                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
+                  {t.nav_your_account}
+                </p>
+                {user ? (
+                  <>
+                    <Link
+                      href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        pathname.includes('/pedidos')
+                          ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : hasUnseenOrderUpdates
+                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
+                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                      }`}
+                    >
+                      <span>{t.nav_orders}</span>
+                      {hasUnseenOrderUpdates && (
+                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black uppercase">
+                          Nuevo
+                        </span>
+                      )}
+                    </Link>
+
+                    {isSeller && (
+                      <Link
+                        href="/vendedor/eventos"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                          pathname === '/vendedor/eventos'
+                            ? 'bg-[#FFE259] text-[#1D1D1B]'
+                            : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                        }`}
+                      >
+                        <span>{t.nav_events}</span>
+                      </Link>
+                    )}
+
+                    {isSeller && (
+                      <Link
+                        href="/vendedor/productos/nuevo"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all ${
+                          pathname === '/vendedor/productos/nuevo'
+                            ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
+                            : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                        }`}
+                      >
+                        <span>{t.nav_add_product}</span>
+                      </Link>
+                    )}
+
+                    <Link
+                      href="/chat"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        pathname.startsWith('/chat')
+                          ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                      }`}
+                    >
+                      <span>{t.nav_chats}</span>
+                      {unreadMessagesCount > 0 && (
+                        <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
+                          {unreadMessagesCount}
+                        </span>
+                      )}
+                    </Link>
+
+                    <Link
+                      href="/perfil"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        pathname === '/perfil'
+                          ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                      }`}
+                    >
+                      <span>{t.nav_profile}</span>
+                    </Link>
+
+                    <form action={signout} className="pt-2">
+                      <button
+                        type="submit"
+                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
+                      >
+                        <span>{t.nav_logout}</span>
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 pt-1 font-serif">
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-white hover:border-[#FFE259] hover:text-[#FFE259] transition-all bg-stone-850"
+                    >
+                      {t.nav_login}
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#FFE259] font-black text-xs tracking-[0.14em] uppercase text-[#1D1D1B] shadow-md hover:scale-102 transition-all"
+                    >
+                      {t.nav_register}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
+              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
+                <Store className="w-3.5 h-3.5 text-[#FFE259]" />
+                <span>Quesería & Tienda en Lekeitio</span>
+              </div>
+              <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
+              <p className="font-semibold text-[#FFE259]">WhatsApp: +34 600 000 000</p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
 `);
 
-console.log('\n✨ Modo oscuro y selector de Puntos de Entrega / Tienda en la Cesta completado con éxito.');
+// 2. components/SellerOrdersView.tsx (Iluminación de pedido nuevo en tarjeta y botón visto que apaga la alerta)
+saveFile('components/SellerOrdersView.tsx', `
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
+import { LOCALE_MAP } from '@/lib/i18n/translations';
+import { updateOrderStatus } from '@/app/actions/orders';
+import Link from 'next/link';
+import type { Order, OrderStatus } from '@/types/database';
+import { Package, MessageCircle, User, MapPin, Store, Sparkles, CheckCircle } from 'lucide-react';
+
+export function SellerOrdersView({ orders }: { orders: Order[] }) {
+  const { t, language } = useLanguage();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('ekhiteka_seen_orders_seller');
+      if (stored) {
+        setSeenMap(JSON.parse(stored));
+      }
+    } catch {}
+  }, []);
+
+  const handleMarkAsSeen = (orderId: string, currentStatus: string) => {
+    const updated = { ...seenMap, [orderId]: currentStatus };
+    setSeenMap(updated);
+    try {
+      localStorage.setItem('ekhiteka_seen_orders_seller', JSON.stringify(updated));
+      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+    } catch {}
+  };
+
+  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    setLoadingId(orderId);
+    await updateOrderStatus(orderId, newStatus);
+    handleMarkAsSeen(orderId, newStatus);
+    setLoadingId(null);
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pendiente': return t.orders_pending;
+      case 'confirmado': return t.orders_confirmed;
+      case 'preparando': return t.orders_preparing;
+      case 'listo_entrega': return t.orders_ready_delivery;
+      case 'entregado': return t.orders_delivered;
+      case 'cancelado': return t.orders_cancelled;
+      default: return status;
+    }
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 space-y-8 font-serif">
+      <div className="pb-4 border-b border-stone-200 dark:border-stone-800">
+        <h1 className="text-3xl font-black text-stone-900 dark:text-stone-100">
+          {t.orders_title_seller}
+        </h1>
+        <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+          {t.orders_subtitle_seller}
+        </p>
+      </div>
+
+      {orders.length > 0 ? (
+        <div className="space-y-6">
+          {orders.map((order) => {
+            const total = Number(order.total_price ?? order.total_amount ?? 0);
+            const isStorePickup = order.delivery_type === 'recogida_tienda' || order.delivery_method === 'recogida_tienda' || order.delivery_method === 'tienda';
+            
+            // Comprobar si es un pedido nuevo no visto por el vendedor
+            const lastSeenStatus = seenMap[order.id];
+            const isNewOrder = order.status === 'pendiente' && lastSeenStatus !== 'pendiente';
+
+            return (
+              <div
+                key={order.id}
+                className={\`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-6 shadow-xs transition-all \${
+                  isNewOrder
+                    ? 'border-[#FFE259] ring-4 ring-[#FFE259]/40 shadow-xl animate-pulse'
+                    : 'border-stone-200 dark:border-stone-800'
+                }\`}
+              >
+                {/* Banner luminoso de Nuevo Pedido con Botón VISTO */}
+                {isNewOrder && (
+                  <div className="p-3.5 bg-[#FFE259]/20 dark:bg-[#FFE259]/10 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-sans animate-fadeIn">
+                    <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
+                      <Sparkles className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                      <span>¡Nuevo pedido recibido para preparar!</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleMarkAsSeen(order.id, order.status)}
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl shadow-xs cursor-pointer transition-transform hover:scale-105"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Visto</span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
+                      {t.orders_order_number} #{order.id.slice(0, 8)}
+                    </span>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                      {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className={\`px-3 py-1 rounded-xl font-black text-xs uppercase tracking-wider font-serif \${
+                      isNewOrder
+                        ? 'bg-[#FFE259] text-[#1D1D1B] shadow-md animate-bounce'
+                        : 'bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]'
+                    }\`}>
+                      {getStatusText(order.status)}
+                    </span>
+                    <span className="text-base font-black font-serif text-stone-900 dark:text-stone-100">
+                      {t.orders_total_to_charge} {total.toFixed(2)} €
+                    </span>
+                  </div>
+                </div>
+
+                {/* Datos del Cliente y Modo de Entrega */}
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 text-xs space-y-2 font-sans">
+                  <div className="flex items-center gap-2 font-bold text-stone-900 dark:text-stone-100">
+                    <User className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                    <span>{order.profiles?.full_name || t.orders_client_label}</span>
+                    {order.profiles?.phone && (
+                      <span className="text-stone-500 dark:text-stone-400 font-normal">· {order.profiles.phone}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
+                    {isStorePickup ? (
+                      <>
+                        <Store className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                        <span>{t.deliv_store_pickup_tag} {order.pickup_schedule ? \`(\${order.pickup_schedule})\` : ''}</span>
+                      </>
+                    ) : (
+                      <>
+                        <MapPin className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 shrink-0" />
+                        <span>{order.shipping_address || t.deliv_home_tag}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Productos a preparar */}
+                {order.order_items && order.order_items.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300">
+                      {t.orders_products_to_prepare}
+                    </h4>
+                    {order.order_items.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between text-xs py-1 border-b border-stone-100 dark:border-stone-800 last:border-0 font-sans">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
+                          <span className="font-bold text-stone-800 dark:text-stone-200">
+                            {item.products?.name || 'Producto'}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-[#FFE259] text-[#1D1D1B] font-black text-[10px]">
+                            x{item.quantity}
+                          </span>
+                        </div>
+                        <span className="font-serif font-black text-stone-900 dark:text-stone-100">
+                          {Number(item.subtotal || (item.unit_price || 0) * item.quantity).toFixed(2)} €
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Botones de Cambio de Estado en 1 clic */}
+                <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 font-serif">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={loadingId === order.id || order.status === 'confirmado'}
+                      onClick={() => handleStatusChange(order.id, 'confirmado')}
+                      className={\`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer \${
+                        order.status === 'confirmado'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-blue-100 dark:hover:bg-blue-950 text-stone-700 dark:text-stone-300'
+                      }\`}
+                    >
+                      {t.status_confirm}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={loadingId === order.id || order.status === 'preparando'}
+                      onClick={() => handleStatusChange(order.id, 'preparando')}
+                      className={\`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer \${
+                        order.status === 'preparando'
+                          ? 'bg-amber-500 text-white shadow-xs'
+                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-amber-100 dark:hover:bg-amber-950 text-stone-700 dark:text-stone-300'
+                      }\`}
+                    >
+                      {t.status_preparing}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={loadingId === order.id || order.status === 'listo_entrega'}
+                      onClick={() => handleStatusChange(order.id, 'listo_entrega')}
+                      className={\`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer \${
+                        order.status === 'listo_entrega'
+                          ? 'bg-purple-600 text-white shadow-xs'
+                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-purple-100 dark:hover:bg-purple-950 text-stone-700 dark:text-stone-300'
+                      }\`}
+                    >
+                      {t.status_ready}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={loadingId === order.id || order.status === 'entregado'}
+                      onClick={() => handleStatusChange(order.id, 'entregado')}
+                      className={\`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer \${
+                        order.status === 'entregado'
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-stone-700 dark:text-stone-300'
+                      }\`}
+                    >
+                      {t.status_delivered}
+                    </button>
+                  </div>
+
+                  <Link
+                    href={\`/chat/\${order.buyer_id}?order_id=\${order.id}\`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>{t.orders_chat_with_buyer}</span>
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="py-16 text-center space-y-4 bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-8">
+          <Package className="w-12 h-12 text-stone-300 dark:text-stone-700 mx-auto" />
+          <h3 className="text-lg font-black font-serif text-stone-800 dark:text-stone-200">
+            {t.orders_no_orders_seller}
+          </h3>
+          <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+            {t.orders_no_orders_seller_sub}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+`);
+
+// 3. app/vendedor/pedidos/page.tsx (Carga de pedidos para todos los vendedores)
+saveFile('app/vendedor/pedidos/page.tsx', `
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { SellerOrdersView } from '@/components/SellerOrdersView';
+import type { Order } from '@/types/database';
+
+export default async function SellerOrdersPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
+    redirect('/');
+  }
+
+  const { data: orders } = await supabase
+    .from('orders')
+    .select('*, profiles!orders_buyer_id_fkey(id, full_name, phone, town, email), order_items(*, products(*))')
+    .order('created_at', { ascending: false });
+
+  return <SellerOrdersView orders={(orders || []) as unknown as Order[]} />;
+}
+`);
+
+console.log('\n✨ Visibilidad de cesta para compradores y alertas lumínicas con botón visto actualizadas.');
