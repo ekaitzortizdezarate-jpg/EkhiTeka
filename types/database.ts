@@ -35,6 +35,7 @@ export interface WhatsAppContact {
   name: string;
   phone: string;
   enabled: boolean;
+  seller_id?: string;
 }
 
 export interface ProfileDetails {
@@ -127,7 +128,10 @@ export function parseProfile(raw?: any): Profile {
 
   const legacyWhatsApp = details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '';
   const whatsappContacts: WhatsAppContact[] = Array.isArray(details.whatsapp_contacts)
-    ? details.whatsapp_contacts
+    ? details.whatsapp_contacts.map((contact: WhatsAppContact, index: number) => ({
+        ...contact,
+        enabled: contact.enabled && index === details.whatsapp_contacts!.findIndex((item) => item.enabled),
+      }))
     : legacyWhatsApp
       ? [{
           id: 'whatsapp_legacy',

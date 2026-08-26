@@ -106,6 +106,13 @@ export async function updateProfile(formData: FormData) {
   try {
     whatsappContacts = JSON.parse(whatsappContactsInput);
     if (!Array.isArray(whatsappContacts)) throw new Error();
+    let enabledFound = false;
+    whatsappContacts = whatsappContacts.map((contact) => ({
+      ...contact,
+      enabled: Boolean(contact.enabled) && !enabledFound && Boolean(String(contact.phone || '').trim())
+        ? (enabledFound = true)
+        : false,
+    }));
   } catch {
     return { error: 'Los contactos de WhatsApp no son válidos.' };
   }

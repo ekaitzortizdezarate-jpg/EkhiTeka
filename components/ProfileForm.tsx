@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile, changeUserPassword } from '@/app/actions/auth';
 import type { Profile, PickupAddress, WhatsAppContact } from '@/types/database';
 import { parseProfile, isProfileComplete } from '@/types/database';
+import { createClient } from '@/lib/supabase/client';
 import {
   User,
   Phone,
@@ -42,6 +43,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const [whatsappContacts, setWhatsAppContacts] = useState<WhatsAppContact[]>(
     currentProfile.whatsapp_contacts || []
   );
+  const [registeredSellers, setRegisteredSellers] = useState<Profile[]>([]);
 
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ text: string; isError: boolean } | null>(null);
@@ -52,6 +54,20 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const p = currentProfile;
   const isSeller = p.role === 'vendedor' || p.role === 'admin';
   const isComplete = isProfileComplete(p);
+
+  useEffect(() => {
+    if (!isSeller) return;
+    const loadRegisteredSellers = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'vendedor')
+        .order('full_name');
+      if (data) setRegisteredSellers(data as Profile[]);
+    };
+    loadRegisteredSellers();
+  }, [isSeller]);
 
   const handleSetActiveAddress = (id: string) => {
     const updated = pickupAddresses.map((addr) => ({
@@ -115,6 +131,15 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
       ...contacts,
       { id: `whatsapp_${Date.now()}`, name: '', phone: '', enabled: false },
     ]);
+  };
+
+  const handleWhatsAppSellerChange = (id: string, sellerId: string) => {
+    const seller = registeredSellers.find((item) => item.id === sellerId);
+    setWhatsAppContacts((contacts) => contacts.map((contact) => contact.id === id
+      ? seller
+        ? { ...contact, seller_id: seller.id, name: seller.full_name, phone: seller.phone || '' }
+        : { ...contact, seller_id: undefined, name: '', phone: '' }
+      : contact));
   };
 
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -347,21 +372,21 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                               <button
                                 type="button"
                                 onClick={() => handleToggleWhatsApp(contact.id)}
-                                className="text-[9px] font-black uppercase text-emerald-700 dark:text-emerald-300 cursor-pointer"
+                                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
                               >
                                 {contact.enabled ? 'Deshabilitar' : 'Habilitar'}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setIsEditing(true)}
-                                className="text-[9px] font-black uppercase text-stone-600 dark:text-stone-300 cursor-pointer"
+                                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
                               >
                                 Editar
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteWhatsApp(contact.id)}
-                                className="text-[9px] font-black uppercase text-red-700 dark:text-red-300 cursor-pointer"
+                                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-black text-[10px] uppercase cursor-pointer"
                               >
                                 Borrar
                               </button>
@@ -370,15 +395,6 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                         </div>
                       )}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(true)}
-                      className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
-                    >
-                      <Pencil className="w-3 h-3" /> Editar
-                    </button>
                   </div>
                 </div>
 
@@ -633,6 +649,13 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
+                        type="button"
+                        onClick={handleAddWhatsApp}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
+                      >
+                        <Plus className="w-3 h-3" /> Añadir contacto
+                      </button>
+                      <button
                         type="submit"
                         disabled={loadingProfile}
                         className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-[10px] uppercase cursor-pointer disabled:opacity-50"
@@ -648,11 +671,28 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   <div className="space-y-3">
                     {whatsappContacts.map((contact) => (
                       <div key={contact.id} className="flex flex-wrap items-end gap-2 p-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-white/60 dark:bg-[#141312]/60">
+                        <label className="w-full">
+                          <span className="block mb-1 font-bold text-stone-700 dark:text-stone-300">Origen del contacto</span>
+                          <select
+                            value={contact.seller_id || ''}
+                            onChange={(e) => handleWhatsAppSellerChange(contact.id, e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
+                          >
+                            <option value="">Introducir manualmente</option>
+                            {registeredSellers.map((seller) => (
+                              <option key={seller.id} value={seller.id}>
+                                {seller.full_name} {seller.phone ? `(${seller.phone})` : '(sin teléfono)'}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
                         <label className="flex-1 min-w-[150px]">
                           <span className="block mb-1 font-bold text-stone-700 dark:text-stone-300">Nombre</span>
                           <input
                             type="text"
+                            required={!contact.seller_id}
                             value={contact.name}
+                            disabled={Boolean(contact.seller_id)}
                             onChange={(e) => setWhatsAppContacts((contacts) => contacts.map((item) => item.id === contact.id ? { ...item, name: e.target.value } : item))}
                             placeholder="Nombre del contacto"
                             className="w-full px-3 py-2 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
@@ -663,6 +703,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                           <input
                             type="tel"
                             value={contact.phone}
+                            disabled={Boolean(contact.seller_id)}
                             onChange={(e) => setWhatsAppContacts((contacts) => contacts.map((item) => item.id === contact.id ? { ...item, phone: e.target.value } : item))}
                             placeholder="34600000000"
                             className="w-full px-3 py-2 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
@@ -684,14 +725,6 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                         </button>
                       </div>
                     ))}
-
-                    <button
-                      type="button"
-                      onClick={handleAddWhatsApp}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" /> Añadir contacto
-                    </button>
 
                   </div>
                 </div>
