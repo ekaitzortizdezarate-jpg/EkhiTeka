@@ -326,6 +326,56 @@ export interface TranslationDict {
   profile_status_complete: string;
   profile_status_incomplete: string;
 
+  // Shop Section (CatalogView & Hero)
+  shop_specialty: string;
+  shop_hero_title: string;
+  shop_hero_desc: string;
+  shop_see_cheeses: string;
+  shop_whatsapp_orders: string;
+  shop_visit_title: string;
+  shop_visit_subtitle: string;
+  shop_visit_desc: string;
+  shop_visit_contact: string;
+
+  // Chat Section
+  chat_title: string;
+  chat_type_message: string;
+  chat_send: string;
+  chat_about_product: string;
+  chat_about_order: string;
+  chat_no_messages: string;
+  chat_conversations: string;
+
+  // Seller Dashboard & Product Form
+  seller_new_product: string;
+  seller_edit_product: string;
+  seller_product_name: string;
+  seller_product_desc: string;
+  seller_product_price: string;
+  seller_product_category: string;
+  seller_product_format: string;
+  seller_product_origin: string;
+  seller_product_stock: string;
+  seller_product_image: string;
+  seller_save_product: string;
+  seller_delete_product: string;
+  seller_product_deleted: string;
+  seller_events_title: string;
+  seller_events_subtitle: string;
+  seller_events_edit_btn: string;
+  seller_events_reserved: string;
+  seller_events_available: string;
+  seller_events_collected: string;
+  seller_events_attendees_title: string;
+  seller_events_no_events: string;
+  seller_events_no_events_desc: string;
+  seller_events_col_buyer: string;
+  seller_events_col_contact: string;
+  seller_events_col_seats: string;
+  seller_events_col_date: string;
+  seller_events_col_total: string;
+  seller_events_col_actions: string;
+
   // Roles & Auth
   role_buyer: string;
   role_seller: string;
@@ -706,6 +756,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Profila Osatua',
     profile_status_incomplete: 'Profila Osatu Gabea',
 
+    // Shop Section
+    shop_specialty: 'Gure Espezialitatea',
+    shop_hero_title: 'Gaztak eta opari gastronomikoak Lekeition',
+    shop_hero_desc: 'Egileak sinatutako gaztak, Kantabriako altxorrak eta hautatutako marinadak. Lekeitioko zapore benetakoa opari eta gozatzeko.',
+    shop_see_cheeses: 'GURE GAZTAK IKUSI',
+    shop_whatsapp_orders: 'WhatsApp bidez eskaerak',
+    shop_visit_title: 'Gure Gaztategia & Gourmet Gunea',
+    shop_visit_subtitle: 'Bisitatu Lekeition · Km0',
+    shop_visit_desc: 'Gure Lekeitioko gaztaterian dena duzu: 80 baino gehiago erreferentzia artisau gazta, Kantabriako kontserbak eta aholkularitza pertsonalizatua.',
+    shop_visit_contact: 'Kontaktatu Dendarekin',
+
+    // Chat
+    chat_title: 'Txatak eta Mezuak',
+    chat_type_message: 'Idatzi mezu bat hemen...',
+    chat_send: 'Bidali',
+    chat_about_product: 'Produktu honi buruz',
+    chat_about_order: 'Eskaera honi buruz',
+    chat_no_messages: 'Ez dago mezurik oraindik',
+    chat_conversations: 'Elkarrizketak',
+
+    // Seller Dashboard
+    seller_new_product: 'Gehitu Produktu Berria',
+    seller_edit_product: 'Editatu Produktua',
+    seller_product_name: 'Produktuaren Izena',
+    seller_product_desc: 'Deskribapena eta ezaugarriak',
+    seller_product_price: 'Prezioa (€)',
+    seller_product_category: 'Kategoria',
+    seller_product_format: 'Formatua / Aurkezpena',
+    seller_product_origin: 'Jatorria (Herria/Eskualdea)',
+    seller_product_stock: 'Stock erabilgarria',
+    seller_product_image: 'Produktuaren Argazkia',
+    seller_save_product: 'Gorde Produktua',
+    seller_delete_product: 'Ezabatu Produktua',
+    seller_product_deleted: 'Produktua ezabatu da',
+    seller_events_title: 'Dastaketa Presentzialak Dendan',
+    seller_events_subtitle: 'Aforoa, aldagaien edizioa eta bertaratuen kudeaketa Lekeitioko dastaketetan.',
+    seller_events_edit_btn: 'Editatu Dastaketa',
+    seller_events_reserved: 'Erreserbatuta',
+    seller_events_available: 'Libre',
+    seller_events_collected: 'Bilketa',
+    seller_events_attendees_title: 'Dastaketako Partaideak',
+    seller_events_no_events: 'Ez duzu dastaketa presentzialik sortu oraindik',
+    seller_events_no_events_desc: 'Argitaratu dastaketa presentzial bat Lekeitioko dendan goiko menutik.',
+    seller_events_col_buyer: 'Eroslea',
+    seller_events_col_contact: 'Kontaktua',
+    seller_events_col_seats: 'Lekuak',
+    seller_events_col_date: 'Erosketa Data',
+    seller_events_col_total: 'Guztira',
+    seller_events_col_actions: 'Ekintzak',
+
     role_buyer: 'Bezeroa / Eroslea',
     role_seller: 'Ekoizlea / Saltzailea',
     role_admin: 'Administratzailea',
@@ -1074,6 +1174,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Perfil Completo',
     profile_status_incomplete: 'Perfil Incompleto',
 
+    // Shop Section
+    shop_specialty: 'Nuestra Especialidad',
+    shop_hero_title: 'Quesos y regalos gastronómicos en Lekeitio',
+    shop_hero_desc: 'Quesos afinados de autor, tesoros del Cantábrico y maridajes selectos. El sabor auténtico de Lekeitio para regalar y disfrutar.',
+    shop_see_cheeses: 'VER NUESTROS QUESOS',
+    shop_whatsapp_orders: 'Encargos por WhatsApp',
+    shop_visit_title: 'Nuestra Quesería & Espacio Gourmet',
+    shop_visit_subtitle: 'Visítanos en Lekeitio · Km0',
+    shop_visit_desc: 'En nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y asesoramiento personalizado.',
+    shop_visit_contact: 'Contactar con la Tienda',
+
+    // Chat
+    chat_title: 'Mensajes & Asesoramiento',
+    chat_type_message: 'Escribe tu mensaje aquí...',
+    chat_send: 'Enviar',
+    chat_about_product: 'Sobre este producto',
+    chat_about_order: 'Sobre este pedido',
+    chat_no_messages: 'No hay mensajes aún',
+    chat_conversations: 'Conversaciones',
+
+    // Seller Dashboard
+    seller_new_product: 'Añadir Producto Gourmet',
+    seller_edit_product: 'Editar Producto',
+    seller_product_name: 'Nombre del Producto',
+    seller_product_desc: 'Descripción y notas de cata',
+    seller_product_price: 'Precio (€)',
+    seller_product_category: 'Categoría',
+    seller_product_format: 'Formato / Presentación',
+    seller_product_origin: 'Origen (Localidad/Denominación)',
+    seller_product_stock: 'Stock disponible',
+    seller_product_image: 'Fotografía del Producto',
+    seller_save_product: 'Guardar Producto',
+    seller_delete_product: 'Eliminar Producto',
+    seller_product_deleted: 'Producto eliminado correctamente',
+    seller_events_title: 'Catas Presenciales en Tienda',
+    seller_events_subtitle: 'Control de aforo, edición de variables y gestión de asistentes para catas en Lekeitio.',
+    seller_events_edit_btn: 'Editar Cata',
+    seller_events_reserved: 'Reservadas',
+    seller_events_available: 'Disponibles',
+    seller_events_collected: 'Recaudado',
+    seller_events_attendees_title: 'Participantes de la Cata',
+    seller_events_no_events: 'No tienes catas presenciales creadas todavía',
+    seller_events_no_events_desc: 'Publica una cata presencial en la tienda de Lekeitio desde el menú superior para gestionar aforo, plazas y asistentes.',
+    seller_events_col_buyer: 'Comprador',
+    seller_events_col_contact: 'Contacto',
+    seller_events_col_seats: 'Plazas',
+    seller_events_col_date: 'Fecha Compra',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Acciones',
+
     role_buyer: 'Comprador / Gourmet',
     role_seller: 'Productor / Vendedor',
     role_admin: 'Administrador',
@@ -1089,18 +1239,18 @@ export const translations: Record<Language, TranslationDict> = {
     legal_privacy: 'Política de Privacidad',
     legal_cookies: 'Política de Cookies',
     legal_notice: 'Aviso Legal',
-    cookie_text: 'Utilizamos cookies para garantizar la mejor experiencia gastronómica.',
+    cookie_text: 'Utilizamos cookies para garantizar la mejor experiencia gastronómica en nuestra tienda.',
     cookie_accept: 'Aceptar Todas',
     cookie_reject: 'Rechazar',
     cookie_settings: 'Configurar',
 
     footer_club_title: 'Club de Amigos del Buen Queso',
     footer_club_subtitle: '¿Quieres estar al día de las novedades de EkhiTeka?',
-    footer_club_desc: 'Nuevas llegadas de quesos de temporada y catas exclusivas.',
+    footer_club_desc: 'Nuevas llegadas de quesos de temporada, catas exclusivas en Lekeitio y lotes limitados antes que nadie.',
     footer_join_whatsapp: 'Unirme por WhatsApp',
-    footer_cheese_desc: 'Quesos afinados y salazones del cantábrico.',
-    footer_delivery_desc: 'Cadena de frío garantizada 24/48 horas.',
-    footer_pickup_desc: 'Haz tu pedido online y recógelo preparado sin esperas.',
+    footer_cheese_desc: 'Quesos afinados, salazones del cantábrico y conservas artesanales seleccionadas una a una.',
+    footer_delivery_desc: 'Cadena de frío garantizada 24/48 horas para que cada producto llegue en su punto óptimo.',
+    footer_pickup_desc: 'Haz tu pedido online y recógelo preparado sin esperas en nuestra quesería de Lekeitio.',
     footer_categories: 'Categorías',
     footer_experiences: 'Experiencias',
     footer_legal: 'Información Legal',
@@ -1442,6 +1592,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Complete Profile',
     profile_status_incomplete: 'Incomplete Profile',
 
+    // Shop Section
+    shop_specialty: 'Our Speciality',
+    shop_hero_title: 'Artisan cheeses & gourmet gifts in Lekeitio',
+    shop_hero_desc: 'Author-aged cheeses, Cantabrian treasures and curated pairings. The authentic taste of Lekeitio to gift and enjoy.',
+    shop_see_cheeses: 'SEE OUR CHEESES',
+    shop_whatsapp_orders: 'Custom Orders via WhatsApp',
+    shop_visit_title: 'Our Cheesemonger & Gourmet Space',
+    shop_visit_subtitle: 'Visit us in Lekeitio · Km0',
+    shop_visit_desc: 'Our website shows a selection, but our Lekeitio shop has it all: over 80 references of aged artisan cheeses, Cantabrian preserved fish and personalised advice.',
+    shop_visit_contact: 'Contact the Shop',
+
+    // Chat
+    chat_title: 'Messages & Support',
+    chat_type_message: 'Type your message here...',
+    chat_send: 'Send',
+    chat_about_product: 'About this item',
+    chat_about_order: 'About this order',
+    chat_no_messages: 'No messages yet',
+    chat_conversations: 'Conversations',
+
+    // Seller Dashboard
+    seller_new_product: 'Add Gourmet Product',
+    seller_edit_product: 'Edit Product',
+    seller_product_name: 'Product Name',
+    seller_product_desc: 'Description & Tasting Notes',
+    seller_product_price: 'Price (€)',
+    seller_product_category: 'Category',
+    seller_product_format: 'Format / Presentation',
+    seller_product_origin: 'Origin / Region',
+    seller_product_stock: 'Available Stock',
+    seller_product_image: 'Product Photo',
+    seller_save_product: 'Save Product',
+    seller_delete_product: 'Delete Product',
+    seller_product_deleted: 'Product deleted successfully',
+    seller_events_title: 'In-Store In-Person Tastings',
+    seller_events_subtitle: 'Capacity control, variables edition and attendee management for tastings in Lekeitio.',
+    seller_events_edit_btn: 'Edit Tasting',
+    seller_events_reserved: 'Booked',
+    seller_events_available: 'Available',
+    seller_events_collected: 'Collected',
+    seller_events_attendees_title: 'Tasting Attendees',
+    seller_events_no_events: 'You have no in-person tastings created yet',
+    seller_events_no_events_desc: 'Publish an in-person tasting in our Lekeitio shop from the top menu to manage capacity and attendees.',
+    seller_events_col_buyer: 'Buyer',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Seats',
+    seller_events_col_date: 'Purchase Date',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
+
     role_buyer: 'Buyer / Gourmet',
     role_seller: 'Artisan / Seller',
     role_admin: 'Administrator',
@@ -1464,11 +1664,11 @@ export const translations: Record<Language, TranslationDict> = {
 
     footer_club_title: 'Friends of Good Cheese Club',
     footer_club_subtitle: 'Want to stay up to date with EkhiTeka news?',
-    footer_club_desc: 'Seasonal cheese arrivals and exclusive tastings.',
+    footer_club_desc: 'Seasonal cheese arrivals, exclusive tastings in Lekeitio and limited batches — before anyone else.',
     footer_join_whatsapp: 'Join via WhatsApp',
-    footer_cheese_desc: 'Aged artisan cheeses and Cantabrian salted fish.',
-    footer_delivery_desc: 'Cold chain guaranteed 24/48 hours.',
-    footer_pickup_desc: 'Order online and collect your prepared order in Lekeitio.',
+    footer_cheese_desc: 'Aged artisan cheeses, Cantabrian salted fish and hand-picked preserves.',
+    footer_delivery_desc: 'Cold chain guaranteed 24/48 hours so every product arrives in perfect condition.',
+    footer_pickup_desc: 'Order online and collect your prepared order with no wait at our Lekeitio cheesemonger.',
     footer_categories: 'Categories',
     footer_experiences: 'Experiences',
     footer_legal: 'Legal Information',
@@ -1711,7 +1911,7 @@ export const translations: Record<Language, TranslationDict> = {
     reviews_title: 'Avis de Nos Clients',
     reviews_subtitle: 'Ce que disent les amateurs de bon fromage',
     reviews_verified_buyer: 'Acheteur vérifié',
-    rev1_comment: 'Les fromages sont extraordinaires. Affinage impeccable et colis frais reçu en 24h.',
+    rev1_comment: 'Les fromages sont extraordinaires. Affinage缩peccable et colis frais reçu en 24h.',
     rev1_date: 'Il y a 3 jours',
     rev2_comment: 'J\'ai commandé un plateau pour un anniversaire, les invités étaient conquis.',
     rev2_date: 'Il y a 1 semaine',
@@ -1769,7 +1969,7 @@ export const translations: Record<Language, TranslationDict> = {
     orders_order_number: 'Commande :',
     orders_total_to_charge: 'Total à encaisser :',
     orders_new_status: 'Le statut de votre commande a changé :',
-    orders_mark_seen: 'Marquer comme lu',
+    orders_mark_seen: 'Marquer como lu',
     orders_client_label: 'Client',
     orders_qty_label: 'Quantité',
 
@@ -1809,6 +2009,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_full_address: 'Adresse complète',
     profile_status_complete: 'Profil Complet',
     profile_status_incomplete: 'Profil Incomplet',
+
+    // Shop Section
+    shop_specialty: 'Notre Spécialité',
+    shop_hero_title: 'Fromages et cadeaux gastronomiques à Lekeitio',
+    shop_hero_desc: 'Fromages affinés d\'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
+    shop_see_cheeses: 'VOIR NOS FROMAGES',
+    shop_whatsapp_orders: 'Commandes sur WhatsApp',
+    shop_visit_title: 'Notre Fromagerie & Espace Gourmet',
+    shop_visit_subtitle: 'Venez nous rendre visite à Lekeitio · Km0',
+    shop_visit_desc: 'Notre fromagerie de Lekeitio propose plus de 80 références de fromages artisanaux affinés, conserves du Cantabrique et conseils personnalisés.',
+    shop_visit_contact: 'Contacter la Boutique',
+
+    // Chat
+    chat_title: 'Messagerie & Conseils',
+    chat_type_message: 'Écrivez votre message ici...',
+    chat_send: 'Envoyer',
+    chat_about_product: 'À propos de cet article',
+    chat_about_order: 'À propos de cette commande',
+    chat_no_messages: 'Aucun message pour le moment',
+    chat_conversations: 'Conversations',
+
+    // Seller Dashboard
+    seller_new_product: 'Ajouter un Produit Gourmet',
+    seller_edit_product: 'Modifier le Produit',
+    seller_product_name: 'Nom du Produit',
+    seller_product_desc: 'Description et notes de dégustation',
+    seller_product_price: 'Prix (€)',
+    seller_product_category: 'Catégorie',
+    seller_product_format: 'Format / Présentation',
+    seller_product_origin: 'Origine / Terroir',
+    seller_product_stock: 'Stock disponible',
+    seller_product_image: 'Photo du Produit',
+    seller_save_product: 'Enregistrer le Produit',
+    seller_delete_product: 'Supprimer le Produit',
+    seller_product_deleted: 'Produit supprimé avec succès',
+    seller_events_title: 'Dégustations en Boutique',
+    seller_events_subtitle: 'Contrôle de jauge, modification des variables et gestion des inscrits à Lekeitio.',
+    seller_events_edit_btn: 'Modifier la Dégustation',
+    seller_events_reserved: 'Réservées',
+    seller_events_available: 'Disponibles',
+    seller_events_collected: 'Encaissé',
+    seller_events_attendees_title: 'Participants à la Dégustation',
+    seller_events_no_events: 'Vous n\'avez pas encore créé de dégustation en boutique',
+    seller_events_no_events_desc: 'Publiez une dégustation en boutique depuis le menu supérieur pour gérer la jauge et les réservations.',
+    seller_events_col_buyer: 'Acheteur',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Places',
+    seller_events_col_date: 'Date d\'Achat',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
 
     role_buyer: 'Client / Gourmet',
     role_seller: 'Artisan / Vendeur',

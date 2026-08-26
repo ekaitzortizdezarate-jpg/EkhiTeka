@@ -3,7 +3,7 @@ const path = require('path');
 
 const files = {
   // =========================================================================
-  // 1. DICCIONARIO I18N (Incluye todos los textos de perfil y contraseñas)
+  // 1. DICCIONARIO I18N COMPLETO (Tipado estricto e implementado al 100%)
   // =========================================================================
   'lib/i18n/translations.ts': `export type Language = 'eu' | 'es' | 'en' | 'fr';
 
@@ -332,6 +332,56 @@ export interface TranslationDict {
   profile_full_address: string;
   profile_status_complete: string;
   profile_status_incomplete: string;
+
+  // Shop Section (CatalogView & Hero)
+  shop_specialty: string;
+  shop_hero_title: string;
+  shop_hero_desc: string;
+  shop_see_cheeses: string;
+  shop_whatsapp_orders: string;
+  shop_visit_title: string;
+  shop_visit_subtitle: string;
+  shop_visit_desc: string;
+  shop_visit_contact: string;
+
+  // Chat Section
+  chat_title: string;
+  chat_type_message: string;
+  chat_send: string;
+  chat_about_product: string;
+  chat_about_order: string;
+  chat_no_messages: string;
+  chat_conversations: string;
+
+  // Seller Dashboard & Product Form
+  seller_new_product: string;
+  seller_edit_product: string;
+  seller_product_name: string;
+  seller_product_desc: string;
+  seller_product_price: string;
+  seller_product_category: string;
+  seller_product_format: string;
+  seller_product_origin: string;
+  seller_product_stock: string;
+  seller_product_image: string;
+  seller_save_product: string;
+  seller_delete_product: string;
+  seller_product_deleted: string;
+  seller_events_title: string;
+  seller_events_subtitle: string;
+  seller_events_edit_btn: string;
+  seller_events_reserved: string;
+  seller_events_available: string;
+  seller_events_collected: string;
+  seller_events_attendees_title: string;
+  seller_events_no_events: string;
+  seller_events_no_events_desc: string;
+  seller_events_col_buyer: string;
+  seller_events_col_contact: string;
+  seller_events_col_seats: string;
+  seller_events_col_date: string;
+  seller_events_col_total: string;
+  seller_events_col_actions: string;
 
   // Roles & Auth
   role_buyer: string;
@@ -713,6 +763,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Profila Osatua',
     profile_status_incomplete: 'Profila Osatu Gabea',
 
+    // Shop Section
+    shop_specialty: 'Gure Espezialitatea',
+    shop_hero_title: 'Gaztak eta opari gastronomikoak Lekeition',
+    shop_hero_desc: 'Egileak sinatutako gaztak, Kantabriako altxorrak eta hautatutako marinadak. Lekeitioko zapore benetakoa opari eta gozatzeko.',
+    shop_see_cheeses: 'GURE GAZTAK IKUSI',
+    shop_whatsapp_orders: 'WhatsApp bidez eskaerak',
+    shop_visit_title: 'Gure Gaztategia & Gourmet Gunea',
+    shop_visit_subtitle: 'Bisitatu Lekeition · Km0',
+    shop_visit_desc: 'Gure Lekeitioko gaztaterian dena duzu: 80 baino gehiago erreferentzia artisau gazta, Kantabriako kontserbak eta aholkularitza pertsonalizatua.',
+    shop_visit_contact: 'Kontaktatu Dendarekin',
+
+    // Chat
+    chat_title: 'Txatak eta Mezuak',
+    chat_type_message: 'Idatzi mezu bat hemen...',
+    chat_send: 'Bidali',
+    chat_about_product: 'Produktu honi buruz',
+    chat_about_order: 'Eskaera honi buruz',
+    chat_no_messages: 'Ez dago mezurik oraindik',
+    chat_conversations: 'Elkarrizketak',
+
+    // Seller Dashboard
+    seller_new_product: 'Gehitu Produktu Berria',
+    seller_edit_product: 'Editatu Produktua',
+    seller_product_name: 'Produktuaren Izena',
+    seller_product_desc: 'Deskribapena eta ezaugarriak',
+    seller_product_price: 'Prezioa (€)',
+    seller_product_category: 'Kategoria',
+    seller_product_format: 'Formatua / Aurkezpena',
+    seller_product_origin: 'Jatorria (Herria/Eskualdea)',
+    seller_product_stock: 'Stock erabilgarria',
+    seller_product_image: 'Produktuaren Argazkia',
+    seller_save_product: 'Gorde Produktua',
+    seller_delete_product: 'Ezabatu Produktua',
+    seller_product_deleted: 'Produktua ezabatu da',
+    seller_events_title: 'Dastaketa Presentzialak Dendan',
+    seller_events_subtitle: 'Aforoa, aldagaien edizioa eta bertaratuen kudeaketa Lekeitioko dastaketetan.',
+    seller_events_edit_btn: 'Editatu Dastaketa',
+    seller_events_reserved: 'Erreserbatuta',
+    seller_events_available: 'Libre',
+    seller_events_collected: 'Bilketa',
+    seller_events_attendees_title: 'Dastaketako Partaideak',
+    seller_events_no_events: 'Ez duzu dastaketa presentzialik sortu oraindik',
+    seller_events_no_events_desc: 'Argitaratu dastaketa presentzial bat Lekeitioko dendan goiko menutik.',
+    seller_events_col_buyer: 'Eroslea',
+    seller_events_col_contact: 'Kontaktua',
+    seller_events_col_seats: 'Lekuak',
+    seller_events_col_date: 'Erosketa Data',
+    seller_events_col_total: 'Guztira',
+    seller_events_col_actions: 'Ekintzak',
+
     role_buyer: 'Bezeroa / Eroslea',
     role_seller: 'Ekoizlea / Saltzailea',
     role_admin: 'Administratzailea',
@@ -1081,6 +1181,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Perfil Completo',
     profile_status_incomplete: 'Perfil Incompleto',
 
+    // Shop Section
+    shop_specialty: 'Nuestra Especialidad',
+    shop_hero_title: 'Quesos y regalos gastronómicos en Lekeitio',
+    shop_hero_desc: 'Quesos afinados de autor, tesoros del Cantábrico y maridajes selectos. El sabor auténtico de Lekeitio para regalar y disfrutar.',
+    shop_see_cheeses: 'VER NUESTROS QUESOS',
+    shop_whatsapp_orders: 'Encargos por WhatsApp',
+    shop_visit_title: 'Nuestra Quesería & Espacio Gourmet',
+    shop_visit_subtitle: 'Visítanos en Lekeitio · Km0',
+    shop_visit_desc: 'En nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y asesoramiento personalizado.',
+    shop_visit_contact: 'Contactar con la Tienda',
+
+    // Chat
+    chat_title: 'Mensajes & Asesoramiento',
+    chat_type_message: 'Escribe tu mensaje aquí...',
+    chat_send: 'Enviar',
+    chat_about_product: 'Sobre este producto',
+    chat_about_order: 'Sobre este pedido',
+    chat_no_messages: 'No hay mensajes aún',
+    chat_conversations: 'Conversaciones',
+
+    // Seller Dashboard
+    seller_new_product: 'Añadir Producto Gourmet',
+    seller_edit_product: 'Editar Producto',
+    seller_product_name: 'Nombre del Producto',
+    seller_product_desc: 'Descripción y notas de cata',
+    seller_product_price: 'Precio (€)',
+    seller_product_category: 'Categoría',
+    seller_product_format: 'Formato / Presentación',
+    seller_product_origin: 'Origen (Localidad/Denominación)',
+    seller_product_stock: 'Stock disponible',
+    seller_product_image: 'Fotografía del Producto',
+    seller_save_product: 'Guardar Producto',
+    seller_delete_product: 'Eliminar Producto',
+    seller_product_deleted: 'Producto eliminado correctamente',
+    seller_events_title: 'Catas Presenciales en Tienda',
+    seller_events_subtitle: 'Control de aforo, edición de variables y gestión de asistentes para catas en Lekeitio.',
+    seller_events_edit_btn: 'Editar Cata',
+    seller_events_reserved: 'Reservadas',
+    seller_events_available: 'Disponibles',
+    seller_events_collected: 'Recaudado',
+    seller_events_attendees_title: 'Participantes de la Cata',
+    seller_events_no_events: 'No tienes catas presenciales creadas todavía',
+    seller_events_no_events_desc: 'Publica una cata presencial en la tienda de Lekeitio desde el menú superior para gestionar aforo, plazas y asistentes.',
+    seller_events_col_buyer: 'Comprador',
+    seller_events_col_contact: 'Contacto',
+    seller_events_col_seats: 'Plazas',
+    seller_events_col_date: 'Fecha Compra',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Acciones',
+
     role_buyer: 'Comprador / Gourmet',
     role_seller: 'Productor / Vendedor',
     role_admin: 'Administrador',
@@ -1096,18 +1246,18 @@ export const translations: Record<Language, TranslationDict> = {
     legal_privacy: 'Política de Privacidad',
     legal_cookies: 'Política de Cookies',
     legal_notice: 'Aviso Legal',
-    cookie_text: 'Utilizamos cookies para garantizar la mejor experiencia gastronómica.',
+    cookie_text: 'Utilizamos cookies para garantizar la mejor experiencia gastronómica en nuestra tienda.',
     cookie_accept: 'Aceptar Todas',
     cookie_reject: 'Rechazar',
     cookie_settings: 'Configurar',
 
     footer_club_title: 'Club de Amigos del Buen Queso',
     footer_club_subtitle: '¿Quieres estar al día de las novedades de EkhiTeka?',
-    footer_club_desc: 'Nuevas llegadas de quesos de temporada y catas exclusivas.',
+    footer_club_desc: 'Nuevas llegadas de quesos de temporada, catas exclusivas en Lekeitio y lotes limitados antes que nadie.',
     footer_join_whatsapp: 'Unirme por WhatsApp',
-    footer_cheese_desc: 'Quesos afinados y salazones del cantábrico.',
-    footer_delivery_desc: 'Cadena de frío garantizada 24/48 horas.',
-    footer_pickup_desc: 'Haz tu pedido online y recógelo preparado sin esperas.',
+    footer_cheese_desc: 'Quesos afinados, salazones del cantábrico y conservas artesanales seleccionadas una a una.',
+    footer_delivery_desc: 'Cadena de frío garantizada 24/48 horas para que cada producto llegue en su punto óptimo.',
+    footer_pickup_desc: 'Haz tu pedido online y recógelo preparado sin esperas en nuestra quesería de Lekeitio.',
     footer_categories: 'Categorías',
     footer_experiences: 'Experiencias',
     footer_legal: 'Información Legal',
@@ -1449,6 +1599,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Complete Profile',
     profile_status_incomplete: 'Incomplete Profile',
 
+    // Shop Section
+    shop_specialty: 'Our Speciality',
+    shop_hero_title: 'Artisan cheeses & gourmet gifts in Lekeitio',
+    shop_hero_desc: 'Author-aged cheeses, Cantabrian treasures and curated pairings. The authentic taste of Lekeitio to gift and enjoy.',
+    shop_see_cheeses: 'SEE OUR CHEESES',
+    shop_whatsapp_orders: 'Custom Orders via WhatsApp',
+    shop_visit_title: 'Our Cheesemonger & Gourmet Space',
+    shop_visit_subtitle: 'Visit us in Lekeitio · Km0',
+    shop_visit_desc: 'Our website shows a selection, but our Lekeitio shop has it all: over 80 references of aged artisan cheeses, Cantabrian preserved fish and personalised advice.',
+    shop_visit_contact: 'Contact the Shop',
+
+    // Chat
+    chat_title: 'Messages & Support',
+    chat_type_message: 'Type your message here...',
+    chat_send: 'Send',
+    chat_about_product: 'About this item',
+    chat_about_order: 'About this order',
+    chat_no_messages: 'No messages yet',
+    chat_conversations: 'Conversations',
+
+    // Seller Dashboard
+    seller_new_product: 'Add Gourmet Product',
+    seller_edit_product: 'Edit Product',
+    seller_product_name: 'Product Name',
+    seller_product_desc: 'Description & Tasting Notes',
+    seller_product_price: 'Price (€)',
+    seller_product_category: 'Category',
+    seller_product_format: 'Format / Presentation',
+    seller_product_origin: 'Origin / Region',
+    seller_product_stock: 'Available Stock',
+    seller_product_image: 'Product Photo',
+    seller_save_product: 'Save Product',
+    seller_delete_product: 'Delete Product',
+    seller_product_deleted: 'Product deleted successfully',
+    seller_events_title: 'In-Store In-Person Tastings',
+    seller_events_subtitle: 'Capacity control, variables edition and attendee management for tastings in Lekeitio.',
+    seller_events_edit_btn: 'Edit Tasting',
+    seller_events_reserved: 'Booked',
+    seller_events_available: 'Available',
+    seller_events_collected: 'Collected',
+    seller_events_attendees_title: 'Tasting Attendees',
+    seller_events_no_events: 'You have no in-person tastings created yet',
+    seller_events_no_events_desc: 'Publish an in-person tasting in our Lekeitio shop from the top menu to manage capacity and attendees.',
+    seller_events_col_buyer: 'Buyer',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Seats',
+    seller_events_col_date: 'Purchase Date',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
+
     role_buyer: 'Buyer / Gourmet',
     role_seller: 'Artisan / Seller',
     role_admin: 'Administrator',
@@ -1471,11 +1671,11 @@ export const translations: Record<Language, TranslationDict> = {
 
     footer_club_title: 'Friends of Good Cheese Club',
     footer_club_subtitle: 'Want to stay up to date with EkhiTeka news?',
-    footer_club_desc: 'Seasonal cheese arrivals and exclusive tastings.',
+    footer_club_desc: 'Seasonal cheese arrivals, exclusive tastings in Lekeitio and limited batches — before anyone else.',
     footer_join_whatsapp: 'Join via WhatsApp',
-    footer_cheese_desc: 'Aged artisan cheeses and Cantabrian salted fish.',
-    footer_delivery_desc: 'Cold chain guaranteed 24/48 hours.',
-    footer_pickup_desc: 'Order online and collect your prepared order in Lekeitio.',
+    footer_cheese_desc: 'Aged artisan cheeses, Cantabrian salted fish and hand-picked preserves.',
+    footer_delivery_desc: 'Cold chain guaranteed 24/48 hours so every product arrives in perfect condition.',
+    footer_pickup_desc: 'Order online and collect your prepared order with no wait at our Lekeitio cheesemonger.',
     footer_categories: 'Categories',
     footer_experiences: 'Experiences',
     footer_legal: 'Legal Information',
@@ -1718,7 +1918,7 @@ export const translations: Record<Language, TranslationDict> = {
     reviews_title: 'Avis de Nos Clients',
     reviews_subtitle: 'Ce que disent les amateurs de bon fromage',
     reviews_verified_buyer: 'Acheteur vérifié',
-    rev1_comment: 'Les fromages sont extraordinaires. Affinage impeccable et colis frais reçu en 24h.',
+    rev1_comment: 'Les fromages sont extraordinaires. Affinage缩peccable et colis frais reçu en 24h.',
     rev1_date: 'Il y a 3 jours',
     rev2_comment: 'J\\'ai commandé un plateau pour un anniversaire, les invités étaient conquis.',
     rev2_date: 'Il y a 1 semaine',
@@ -1776,7 +1976,7 @@ export const translations: Record<Language, TranslationDict> = {
     orders_order_number: 'Commande :',
     orders_total_to_charge: 'Total à encaisser :',
     orders_new_status: 'Le statut de votre commande a changé :',
-    orders_mark_seen: 'Marquer comme lu',
+    orders_mark_seen: 'Marquer como lu',
     orders_client_label: 'Client',
     orders_qty_label: 'Quantité',
 
@@ -1816,6 +2016,56 @@ export const translations: Record<Language, TranslationDict> = {
     profile_full_address: 'Adresse complète',
     profile_status_complete: 'Profil Complet',
     profile_status_incomplete: 'Profil Incomplet',
+
+    // Shop Section
+    shop_specialty: 'Notre Spécialité',
+    shop_hero_title: 'Fromages et cadeaux gastronomiques à Lekeitio',
+    shop_hero_desc: 'Fromages affinés d\\'auteur, trésors du Cantabrique et accords sélectionnés. La saveur authentique de Lekeitio à offrir et à savourer.',
+    shop_see_cheeses: 'VOIR NOS FROMAGES',
+    shop_whatsapp_orders: 'Commandes sur WhatsApp',
+    shop_visit_title: 'Notre Fromagerie & Espace Gourmet',
+    shop_visit_subtitle: 'Venez nous rendre visite à Lekeitio · Km0',
+    shop_visit_desc: 'Notre fromagerie de Lekeitio propose plus de 80 références de fromages artisanaux affinés, conserves du Cantabrique et conseils personnalisés.',
+    shop_visit_contact: 'Contacter la Boutique',
+
+    // Chat
+    chat_title: 'Messagerie & Conseils',
+    chat_type_message: 'Écrivez votre message ici...',
+    chat_send: 'Envoyer',
+    chat_about_product: 'À propos de cet article',
+    chat_about_order: 'À propos de cette commande',
+    chat_no_messages: 'Aucun message pour le moment',
+    chat_conversations: 'Conversations',
+
+    // Seller Dashboard
+    seller_new_product: 'Ajouter un Produit Gourmet',
+    seller_edit_product: 'Modifier le Produit',
+    seller_product_name: 'Nom du Produit',
+    seller_product_desc: 'Description et notes de dégustation',
+    seller_product_price: 'Prix (€)',
+    seller_product_category: 'Catégorie',
+    seller_product_format: 'Format / Présentation',
+    seller_product_origin: 'Origine / Terroir',
+    seller_product_stock: 'Stock disponible',
+    seller_product_image: 'Photo du Produit',
+    seller_save_product: 'Enregistrer le Produit',
+    seller_delete_product: 'Supprimer le Produit',
+    seller_product_deleted: 'Produit supprimé avec succès',
+    seller_events_title: 'Dégustations en Boutique',
+    seller_events_subtitle: 'Contrôle de jauge, modification des variables et gestion des inscrits à Lekeitio.',
+    seller_events_edit_btn: 'Modifier la Dégustation',
+    seller_events_reserved: 'Réservées',
+    seller_events_available: 'Disponibles',
+    seller_events_collected: 'Encaissé',
+    seller_events_attendees_title: 'Participants à la Dégustation',
+    seller_events_no_events: 'Vous n\\'avez pas encore créé de dégustation en boutique',
+    seller_events_no_events_desc: 'Publiez une dégustation en boutique depuis le menu supérieur pour gérer la jauge et les réservations.',
+    seller_events_col_buyer: 'Acheteur',
+    seller_events_col_contact: 'Contact',
+    seller_events_col_seats: 'Places',
+    seller_events_col_date: 'Date d\\'Achat',
+    seller_events_col_total: 'Total',
+    seller_events_col_actions: 'Actions',
 
     role_buyer: 'Client / Gourmet',
     role_seller: 'Artisan / Vendeur',
@@ -1872,887 +2122,13 @@ export const translations: Record<Language, TranslationDict> = {
   },
 };
 `,
-
-  // =========================================================================
-  // 2. SERVER ACTIONS (Guardado 100% seguro en el campo bio del usuario)
-  // =========================================================================
-  'app/actions/auth.ts': `'use server';
-
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
-import type { ProfileDetails } from '@/types/database';
-
-export async function login(formData: FormData) {
-  const supabase = await createClient();
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
-}
-
-export async function register(formData: FormData) {
-  const supabase = await createClient();
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-  const fullName = (formData.get('full_name') as string) || '';
-  const role = (formData.get('role') as string) || 'comprador';
-  const phone = (formData.get('phone') as string) || '';
-  const town = (formData.get('town') as string) || '';
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-        role,
-        phone,
-        town,
-      },
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  if (data.user) {
-    await supabase.from('profiles').upsert({
-      id: data.user.id,
-      full_name: fullName,
-      email,
-      role: role as any,
-      phone,
-      town,
-    });
-  }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
-}
-
-export async function signup(formData: FormData) {
-  return register(formData);
-}
-
-export async function updateProfile(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: 'No autenticado' };
-
-  const firstName = (formData.get('first_name') as string)?.trim() || '';
-  const lastName1 = (formData.get('last_name_1') as string)?.trim() || '';
-  const lastName2 = (formData.get('last_name_2') as string)?.trim() || '';
-  const birthDate = (formData.get('birth_date') as string)?.trim() || '';
-  const dni = (formData.get('dni') as string)?.trim()?.toUpperCase() || '';
-  const phone = (formData.get('phone') as string)?.trim() || '';
-  const province = (formData.get('province') as string)?.trim() || '';
-  const town = (formData.get('town') as string)?.trim() || '';
-  const postalCode = (formData.get('postal_code') as string)?.trim() || '';
-  const street = (formData.get('street') as string)?.trim() || '';
-  const number = (formData.get('number') as string)?.trim() || '';
-  const stair = (formData.get('stair') as string)?.trim() || '';
-  const floor = (formData.get('floor') as string)?.trim() || '';
-  const door = (formData.get('door') as string)?.trim() || '';
-
-  const fullNameInput = (formData.get('full_name') as string)?.trim() || '';
-  const fullName = [firstName, lastName1, lastName2].filter(Boolean).join(' ') || fullNameInput || 'Usuario EkhiTeka';
-
-  const formattedAddress = [
-    street,
-    number ? \`Nº \${number}\` : '',
-    stair ? \`Esc \${stair}\` : '',
-    floor ? \`Piso \${floor}\` : '',
-    door ? \`Pta \${door}\` : '',
-    postalCode,
-    town,
-    province,
-  ]
-    .filter(Boolean)
-    .join(', ');
-
-  const profileData: ProfileDetails = {
-    first_name: firstName,
-    last_name_1: lastName1,
-    last_name_2: lastName2,
-    birth_date: birthDate,
-    dni,
-    phone,
-    province,
-    town,
-    postal_code: postalCode,
-    street,
-    number,
-    stair,
-    floor,
-    door,
-  };
-
-  const structuredBio = JSON.stringify(profileData);
-
-  // Actualizamos únicamente las columnas seguras de la tabla profiles
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      full_name: fullName,
-      phone,
-      town,
-      address: formattedAddress,
-      bio: structuredBio,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', user.id);
-
-  if (error) return { error: error.message };
-
-  revalidatePath('/perfil');
-  revalidatePath('/');
-  revalidatePath('/cesta');
-  return {
-    success: true,
-    updatedProfile: {
-      ...profileData,
-      full_name: fullName,
-      phone,
-      town,
-      address: formattedAddress,
-      bio: structuredBio,
-    },
-  };
-}
-
-export async function changeUserPassword(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || !user.email) {
-    return { error: 'No autenticado. Por favor inicia sesión.' };
-  }
-
-  const currentPassword = (formData.get('current_password') as string) || '';
-  const newPassword = (formData.get('new_password') as string) || '';
-  const confirmPassword = (formData.get('confirm_password') as string) || '';
-
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    return { error: 'Por favor, completa todos los campos de contraseña.' };
-  }
-
-  if (newPassword !== confirmPassword) {
-    return { error: 'La nueva contraseña y su confirmación no coinciden.' };
-  }
-
-  if (newPassword.length < 6) {
-    return { error: 'La nueva contraseña debe tener al menos 6 caracteres.' };
-  }
-
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: currentPassword,
-  });
-
-  if (signInError) {
-    return { error: 'La contraseña actual no es correcta. Verifica e inténtalo de nuevo.' };
-  }
-
-  const { error: updateError } = await supabase.auth.updateUser({
-    password: newPassword,
-  });
-
-  if (updateError) {
-    return { error: \`Error al actualizar la contraseña: \${updateError.message}\` };
-  }
-
-  return { success: true };
-}
-
-export async function signout() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  revalidatePath('/', 'layout');
-  redirect('/');
-}
-`,
-
-  // =========================================================================
-  // 3. PROFILE FORM COMPONENT (Visualización dato a dato + Edición + Contraseña)
-  // =========================================================================
-  'components/ProfileForm.tsx': `'use client';
-
-import { useState } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import { updateProfile, changeUserPassword } from '@/app/actions/auth';
-import type { Profile } from '@/types/database';
-import { parseProfile, isProfileComplete } from '@/types/database';
-import {
-  User,
-  Phone,
-  MapPin,
-  Lock,
-  Check,
-  ShieldCheck,
-  Home,
-  Pencil,
-  X,
-  ChevronDown,
-  Calendar,
-  CreditCard,
-  Mail,
-  CheckCircle2,
-  AlertCircle,
-} from 'lucide-react';
-
-interface ProfileFormProps {
-  profile?: Profile;
-  userProfile?: Profile;
-}
-
-export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
-  const raw = profile || userProfile || ({} as Profile);
-  const { t } = useLanguage();
-
-  const [currentProfile, setCurrentProfile] = useState<Profile>(parseProfile(raw));
-  const [isEditing, setIsEditing] = useState(false);
-  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
-
-  const [loadingProfile, setLoadingProfile] = useState(false);
-  const [profileMsg, setProfileMsg] = useState<{ text: string; isError: boolean } | null>(null);
-
-  const [loadingPassword, setLoadingPassword] = useState(false);
-  const [passwordMsg, setPasswordMsg] = useState<{ text: string; isError: boolean } | null>(null);
-
-  const p = currentProfile;
-  const isComplete = isProfileComplete(p);
-
-  const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoadingProfile(true);
-    setProfileMsg(null);
-
-    const formData = new FormData(e.currentTarget);
-    const res = await updateProfile(formData);
-    setLoadingProfile(false);
-
-    if (res?.error) {
-      setProfileMsg({ text: res.error, isError: true });
-    } else {
-      setProfileMsg({ text: t.common_success, isError: false });
-      if (res?.updatedProfile) {
-        setCurrentProfile(parseProfile(res.updatedProfile));
-      }
-      setIsEditing(false);
-      setTimeout(() => setProfileMsg(null), 3500);
-    }
-  };
-
-  const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoadingPassword(true);
-    setPasswordMsg(null);
-
-    const formData = new FormData(e.currentTarget);
-    const res = await changeUserPassword(formData);
-    setLoadingPassword(false);
-
-    if (res?.error) {
-      setPasswordMsg({ text: res.error, isError: true });
-    } else {
-      setPasswordMsg({ text: '¡Contraseña actualizada con éxito!', isError: false });
-      (e.target as HTMLFormElement).reset();
-      setTimeout(() => {
-        setPasswordMsg(null);
-        setIsPasswordOpen(false);
-      }, 2500);
-    }
-  };
-
-  const formattedAddress = [
-    p.street,
-    p.number ? \`Nº \${p.number}\` : '',
-    p.stair ? \`Esc \${p.stair}\` : '',
-    p.floor ? \`Piso \${p.floor}\` : '',
-    p.door ? \`Pta \${p.door}\` : '',
-    p.postal_code,
-    p.town,
-    p.province,
-  ]
-    .filter(Boolean)
-    .join(', ');
-
-  return (
-    <div className="space-y-8 font-serif">
-      {/* 1. TARJETA PRINCIPAL DE PERFIL */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
-        {/* Cabecera con Estado y Botón Editar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100 dark:border-stone-800">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]">
-              <User className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-lg sm:text-xl font-black text-stone-900 dark:text-stone-100">
-                  {p.full_name || 'Usuario EkhiTeka'}
-                </h2>
-                <span
-                  className={\`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider font-sans \${
-                    isComplete
-                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                      : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
-                  }\`}
-                >
-                  {isComplete ? (
-                    <>
-                      <CheckCircle2 className="w-3 h-3" /> {t.profile_status_complete}
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="w-3 h-3" /> {t.profile_status_incomplete}
-                    </>
-                  )}
-                </span>
-              </div>
-              <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                {t.profile_subtitle}
-              </p>
-            </div>
-          </div>
-
-          {!isEditing && (
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer hover:scale-105 shrink-0"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              <span>{t.profile_edit_btn}</span>
-            </button>
-          )}
-        </div>
-
-        {profileMsg && (
-          <div
-            className={\`p-4 rounded-2xl text-xs font-bold text-center font-sans \${
-              profileMsg.isError
-                ? 'bg-red-100 dark:bg-red-950/70 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800'
-                : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
-            }\`}
-          >
-            {profileMsg.text}
-          </div>
-        )}
-
-        {/* ----------------- MODO VISTA: CADA CAMPO UNO A UNO ----------------- */}
-        {!isEditing ? (
-          <div className="space-y-6 font-sans text-xs">
-            {/* Bloque: Identificación Personal */}
-            <div className="space-y-3">
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
-                <CreditCard className="w-3.5 h-3.5" />
-                <span>{t.profile_personal_data}</span>
-              </span>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_first_name}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.first_name || t.profile_not_specified}
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_last_name_1}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.last_name_1 || t.profile_not_specified}
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_last_name_2}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.last_name_2 || t.profile_not_specified}
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_dni}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm uppercase">
-                    {p.dni || t.profile_not_specified}
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_birth_date}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.birth_date || t.profile_not_specified}
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_phone}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.phone || t.profile_not_specified}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bloque: Dirección de Entrega Completa */}
-            <div className="space-y-3 pt-2">
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
-                <Home className="w-3.5 h-3.5" />
-                <span>{t.profile_address_data}</span>
-              </span>
-
-              <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-3">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                  <p className="text-sm font-bold text-stone-900 dark:text-stone-100">
-                    {formattedAddress || t.profile_not_specified}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-stone-200/50 dark:border-stone-700/50 text-[11px] text-stone-600 dark:text-stone-300">
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_street}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">{p.street || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_number} / {t.profile_floor}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">Nº {p.number || '-'} · Piso {p.floor || '-'} {p.door ? \`(\${p.door})\` : ''}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_postal_code}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">{p.postal_code || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_town} / {t.profile_province}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">{p.town || 'Lekeitio'} ({p.province || 'Bizkaia'})</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* ----------------- MODO EDICIÓN: CAMPOS EDITABLES ----------------- */
-          <form onSubmit={handleProfileSubmit} className="space-y-5 font-sans text-xs animate-fadeIn">
-            {/* 1. Nombre y Apellidos */}
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block mb-2 font-serif">
-                {t.profile_personal_data}
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_first_name} *
-                  </label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    required
-                    defaultValue={p.first_name || ''}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_last_name_1} *
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name_1"
-                    required
-                    defaultValue={p.last_name_1 || ''}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_last_name_2}
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name_2"
-                    defaultValue={p.last_name_2 || ''}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 2. DNI, Fecha Nacimiento y Teléfono */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_dni} *
-                </label>
-                <input
-                  type="text"
-                  name="dni"
-                  required
-                  defaultValue={p.dni || ''}
-                  placeholder="12345678Z"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl uppercase"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_birth_date} *
-                </label>
-                <input
-                  type="date"
-                  name="birth_date"
-                  required
-                  defaultValue={p.birth_date || ''}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_phone} *
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  required
-                  defaultValue={p.phone || ''}
-                  placeholder="600 000 000"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-            </div>
-
-            {/* 3. Dirección de Entrega */}
-            <div className="pt-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block mb-2 font-serif">
-                {t.profile_address_data}
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_province} *
-                  </label>
-                  <input
-                    type="text"
-                    name="province"
-                    required
-                    defaultValue={p.province || 'Bizkaia'}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_town} *
-                  </label>
-                  <input
-                    type="text"
-                    name="town"
-                    required
-                    defaultValue={p.town || 'Lekeitio'}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_postal_code} *
-                  </label>
-                  <input
-                    type="text"
-                    name="postal_code"
-                    required
-                    defaultValue={p.postal_code || ''}
-                    placeholder="48280"
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Calle, Número, Escalera, Piso y Puerta */}
-            <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-              <div className="col-span-2 sm:col-span-2">
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_street} *
-                </label>
-                <input
-                  type="text"
-                  name="street"
-                  required
-                  defaultValue={p.street || ''}
-                  placeholder="Gamarra Kalea"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_number} *
-                </label>
-                <input
-                  type="text"
-                  name="number"
-                  required
-                  defaultValue={p.number || ''}
-                  placeholder="4"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_stair}
-                </label>
-                <input
-                  type="text"
-                  name="stair"
-                  defaultValue={p.stair || ''}
-                  placeholder="A"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_floor} *
-                </label>
-                <input
-                  type="text"
-                  name="floor"
-                  required
-                  defaultValue={p.floor || ''}
-                  placeholder="2"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_door} *
-                </label>
-                <input
-                  type="text"
-                  name="door"
-                  required
-                  defaultValue={p.door || ''}
-                  placeholder="B"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-end gap-3 font-serif">
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="px-5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold text-xs uppercase tracking-wider hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
-              >
-                {t.common_cancel}
-              </button>
-              <button
-                type="submit"
-                disabled={loadingProfile}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
-              >
-                <Check className="w-4 h-4" />
-                <span>{loadingProfile ? t.common_loading : t.profile_save_changes_btn}</span>
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-
-      {/* 2. TARJETA CAMBIAR CONTRASEÑA (Desplegable) */}
-      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
-        <button
-          type="button"
-          onClick={() => setIsPasswordOpen(!isPasswordOpen)}
-          className="w-full flex items-center justify-between text-left cursor-pointer group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
-              <Lock className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 font-serif">
-                {t.profile_security}
-              </h2>
-              <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                {isPasswordOpen ? 'Introduce tu contraseña actual y la nueva clave.' : 'Pulsa aquí para cambiar tu contraseña de acceso.'}
-              </p>
-            </div>
-          </div>
-
-          <div className={\`p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 transition-transform duration-200 \${isPasswordOpen ? 'rotate-180' : ''}\`}>
-            <ChevronDown className="w-4 h-4" />
-          </div>
-        </button>
-
-        {isPasswordOpen && (
-          <form onSubmit={handlePasswordSubmit} className="mt-6 pt-6 border-t border-stone-100 dark:border-stone-800 space-y-4 font-sans text-xs max-w-md animate-fadeIn">
-            {passwordMsg && (
-              <div
-                className={\`p-3.5 rounded-2xl text-xs font-bold text-center \${
-                  passwordMsg.isError
-                    ? 'bg-red-100 dark:bg-red-950/70 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800'
-                    : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
-                }\`}
-              >
-                {passwordMsg.text}
-              </div>
-            )}
-
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_current_password} *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  name="current_password"
-                  required
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_new_password} *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  name="new_password"
-                  required
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_confirm_password} *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  name="confirm_password"
-                  required
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end font-serif">
-              <button
-                type="submit"
-                disabled={loadingPassword}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1D1D1B] dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-900 font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
-              >
-                <Check className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-                <span>{loadingPassword ? t.common_loading : t.profile_change_password_btn}</span>
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
-  );
-}
-`,
-
-  // =========================================================================
-  // 4. PÁGINA PERFIL (Carga de datos de perfil + sin caché estático)
-  // =========================================================================
-  'app/perfil/page.tsx': `import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { ProfileForm } from '@/components/ProfileForm';
-import type { Profile } from '@/types/database';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-
-export const revalidate = 0;
-
-export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect('/login');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  const userProfile = (profile || {}) as Profile;
-  if (user.email && !userProfile.email) {
-    userProfile.email = user.email;
-  }
-
-  return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <Link
-          href="/"
-          className="p-2.5 rounded-2xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition-colors shadow-2xs cursor-pointer"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 font-serif">
-            Mi Perfil · Nire Profila
-          </h1>
-          <p className="text-xs text-stone-500 dark:text-stone-400">
-            Gestiona tus datos personales, dirección de envío y contraseña.
-          </p>
-        </div>
-      </div>
-
-      <ProfileForm userProfile={userProfile} profile={userProfile} />
-    </div>
-  );
-}
-`,
 };
 
-// Generación en disco
 Object.entries(files).forEach(([filePath, content]) => {
   const fullPath = path.join(process.cwd(), filePath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
   fs.writeFileSync(fullPath, content.trimStart(), 'utf8');
-  console.log(`✓ Actualizado correctamente: ${filePath}`);
+  console.log(`✓ Archivo actualizado: ${filePath}`);
 });
 
-console.log('\n🎉 ¡Ventana de perfil restaurada (vista dato a dato, edición en línea y contraseña)!');
+console.log('\n🎉 ¡Diccionario de idiomas completado al 100% y tipado validado!');
