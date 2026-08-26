@@ -176,7 +176,6 @@ export function isProfileComplete(raw?: any): boolean {
     'door',
   ];
 
-  // La dirección NO es obligatoria para usuarios vendedores
   const requiredKeys = isSeller ? userKeys : [...userKeys, ...addressKeys];
 
   return requiredKeys.every((key) => {

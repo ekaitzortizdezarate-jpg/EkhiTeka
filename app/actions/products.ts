@@ -15,7 +15,6 @@ async function checkSellerPermission(supabase: any, userId: string) {
   return profile?.role === 'vendedor' || profile?.role === 'admin';
 }
 
-// Auto-crear la categoría en la tabla categories si es un tipo especial
 async function ensureCategoryExists(supabase: any, categoryId: string) {
   const specialCategories: Record<string, { es: string; eu: string; en: string; fr: string; icon: string }> = {
     cesta_gourmet: { es: 'Cesta Gourmet', eu: 'Gourmet Saskia', en: 'Gourmet Hamper', fr: 'Coffret Gourmet', icon: '🎁' },
@@ -62,21 +61,25 @@ export async function createProduct(formData: FormData) {
     return { error: 'Debes completar tu perfil con todos los campos obligatorios antes de publicar productos.' };
   }
 
-  const name = formData.get('name') as string;
-  const description = formData.get('description') as string;
-  const categoryId = formData.get('category_id') as string;
+  const name = (formData.get('name') as string)?.trim();
+  const description = (formData.get('description') as string)?.trim();
+  const categoryId = (formData.get('category_id') as string) || 'queso';
   const price = parseFloat(formData.get('price') as string);
   const format = (formData.get('format') as string) || 'unidad';
   const weightG = formData.get('weight_g') ? parseInt(formData.get('weight_g') as string) : null;
   const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : 10;
   const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
-  const originRegion = formData.get('origin_region') as string;
+  const originRegion = (formData.get('origin_region') as string)?.trim() || 'Lekeitio / Bizkaia';
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
+  const pickupAddressIds = formData.getAll('pickup_address_ids') as string[];
+  const eventAddressId = (formData.get('event_address_id') as string) || null;
 
-  // Garantizar que la categoría existe en la BD
+  if (!name || isNaN(price)) {
+    return { error: 'Por favor, rellena los campos obligatorios (Nombre y Precio).' };
+  }
+
   await ensureCategoryExists(supabase, categoryId);
 
-  // Gestión de subida de imagen a Supabase Storage
   let imageUrl = (formData.get('image_url_fallback') as string) || null;
   const imageFile = formData.get('image_file') as File | null;
 
@@ -120,10 +123,12 @@ export async function createProduct(formData: FormData) {
   }
 
   revalidatePath('/');
+  revalidatePath('/tienda');
   revalidatePath('/regalos-gourmet');
   revalidatePath('/experiencias');
   revalidatePath('/vendedor/productos');
-  redirect('/');
+  revalidatePath('/vendedor/eventos');
+  redirect('/tienda');
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
@@ -141,18 +146,17 @@ export async function updateProduct(productId: string, formData: FormData) {
     return { error: 'Permisos insuficientes. Solo los vendedores de EkhiTeka pueden editar productos.' };
   }
 
-  const name = formData.get('name') as string;
-  const description = formData.get('description') as string;
+  const name = (formData.get('name') as string)?.trim();
+  const description = (formData.get('description') as string)?.trim();
   const categoryId = formData.get('category_id') as string;
   const price = parseFloat(formData.get('price') as string);
   const format = (formData.get('format') as string) || 'unidad';
   const weightG = formData.get('weight_g') ? parseInt(formData.get('weight_g') as string) : null;
   const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : 10;
   const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
-  const originRegion = formData.get('origin_region') as string;
+  const originRegion = (formData.get('origin_region') as string)?.trim() || 'Lekeitio / Bizkaia';
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
 
-  // Garantizar que la categoría existe en la BD
   await ensureCategoryExists(supabase, categoryId);
 
   let imageUrl = (formData.get('existing_image_url') as string) || (formData.get('image_url_fallback') as string) || null;
@@ -196,10 +200,11 @@ export async function updateProduct(productId: string, formData: FormData) {
   }
 
   revalidatePath('/');
+  revalidatePath('/tienda');
   revalidatePath('/regalos-gourmet');
   revalidatePath('/experiencias');
   revalidatePath(`/producto/${productId}`);
-  redirect('/');
+  redirect('/tienda');
 }
 
 export async function deleteProduct(productId: string) {
@@ -227,6 +232,7 @@ export async function deleteProduct(productId: string) {
   }
 
   revalidatePath('/');
+  revalidatePath('/tienda');
   revalidatePath('/regalos-gourmet');
   revalidatePath('/experiencias');
   revalidatePath(`/producto/${productId}`);

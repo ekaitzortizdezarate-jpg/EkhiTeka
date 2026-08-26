@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import { SellerProductForm } from '@/components/SellerProductForm';
-import type { Category, Product } from '@/types/database';
+import { type Category, type Product, parseProfile } from '@/types/database';
 
 interface EditProductPageProps {
   params: Promise<{ id: string }>;
@@ -18,13 +18,15 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('*')
     .eq('id', user.id)
     .single();
 
   if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
     redirect('/');
   }
+
+  const parsed = parseProfile(profile);
 
   const [categoriesRes, productRes, singleProductsRes] = await Promise.all([
     supabase.from('categories').select('*').eq('is_active', true).order('display_order', { ascending: true }),
@@ -41,6 +43,8 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       categories={(categoriesRes.data || []) as Category[]}
       initialProduct={productRes.data as Product}
       availableSingleProducts={(singleProductsRes.data || []) as Product[]}
+      pickupAddresses={parsed.pickup_addresses || []}
+      eventAddresses={parsed.event_addresses || []}
     />
   );
 }

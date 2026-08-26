@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { SellerProductForm } from '@/components/SellerProductForm';
-import { type Category, type Product, isProfileComplete } from '@/types/database';
+import { type Category, type Product, isProfileComplete, parseProfile } from '@/types/database';
 
 export default async function NewProductPage() {
   const supabase = await createClient();
@@ -25,6 +25,8 @@ export default async function NewProductPage() {
     redirect('/perfil');
   }
 
+  const parsed = parseProfile(profile);
+
   const [categoriesRes, singleProductsRes] = await Promise.all([
     supabase
       .from('categories')
@@ -43,6 +45,8 @@ export default async function NewProductPage() {
     <SellerProductForm
       categories={(categoriesRes.data || []) as Category[]}
       availableSingleProducts={(singleProductsRes.data || []) as Product[]}
+      pickupAddresses={parsed.pickup_addresses || []}
+      eventAddresses={parsed.event_addresses || []}
     />
   );
 }
