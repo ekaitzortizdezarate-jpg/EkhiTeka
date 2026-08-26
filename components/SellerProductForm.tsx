@@ -757,7 +757,7 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 4. PRODUCTOS DE LA LISTA (Formato responsive vertical en móvil con cantidad encima del precio y papelera) */}
+          {/* 4. PRODUCTOS DE LA LISTA (Móvil: Arriba izquierda imagen, derecha cantidad y precio/borrar. Abajo ancho completo nombre e info) */}
           {isPackOrEvent && (
             <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-3 font-sans">
               <div className="flex items-center gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
@@ -768,67 +768,84 @@ export function SellerProductForm({
               </div>
 
               {selectedListItems.length > 0 ? (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {selectedListItems.map((item) => (
                     <div
                       key={item.id}
-                      className="p-3 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                      className="p-3.5 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 shadow-2xs space-y-2.5"
                     >
-                      {/* Lado izquierdo: Foto + Info */}
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <img
-                          src={item.imageUrl || '/images/secciones/Quesos.JPG'}
-                          alt={item.name}
-                          className="w-12 h-12 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
-                        />
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <p className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:truncate leading-snug">
-                            {item.name}
-                          </p>
-                          <p className="text-[10.5px] text-stone-500 dark:text-stone-400 leading-tight">
-                            {item.price.toFixed(2)} € / ud {item.origin ? `· ${item.origin}` : ''} {item.isCustom ? '(Específico)' : ''}
-                          </p>
+                      {/* Fila Superior: Izquierda Imagen (2 alturas) · Derecha Cantidad y debajo Precio/Borrar */}
+                      <div className="flex items-center justify-between gap-3">
+                        {/* Imagen a la izquierda */}
+                        <div className="w-16 h-16 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-stone-100 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 shrink-0">
+                          <img
+                            src={item.imageUrl || '/images/secciones/Quesos.JPG'}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        {/* Derecha: Arriba Cantidad, Debajo Precio y Borrar */}
+                        <div className="flex flex-col items-end gap-1.5 shrink-0">
+                          {/* Arriba: Cantidad */}
+                          <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-[#141312] p-0.5">
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateItemQuantity(item.id, item.quantity - 1)}
+                              className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer text-stone-700 dark:text-stone-300"
+                            >
+                              -
+                            </button>
+                            <span className="w-7 text-center text-xs font-black text-stone-900 dark:text-stone-100">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateItemQuantity(item.id, item.quantity + 1)}
+                              className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer text-stone-700 dark:text-stone-300"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          {/* Debajo: Precio y Borrar */}
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif font-black text-xs sm:text-sm text-stone-900 dark:text-stone-100 min-w-[55px] text-right">
+                              {(item.price * item.quantity).toFixed(2)} €
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveListItem(item.id)}
+                              className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                              title="Eliminar de la lista"
+                            >
+                              <Trash className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Lado derecho: Cantidad encima de precio y botón borrar en móvil */}
-                      <div className="flex sm:flex-row flex-col items-end sm:items-center gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100 dark:border-stone-800/60 w-full sm:w-auto justify-between sm:justify-end">
-                        {/* Control de cantidad */}
-                        <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-[#141312] p-0.5">
-                          <button
-                            type="button"
-                            onClick={() => handleUpdateItemQuantity(item.id, item.quantity - 1)}
-                            className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
-                          >
-                            -
-                          </button>
-                          <span className="w-7 text-center text-xs font-black">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleUpdateItemQuantity(item.id, item.quantity + 1)}
-                            className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
-                          >
-                            +
-                          </button>
+                      {/* Fila Inferior: Ancho completo para Nombre y Resto de Información */}
+                      <div className="pt-2 border-t border-stone-100 dark:border-stone-800/60 space-y-0.5 w-full">
+                        <p className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:text-sm leading-snug break-words">
+                          {item.name}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-stone-500 dark:text-stone-400">
+                          <span>{item.price.toFixed(2)} €/ud</span>
+                          {item.format && <span>· Formato: {item.format}</span>}
+                          {item.origin && <span>· {item.origin}</span>}
+                          {item.isCustom && (
+                            <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-[10px]">
+                              Específico
+                            </span>
+                          )}
                         </div>
-
-                        {/* Fila inferior móvil / lateral desktop: Precio y Borrar */}
-                        <div className="flex items-center gap-2.5">
-                          <span className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 text-right min-w-[55px]">
-                            {(item.price * item.quantity).toFixed(2)} €
-                          </span>
-
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveListItem(item.id)}
-                            className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
-                            title="Eliminar de la lista"
-                          >
-                            <Trash className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                        {item.description && (
+                          <p className="text-[10.5px] text-stone-400 dark:text-stone-500 line-clamp-2 pt-0.5">
+                            {item.description}
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}
