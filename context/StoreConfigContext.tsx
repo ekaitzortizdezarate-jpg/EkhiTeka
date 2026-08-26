@@ -24,11 +24,15 @@ export function StoreConfigProvider({
 }) {
   const seller = useMemo(() => parseProfile(initialSellerProfile), [initialSellerProfile]);
 
+  const enabledWhatsApp = useMemo(
+    () => (seller.whatsapp_contacts || []).find((contact) => contact.enabled),
+    [seller]
+  );
+
   const whatsappPhone = useMemo(() => {
-    if (seller.whatsapp_enabled === false) return '';
-    const raw = seller.whatsapp_phone || seller.phone || '34600000000';
-    return raw.replace(/[^0-9]/g, '');
-  }, [seller]);
+    if (seller.whatsapp_enabled === false || !enabledWhatsApp) return '';
+    return enabledWhatsApp.phone.replace(/[^0-9]/g, '');
+  }, [enabledWhatsApp, seller.whatsapp_enabled]);
 
   const isWhatsAppEnabled = seller.whatsapp_enabled !== false;
 

@@ -92,6 +92,7 @@ export async function updateProfile(formData: FormData) {
   const door = (formData.get('door') as string)?.trim() || '';
   const whatsappEnabled = formData.get('whatsapp_enabled') === 'on';
   const whatsappPhone = (formData.get('whatsapp_phone') as string)?.trim() || null;
+  const whatsappContactsInput = (formData.get('whatsapp_contacts') as string)?.trim() || '[]';
   const pickupAddressesInput = (formData.get('pickup_addresses') as string)?.trim() || '';
   let pickupAddresses = undefined;
   if (pickupAddressesInput) {
@@ -100,6 +101,13 @@ export async function updateProfile(formData: FormData) {
     } catch {
       return { error: 'La configuración de la tienda no es válida.' };
     }
+  }
+  let whatsappContacts;
+  try {
+    whatsappContacts = JSON.parse(whatsappContactsInput);
+    if (!Array.isArray(whatsappContacts)) throw new Error();
+  } catch {
+    return { error: 'Los contactos de WhatsApp no son válidos.' };
   }
 
   const fullNameInput = (formData.get('full_name') as string)?.trim() || '';
@@ -135,6 +143,7 @@ export async function updateProfile(formData: FormData) {
     door,
     whatsapp_phone: whatsappEnabled ? whatsappPhone : null,
     whatsapp_enabled: whatsappEnabled,
+    whatsapp_contacts: whatsappContacts,
     pickup_addresses: pickupAddresses,
   };
 

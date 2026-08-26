@@ -30,6 +30,13 @@ export interface PickupAddress {
   is_active: boolean;
 }
 
+export interface WhatsAppContact {
+  id: string;
+  name: string;
+  phone: string;
+  enabled: boolean;
+}
+
 export interface ProfileDetails {
   first_name?: string | null;
   last_name_1?: string | null;
@@ -47,6 +54,7 @@ export interface ProfileDetails {
   door?: string | null;
   whatsapp_phone?: string | null;
   whatsapp_enabled?: boolean;
+  whatsapp_contacts?: WhatsAppContact[];
   pickup_addresses?: PickupAddress[];
 }
 
@@ -86,6 +94,7 @@ export function parseProfile(raw?: any): Profile {
       door: '',
       whatsapp_phone: '34600000000',
       whatsapp_enabled: true,
+      whatsapp_contacts: [],
       pickup_addresses: [],
     };
   }
@@ -116,6 +125,18 @@ export function parseProfile(raw?: any): Profile {
     },
   ];
 
+  const legacyWhatsApp = details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '';
+  const whatsappContacts: WhatsAppContact[] = Array.isArray(details.whatsapp_contacts)
+    ? details.whatsapp_contacts
+    : legacyWhatsApp
+      ? [{
+          id: 'whatsapp_legacy',
+          name: 'WhatsApp de la tienda',
+          phone: legacyWhatsApp,
+          enabled: details.whatsapp_enabled ?? raw.whatsapp_enabled ?? true,
+        }]
+      : [];
+
   return {
     ...raw,
     first_name: details.first_name || raw.first_name || raw.full_name?.split(' ')[0] || '',
@@ -137,6 +158,7 @@ export function parseProfile(raw?: any): Profile {
         ? details.whatsapp_phone ?? raw.whatsapp_phone ?? null
         : details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '34600000000',
     whatsapp_enabled: details.whatsapp_enabled ?? raw.whatsapp_enabled ?? true,
+    whatsapp_contacts: whatsappContacts,
     pickup_addresses: details.pickup_addresses && details.pickup_addresses.length > 0 ? details.pickup_addresses : defaultAddresses,
   };
 }

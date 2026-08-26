@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile, changeUserPassword } from '@/app/actions/auth';
-import type { Profile, PickupAddress } from '@/types/database';
+import type { Profile, PickupAddress, WhatsAppContact } from '@/types/database';
 import { parseProfile, isProfileComplete } from '@/types/database';
 import {
   User,
@@ -39,16 +39,8 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const [pickupAddresses, setPickupAddresses] = useState<PickupAddress[]>(
     currentProfile.pickup_addresses || []
   );
-  const [customWhatsApp, setCustomWhatsApp] = useState<string>(
-    currentProfile.whatsapp_phone || ''
-  );
-  const [whatsAppEnabled, setWhatsAppEnabled] = useState(
-    currentProfile.whatsapp_enabled !== false
-  );
-  const [whatsAppMode, setWhatsAppMode] = useState<'registered' | 'custom'>(
-    currentProfile.whatsapp_phone && currentProfile.whatsapp_phone !== currentProfile.phone
-      ? 'custom'
-      : 'registered'
+  const [whatsappContacts, setWhatsAppContacts] = useState<WhatsAppContact[]>(
+    currentProfile.whatsapp_contacts || []
   );
 
   const [loadingProfile, setLoadingProfile] = useState(false);
@@ -103,14 +95,26 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     setPickupAddresses(filtered);
   };
 
-  const handleClearWhatsApp = () => {
-    if (!window.confirm('¿Estás seguro de que quieres borrar el contacto de WhatsApp de la tienda?')) {
+  const handleDeleteWhatsApp = (id: string) => {
+    if (!window.confirm('¿Estás seguro de que quieres borrar este contacto de WhatsApp de la tienda?')) {
       return;
     }
-    setCustomWhatsApp('');
-    setWhatsAppMode('custom');
-    setWhatsAppEnabled(false);
-    setIsEditing(false);
+    setWhatsAppContacts((contacts) => contacts.filter((contact) => contact.id !== id));
+  };
+
+  const handleToggleWhatsApp = (id: string) => {
+    setWhatsAppContacts((contacts) => contacts.map((contact) => {
+      if (contact.id !== id) return { ...contact, enabled: false };
+      if (!contact.phone.trim()) return contact;
+      return { ...contact, enabled: !contact.enabled };
+    }));
+  };
+
+  const handleAddWhatsApp = () => {
+    setWhatsAppContacts((contacts) => [
+      ...contacts,
+      { id: `whatsapp_${Date.now()}`, name: '', phone: '', enabled: false },
+    ]);
   };
 
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -119,9 +123,15 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     setProfileMsg(null);
 
     const formData = new FormData(e.currentTarget);
-    const resolvedWhatsApp = whatsAppMode === 'registered' ? (formData.get('phone') as string) : customWhatsApp;
-    formData.append('whatsapp_phone', resolvedWhatsApp);
-    if (whatsAppEnabled) formData.append('whatsapp_enabled', 'on');
+    const validWhatsAppContacts = whatsappContacts
+      .filter((contact) => contact.phone.trim())
+      .map((contact) => ({ ...contact, phone: contact.phone.trim() }));
+    formData.append('whatsapp_contacts', JSON.stringify(validWhatsAppContacts));
+    const enabledWhatsApp = validWhatsAppContacts.find((contact) => contact.enabled);
+    if (enabledWhatsApp) {
+      formData.append('whatsapp_phone', enabledWhatsApp.phone);
+      formData.append('whatsapp_enabled', 'on');
+    }
     formData.append('pickup_addresses', JSON.stringify(pickupAddresses));
 
     const res = await updateProfile(formData);
@@ -133,6 +143,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
       setProfileMsg({ text: t.common_success, isError: false });
       if (res?.updatedProfile) {
         setCurrentProfile(parseProfile(res.updatedProfile));
+        setWhatsAppContacts(parseProfile(res.updatedProfile).whatsapp_contacts || []);
       }
       setIsEditing(false);
       setTimeout(() => setProfileMsg(null), 3500);
@@ -311,51 +322,62 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <div className="space-y-4 pt-4 border-t border-stone-200/60 dark:border-stone-800">
                 {/* WhatsApp Tienda */}
                 <div className={`p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 ${
-                  whatsAppEnabled
+                  whatsappContacts.some((contact) => contact.enabled)
                     ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60'
                     : 'bg-transparent border-stone-200 dark:border-stone-800'
                 }`}>
                   <div className="flex items-center gap-3 min-w-0">
                     <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    <div>
+                    <div className="min-w-0">
                       <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block font-serif">
                         WhatsApp Oficial de la Tienda
                       </span>
-                      <p className="text-sm font-black text-stone-900 dark:text-[#F5F5F0]">
-                        {!customWhatsApp && whatsAppMode === 'custom'
-                          ? 'No hay contacto. Pulsa Editar para añadirlo.'
-                          : !whatsAppEnabled
-                            ? 'Deshabilitado'
-                            : `+${whatsAppMode === 'registered' ? p.phone : customWhatsApp}`}
-                      </p>
+                      {whatsappContacts.length === 0 ? (
+                        <p className="text-sm font-black text-stone-900 dark:text-[#F5F5F0]">
+                          No hay contacto. Pulsa Editar para añadirlo.
+                        </p>
+                      ) : (
+                        <div className="space-y-2 mt-1">
+                          {whatsappContacts.map((contact) => (
+                            <div key={contact.id} className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-black text-stone-900 dark:text-[#F5F5F0]">
+                                {contact.name || 'Sin nombre'} · +{contact.phone}
+                                {!contact.enabled && <span className="text-xs font-medium text-stone-500"> · Deshabilitado</span>}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleWhatsApp(contact.id)}
+                                className="text-[9px] font-black uppercase text-emerald-700 dark:text-emerald-300 cursor-pointer"
+                              >
+                                {contact.enabled ? 'Deshabilitar' : 'Habilitar'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setIsEditing(true)}
+                                className="text-[9px] font-black uppercase text-stone-600 dark:text-stone-300 cursor-pointer"
+                              >
+                                Editar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteWhatsApp(contact.id)}
+                                className="text-[9px] font-black uppercase text-red-700 dark:text-red-300 cursor-pointer"
+                              >
+                                Borrar
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setWhatsAppEnabled((enabled) => !enabled)}
-                      className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl border font-black text-[10px] uppercase cursor-pointer ${
-                        whatsAppEnabled
-                          ? 'border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
-                          : 'border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300'
-                      }`}
-                    >
-                      <Check className="w-3 h-3" />
-                      {whatsAppEnabled ? 'Habilitado' : 'Deshabilitado'}
-                    </button>
                     <button
                       type="button"
                       onClick={() => setIsEditing(true)}
                       className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
                     >
                       <Pencil className="w-3 h-3" /> Editar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleClearWhatsApp}
-                      className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-black text-[10px] uppercase cursor-pointer"
-                    >
-                      <Trash2 className="w-3 h-3" /> Borrar
                     </button>
                   </div>
                 </div>
@@ -598,37 +620,18 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <div className="space-y-6 pt-4 border-t border-stone-200 dark:border-stone-800">
                 {/* WhatsApp Config */}
                 <div className={`p-4 rounded-2xl border space-y-3 ${
-                  whatsAppEnabled
+                  whatsappContacts.some((contact) => contact.enabled)
                     ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60'
                     : 'bg-transparent border-stone-200 dark:border-stone-800'
                 }`}>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4 text-emerald-600" />
-                    <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 font-serif">
-                      WhatsApp Oficial de la Tienda
-                    </h3>
+                      <MessageCircle className="w-4 h-4 text-emerald-600" />
+                      <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 font-serif">
+                        WhatsApp Oficial de la Tienda
+                      </h3>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setWhatsAppEnabled((enabled) => !enabled)}
-                        className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl border font-black text-[10px] uppercase cursor-pointer ${
-                          whatsAppEnabled
-                            ? 'border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
-                            : 'border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300'
-                        }`}
-                      >
-                        <Check className="w-3 h-3" />
-                        {whatsAppEnabled ? 'Habilitado' : 'Deshabilitado'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleClearWhatsApp}
-                        className="inline-flex items-center gap-1 px-3 py-2 rounded-xl border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-black text-[10px] uppercase cursor-pointer"
-                      >
-                        <Trash2 className="w-3 h-3" /> Borrar
-                      </button>
                       <button
                         type="submit"
                         disabled={loadingProfile}
@@ -639,41 +642,56 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     </div>
                   </div>
                   <p className="text-[11px] text-stone-500 dark:text-stone-400">
-                    Todos los botones de WhatsApp de la web se dirigirán a este número.
+                    Solo un contacto puede estar habilitado para los botones de WhatsApp de la web.
                   </p>
 
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 cursor-pointer font-medium text-stone-800 dark:text-stone-200">
-                      <input
-                        type="radio"
-                        name="whatsapp_choice"
-                        checked={whatsAppMode === 'registered'}
-                        onChange={() => setWhatsAppMode('registered')}
-                      />
-                      <span>Usar el teléfono de contacto principal ({p.phone || 'registrado'})</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 cursor-pointer font-medium text-stone-800 dark:text-stone-200">
-                      <input
-                        type="radio"
-                        name="whatsapp_choice"
-                        checked={whatsAppMode === 'custom'}
-                        onChange={() => setWhatsAppMode('custom')}
-                      />
-                      <span>Introducir otro número de WhatsApp para la tienda</span>
-                    </label>
-
-                    {whatsAppMode === 'custom' && (
-                      <div className="pt-1">
-                        <input
-                          type="text"
-                          value={customWhatsApp}
-                          onChange={(e) => setCustomWhatsApp(e.target.value)}
-                          placeholder="Ej: 34600000000"
-                          className="w-full sm:max-w-xs px-3.5 py-2 rounded-xl border font-bold bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
-                        />
+                  <div className="space-y-3">
+                    {whatsappContacts.map((contact) => (
+                      <div key={contact.id} className="flex flex-wrap items-end gap-2 p-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-white/60 dark:bg-[#141312]/60">
+                        <label className="flex-1 min-w-[150px]">
+                          <span className="block mb-1 font-bold text-stone-700 dark:text-stone-300">Nombre</span>
+                          <input
+                            type="text"
+                            value={contact.name}
+                            onChange={(e) => setWhatsAppContacts((contacts) => contacts.map((item) => item.id === contact.id ? { ...item, name: e.target.value } : item))}
+                            placeholder="Nombre del contacto"
+                            className="w-full px-3 py-2 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
+                          />
+                        </label>
+                        <label className="flex-1 min-w-[170px]">
+                          <span className="block mb-1 font-bold text-stone-700 dark:text-stone-300">Teléfono</span>
+                          <input
+                            type="tel"
+                            value={contact.phone}
+                            onChange={(e) => setWhatsAppContacts((contacts) => contacts.map((item) => item.id === contact.id ? { ...item, phone: e.target.value } : item))}
+                            placeholder="34600000000"
+                            className="w-full px-3 py-2 rounded-xl border bg-white dark:bg-[#141312] text-stone-900 dark:text-stone-100 border-stone-200 dark:border-stone-700"
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleWhatsApp(contact.id)}
+                          className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl border font-black text-[10px] uppercase cursor-pointer ${contact.enabled ? 'border-emerald-300 text-emerald-800' : 'border-stone-300 text-stone-600'}`}
+                        >
+                          <Check className="w-3 h-3" /> {contact.enabled ? 'Habilitado' : 'Habilitar'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteWhatsApp(contact.id)}
+                          className="inline-flex items-center gap-1 px-3 py-2 rounded-xl border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-black text-[10px] uppercase cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" /> Borrar
+                        </button>
                       </div>
-                    )}
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={handleAddWhatsApp}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" /> Añadir contacto
+                    </button>
 
                   </div>
                 </div>
