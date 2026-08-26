@@ -104,10 +104,13 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   };
 
   const handleClearWhatsApp = () => {
+    if (!window.confirm('¿Estás seguro de que quieres borrar el contacto de WhatsApp de la tienda?')) {
+      return;
+    }
     setCustomWhatsApp('');
     setWhatsAppMode('custom');
     setWhatsAppEnabled(false);
-    setIsEditing(true);
+    setIsEditing(false);
   };
 
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -307,7 +310,11 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
             {isSeller && (
               <div className="space-y-4 pt-4 border-t border-stone-200/60 dark:border-stone-800">
                 {/* WhatsApp Tienda */}
-                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex flex-wrap items-center justify-between gap-3">
+                <div className={`p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 ${
+                  whatsAppEnabled
+                    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60'
+                    : 'bg-transparent border-stone-200 dark:border-stone-800'
+                }`}>
                   <div className="flex items-center gap-3 min-w-0">
                     <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     <div>
@@ -315,7 +322,11 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                         WhatsApp Oficial de la Tienda
                       </span>
                       <p className="text-sm font-black text-stone-900 dark:text-[#F5F5F0]">
-                        {p.whatsapp_enabled === false ? 'Deshabilitado' : `+${p.whatsapp_phone || p.phone || '34600000000'}`}
+                        {!customWhatsApp && whatsAppMode === 'custom'
+                          ? 'No hay contacto. Pulsa Editar para añadirlo.'
+                          : !whatsAppEnabled
+                            ? 'Deshabilitado'
+                            : `+${whatsAppMode === 'registered' ? p.phone : customWhatsApp}`}
                       </p>
                     </div>
                   </div>
@@ -586,7 +597,11 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
             {isSeller && (
               <div className="space-y-6 pt-4 border-t border-stone-200 dark:border-stone-800">
                 {/* WhatsApp Config */}
-                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 space-y-3">
+                <div className={`p-4 rounded-2xl border space-y-3 ${
+                  whatsAppEnabled
+                    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60'
+                    : 'bg-transparent border-stone-200 dark:border-stone-800'
+                }`}>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-emerald-600" />

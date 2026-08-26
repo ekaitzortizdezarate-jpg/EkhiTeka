@@ -132,7 +132,10 @@ export function parseProfile(raw?: any): Profile {
     stair: details.stair || raw.stair || '',
     floor: details.floor || raw.floor || '',
     door: details.door || raw.door || '',
-    whatsapp_phone: details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '34600000000',
+    whatsapp_phone:
+      raw.whatsapp_enabled === false
+        ? details.whatsapp_phone ?? raw.whatsapp_phone ?? null
+        : details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '34600000000',
     whatsapp_enabled: details.whatsapp_enabled ?? raw.whatsapp_enabled ?? true,
     pickup_addresses: details.pickup_addresses && details.pickup_addresses.length > 0 ? details.pickup_addresses : defaultAddresses,
   };
