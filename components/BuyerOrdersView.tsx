@@ -1,13 +1,33 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
 import Link from 'next/link';
 import type { Order } from '@/types/database';
-import { Package, MessageCircle, MapPin, Store } from 'lucide-react';
+import { Package, MessageCircle, MapPin, Store, CheckCircle, Sparkles } from 'lucide-react';
 
 export function BuyerOrdersView({ orders }: { orders: Order[] }) {
   const { t, language } = useLanguage();
+  const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('ekhiteka_seen_orders_buyer');
+      if (stored) {
+        setSeenMap(JSON.parse(stored));
+      }
+    } catch {}
+  }, []);
+
+  const handleMarkAsSeen = (orderId: string, currentStatus: string) => {
+    const updated = { ...seenMap, [orderId]: currentStatus };
+    setSeenMap(updated);
+    try {
+      localStorage.setItem('ekhiteka_seen_orders_buyer', JSON.stringify(updated));
+      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+    } catch {}
+  };
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -37,12 +57,38 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
           {orders.map((order) => {
             const total = Number(order.total_price ?? order.total_amount ?? 0);
             const isStorePickup = order.delivery_type === 'recogida_tienda' || order.delivery_method === 'recogida_tienda' || order.delivery_method === 'tienda';
+            
+            // Comprobar si este pedido específico tiene un cambio de estado no visto
+            const lastSeenStatus = seenMap[order.id];
+            const hasUpdate = lastSeenStatus ? lastSeenStatus !== order.status : order.status !== 'pendiente';
 
             return (
               <div
                 key={order.id}
-                className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-5 shadow-xs"
+                className={`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-5 shadow-xs transition-all ${
+                  hasUpdate
+                    ? 'border-[#FFE259] ring-2 ring-[#FFE259]/40 shadow-lg animate-pulse'
+                    : 'border-stone-200 dark:border-stone-800'
+                }`}
               >
+                {/* Banner de novedad si el pedido cambió de estado */}
+                {hasUpdate && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs font-sans">
+                    <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
+                      <Sparkles className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                      <span>{t.orders_new_status} <strong className="text-[#C68D07] dark:text-[#FFE259] uppercase">{getStatusText(order.status)}</strong></span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleMarkAsSeen(order.id, order.status)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-[11px] uppercase tracking-wider rounded-xl shadow-xs cursor-pointer transition-transform hover:scale-105"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>{t.orders_mark_seen}</span>
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
@@ -60,7 +106,11 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259] font-black text-xs uppercase tracking-wider font-serif">
+                    <span className={`px-3 py-1 rounded-xl font-black text-xs uppercase tracking-wider font-serif ${
+                      hasUpdate
+                        ? 'bg-[#FFE259] text-[#1D1D1B] shadow-md'
+                        : 'bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]'
+                    }`}>
                       {getStatusText(order.status)}
                     </span>
                     <span className="text-base font-black font-serif text-stone-900 dark:text-stone-100">

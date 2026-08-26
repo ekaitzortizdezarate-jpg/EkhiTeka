@@ -50,7 +50,7 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
             return (
               <div
                 key={order.id}
-                className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-6 shadow-xs"
+                className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-6 shadow-xs"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
                   <div className="space-y-0.5">
@@ -78,13 +78,13 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 </div>
 
-                {/* Datos del Cliente y Modo de Entrega */}
-                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 text-xs space-y-2 font-sans">
+                {/* Datos del Cliente y Modo de Entrega (Modo oscuro 100% corregido) */}
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 text-xs space-y-2 font-sans">
                   <div className="flex items-center gap-2 font-bold text-stone-900 dark:text-stone-100">
-                    <User className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
+                    <User className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
                     <span>{order.profiles?.full_name || t.orders_client_label}</span>
                     {order.profiles?.phone && (
-                      <span className="text-stone-500 font-normal">· {order.profiles.phone}</span>
+                      <span className="text-stone-500 dark:text-stone-400 font-normal">· {order.profiles.phone}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
@@ -95,7 +95,7 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                       </>
                     ) : (
                       <>
-                        <MapPin className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 shrink-0" />
                         <span>{order.shipping_address || t.deliv_home_tag}</span>
                       </>
                     )}

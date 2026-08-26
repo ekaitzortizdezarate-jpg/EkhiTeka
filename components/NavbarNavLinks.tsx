@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { useStoreConfig } from '@/context/StoreConfigContext';
 import { signout } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
 import { CartNavButton } from '@/components/CartNavButton';
@@ -16,7 +15,7 @@ import {
   Menu,
   X,
   Store,
-  MessageCircle,
+  Package,
 } from 'lucide-react';
 
 interface NavbarNavLinksProps {
@@ -36,7 +35,6 @@ export function NavbarNavLinks({
 }: NavbarNavLinksProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
-  const { whatsappPhone, storeAddress } = useStoreConfig();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
@@ -91,6 +89,8 @@ export function NavbarNavLinks({
       document.body.style.overflow = '';
     };
   }, [mobileMenuOpen]);
+
+  const ordersUrl = isSeller ? '/vendedor/pedidos' : '/comprador/pedidos';
 
   return (
     <div className="flex items-center justify-between w-full min-w-0 gap-3">
@@ -175,7 +175,7 @@ export function NavbarNavLinks({
           {user && (
             <>
               <Link
-                href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
+                href={ordersUrl}
                 className={`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
                   pathname.includes('/pedidos')
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
@@ -236,20 +236,21 @@ export function NavbarNavLinks({
           <div className="flex items-center gap-2">
             {(!profile || profile.role === 'comprador') && <CartNavButton />}
 
+            {/* Icono de Pedidos en Barra Superior Móvil y Desktop */}
             <Link
-              href="/chat"
+              href={ordersUrl}
               className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
-                pathname.startsWith('/chat')
+                pathname.includes('/pedidos')
                   ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
+                  : hasUnseenOrderUpdates
+                  ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse'
                   : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
               }`}
-              title={t.nav_chats}
+              title={t.nav_orders}
             >
-              <MessageCircle className="w-4 h-4" />
-              {unreadMessagesCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
-                  {unreadMessagesCount}
-                </span>
+              <Package className="w-4 h-4" />
+              {hasUnseenOrderUpdates && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#FFE259] border-2 border-stone-900 animate-ping" />
               )}
             </Link>
 
@@ -277,11 +278,13 @@ export function NavbarNavLinks({
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            {/* Icono Iniciar Sesión en Móvil */}
+            <CartNavButton />
+
             <Link
               href="/login"
-              className="lg:hidden p-2.5 rounded-2xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 text-stone-800 dark:text-stone-200 hover:text-[#1D1D1B] border border-stone-200 dark:border-stone-700 transition-all shadow-2xs"
+              className="flex sm:hidden p-2.5 rounded-2xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-800 dark:text-stone-200 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] border border-stone-200 dark:border-stone-700 transition-all cursor-pointer shadow-2xs"
               title={t.nav_login}
+              aria-label={t.nav_login}
             >
               <LogIn className="w-4 h-4" />
             </Link>
@@ -304,7 +307,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* 3. MENÚ MÓVIL (Con link a inicio en el logo y nombre) */}
+      {/* 3. MENÚ MÓVIL LATERAL */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
@@ -404,7 +407,7 @@ export function NavbarNavLinks({
                 {user ? (
                   <>
                     <Link
-                      href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
+                      href={ordersUrl}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname.includes('/pedidos')
@@ -514,8 +517,8 @@ export function NavbarNavLinks({
                 <Store className="w-3.5 h-3.5 text-[#FFE259]" />
                 <span>Quesería & Tienda en Lekeitio</span>
               </div>
-              <p>{storeAddress}</p>
-              <p className="font-semibold text-[#FFE259]">WhatsApp: +{whatsappPhone}</p>
+              <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
+              <p className="font-semibold text-[#FFE259]">WhatsApp: +34 600 000 000</p>
             </div>
           </div>
         </div>,
