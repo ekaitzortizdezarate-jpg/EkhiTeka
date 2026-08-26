@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
-import { getProductImage } from '@/lib/productHelpers';
+import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import {
   ArrowLeft,
@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Ticket,
   UserCheck,
+  Percent,
 } from 'lucide-react';
 
 interface ProductDetailViewProps {
@@ -37,10 +38,12 @@ export function ProductDetailView({
     (product.name && product.name.toLowerCase().includes('cata'));
 
   const imageUrl = getProductImage(product);
+  const discountInfo = getProductDiscount(product);
+  const cleanDescription = getCleanDescription(product.description);
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* Botón Volver */}
+      {/* Botón Volver & Info Vendedor */}
       <div className="flex items-center justify-between">
         <Link
           href="/tienda"
@@ -113,11 +116,25 @@ export function ProductDetailView({
 
           {/* Precio y Añadir a la Cesta */}
           <div className="space-y-4">
-            <div className="flex items-baseline gap-3">
+            <div className="flex flex-wrap items-baseline gap-3">
               <span className="text-3xl sm:text-4xl font-black font-serif text-[#1D1D1B] dark:text-[#F5F5F0]">
                 {Number(product.price).toFixed(2)} €
               </span>
-              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider font-sans">
+
+              {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
+                <span className="text-lg text-stone-400 line-through font-serif font-bold">
+                  {discountInfo.originalPrice.toFixed(2)} €
+                </span>
+              )}
+
+              {discountInfo && discountInfo.discountPercent > 0 && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black text-xs uppercase tracking-wider font-sans">
+                  <Percent className="w-3.5 h-3.5" />
+                  <span>{discountInfo.discountPercent}% Descuento</span>
+                </span>
+              )}
+
+              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider font-sans ml-auto">
                 {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
               </span>
             </div>
@@ -129,13 +146,13 @@ export function ProductDetailView({
           </div>
 
           {/* Descripción & Notas de Cata */}
-          {product.description && (
+          {cleanDescription && (
             <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
               <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-800 dark:text-stone-200">
                 {t.prod_details}
               </h3>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans whitespace-pre-line">
-                {product.description}
+                {cleanDescription}
               </p>
             </div>
           )}

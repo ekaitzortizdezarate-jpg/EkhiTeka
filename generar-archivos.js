@@ -11,7 +11,154 @@ function saveFile(relativeFilePath, content) {
   console.log(`✓ Archivo actualizado: ${relativeFilePath}`);
 }
 
-// components/SellerProductForm.tsx
+// 1. lib/productHelpers.ts
+saveFile('lib/productHelpers.ts', `
+export type PublishingType = 
+  | 'producto_suelto'
+  | 'cesta_gourmet'
+  | 'cata_casa'
+  | 'tarjeta_regalo'
+  | 'cata_presencial';
+
+export interface ExtraProductMeta {
+  publishingType?: PublishingType;
+  includedItems?: string[];
+  experienceDate?: string;
+  experienceTime?: string;
+  maxAttendees?: number;
+  tastingItems?: string[];
+  giftCardAmount?: number | string;
+  boxPresentation?: string;
+}
+
+export function getProductDiscount(product?: { description?: string | null }): { discountPercent: number; originalPrice?: number } | null {
+  if (!product?.description) return null;
+  const match = product.description.match(/<!-- META:({.*?}) -->/);
+  if (match && match[1]) {
+    try {
+      const meta = JSON.parse(match[1]);
+      if (meta.discount_percent && Number(meta.discount_percent) > 0) {
+        return {
+          discountPercent: Math.round(Number(meta.discount_percent)),
+          originalPrice: meta.original_price ? Number(meta.original_price) : undefined,
+        };
+      }
+    } catch {
+      // Ignore
+    }
+  }
+  return null;
+}
+
+export function getCleanDescription(description?: string | null): string {
+  if (!description) return '';
+  return description.replace(/<!-- META:{.*?} -->/g, '').trim();
+}
+
+export function getCategoryImage(category?: { id?: string; slug?: string; name_es?: string } | string): string {
+  if (!category) return '/images/secciones/Quesos.JPG';
+  const key = (typeof category === 'string' ? category : (category.slug || category.id || category.name_es || '')).toLowerCase();
+
+  if (key.includes('cesta') || key.includes('regalo') || key.includes('lote') || key.includes('pack') || key.includes('saski')) {
+    return '/images/secciones/Cestas.JPG';
+  }
+  if (key.includes('cata') || key.includes('experiencia') || key.includes('dastaketa') || key.includes('degustacion')) {
+    return '/images/secciones/Catas.JPG';
+  }
+  if (key.includes('mesa') || key.includes('boda') || key.includes('ezkontza') || key.includes('evento')) {
+    return '/images/secciones/Mesas.JPG';
+  }
+  if (key.includes('atun') || key.includes('bonito') || key.includes('hegaluze')) {
+    return '/images/secciones/Bonito.JPG';
+  }
+  if (key.includes('salazon') || key.includes('anchoa') || key.includes('antxoa') || key.includes('gatzadura')) {
+    return '/images/secciones/Salazones.JPG';
+  }
+  if (key.includes('gilda') || key.includes('jilda') || key.includes('encurtido') || key.includes('ozpinetako')) {
+    return '/images/secciones/Gildas.JPG';
+  }
+  if (key.includes('txakoli') || key.includes('vino') || key.includes('ardo')) {
+    return '/images/secciones/Txakoli.JPG';
+  }
+  if (key.includes('cerveza') || key.includes('garagardo')) {
+    return '/images/secciones/Cerveza.JPG';
+  }
+  if (key.includes('sidra') || key.includes('sagardo')) {
+    return '/images/secciones/Sidra.JPG';
+  }
+
+  return '/images/secciones/Quesos.JPG';
+}
+
+export function getProductImage(product?: {
+  image_url?: string | null;
+  category_id?: string;
+  name?: string;
+  format?: string;
+}): string {
+  if (!product) return '/images/secciones/Quesos.JPG';
+
+  if (product.image_url && product.image_url.trim()) {
+    return product.image_url;
+  }
+
+  const cat = (product.category_id || '').toLowerCase();
+  const name = (product.name || '').toLowerCase();
+
+  if (cat.includes('cesta') || name.includes('cesta') || name.includes('lote') || name.includes('pack') || name.includes('opari') || name.includes('saski') || name.includes('regalo')) {
+    return '/images/secciones/Cestas.JPG';
+  }
+  if (
+    cat.includes('cata') ||
+    cat.includes('experiencia') ||
+    name.includes('cata') ||
+    name.includes('dastaketa') ||
+    name.includes('taller') ||
+    name.includes('degustación')
+  ) {
+    return '/images/secciones/Catas.JPG';
+  }
+  if (cat.includes('tarjeta') || name.includes('tarjeta') || name.includes('mesa') || name.includes('txartel')) {
+    return '/images/secciones/Mesas.JPG';
+  }
+  if (cat.includes('atun') || name.includes('atun') || name.includes('atún') || name.includes('bonito') || name.includes('hegaluze')) {
+    return '/images/secciones/Bonito.JPG';
+  }
+  if (
+    cat.includes('salazon') ||
+    name.includes('anchoa') ||
+    name.includes('antxoa') ||
+    name.includes('salazón') ||
+    name.includes('salazon') ||
+    name.includes('gatzadura')
+  ) {
+    return '/images/secciones/Salazones.JPG';
+  }
+  if (
+    cat.includes('gilda') ||
+    cat.includes('jilda') ||
+    name.includes('gilda') ||
+    name.includes('jilda') ||
+    name.includes('piparra') ||
+    name.includes('encurtido')
+  ) {
+    return '/images/secciones/Gildas.JPG';
+  }
+  if (cat.includes('txakoli') || name.includes('txakoli') || name.includes('vino') || name.includes('ardo')) {
+    return '/images/secciones/Txakoli.JPG';
+  }
+  if (cat.includes('cerveza') || name.includes('cerveza') || name.includes('garagardo')) {
+    return '/images/secciones/Cerveza.JPG';
+  }
+  if (cat.includes('sidra') || name.includes('sidra') || name.includes('sagardo')) {
+    return '/images/secciones/Sidra.JPG';
+  }
+
+  return '/images/secciones/Quesos.JPG';
+}
+`);
+
+// 2. components/SellerProductForm.tsx
 saveFile('components/SellerProductForm.tsx', `
 'use client';
 
@@ -219,7 +366,6 @@ export function SellerProductForm({
 
     setSelectedListItems([...selectedListItems, newItem]);
 
-    // Limpiar campos
     setCustomName('');
     setCustomImageUrl('');
     setCustomImagePreview('');
@@ -229,7 +375,6 @@ export function SellerProductForm({
     setIsCustomAccordionOpen(false);
   };
 
-  // Modificar cantidades o eliminar de "Productos de la lista"
   const handleUpdateItemQuantity = (id: string, newQty: number) => {
     if (newQty <= 0) {
       setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
@@ -244,20 +389,18 @@ export function SellerProductForm({
     setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
   };
 
-  // Suma total calculada de los productos sueltos
   const sumOfLooseItems = useMemo(() => {
     return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
   }, [selectedListItems]);
 
   // ==========================================
-  // PRECIO Y DESCUENTO (%) BIDIRECCIONALES
+  // PRECIO (€) Y DESCUENTO (%) BIDIRECCIONALES
   // ==========================================
   const [finalPriceInput, setFinalPriceInput] = useState<string>(
     initialProduct?.price ? String(initialProduct.price) : ''
   );
   const [discountInput, setDiscountInput] = useState<string>('0');
 
-  // Cuando cambia la suma de productos sueltos, sincronizamos manteniendo el descuento actual
   useEffect(() => {
     if (sumOfLooseItems > 0) {
       const disc = parseFloat(discountInput) || 0;
@@ -266,7 +409,6 @@ export function SellerProductForm({
     }
   }, [sumOfLooseItems]);
 
-  // Al escribir en Precio -> actualiza Descuento
   const handlePriceChange = (val: string) => {
     setFinalPriceInput(val);
     const num = parseFloat(val);
@@ -282,7 +424,6 @@ export function SellerProductForm({
     }
   };
 
-  // Al escribir en Descuento -> actualiza Precio
   const handleDiscountChange = (val: string) => {
     setDiscountInput(val);
     const num = parseFloat(val);
@@ -293,6 +434,8 @@ export function SellerProductForm({
       setFinalPriceInput('');
     }
   };
+
+  const numericDiscount = parseFloat(discountInput);
 
   const handleTogglePickup = (id: string) => {
     if (selectedPickupIds.includes(id)) {
@@ -345,17 +488,27 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
+    // Componer descripción con lista y metadatos seguros de descuento
+    const rawDesc = (formData.get('description') as string) || '';
+    let composedDesc = rawDesc.trim();
+
     if (isPackOrEvent && selectedListItems.length > 0) {
-      const rawDesc = (formData.get('description') as string) || '';
       const itemsFormatted = selectedListItems.map(
         (it) => \`• \${it.name} (x\${it.quantity}) — \${(it.price * it.quantity).toFixed(2)} €\`
       );
 
-      if (!rawDesc.includes('Productos incluidos')) {
-        const fullDesc = \`\${rawDesc.trim()}\\n\\n📦 Productos incluidos en esta selección:\\n\${itemsFormatted.join('\\n')}\\n\\nValor suma productos: \${sumOfLooseItems.toFixed(2)} €\`;
-        formData.set('description', fullDesc);
+      if (!composedDesc.includes('Productos incluidos')) {
+        composedDesc = \`\${composedDesc}\\n\\n📦 Productos incluidos en esta selección:\\n\${itemsFormatted.join('\\n')}\`;
       }
     }
+
+    // Adjuntar metadatos de descuento solo si es positivo para que los compradores lo vean
+    if (numericDiscount > 0 && sumOfLooseItems > 0) {
+      const metaTag = \`\\n\\n<!-- META:{"discount_percent":\${numericDiscount},"original_price":\${sumOfLooseItems.toFixed(2)}} -->\`;
+      composedDesc = \`\${composedDesc}\${metaTag}\`;
+    }
+
+    formData.set('description', composedDesc);
 
     if (isEditing && initialProduct) {
       const res = await updateProduct(initialProduct.id, formData);
@@ -643,7 +796,6 @@ export function SellerProductForm({
                     />
                   </div>
 
-                  {/* Selector de Foto desde Archivo y URL */}
                   <div>
                     <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Fotografía del Producto</label>
                     <div className="flex items-center gap-3">
@@ -767,19 +919,14 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 4. PRODUCTOS DE LA LISTA */}
+          {/* 4. PRODUCTOS DE LA LISTA (Suma total al final, no editable) */}
           {isPackOrEvent && (
-            <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-4 font-sans">
-              <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-                <div className="flex items-center gap-2">
-                  <Tag className="w-4 h-4 text-amber-600 dark:text-[#FFE259]" />
-                  <h3 className="font-black text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
-                    Productos de la lista ({selectedListItems.length})
-                  </h3>
-                </div>
-                <span className="text-xs font-black text-stone-900 dark:text-[#F5F5F0]">
-                  Suma total: <strong className="text-amber-600 dark:text-[#FFE259] font-serif text-sm">{sumOfLooseItems.toFixed(2)} €</strong>
-                </span>
+            <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-3 font-sans">
+              <div className="flex items-center gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
+                <Tag className="w-4 h-4 text-amber-600 dark:text-[#FFE259]" />
+                <h3 className="font-black text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
+                  Productos de la lista ({selectedListItems.length})
+                </h3>
               </div>
 
               {selectedListItems.length > 0 ? (
@@ -840,6 +987,16 @@ export function SellerProductForm({
                       </div>
                     </div>
                   ))}
+
+                  {/* Suma total al final de los productos individuales */}
+                  <div className="pt-3 mt-3 border-t-2 border-stone-200 dark:border-stone-800 flex items-center justify-between px-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 font-serif">
+                      Suma total de la lista:
+                    </span>
+                    <span className="text-base font-black text-stone-900 dark:text-[#F5F5F0] font-serif">
+                      {sumOfLooseItems.toFixed(2)} €
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <div className="p-4 rounded-2xl bg-white/60 dark:bg-[#1C1B19]/60 border border-dashed border-stone-300 dark:border-stone-700 text-center text-stone-400 text-xs">
@@ -849,7 +1006,7 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 5. PRECIO (€) Y DESCUENTO (%) - Lado a Lado con Cálculo Automático */}
+          {/* 5. PRECIO (€) Y DESCUENTO (%) - Colores dinámicos y cálculo bidireccional */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
@@ -885,14 +1042,28 @@ export function SellerProductForm({
                   value={discountInput}
                   onChange={(e) => handleDiscountChange(e.target.value)}
                   placeholder="0"
-                  className="w-full pl-3.5 pr-8 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
+                  className={\`w-full pl-3.5 pr-8 py-2.5 rounded-xl font-black text-xs transition-colors disabled:opacity-40 \${
+                    !isNaN(numericDiscount) && numericDiscount > 0
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                      : !isNaN(numericDiscount) && numericDiscount < 0
+                      ? 'bg-red-50 dark:bg-red-950/40 border-2 border-red-500 text-red-700 dark:text-red-300'
+                      : 'bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100'
+                  }\`}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-stone-400 text-xs">
                   %
                 </span>
               </div>
-              <span className="text-[10.5px] text-stone-400 block mt-1">
-                {sumOfLooseItems > 0 ? 'Calcula el precio automáticamente' : 'Añade productos sueltos para calcular'}
+              <span className="text-[10.5px] block mt-1">
+                {sumOfLooseItems === 0 ? (
+                  <span className="text-stone-400">Añade productos sueltos para calcular descuento</span>
+                ) : !isNaN(numericDiscount) && numericDiscount > 0 ? (
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Descuento aplicado: visible para los compradores</span>
+                ) : !isNaN(numericDiscount) && numericDiscount < 0 ? (
+                  <span className="text-red-600 dark:text-red-400 font-bold">Recargo sobre la suma suelta (no visible a compradores)</span>
+                ) : (
+                  <span className="text-stone-400">0% de descuento (precio igual a la suma suelta)</span>
+                )}
               </span>
             </div>
           </div>
@@ -1082,7 +1253,7 @@ export function SellerProductForm({
               </div>
             </div>
 
-            {/* Puntos de Entrega (Se muestra SOLO si se selecciona Recogida en Tienda) */}
+            {/* Puntos de Entrega con diseño unificado */}
             {hasPickup && (
               <div className="space-y-2 pt-2 animate-fadeIn">
                 <label className="font-bold text-stone-700 dark:text-stone-300 block">
@@ -1189,4 +1360,364 @@ export function SellerProductForm({
 }
 `);
 
-console.log('\n✨ Formulario de productos y cálculo automático de descuento actualizado con éxito.');
+// 3. components/ProductCard.tsx
+saveFile('components/ProductCard.tsx', `
+'use client';
+
+import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
+import type { ProductWithSeller } from '@/types/database';
+import { ShoppingBag, Ticket, MapPin, Eye } from 'lucide-react';
+
+interface ProductCardProps {
+  product: ProductWithSeller;
+  isSeller?: boolean;
+}
+
+export function ProductCard({ product, isSeller = false }: ProductCardProps) {
+  const { addToCart } = useCart();
+  const { t } = useLanguage();
+
+  const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
+  const isEvent =
+    product.category_id === 'catas' ||
+    product.category_id === 'cata_presencial' ||
+    product.category_id === 'experiencia' ||
+    product.name.toLowerCase().includes('cata');
+
+  const imageUrl = getProductImage(product);
+  const discountInfo = getProductDiscount(product);
+  const cleanDescription = getCleanDescription(product.description);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isSoldOut) return;
+    addToCart(product, product.profiles?.full_name || 'EkhiTeka Selección');
+  };
+
+  return (
+    <Link
+      href={\`/producto/\${product.id}\`}
+      className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] p-4 flex flex-col justify-between shadow-xs transition-all font-serif overflow-hidden"
+    >
+      <div className="space-y-3">
+        {/* Imagen del Producto */}
+        <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700">
+          <img
+            src={imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+            }}
+          />
+
+          {/* Badge de Descuento (Solo si > 0) */}
+          {discountInfo && discountInfo.discountPercent > 0 && !isSoldOut && (
+            <span className="absolute top-2.5 right-2.5 px-2.5 py-1 bg-emerald-600 text-white text-[10.5px] font-black rounded-full shadow-md font-sans">
+              -{discountInfo.discountPercent}%
+            </span>
+          )}
+
+          {/* Badge de Evento o Stock */}
+          {isSoldOut ? (
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+              {isEvent ? t.event_capacity_full : t.prod_sold_out}
+            </span>
+          ) : !product.is_unlimited_stock && (product.stock ?? 0) <= 5 ? (
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-amber-500 text-stone-900 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+              {isEvent ? t.event_last_seats : t.prod_last_units}
+            </span>
+          ) : null}
+        </div>
+
+        {/* Datos del Producto */}
+        <div className="space-y-1">
+          {product.origin_region && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center gap-1 font-sans truncate">
+              <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              {product.origin_region}
+            </span>
+          )}
+
+          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-1 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+            {product.name}
+          </h3>
+
+          {cleanDescription && (
+            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 font-sans font-medium">
+              {cleanDescription}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Precio y Botón */}
+      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
+        <div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-serif font-black text-base sm:text-lg text-stone-900 dark:text-stone-100 block leading-none">
+              {Number(product.price).toFixed(2)} €
+            </span>
+            {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
+              <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
+                {discountInfo.originalPrice.toFixed(2)} €
+              </span>
+            )}
+          </div>
+          <span className="text-[9.5px] font-sans font-semibold text-stone-400">
+            {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
+          </span>
+        </div>
+
+        {!isSeller ? (
+          <button
+            type="button"
+            disabled={isSoldOut}
+            onClick={handleAddToCart}
+            className={\`p-2.5 rounded-xl font-bold transition-all flex items-center justify-center cursor-pointer \${
+              isSoldOut
+                ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
+                : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] shadow-xs hover:scale-105'
+            }\`}
+            title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
+          >
+            {isEvent ? <Ticket className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+          </button>
+        ) : (
+          <span className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-500">
+            <Eye className="w-4 h-4" />
+          </span>
+        )}
+      </div>
+    </Link>
+  );
+}
+`);
+
+// 4. components/ProductDetailView.tsx
+saveFile('components/ProductDetailView.tsx', `
+'use client';
+
+import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
+import { ProductCard } from '@/components/ProductCard';
+import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
+import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
+import type { ProductWithSeller } from '@/types/database';
+import {
+  ArrowLeft,
+  MapPin,
+  Truck,
+  Store,
+  ShieldCheck,
+  MessageCircle,
+  Ticket,
+  UserCheck,
+  Percent,
+} from 'lucide-react';
+
+interface ProductDetailViewProps {
+  product: ProductWithSeller;
+  relatedProducts: ProductWithSeller[];
+  isSeller: boolean;
+}
+
+export function ProductDetailView({
+  product,
+  relatedProducts,
+  isSeller,
+}: ProductDetailViewProps) {
+  const { t } = useLanguage();
+
+  const isEvent =
+    product.category_id === 'catas' ||
+    product.category_id === 'cata_presencial' ||
+    product.category_id === 'experiencia' ||
+    (product.name && product.name.toLowerCase().includes('cata'));
+
+  const imageUrl = getProductImage(product);
+  const discountInfo = getProductDiscount(product);
+  const cleanDescription = getCleanDescription(product.description);
+
+  return (
+    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* Botón Volver & Info Vendedor */}
+      <div className="flex items-center justify-between">
+        <Link
+          href="/tienda"
+          className="inline-flex items-center gap-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white transition-colors p-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-[#1F1E1C] dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 shadow-2xs"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>{t.prod_back_to_selection}</span>
+        </Link>
+
+        {isSeller && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 text-xs font-bold font-sans">
+            <UserCheck className="w-4 h-4" />
+            <span>
+              Última edición por: <strong className="font-black">{product.profiles?.full_name || 'Vendedor EkhiTeka'}</strong>
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Grid Principal del Producto */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* Imagen del Producto */}
+        <div className="lg:col-span-6 space-y-4">
+          <div className="relative aspect-square w-full rounded-3xl overflow-hidden border-2 border-stone-200 dark:border-stone-800 bg-[#FAF7F2] dark:bg-[#1C1B19] shadow-lg">
+            <img
+              src={imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+              }}
+            />
+            {product.origin_region && (
+              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-xs text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-md font-sans">
+                <MapPin className="w-3.5 h-3.5 text-[#FFE259]" />
+                <span>{product.origin_region}</span>
+              </span>
+            )}
+            {isEvent && (
+              <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-xl uppercase tracking-wider shadow-md font-sans">
+                <Ticket className="w-3.5 h-3.5" />
+                <span>{product.stock} {t.event_seats_available}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Información & Checkout */}
+        <div className="lg:col-span-6 space-y-6">
+          <div className="space-y-2 border-b border-stone-200 dark:border-stone-800 pb-4">
+            <span className="text-xs font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] font-serif">
+              EkhiTeka Gourmet · Lekeitio
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 dark:text-stone-100 leading-tight">
+              {product.name}
+            </h1>
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-bold text-stone-500 dark:text-stone-400 font-sans">
+              {product.format && (
+                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
+                  {t.prod_format_label}: {product.format}
+                </span>
+              )}
+              {product.weight_g && (
+                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
+                  {t.prod_weight_label}: {product.weight_g}g
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Precio y Añadir a la Cesta */}
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <span className="text-3xl sm:text-4xl font-black font-serif text-[#1D1D1B] dark:text-[#F5F5F0]">
+                {Number(product.price).toFixed(2)} €
+              </span>
+
+              {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
+                <span className="text-lg text-stone-400 line-through font-serif font-bold">
+                  {discountInfo.originalPrice.toFixed(2)} €
+                </span>
+              )}
+
+              {discountInfo && discountInfo.discountPercent > 0 && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black text-xs uppercase tracking-wider font-sans">
+                  <Percent className="w-3.5 h-3.5" />
+                  <span>{discountInfo.discountPercent}% Descuento</span>
+                </span>
+              )}
+
+              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider font-sans ml-auto">
+                {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
+              </span>
+            </div>
+
+            <ProductDetailAddToCart
+              product={product}
+              isSeller={isSeller}
+            />
+          </div>
+
+          {/* Descripción & Notas de Cata */}
+          {cleanDescription && (
+            <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
+              <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-800 dark:text-stone-200">
+                {t.prod_details}
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans whitespace-pre-line">
+                {cleanDescription}
+              </p>
+            </div>
+          )}
+
+          {/* Caja de Consultas por Chat */}
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <p className="text-xs font-bold font-serif text-stone-900 dark:text-[#F5F5F0]">
+                {t.prod_doubt_title}
+              </p>
+              <p className="text-[11px] text-stone-500 dark:text-stone-400 font-sans">
+                {t.prod_doubt_desc}
+              </p>
+            </div>
+            <Link
+              href={\`/chat/\${product.seller_id || ''}?product_id=\${product.id}\`}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-black uppercase tracking-wider transition-all font-serif shrink-0 shadow-xs hover:scale-105"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>{t.prod_ask_btn}</span>
+            </Link>
+          </div>
+
+          {/* Garantías */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-600 dark:text-stone-400 font-sans">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
+              <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              <span>{t.prod_guarantee_cold}</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
+              <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              <span>{t.prod_guarantee_pickup}</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
+              <ShieldCheck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              <span>{t.prod_guarantee_km0}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Productos Relacionados */}
+      {relatedProducts && relatedProducts.length > 0 && (
+        <section className="space-y-6 pt-10 border-t border-stone-200 dark:border-stone-800 font-serif">
+          <div className="pb-2">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              {t.prod_related_subtitle}
+            </span>
+            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
+              {t.prod_related_title}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {relatedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+`);
+
+console.log('\n✨ Suma total reubicada, colores de descuento dinámicos y visualización para compradores completada.');

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { getProductImage } from '@/lib/productHelpers';
+import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import { ShoppingBag, Ticket, MapPin, Eye } from 'lucide-react';
 
@@ -24,6 +24,8 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
     product.name.toLowerCase().includes('cata');
 
   const imageUrl = getProductImage(product);
+  const discountInfo = getProductDiscount(product);
+  const cleanDescription = getCleanDescription(product.description);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -49,6 +51,13 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             }}
           />
 
+          {/* Badge de Descuento (Solo si > 0) */}
+          {discountInfo && discountInfo.discountPercent > 0 && !isSoldOut && (
+            <span className="absolute top-2.5 right-2.5 px-2.5 py-1 bg-emerald-600 text-white text-[10.5px] font-black rounded-full shadow-md font-sans">
+              -{discountInfo.discountPercent}%
+            </span>
+          )}
+
           {/* Badge de Evento o Stock */}
           {isSoldOut ? (
             <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
@@ -64,30 +73,37 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         {/* Datos del Producto */}
         <div className="space-y-1">
           {product.origin_region && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-start gap-1 font-sans break-words">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center gap-1 font-sans truncate">
               <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
               {product.origin_region}
             </span>
           )}
 
-          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 break-words group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-1 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
             {product.name}
           </h3>
 
-          {product.description && (
-            <p className="text-xs text-stone-500 dark:text-stone-400 break-words whitespace-pre-line font-sans font-medium">
-              {product.description}
+          {cleanDescription && (
+            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 font-sans font-medium">
+              {cleanDescription}
             </p>
           )}
         </div>
       </div>
 
       {/* Precio y Botón */}
-      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-start justify-between gap-2">
-        <div className="min-w-0">
-          <span className="font-serif font-black text-base sm:text-lg text-stone-900 dark:text-stone-100 block leading-none">
-            {Number(product.price).toFixed(2)} €
-          </span>
+      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
+        <div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-serif font-black text-base sm:text-lg text-stone-900 dark:text-stone-100 block leading-none">
+              {Number(product.price).toFixed(2)} €
+            </span>
+            {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
+              <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
+                {discountInfo.originalPrice.toFixed(2)} €
+              </span>
+            )}
+          </div>
           <span className="text-[9.5px] font-sans font-semibold text-stone-400">
             {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
           </span>

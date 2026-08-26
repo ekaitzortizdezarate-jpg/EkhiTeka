@@ -204,7 +204,6 @@ export function SellerProductForm({
 
     setSelectedListItems([...selectedListItems, newItem]);
 
-    // Limpiar campos
     setCustomName('');
     setCustomImageUrl('');
     setCustomImagePreview('');
@@ -214,7 +213,6 @@ export function SellerProductForm({
     setIsCustomAccordionOpen(false);
   };
 
-  // Modificar cantidades o eliminar de "Productos de la lista"
   const handleUpdateItemQuantity = (id: string, newQty: number) => {
     if (newQty <= 0) {
       setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
@@ -229,20 +227,18 @@ export function SellerProductForm({
     setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
   };
 
-  // Suma total calculada de los productos sueltos
   const sumOfLooseItems = useMemo(() => {
     return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
   }, [selectedListItems]);
 
   // ==========================================
-  // PRECIO Y DESCUENTO (%) BIDIRECCIONALES
+  // PRECIO (€) Y DESCUENTO (%) BIDIRECCIONALES
   // ==========================================
   const [finalPriceInput, setFinalPriceInput] = useState<string>(
     initialProduct?.price ? String(initialProduct.price) : ''
   );
   const [discountInput, setDiscountInput] = useState<string>('0');
 
-  // Cuando cambia la suma de productos sueltos, sincronizamos manteniendo el descuento actual
   useEffect(() => {
     if (sumOfLooseItems > 0) {
       const disc = parseFloat(discountInput) || 0;
@@ -251,7 +247,6 @@ export function SellerProductForm({
     }
   }, [sumOfLooseItems]);
 
-  // Al escribir en Precio -> actualiza Descuento
   const handlePriceChange = (val: string) => {
     setFinalPriceInput(val);
     const num = parseFloat(val);
@@ -267,7 +262,6 @@ export function SellerProductForm({
     }
   };
 
-  // Al escribir en Descuento -> actualiza Precio
   const handleDiscountChange = (val: string) => {
     setDiscountInput(val);
     const num = parseFloat(val);
@@ -278,6 +272,8 @@ export function SellerProductForm({
       setFinalPriceInput('');
     }
   };
+
+  const numericDiscount = parseFloat(discountInput);
 
   const handleTogglePickup = (id: string) => {
     if (selectedPickupIds.includes(id)) {
@@ -330,17 +326,27 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
+    // Componer descripción con lista y metadatos seguros de descuento
+    const rawDesc = (formData.get('description') as string) || '';
+    let composedDesc = rawDesc.trim();
+
     if (isPackOrEvent && selectedListItems.length > 0) {
-      const rawDesc = (formData.get('description') as string) || '';
       const itemsFormatted = selectedListItems.map(
         (it) => `• ${it.name} (x${it.quantity}) — ${(it.price * it.quantity).toFixed(2)} €`
       );
 
-      if (!rawDesc.includes('Productos incluidos')) {
-        const fullDesc = `${rawDesc.trim()}\n\n📦 Productos incluidos en esta selección:\n${itemsFormatted.join('\n')}\n\nValor suma productos: ${sumOfLooseItems.toFixed(2)} €`;
-        formData.set('description', fullDesc);
+      if (!composedDesc.includes('Productos incluidos')) {
+        composedDesc = `${composedDesc}\n\n📦 Productos incluidos en esta selección:\n${itemsFormatted.join('\n')}`;
       }
     }
+
+    // Adjuntar metadatos de descuento solo si es positivo para que los compradores lo vean
+    if (numericDiscount > 0 && sumOfLooseItems > 0) {
+      const metaTag = `\n\n<!-- META:{"discount_percent":${numericDiscount},"original_price":${sumOfLooseItems.toFixed(2)}} -->`;
+      composedDesc = `${composedDesc}${metaTag}`;
+    }
+
+    formData.set('description', composedDesc);
 
     if (isEditing && initialProduct) {
       const res = await updateProduct(initialProduct.id, formData);
@@ -628,7 +634,6 @@ export function SellerProductForm({
                     />
                   </div>
 
-                  {/* Selector de Foto desde Archivo y URL */}
                   <div>
                     <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Fotografía del Producto</label>
                     <div className="flex items-center gap-3">
@@ -752,19 +757,14 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 4. PRODUCTOS DE LA LISTA */}
+          {/* 4. PRODUCTOS DE LA LISTA (Suma total al final, no editable) */}
           {isPackOrEvent && (
-            <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-4 font-sans">
-              <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-                <div className="flex items-center gap-2">
-                  <Tag className="w-4 h-4 text-amber-600 dark:text-[#FFE259]" />
-                  <h3 className="font-black text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
-                    Productos de la lista ({selectedListItems.length})
-                  </h3>
-                </div>
-                <span className="text-xs font-black text-stone-900 dark:text-[#F5F5F0]">
-                  Suma total: <strong className="text-amber-600 dark:text-[#FFE259] font-serif text-sm">{sumOfLooseItems.toFixed(2)} €</strong>
-                </span>
+            <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-3 font-sans">
+              <div className="flex items-center gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
+                <Tag className="w-4 h-4 text-amber-600 dark:text-[#FFE259]" />
+                <h3 className="font-black text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
+                  Productos de la lista ({selectedListItems.length})
+                </h3>
               </div>
 
               {selectedListItems.length > 0 ? (
@@ -825,6 +825,16 @@ export function SellerProductForm({
                       </div>
                     </div>
                   ))}
+
+                  {/* Suma total al final de los productos individuales */}
+                  <div className="pt-3 mt-3 border-t-2 border-stone-200 dark:border-stone-800 flex items-center justify-between px-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 font-serif">
+                      Suma total de la lista:
+                    </span>
+                    <span className="text-base font-black text-stone-900 dark:text-[#F5F5F0] font-serif">
+                      {sumOfLooseItems.toFixed(2)} €
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <div className="p-4 rounded-2xl bg-white/60 dark:bg-[#1C1B19]/60 border border-dashed border-stone-300 dark:border-stone-700 text-center text-stone-400 text-xs">
@@ -834,7 +844,7 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 5. PRECIO (€) Y DESCUENTO (%) - Lado a Lado con Cálculo Automático */}
+          {/* 5. PRECIO (€) Y DESCUENTO (%) - Colores dinámicos y cálculo bidireccional */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
@@ -870,14 +880,28 @@ export function SellerProductForm({
                   value={discountInput}
                   onChange={(e) => handleDiscountChange(e.target.value)}
                   placeholder="0"
-                  className="w-full pl-3.5 pr-8 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
+                  className={`w-full pl-3.5 pr-8 py-2.5 rounded-xl font-black text-xs transition-colors disabled:opacity-40 ${
+                    !isNaN(numericDiscount) && numericDiscount > 0
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                      : !isNaN(numericDiscount) && numericDiscount < 0
+                      ? 'bg-red-50 dark:bg-red-950/40 border-2 border-red-500 text-red-700 dark:text-red-300'
+                      : 'bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100'
+                  }`}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-stone-400 text-xs">
                   %
                 </span>
               </div>
-              <span className="text-[10.5px] text-stone-400 block mt-1">
-                {sumOfLooseItems > 0 ? 'Calcula el precio automáticamente' : 'Añade productos sueltos para calcular'}
+              <span className="text-[10.5px] block mt-1">
+                {sumOfLooseItems === 0 ? (
+                  <span className="text-stone-400">Añade productos sueltos para calcular descuento</span>
+                ) : !isNaN(numericDiscount) && numericDiscount > 0 ? (
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Descuento aplicado: visible para los compradores</span>
+                ) : !isNaN(numericDiscount) && numericDiscount < 0 ? (
+                  <span className="text-red-600 dark:text-red-400 font-bold">Recargo sobre la suma suelta (no visible a compradores)</span>
+                ) : (
+                  <span className="text-stone-400">0% de descuento (precio igual a la suma suelta)</span>
+                )}
               </span>
             </div>
           </div>
@@ -1067,7 +1091,7 @@ export function SellerProductForm({
               </div>
             </div>
 
-            {/* Puntos de Entrega (Se muestra SOLO si se selecciona Recogida en Tienda) */}
+            {/* Puntos de Entrega con diseño unificado */}
             {hasPickup && (
               <div className="space-y-2 pt-2 animate-fadeIn">
                 <label className="font-bold text-stone-700 dark:text-stone-300 block">

@@ -16,6 +16,30 @@ export interface ExtraProductMeta {
   boxPresentation?: string;
 }
 
+export function getProductDiscount(product?: { description?: string | null }): { discountPercent: number; originalPrice?: number } | null {
+  if (!product?.description) return null;
+  const match = product.description.match(/<!-- META:({.*?}) -->/);
+  if (match && match[1]) {
+    try {
+      const meta = JSON.parse(match[1]);
+      if (meta.discount_percent && Number(meta.discount_percent) > 0) {
+        return {
+          discountPercent: Math.round(Number(meta.discount_percent)),
+          originalPrice: meta.original_price ? Number(meta.original_price) : undefined,
+        };
+      }
+    } catch {
+      // Ignore
+    }
+  }
+  return null;
+}
+
+export function getCleanDescription(description?: string | null): string {
+  if (!description) return '';
+  return description.replace(/<!-- META:{.*?} -->/g, '').trim();
+}
+
 export function getCategoryImage(category?: { id?: string; slug?: string; name_es?: string } | string): string {
   if (!category) return '/images/secciones/Quesos.JPG';
   const key = (typeof category === 'string' ? category : (category.slug || category.id || category.name_es || '')).toLowerCase();
