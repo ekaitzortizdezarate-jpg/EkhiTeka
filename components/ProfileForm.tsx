@@ -307,7 +307,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
             {isSeller && (
               <div className="space-y-4 pt-4 border-t border-stone-200/60 dark:border-stone-800">
                 {/* WhatsApp Tienda */}
-                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
+                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     <div>
@@ -320,6 +320,19 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    <label className="inline-flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={whatsAppEnabled}
+                        onChange={(e) => {
+                          setWhatsAppEnabled(e.target.checked);
+                          setIsEditing(true);
+                        }}
+                        className="h-4 w-4 accent-emerald-600"
+                        aria-label="Habilitar WhatsApp oficial de la tienda"
+                      />
+                      <span>Habilitado</span>
+                    </label>
                     <button
                       type="button"
                       onClick={() => setIsEditing(true)}
@@ -575,26 +588,43 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <div className="space-y-6 pt-4 border-t border-stone-200 dark:border-stone-800">
                 {/* WhatsApp Config */}
                 <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 space-y-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-emerald-600" />
                     <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 font-serif">
                       WhatsApp Oficial de la Tienda
                     </h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="inline-flex items-center gap-1.5 text-stone-800 dark:text-stone-200 font-bold text-[10px] uppercase cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={whatsAppEnabled}
+                          onChange={(e) => setWhatsAppEnabled(e.target.checked)}
+                          className="h-4 w-4 accent-emerald-600"
+                          aria-label="Habilitar WhatsApp oficial de la tienda"
+                        />
+                        <span>Habilitar</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleClearWhatsApp}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-xl border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-black text-[10px] uppercase cursor-pointer"
+                      >
+                        <Trash2 className="w-3 h-3" /> Borrar
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loadingProfile}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-[10px] uppercase cursor-pointer disabled:opacity-50"
+                      >
+                        <Check className="w-3 h-3" /> Guardar datos
+                      </button>
+                    </div>
                   </div>
                   <p className="text-[11px] text-stone-500 dark:text-stone-400">
                     Todos los botones de WhatsApp de la web se dirigirán a este número.
                   </p>
-
-                  <label className="flex items-center gap-2 cursor-pointer font-bold text-stone-800 dark:text-stone-200">
-                    <input
-                      type="checkbox"
-                      name="whatsapp_enabled"
-                      checked={whatsAppEnabled}
-                      onChange={(e) => setWhatsAppEnabled(e.target.checked)}
-                      className="h-4 w-4 accent-emerald-600"
-                    />
-                    <span>Habilitar WhatsApp oficial de la tienda</span>
-                  </label>
 
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer font-medium text-stone-800 dark:text-stone-200">
@@ -629,13 +659,6 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                       </div>
                     )}
 
-                    <button
-                      type="button"
-                      onClick={handleClearWhatsApp}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-bold text-[10px] uppercase cursor-pointer"
-                    >
-                      <Trash2 className="w-3 h-3" /> Borrar
-                    </button>
                   </div>
                 </div>
 
