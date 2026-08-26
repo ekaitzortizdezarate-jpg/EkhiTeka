@@ -236,10 +236,10 @@ export function NavbarNavLinks({
           <div className="flex items-center gap-2">
             {(!profile || profile.role === 'comprador') && <CartNavButton />}
 
-            {/* Icono de Pedidos en Barra Superior Móvil y Desktop */}
+            {/* Icono de Pedidos SOLO en Barra Superior Móvil (oculto en lg:hidden) */}
             <Link
               href={ordersUrl}
-              className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
+              className={`lg:hidden relative p-2.5 rounded-2xl border transition-all shrink-0 ${
                 pathname.includes('/pedidos')
                   ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
                   : hasUnseenOrderUpdates
@@ -452,23 +452,6 @@ export function NavbarNavLinks({
                         <span>{t.nav_add_product}</span>
                       </Link>
                     )}
-
-                    <Link
-                      href="/chat"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
-                        pathname.startsWith('/chat')
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }`}
-                    >
-                      <span>{t.nav_chats}</span>
-                      {unreadMessagesCount > 0 && (
-                        <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
-                          {unreadMessagesCount}
-                        </span>
-                      )}
-                    </Link>
 
                     <Link
                       href="/perfil"
