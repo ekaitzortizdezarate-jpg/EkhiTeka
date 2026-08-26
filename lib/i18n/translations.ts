@@ -1939,7 +1939,7 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_pickup_address: 'Adresse boutique : Gamarra Kalea 4, Lekeitio',
     deliv_confirm_order: 'Confirmer la commande',
     deliv_order_success: 'Commande validée avec succès !',
-    deliv_order_success_desc: 'L\'artisan a reçu votre commande et prépare vos produits.',
+    deliv_order_success_desc: 'L\'artisan a reçu votre commande et prépare vos productos.',
     deliv_store_pickup_tag: 'Retrait en boutique à Lekeitio',
     deliv_home_tag: 'Livraison à domicile',
 
