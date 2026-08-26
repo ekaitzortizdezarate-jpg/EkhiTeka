@@ -58,7 +58,9 @@ export default function ExperienciasPage() {
           return (
             cat === 'cata_casa' ||
             name.includes('cata en casa') ||
-            desc.includes('cata en casa')
+            name.includes('etxeko dastaketa') ||
+            desc.includes('cata en casa') ||
+            desc.includes('dastaketa-kit')
           );
         });
 
@@ -78,6 +80,9 @@ export default function ExperienciasPage() {
             src="/images/secciones/Catas.JPG"
             alt={t.exp_hero_title}
             className="w-full h-full object-cover object-center"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
         </div>
@@ -97,20 +102,30 @@ export default function ExperienciasPage() {
         </div>
       </section>
 
-      {/* 2. Cuatro Tarjetas de Experiencias */}
+      {/* 2. Cuatro Tarjetas de Experiencias con Imagen */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-serif">
         {/* Tarjeta 1: Catas en Casa */}
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Home className="w-5 h-5" />
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Cestas.JPG"
+                alt={t.exp_home_tasting_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Home className="w-4 h-4" />
               </div>
               <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
                 {t.exp_home_tasting_badge}
               </span>
             </div>
-            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
               {t.exp_home_tasting_title}
             </h2>
             <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
@@ -129,17 +144,27 @@ export default function ExperienciasPage() {
         </div>
 
         {/* Tarjeta 2: Catas en la Tienda */}
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Wine className="w-5 h-5" />
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Catas.JPG"
+                alt={t.exp_store_tasting_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Wine className="w-4 h-4" />
               </div>
               <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
                 {t.exp_store_tasting_badge}
               </span>
             </div>
-            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
               {t.exp_store_tasting_title}
             </h2>
             <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
@@ -156,17 +181,27 @@ export default function ExperienciasPage() {
         </div>
 
         {/* Tarjeta 3: Mesas para Bodas */}
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <HeartHandshake className="w-5 h-5" />
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Mesas.JPG"
+                alt={t.exp_wedding_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <HeartHandshake className="w-4 h-4" />
               </div>
               <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
                 {t.exp_wedding_badge}
               </span>
             </div>
-            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
               {t.exp_wedding_title}
             </h2>
             <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
@@ -185,17 +220,27 @@ export default function ExperienciasPage() {
         </div>
 
         {/* Tarjeta 4: Préstamo de Raclette */}
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Flame className="w-5 h-5" />
+            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Quesos.JPG"
+                alt={t.exp_raclette_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Flame className="w-4 h-4" />
               </div>
               <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
                 {t.exp_raclette_badge}
               </span>
             </div>
-            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
               {t.exp_raclette_title}
             </h2>
             <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">

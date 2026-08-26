@@ -34,13 +34,16 @@ export default function RegalosEmpresaPage() {
 
   return (
     <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero */}
+      {/* 1. Hero Principal */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/secciones/Empresas.JPG"
+            src="/images/secciones/Cestas.JPG"
             alt={t.corp_hero_title}
             className="w-full h-full object-cover object-center"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
         </div>
@@ -74,42 +77,90 @@ export default function RegalosEmpresaPage() {
         </div>
       </section>
 
-      {/* 2. Pilares de Empresa */}
+      {/* 2. Tarjetas con Imagen: Lotes, Catas y Personalización */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-            <Briefcase className="w-6 h-6" />
+        {/* Tarjeta 1: Lotes y Cestas de Navidad */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Cestas.JPG"
+                alt={t.corp_card1_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Briefcase className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 leading-snug">
+                {t.corp_card1_title}
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.corp_card1_desc}
+              </p>
+            </div>
           </div>
-          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-            {t.corp_card1_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-            {t.corp_card1_desc}
-          </p>
         </div>
 
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-            <Users className="w-6 h-6" />
+        {/* Tarjeta 2: Catas Privadas & Team Building */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Catas.JPG"
+                alt={t.corp_card2_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Users className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 leading-snug">
+                {t.corp_card2_title}
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.corp_card2_desc}
+              </p>
+            </div>
           </div>
-          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-            {t.corp_card2_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-            {t.corp_card2_desc}
-          </p>
         </div>
 
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-            <Sparkles className="w-6 h-6" />
+        {/* Tarjeta 3: Personalización con tu Marca */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Mesas.JPG"
+                alt={t.corp_card3_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 leading-snug">
+                {t.corp_card3_title}
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.corp_card3_desc}
+              </p>
+            </div>
           </div>
-          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-            {t.corp_card3_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-            {t.corp_card3_desc}
-          </p>
         </div>
       </section>
 
