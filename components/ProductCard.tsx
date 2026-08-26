@@ -64,18 +64,18 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         {/* Datos del Producto */}
         <div className="space-y-1">
           {product.origin_region && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center gap-1 font-sans truncate">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-start gap-1 font-sans break-words">
               <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
               {product.origin_region}
             </span>
           )}
 
-          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-1 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 break-words group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
             {product.name}
           </h3>
 
           {product.description && (
-            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 font-sans font-medium">
+            <p className="text-xs text-stone-500 dark:text-stone-400 break-words whitespace-pre-line font-sans font-medium">
               {product.description}
             </p>
           )}
@@ -83,8 +83,8 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
       </div>
 
       {/* Precio y Botón */}
-      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
-        <div>
+      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
           <span className="font-serif font-black text-base sm:text-lg text-stone-900 dark:text-stone-100 block leading-none">
             {Number(product.price).toFixed(2)} €
           </span>
