@@ -12,7 +12,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
-  const currentProfile = profile || userProfile || ({} as Profile);
+  const p = profile || userProfile || ({} as Profile);
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ text: string; isError: boolean } | null>(null);
@@ -38,11 +38,12 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6 font-serif">
       {msg && (
         <div
-          className={`p-4 rounded-2xl text-xs font-bold text-center ${
-            msg.isError
+          className={
+            'p-4 rounded-2xl text-xs font-bold text-center ' +
+            (msg.isError
               ? 'bg-red-100 dark:bg-red-950/70 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800'
-              : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
-          }`}
+              : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800')
+          }
         >
           {msg.text}
         </div>
@@ -59,7 +60,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               type="text"
               name="full_name"
               required
-              defaultValue={currentProfile.full_name || ''}
+              defaultValue={p.full_name || ''}
               className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
             />
           </div>
@@ -75,7 +76,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <input
                 type="tel"
                 name="phone"
-                defaultValue={currentProfile.phone || ''}
+                defaultValue={p.phone || ''}
                 placeholder="600 000 000"
                 className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
               />
@@ -91,7 +92,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <input
                 type="text"
                 name="town"
-                defaultValue={currentProfile.town || ''}
+                defaultValue={p.town || ''}
                 placeholder="Lekeitio / Bizkaia"
                 className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
               />

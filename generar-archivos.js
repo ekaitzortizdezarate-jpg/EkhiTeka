@@ -2,9 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const files = {
-  // =========================================================================
-  // 1. ACCIONES DE AUTENTICACIÓN (100% compatibles con Turbopack)
-  // =========================================================================
+  // 1. ACCIONES DE AUTENTICACIÓN (Funciones async declaradas explícitamente para Turbopack)
   'app/actions/auth.ts': `'use server';
 
 import { createClient } from '@/lib/supabase/server';
@@ -115,9 +113,7 @@ export async function signout() {
 }
 `,
 
-  // =========================================================================
   // 2. PÁGINA DE REGISTRO
-  // =========================================================================
   'app/register/page.tsx': `'use client';
 
 import { useState } from 'react';
@@ -265,9 +261,7 @@ export default function RegisterPage() {
 }
 `,
 
-  // =========================================================================
-  // 3. COMPONENTE DE FORMULARIO DE PERFIL
-  // =========================================================================
+  // 3. COMPONENTE ProfileForm
   'components/ProfileForm.tsx': `'use client';
 
 import { useState } from 'react';
@@ -282,7 +276,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
-  const currentProfile = profile || userProfile || ({} as Profile);
+  const p = profile || userProfile || ({} as Profile);
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ text: string; isError: boolean } | null>(null);
@@ -308,11 +302,12 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6 font-serif">
       {msg && (
         <div
-          className={\`p-4 rounded-2xl text-xs font-bold text-center \${
-            msg.isError
+          className={
+            'p-4 rounded-2xl text-xs font-bold text-center ' +
+            (msg.isError
               ? 'bg-red-100 dark:bg-red-950/70 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800'
-              : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
-          }\`}
+              : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800')
+          }
         >
           {msg.text}
         </div>
@@ -329,7 +324,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               type="text"
               name="full_name"
               required
-              defaultValue={currentProfile.full_name || ''}
+              defaultValue={p.full_name || ''}
               className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
             />
           </div>
@@ -345,7 +340,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <input
                 type="tel"
                 name="phone"
-                defaultValue={currentProfile.phone || ''}
+                defaultValue={p.phone || ''}
                 placeholder="600 000 000"
                 className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
               />
@@ -361,7 +356,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <input
                 type="text"
                 name="town"
-                defaultValue={currentProfile.town || ''}
+                defaultValue={p.town || ''}
                 placeholder="Lekeitio / Bizkaia"
                 className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE259]"
               />
@@ -385,9 +380,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
 }
 `,
 
-  // =========================================================================
   // 4. PÁGINA DE PERFIL
-  // =========================================================================
   'app/perfil/page.tsx': `import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ProfileForm } from '@/components/ProfileForm';
@@ -434,106 +427,14 @@ export default async function ProfilePage() {
     </div>
   );
 }
-`,
-
-  // =========================================================================
-  // 5. ACCIONES DE ADMINISTRACIÓN
-  // =========================================================================
-  'app/actions/admin.ts': `'use server';
-
-import { createClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
-
-export async function createCategory(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: 'No autenticado' };
-
-  const id = (formData.get('id') as string).toLowerCase().trim().replace(/\\s+/g, '_');
-  const nameEs = formData.get('name_es') as string;
-  const nameEu = formData.get('name_eu') as string;
-  const nameEn = formData.get('name_en') as string;
-  const nameFr = formData.get('name_fr') as string;
-  const icon = (formData.get('icon') as string) || '✨';
-  const displayOrder = parseInt((formData.get('display_order') as string) || '0');
-
-  const { error } = await supabase
-    .from('categories')
-    .insert({
-      id,
-      name_es: nameEs,
-      name_eu: nameEu,
-      name_en: nameEn,
-      name_fr: nameFr,
-      icon,
-      display_order: displayOrder,
-      is_active: true,
-    });
-
-  if (error) return { error: error.message };
-
-  revalidatePath('/');
-  revalidatePath('/admin');
-  return { success: true };
-}
-
-export async function changeUserPassword(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || !user.email) {
-    return { error: 'No autenticado. Por favor inicia sesión.' };
-  }
-
-  const currentPassword = (formData.get('current_password') as string) || '';
-  const newPassword = (formData.get('new_password') as string) || '';
-  const confirmPassword = (formData.get('confirm_password') as string) || '';
-
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    return { error: 'Por favor, completa todos los campos de contraseña.' };
-  }
-
-  if (newPassword !== confirmPassword) {
-    return { error: 'La nueva contraseña y su confirmación no coinciden.' };
-  }
-
-  if (newPassword.length < 6) {
-    return { error: 'La nueva contraseña debe tener al menos 6 caracteres.' };
-  }
-
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: currentPassword,
-  });
-
-  if (signInError) {
-    return { error: 'La contraseña actual no es correcta. Verifica e inténtalo de nuevo.' };
-  }
-
-  const { error: updateError } = await supabase.auth.updateUser({
-    password: newPassword,
-  });
-
-  if (updateError) {
-    return { error: \`Error al actualizar la contraseña: \${updateError.message}\` };
-  }
-
-  return { success: true, message: '¡Contraseña cambiada con éxito!' };
-}
-`,
+`
 };
 
-// Escritura en disco
 Object.entries(files).forEach(([filePath, content]) => {
   const fullPath = path.join(process.cwd(), filePath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
   fs.writeFileSync(fullPath, content.trimStart(), 'utf8');
-  console.log(`✓ Actualizado correctamente: ${filePath}`);
+  console.log(`✓ Archivo actualizado: ${filePath}`);
 });
 
-console.log('\n🎉 ¡Archivos regenerados con éxito!');
+console.log('\n Archivos regenerados correctamente.');
