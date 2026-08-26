@@ -3,7 +3,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import type { ProfileDetails } from '@/types/database';
+import type { ProfileDetails, WhatsAppContact, StoreAddress, EventAddress } from '@/types/database';
+import { parseProfile } from '@/types/database';
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -76,6 +77,14 @@ export async function updateProfile(formData: FormData) {
 
   if (!user) return { error: 'No autenticado' };
 
+  const { data: currentProfileRaw } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  const currentParsed = parseProfile(currentProfileRaw);
+
   const firstName = (formData.get('first_name') as string)?.trim() || '';
   const lastName1 = (formData.get('last_name_1') as string)?.trim() || '';
   const lastName2 = (formData.get('last_name_2') as string)?.trim() || '';
@@ -90,35 +99,9 @@ export async function updateProfile(formData: FormData) {
   const stair = (formData.get('stair') as string)?.trim() || '';
   const floor = (formData.get('floor') as string)?.trim() || '';
   const door = (formData.get('door') as string)?.trim() || '';
-  const whatsappEnabled = formData.get('whatsapp_enabled') === 'on';
-  const whatsappPhone = (formData.get('whatsapp_phone') as string)?.trim() || null;
-  const whatsappContactsInput = (formData.get('whatsapp_contacts') as string)?.trim() || '[]';
-  const pickupAddressesInput = (formData.get('pickup_addresses') as string)?.trim() || '';
-  let pickupAddresses = undefined;
-  if (pickupAddressesInput) {
-    try {
-      pickupAddresses = JSON.parse(pickupAddressesInput);
-    } catch {
-      return { error: 'La configuración de la tienda no es válida.' };
-    }
-  }
-  let whatsappContacts;
-  try {
-    whatsappContacts = JSON.parse(whatsappContactsInput);
-    if (!Array.isArray(whatsappContacts)) throw new Error();
-    let enabledFound = false;
-    whatsappContacts = whatsappContacts.map((contact) => ({
-      ...contact,
-      enabled: Boolean(contact.enabled) && !enabledFound && Boolean(String(contact.phone || '').trim())
-        ? (enabledFound = true)
-        : false,
-    }));
-  } catch {
-    return { error: 'Los contactos de WhatsApp no son válidos.' };
-  }
 
   const fullNameInput = (formData.get('full_name') as string)?.trim() || '';
-  const fullName = [firstName, lastName1, lastName2].filter(Boolean).join(' ') || fullNameInput || 'Usuario EkhiTeka';
+  const fullName = [firstName, lastName1, lastName2].filter(Boolean).join(' ') || fullNameInput || currentParsed.full_name || 'Usuario EkhiTeka';
 
   const formattedAddress = [
     street,
@@ -148,15 +131,14 @@ export async function updateProfile(formData: FormData) {
     stair,
     floor,
     door,
-    whatsapp_phone: whatsappEnabled ? whatsappPhone : null,
-    whatsapp_enabled: whatsappEnabled,
-    whatsapp_contacts: whatsappContacts,
-    pickup_addresses: pickupAddresses,
+    whatsapp_phone: currentParsed.whatsapp_phone,
+    whatsapp_contacts: currentParsed.whatsapp_contacts,
+    pickup_addresses: currentParsed.pickup_addresses,
+    event_addresses: currentParsed.event_addresses,
   };
 
   const structuredBio = JSON.stringify(profileData);
 
-  // Actualizamos únicamente las columnas seguras de la tabla profiles
   const { error } = await supabase
     .from('profiles')
     .update({
@@ -172,19 +154,95 @@ export async function updateProfile(formData: FormData) {
   if (error) return { error: error.message };
 
   revalidatePath('/perfil');
-  revalidatePath('/');
-  revalidatePath('/cesta');
+  revalidatePath('/', 'layout');
   return {
     success: true,
     updatedProfile: {
       ...profileData,
+      id: user.id,
+      role: currentParsed.role,
       full_name: fullName,
-      phone,
-      town,
+      email: user.email,
       address: formattedAddress,
       bio: structuredBio,
     },
   };
+}
+
+export async function updateStoreConfig(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: currentProf } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (currentProf?.role !== 'vendedor' && currentProf?.role !== 'admin') {
+    return { error: 'Permisos insuficientes para editar los datos de la tienda.' };
+  }
+
+  const rawContacts = formData.get('whatsapp_contacts') as string;
+  const rawPickup = formData.get('pickup_addresses') as string;
+  const rawEvents = formData.get('event_addresses') as string;
+
+  const whatsappContacts: WhatsAppContact[] = rawContacts ? JSON.parse(rawContacts) : [];
+  const pickupAddresses: StoreAddress[] = rawPickup ? JSON.parse(rawPickup) : [];
+  const eventAddresses: EventAddress[] = rawEvents ? JSON.parse(rawEvents) : [];
+
+  const activeWA = whatsappContacts.find((c) => c.is_active);
+  const whatsappPhone = activeWA ? activeWA.phone.replace(/[^0-9]/g, '') : null;
+
+  // Obtener todos los perfiles de vendedores/admins para sincronizar los datos de tienda
+  const { data: allSellers } = await supabase
+    .from('profiles')
+    .select('id, bio')
+    .in('role', ['vendedor', 'admin']);
+
+  if (allSellers) {
+    for (const seller of allSellers) {
+      const sellerParsed = parseProfile(seller);
+      const updatedDetails: ProfileDetails = {
+        first_name: sellerParsed.first_name,
+        last_name_1: sellerParsed.last_name_1,
+        last_name_2: sellerParsed.last_name_2,
+        birth_date: sellerParsed.birth_date,
+        dni: sellerParsed.dni,
+        phone: sellerParsed.phone,
+        province: sellerParsed.province,
+        town: sellerParsed.town,
+        postal_code: sellerParsed.postal_code,
+        street: sellerParsed.street,
+        number: sellerParsed.number,
+        stair: sellerParsed.stair,
+        floor: sellerParsed.floor,
+        door: sellerParsed.door,
+        whatsapp_phone: whatsappPhone,
+        whatsapp_contacts: whatsappContacts,
+        pickup_addresses: pickupAddresses,
+        event_addresses: eventAddresses,
+      };
+
+      await supabase
+        .from('profiles')
+        .update({
+          bio: JSON.stringify(updatedDetails),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', seller.id);
+    }
+  }
+
+  revalidatePath('/', 'layout');
+  revalidatePath('/perfil');
+  revalidatePath('/tienda');
+  revalidatePath('/experiencias');
+  return { success: true };
 }
 
 export async function changeUserPassword(formData: FormData) {

@@ -15,19 +15,24 @@ export default async function ProfilePage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  const [{ data: profile }, { data: sellersData }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase.from('profiles').select('id, full_name, phone').in('role', ['vendedor', 'admin']),
+  ]);
 
   const userProfile = (profile || {}) as Profile;
   if (user.email && !userProfile.email) {
     userProfile.email = user.email;
   }
 
+  const sellers = (sellersData || []).map((s) => ({
+    id: s.id,
+    full_name: s.full_name || 'Vendedor EkhiTeka',
+    phone: s.phone || '',
+  }));
+
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-6">
+    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 space-y-6">
       <div className="flex items-center gap-3">
         <Link
           href="/"
@@ -40,12 +45,12 @@ export default async function ProfilePage() {
             Mi Perfil · Nire Profila
           </h1>
           <p className="text-xs text-stone-500 dark:text-stone-400">
-            Gestiona tus datos personales, dirección de envío y contraseña.
+            Gestiona tus datos personales y los datos compartidos de la tienda.
           </p>
         </div>
       </div>
 
-      <ProfileForm userProfile={userProfile} profile={userProfile} />
+      <ProfileForm userProfile={userProfile} profile={userProfile} sellers={sellers} />
     </div>
   );
 }

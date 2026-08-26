@@ -7,7 +7,7 @@ import { MessageCircle, Sparkles, Gift } from 'lucide-react';
 
 export function ExperienceBanners() {
   const { t } = useLanguage();
-  const { getWhatsAppUrl } = useStoreConfig();
+  const { getWhatsAppUrl, hasActiveWhatsApp } = useStoreConfig();
 
   return (
     <section id="experiencias" className="space-y-8 pt-8">
@@ -45,18 +45,28 @@ export function ExperienceBanners() {
             </div>
           </div>
 
-          <a
-            href={getWhatsAppUrl('Hola, quisiera información sobre las catas presenciales de EkhiTeka')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>{t.exp_b1_btn}</span>
-          </a>
+          {hasActiveWhatsApp ? (
+            <a
+              href={getWhatsAppUrl('Hola, quisiera información sobre las catas presenciales de EkhiTeka')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>{t.exp_b1_btn}</span>
+            </a>
+          ) : (
+            <Link
+              href="/experiencias"
+              className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>{t.exp_b1_btn}</span>
+            </Link>
+          )}
         </div>
 
-        {/* Banner 2: Mesas de Quesos (Botón Amarillo unificado) */}
+        {/* Banner 2: Mesas de Quesos */}
         <div className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xs overflow-hidden">
           <div className="space-y-4">
             <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
@@ -80,15 +90,25 @@ export function ExperienceBanners() {
             </div>
           </div>
 
-          <a
-            href={getWhatsAppUrl('Hola, quisiera presupuesto para un evento o boda con mesa de quesos')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>{t.exp_b2_btn}</span>
-          </a>
+          {hasActiveWhatsApp ? (
+            <a
+              href={getWhatsAppUrl('Hola, quisiera presupuesto para un evento o boda con mesa de quesos')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>{t.exp_b2_btn}</span>
+            </a>
+          ) : (
+            <Link
+              href="/regalos-empresa"
+              className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>{t.exp_b2_btn}</span>
+            </Link>
+          )}
         </div>
 
         {/* Banner 3: Cestas y Regalos */}

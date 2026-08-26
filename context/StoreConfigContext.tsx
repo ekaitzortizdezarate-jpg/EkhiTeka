@@ -1,15 +1,18 @@
 'use client';
 
 import React, { createContext, useContext, useMemo } from 'react';
-import type { Profile, PickupAddress } from '@/types/database';
+import type { Profile, StoreAddress, EventAddress, WhatsAppContact } from '@/types/database';
 import { parseProfile } from '@/types/database';
 
 interface StoreConfigContextType {
-  whatsappPhone: string;
-  isWhatsAppEnabled: boolean;
+  hasActiveWhatsApp: boolean;
+  whatsappPhone: string | null;
+  activeWhatsAppContact: WhatsAppContact | null;
   storeAddress: string;
-  activePickupAddress: PickupAddress | null;
-  pickupAddresses: PickupAddress[];
+  pickupAddresses: StoreAddress[];
+  activePickupAddresses: StoreAddress[];
+  eventAddresses: EventAddress[];
+  activeEventAddresses: EventAddress[];
   getWhatsAppUrl: (message?: string) => string;
 }
 
@@ -24,47 +27,52 @@ export function StoreConfigProvider({
 }) {
   const seller = useMemo(() => parseProfile(initialSellerProfile), [initialSellerProfile]);
 
-  const enabledWhatsApp = useMemo(
-    () => (seller.whatsapp_contacts || []).find((contact) => contact.enabled),
-    [seller]
-  );
-
-  const whatsappPhone = useMemo(() => {
-    if (seller.whatsapp_enabled === false || !enabledWhatsApp) return '';
-    return enabledWhatsApp.phone.replace(/[^0-9]/g, '');
-  }, [enabledWhatsApp, seller.whatsapp_enabled]);
-
-  const isWhatsAppEnabled = seller.whatsapp_enabled !== false;
-
-  const activePickupAddress = useMemo(() => {
-    const addresses = seller.pickup_addresses || [];
-    return addresses.find((a) => a.is_active) || addresses[0] || null;
+  const activeWhatsAppContact = useMemo(() => {
+    const contacts = seller.whatsapp_contacts || [];
+    return contacts.find((c) => c.is_active) || null;
   }, [seller]);
 
+  const hasActiveWhatsApp = Boolean(activeWhatsAppContact && activeWhatsAppContact.phone && activeWhatsAppContact.phone.trim().length > 0);
+
+  const whatsappPhone = useMemo(() => {
+    if (!activeWhatsAppContact) return null;
+    return activeWhatsAppContact.phone.replace(/[^0-9]/g, '');
+  }, [activeWhatsAppContact]);
+
+  const pickupAddresses = useMemo(() => seller.pickup_addresses || [], [seller]);
+  const activePickupAddresses = useMemo(() => pickupAddresses.filter((a) => a.is_active), [pickupAddresses]);
+
+  const eventAddresses = useMemo(() => seller.event_addresses || [], [seller]);
+  const activeEventAddresses = useMemo(() => eventAddresses.filter((a) => a.is_active), [eventAddresses]);
+
   const storeAddress = useMemo(() => {
-    if (activePickupAddress) {
-      return `${activePickupAddress.street}${activePickupAddress.number ? ` ${activePickupAddress.number}` : ''}, ${activePickupAddress.town} · ${activePickupAddress.province}`;
+    const firstActive = activePickupAddresses[0];
+    if (firstActive) {
+      return `${firstActive.street}${firstActive.number ? ' ' + firstActive.number : ''}, ${firstActive.town} · ${firstActive.province}`;
     }
     return 'Gamarra Kalea 4, Lekeitio · Bizkaia';
-  }, [activePickupAddress]);
+  }, [activePickupAddresses]);
 
   const getWhatsAppUrl = useMemo(() => {
     return (message?: string) => {
-      if (!whatsappPhone) return '#';
+      if (!hasActiveWhatsApp || !whatsappPhone) return '';
       const cleanNumber = whatsappPhone.startsWith('34') || whatsappPhone.length > 10 ? whatsappPhone : `34${whatsappPhone}`;
       const encodedMsg = message ? encodeURIComponent(message) : '';
-      return `https://wa.me/${cleanNumber}${encodedMsg ? `?text=${encodedMsg}` : ''}`;
+      return `https://wa.me/${cleanNumber}${encodedMsg ? '?text=' + encodedMsg : ''}`;
     };
-  }, [whatsappPhone]);
+  }, [hasActiveWhatsApp, whatsappPhone]);
 
   return (
     <StoreConfigContext.Provider
       value={{
+        hasActiveWhatsApp,
         whatsappPhone,
-        isWhatsAppEnabled,
+        activeWhatsAppContact,
         storeAddress,
-        activePickupAddress,
-        pickupAddresses: seller.pickup_addresses || [],
+        pickupAddresses,
+        activePickupAddresses,
+        eventAddresses,
+        activeEventAddresses,
         getWhatsAppUrl,
       }}
     >
@@ -77,12 +85,15 @@ export function useStoreConfig() {
   const context = useContext(StoreConfigContext);
   if (!context) {
     return {
-      whatsappPhone: '34600000000',
-      isWhatsAppEnabled: true,
+      hasActiveWhatsApp: false,
+      whatsappPhone: null,
+      activeWhatsAppContact: null,
       storeAddress: 'Gamarra Kalea 4, Lekeitio · Bizkaia',
-      activePickupAddress: null,
       pickupAddresses: [],
-      getWhatsAppUrl: (message?: string) => `https://wa.me/34600000000${message ? `?text=${encodeURIComponent(message)}` : ''}`,
+      activePickupAddresses: [],
+      eventAddresses: [],
+      activeEventAddresses: [],
+      getWhatsAppUrl: () => '',
     };
   }
   return context;

@@ -7,26 +7,26 @@ import { Truck, Store } from 'lucide-react';
 
 export function Footer() {
   const { t } = useLanguage();
-  const { storeAddress, whatsappPhone, isWhatsAppEnabled, getWhatsAppUrl } = useStoreConfig();
+  const { storeAddress, whatsappPhone, getWhatsAppUrl, hasActiveWhatsApp } = useStoreConfig();
 
   return (
     <footer className="border-t border-stone-200 dark:border-stone-800 bg-[#1D1D1B] text-stone-300 transition-colors pt-0 pb-8">
-      {/* 1. Banner Destacado Amarillo */}
-      <div className="bg-[#FFE259] text-[#1D1D1B] py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-1 text-center md:text-left">
-            <span className="text-[11px] font-black uppercase tracking-widest block text-stone-800">
-              {t.footer_club_title}
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-serif sm:font-sans">
-              {t.footer_club_subtitle}
-            </h3>
-            <p className="text-xs sm:text-sm font-semibold text-stone-800 max-w-xl">
-              {t.footer_club_desc}
-            </p>
-          </div>
+      {/* 1. Banner Destacado Amarillo (Solo si WhatsApp está habilitado) */}
+      {hasActiveWhatsApp && (
+        <div className="bg-[#FFE259] text-[#1D1D1B] py-10 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-1 text-center md:text-left">
+              <span className="text-[11px] font-black uppercase tracking-widest block text-stone-800">
+                {t.footer_club_title}
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-serif sm:font-sans">
+                {t.footer_club_subtitle}
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold text-stone-800 max-w-xl">
+                {t.footer_club_desc}
+              </p>
+            </div>
 
-          {isWhatsAppEnabled && (
             <a
               href={getWhatsAppUrl('Hola, quisiera unirme a las novedades del Club de Amigos de EkhiTeka')}
               target="_blank"
@@ -35,9 +35,9 @@ export function Footer() {
             >
               <span>{t.footer_join_whatsapp}</span>
             </a>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 pt-12">
         {/* 2. Valores Gourmet */}
@@ -140,7 +140,7 @@ export function Footer() {
               <p>{t.footer_schedule_weekdays}</p>
               <p>{t.footer_schedule_saturday}</p>
             </div>
-            {isWhatsAppEnabled && (
+            {hasActiveWhatsApp && whatsappPhone && (
               <p className="text-stone-300 font-bold text-[11px]">
                 WhatsApp: +{whatsappPhone}
               </p>

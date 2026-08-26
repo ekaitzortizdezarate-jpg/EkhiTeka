@@ -18,24 +18,42 @@ export type OrderStatus =
   | 'entregado'
   | 'cancelado';
 
-export interface PickupAddress {
-  id: string;
-  title: string;
-  street: string;
-  number?: string;
-  town: string;
-  province: string;
-  postal_code?: string;
-  schedule?: string;
-  is_active: boolean;
-}
-
 export interface WhatsAppContact {
   id: string;
   name: string;
   phone: string;
-  enabled: boolean;
-  seller_id?: string;
+  seller_id?: string | null;
+  is_active: boolean;
+}
+
+export interface StoreAddress {
+  id: string;
+  title: string;
+  street: string;
+  number?: string;
+  stair?: string;
+  floor?: string;
+  door?: string;
+  postal_code?: string;
+  town: string;
+  province: string;
+  schedule?: string;
+  is_active: boolean;
+}
+
+export interface EventAddress {
+  id: string;
+  title: string;
+  street: string;
+  number?: string;
+  stair?: string;
+  floor?: string;
+  door?: string;
+  postal_code?: string;
+  town: string;
+  province: string;
+  notes?: string;
+  is_active: boolean;
 }
 
 export interface ProfileDetails {
@@ -54,9 +72,9 @@ export interface ProfileDetails {
   floor?: string | null;
   door?: string | null;
   whatsapp_phone?: string | null;
-  whatsapp_enabled?: boolean;
   whatsapp_contacts?: WhatsAppContact[];
-  pickup_addresses?: PickupAddress[];
+  pickup_addresses?: StoreAddress[];
+  event_addresses?: EventAddress[];
 }
 
 export interface Profile extends ProfileDetails {
@@ -94,9 +112,9 @@ export function parseProfile(raw?: any): Profile {
       floor: '',
       door: '',
       whatsapp_phone: '34600000000',
-      whatsapp_enabled: true,
       whatsapp_contacts: [],
       pickup_addresses: [],
+      event_addresses: [],
     };
   }
 
@@ -112,35 +130,6 @@ export function parseProfile(raw?: any): Profile {
     }
   }
 
-  const defaultAddresses: PickupAddress[] = [
-    {
-      id: 'default_store_1',
-      title: 'Quesería & Tienda Principal Lekeitio',
-      street: details.street || raw.street || 'Gamarra Kalea',
-      number: details.number || raw.number || '4',
-      town: details.town || raw.town || 'Lekeitio',
-      province: details.province || raw.province || 'Bizkaia',
-      postal_code: details.postal_code || raw.postal_code || '48280',
-      schedule: 'Lun-Vie: 10:00 - 14:30 | 17:00 - 20:30 · Sáb: 10:30 - 15:00',
-      is_active: true,
-    },
-  ];
-
-  const legacyWhatsApp = details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '';
-  const whatsappContacts: WhatsAppContact[] = Array.isArray(details.whatsapp_contacts)
-    ? details.whatsapp_contacts.map((contact: WhatsAppContact, index: number) => ({
-        ...contact,
-        enabled: contact.enabled && index === details.whatsapp_contacts!.findIndex((item) => item.enabled),
-      }))
-    : legacyWhatsApp
-      ? [{
-          id: 'whatsapp_legacy',
-          name: 'WhatsApp de la tienda',
-          phone: legacyWhatsApp,
-          enabled: details.whatsapp_enabled ?? raw.whatsapp_enabled ?? true,
-        }]
-      : [];
-
   return {
     ...raw,
     first_name: details.first_name || raw.first_name || raw.full_name?.split(' ')[0] || '',
@@ -149,7 +138,7 @@ export function parseProfile(raw?: any): Profile {
     birth_date: details.birth_date || raw.birth_date || '',
     dni: details.dni || raw.dni || '',
     phone: details.phone || raw.phone || '',
-    province: details.province || raw.province || (raw.town?.toLowerCase().includes('lekeitio') ? 'Bizkaia' : ''),
+    province: details.province || raw.province || '',
     town: details.town || raw.town || '',
     postal_code: details.postal_code || raw.postal_code || '',
     street: details.street || raw.street || '',
@@ -157,26 +146,27 @@ export function parseProfile(raw?: any): Profile {
     stair: details.stair || raw.stair || '',
     floor: details.floor || raw.floor || '',
     door: details.door || raw.door || '',
-    whatsapp_phone:
-      raw.whatsapp_enabled === false
-        ? details.whatsapp_phone ?? raw.whatsapp_phone ?? null
-        : details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '34600000000',
-    whatsapp_enabled: details.whatsapp_enabled ?? raw.whatsapp_enabled ?? true,
-    whatsapp_contacts: whatsappContacts,
-    pickup_addresses: details.pickup_addresses && details.pickup_addresses.length > 0 ? details.pickup_addresses : defaultAddresses,
+    whatsapp_phone: details.whatsapp_phone || raw.phone || null,
+    whatsapp_contacts: details.whatsapp_contacts || [],
+    pickup_addresses: details.pickup_addresses || [],
+    event_addresses: details.event_addresses || [],
   };
 }
 
 export function isProfileComplete(raw?: any): boolean {
   if (!raw) return false;
   const p = parseProfile(raw);
+  const isSeller = p.role === 'vendedor' || p.role === 'admin';
 
-  const requiredKeys: (keyof ProfileDetails)[] = [
+  const userKeys: (keyof ProfileDetails)[] = [
     'first_name',
     'last_name_1',
     'birth_date',
     'dni',
     'phone',
+  ];
+
+  const addressKeys: (keyof ProfileDetails)[] = [
     'province',
     'town',
     'postal_code',
@@ -185,6 +175,9 @@ export function isProfileComplete(raw?: any): boolean {
     'floor',
     'door',
   ];
+
+  // La dirección NO es obligatoria para usuarios vendedores
+  const requiredKeys = isSeller ? userKeys : [...userKeys, ...addressKeys];
 
   return requiredKeys.every((key) => {
     const val = p[key];
@@ -221,6 +214,8 @@ export interface Product {
   image_url?: string | null;
   origin_region?: string | null;
   delivery_methods: string[];
+  pickup_address_ids?: string[];
+  event_address_id?: string | null;
   created_at?: string;
   updated_at?: string;
 }
