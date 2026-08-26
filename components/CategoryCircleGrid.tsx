@@ -17,23 +17,24 @@ export function CategoryCircleGrid({
   const { t, language } = useLanguage();
 
   const getCategoryName = (cat: Category) => {
-    if (language === 'eu') return cat.name_eu;
-    if (language === 'fr') return cat.name_fr;
-    if (language === 'en') return cat.name_en;
+    if (language === 'eu') return cat.name_eu || cat.name_es;
+    if (language === 'fr') return cat.name_fr || cat.name_es;
+    if (language === 'en') return cat.name_en || cat.name_es;
     return cat.name_es;
   };
 
-  const getCategorySubtitle = (slug: string) => {
-    switch (slug) {
-      case 'quesos': return t.sub_quesos;
-      case 'atun': return t.sub_atun;
-      case 'salazones': return t.sub_salazones;
-      case 'gildas': return t.sub_gildas;
-      case 'cerveza': return t.sub_cerveza;
-      case 'txakoli': return t.sub_txakoli;
-      case 'sidra': return t.sub_sidra;
-      default: return 'Gourmet Selection';
-    }
+  const getCategorySubtitle = (cat: Category) => {
+    const slug = (cat.slug || cat.id || '').toLowerCase();
+    if (slug.includes('queso')) return t.sub_quesos;
+    if (slug.includes('atun') || slug.includes('bonito')) return t.sub_atun;
+    if (slug.includes('salazon') || slug.includes('anchoa') || slug.includes('antxoa')) return t.sub_salazones;
+    if (slug.includes('gilda') || slug.includes('jilda')) return t.sub_gildas;
+    if (slug.includes('cerveza') || slug.includes('garagardo')) return t.sub_cerveza;
+    if (slug.includes('txakoli')) return t.sub_txakoli;
+    if (slug.includes('sidra') || slug.includes('sagardo')) return t.sub_sidra;
+    if (slug.includes('cesta')) return t.sub_cesta;
+    if (slug.includes('cata') || slug.includes('experiencia')) return t.sub_catas;
+    return t.sub_default;
   };
 
   return (
@@ -52,7 +53,6 @@ export function CategoryCircleGrid({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.id;
-          const catSlug = cat.slug || cat.id || '';
 
           return (
             <button
@@ -82,7 +82,7 @@ export function CategoryCircleGrid({
                 <span className={`block text-[9.5px] font-sans font-bold uppercase tracking-wider truncate ${
                   isSelected ? 'text-stone-800' : 'text-stone-400 dark:text-stone-500'
                 }`}>
-                  {getCategorySubtitle(catSlug)}
+                  {getCategorySubtitle(cat)}
                 </span>
               </div>
             </button>

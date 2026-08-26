@@ -1,306 +1,258 @@
-import { createClient } from '@/lib/supabase/server';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useLanguage } from '@/context/LanguageContext';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductWithSeller } from '@/types/database';
 import {
-  Wine,
-  Store,
-  HeartHandshake,
   Sparkles,
+  Wine,
+  Home,
+  HeartHandshake,
   Flame,
-  Calendar,
+  MessageCircle,
+  Ticket,
 } from 'lucide-react';
 
-export const revalidate = 0;
+export default function ExperienciasPage() {
+  const { t } = useLanguage();
+  const [storeTastings, setStoreTastings] = useState<ProductWithSeller[]>([]);
+  const [homeTastingKits, setHomeTastingKits] = useState<ProductWithSeller[]>([]);
+  const [isSeller, setIsSeller] = useState(false);
 
-export default async function ExperienciasPage() {
-  const supabase = await createClient();
+  useEffect(() => {
+    const supabase = createClient();
+    async function loadData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        if (profile?.role === 'vendedor' || profile?.role === 'admin') {
+          setIsSeller(true);
+        }
+      }
 
-  const [{ data: { user } }, productsRes] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase
-      .from('products')
-      .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false }),
-  ]);
+      const { data } = await supabase
+        .from('products')
+        .select('*, profiles!products_seller_id_fkey(id, full_name, town, avatar_url, phone)')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
-  let isSeller = false;
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    if (profile?.role === 'vendedor' || profile?.role === 'admin') {
-      isSeller = true;
+      if (data) {
+        const prods = data as unknown as ProductWithSeller[];
+        const storeEvents = prods.filter((p) => {
+          const cat = (p.category_id || '').toLowerCase();
+          const name = (p.name || '').toLowerCase();
+          const desc = (p.description || '').toLowerCase();
+          return (
+            cat === 'cata_presencial' ||
+            name.includes('presencial') ||
+            (desc.includes('presencial') && !name.includes('casa'))
+          );
+        });
+
+        const homeKits = prods.filter((p) => {
+          const cat = (p.category_id || '').toLowerCase();
+          const name = (p.name || '').toLowerCase();
+          const desc = (p.description || '').toLowerCase();
+          return (
+            cat === 'cata_casa' ||
+            name.includes('cata en casa') ||
+            desc.includes('cata en casa')
+          );
+        });
+
+        setStoreTastings(storeEvents);
+        setHomeTastingKits(homeKits);
+      }
     }
-  }
-
-  const allProducts = (productsRes.data || []) as unknown as ProductWithSeller[];
-
-  const tastingProducts = allProducts.filter((p) => {
-    const cat = (p.category_id || '').toLowerCase();
-    const name = (p.name || '').toLowerCase();
-    const desc = (p.description || '').toLowerCase();
-
-    if (cat === 'tarjeta_regalo' || (name.includes('tarjeta') && name.includes('regalo'))) {
-      return false;
-    }
-
-    return (
-      cat === 'cata_casa' ||
-      cat === 'cata_presencial' ||
-      cat === 'catas' ||
-      cat === 'experiencia' ||
-      name.includes('cata') ||
-      name.includes('degustación') ||
-      name.includes('taller') ||
-      desc.includes('cata')
-    );
-  });
-
-  const presencialEvents = allProducts.filter((p) => {
-    const cat = (p.category_id || '').toLowerCase();
-    const name = (p.name || '').toLowerCase();
-    const desc = (p.description || '').toLowerCase();
-
-    if (
-      name.includes('casa') ||
-      cat.includes('casa') ||
-      cat === 'cesta' ||
-      cat === 'tarjeta_regalo' ||
-      name.includes('tarjeta') ||
-      name.includes('cesta')
-    ) {
-      return false;
-    }
-
-    return (
-      cat === 'cata_presencial' ||
-      name.includes('presencial') ||
-      desc.includes('presencial') ||
-      (desc.includes('fecha & hora') && desc.includes('aforo'))
-    );
-  });
+    loadData();
+  }, []);
 
   return (
     <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Tarjeta presentación */}
+      {/* 1. Hero Editorial */}
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/secciones/Catas.JPG"
-            alt="Catas & Experiencias EkhiTeka"
+            alt={t.exp_hero_title}
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
         </div>
 
         <div className="relative z-10 max-w-2xl space-y-4 text-white">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md">
-            <Sparkles className="w-3.5 h-3.5" /> Experiencias Gastronómicas
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
+            <Sparkles className="w-3.5 h-3.5" /> {t.exp_hero_badge}
           </span>
 
           <h1 className="text-3xl sm:text-5xl font-black font-serif tracking-tight leading-tight">
-            Catas & <span className="text-[#FFE259]">Experiencias</span>
+            {t.exp_hero_title} <span className="text-[#FFE259]">{t.exp_hero_title_highlight}</span>
           </h1>
 
           <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
-            Descubre el arte del queso artesano a través de nuestras catas guiadas, eventos para celebraciones y servicios exclusivos para disfrutar en Lekeitio o donde tú elijas.
+            {t.exp_hero_desc}
           </p>
         </div>
       </section>
 
-      {/* 2. Info Catas en Casa e Info Catas en la Tienda */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
-          <div className="relative h-64 overflow-hidden">
-            <img
-              src="/images/secciones/Catas.JPG"
-              alt="Catas en Casa"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
-              A tu ritmo
-            </div>
-          </div>
-          <div className="p-6 sm:p-8 space-y-4">
-            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
-              <Wine className="w-6 h-6" />
-              <h2 className="font-serif font-bold text-2xl sm:text-3xl text-stone-900 dark:text-stone-100">
-                Catas en Casa
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Conviértete en anfitrión con nuestros kits completos de cata: selección de 6 quesos afinados clasificados por intensidades, maridajes artesanos de acompañamiento, mantel de cata ilustrado y fichas explicativas con notas de cata y maridajes.
-            </p>
-            {!isSeller && (
-              <div className="pt-2">
-                <a
-                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20reservar%20un%20Kit%20de%20Cata%20en%20Casa"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
-                >
-                  <span>Solicitar Kit para Casa</span>
-                </a>
+      {/* 2. Cuatro Tarjetas de Experiencias */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-serif">
+        {/* Tarjeta 1: Catas en Casa */}
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Home className="w-5 h-5" />
               </div>
-            )}
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_home_tasting_badge}
+              </span>
+            </div>
+            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_home_tasting_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_home_tasting_desc}
+            </p>
           </div>
+          <a
+            href="https://wa.me/34600000000?text=Hola,%20quisiera%20solicitar%20un%20Kit%20de%20Cata%20en%20Casa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>{t.exp_home_tasting_btn}</span>
+          </a>
         </div>
 
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
-          <div className="relative h-64 overflow-hidden">
-            <img
-              src="/images/secciones/Tienda.JPG"
-              alt="Catas en la Tienda Lekeitio"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
-              Presencial en Lekeitio
-            </div>
-          </div>
-          <div className="p-6 sm:p-8 space-y-4">
-            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
-              <Store className="w-6 h-6" />
-              <h2 className="font-serif font-bold text-2xl sm:text-3xl text-stone-900 dark:text-stone-100">
-                Catas en la Tienda
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Experiencias presenciales exclusivas en nuestra quesería de Lekeitio (Gamarra Kalea 4). Guiadas por nuestros afinadores queseros en grupos reducidos, probando piezas de autor, txakoli de Bizkaia y maridajes singulares.
-            </p>
-            {!isSeller && (
-              <div className="pt-2">
-                <a
-                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20el%20calendario%20de%20Catas%20en%20la%20Tienda%20de%20Lekeitio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
-                >
-                  <span>Ver Fechas & Reservar Plaza</span>
-                </a>
+        {/* Tarjeta 2: Catas en la Tienda */}
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Wine className="w-5 h-5" />
               </div>
-            )}
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_store_tasting_badge}
+              </span>
+            </div>
+            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_store_tasting_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_store_tasting_desc}
+            </p>
           </div>
+          <a
+            href="#catas-tienda"
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <Ticket className="w-3.5 h-3.5" />
+            <span>{t.exp_store_tasting_btn}</span>
+          </a>
+        </div>
+
+        {/* Tarjeta 3: Mesas para Bodas */}
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <HeartHandshake className="w-5 h-5" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_wedding_badge}
+              </span>
+            </div>
+            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_wedding_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_wedding_desc}
+            </p>
+          </div>
+          <a
+            href="https://wa.me/34600000000?text=Hola,%20quisiera%20pedir%20presupuesto%20para%20Mesa%20de%20Quesos%20de%20Boda"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>{t.exp_wedding_btn}</span>
+          </a>
+        </div>
+
+        {/* Tarjeta 4: Préstamo de Raclette */}
+        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs flex flex-col justify-between hover:border-[#FFE259] transition-colors">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
+                <Flame className="w-5 h-5" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
+                {t.exp_raclette_badge}
+              </span>
+            </div>
+            <h2 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-tight">
+              {t.exp_raclette_title}
+            </h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              {t.exp_raclette_desc}
+            </p>
+          </div>
+          <a
+            href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20para%20préstamo%20de%20Raclette"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>{t.exp_raclette_btn}</span>
+          </a>
         </div>
       </section>
 
-      {/* 3. Productos tipo cata en casa y cata presencial */}
-      {tastingProducts.length > 0 && (
-        <section className="space-y-6 pt-2">
+      {/* 3. Catas Presenciales Disponibles */}
+      {storeTastings.length > 0 && (
+        <section id="catas-tienda" className="space-y-6 pt-4 font-serif">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              Catálogo de Catas & Packs
+              {t.event_upcoming_subtitle}
             </span>
-            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-              Catas & Experiencias Disponibles
+            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
+              {t.event_upcoming_title}
             </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {tastingProducts.map((product) => (
+            {storeTastings.map((product) => (
               <ProductCard key={product.id} product={product} isSeller={isSeller} />
             ))}
           </div>
         </section>
       )}
 
-      {/* 4. Próximos eventos de catas presenciales */}
-      {presencialEvents.length > 0 && (
-        <section className="space-y-6 pt-4">
+      {/* 4. Kits de Cata para Casa */}
+      {homeTastingKits.length > 0 && (
+        <section className="space-y-6 pt-4 font-serif">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Plazas limitadas · Lekeitio Centro</span>
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              {t.event_home_catalog_subtitle}
             </span>
-            <h3 className="text-2xl font-black font-serif text-stone-900 dark:text-stone-100 uppercase">
-              Próximos Eventos de Catas Presenciales
+            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
+              {t.event_home_catalog_title}
             </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {presencialEvents.map((event) => (
-              <ProductCard key={event.id} product={event} isSeller={isSeller} />
+            {homeTastingKits.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
             ))}
           </div>
         </section>
       )}
-
-      {/* 5. Mesa para Bodas y Préstamo de Raclette */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
-          <div className="relative h-64 overflow-hidden">
-            <img
-              src="/images/secciones/Mesas.JPG"
-              alt="Mesa de Quesos para Bodas"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
-              Bodas & Eventos
-            </div>
-          </div>
-          <div className="p-6 sm:p-8 space-y-4">
-            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
-              <HeartHandshake className="w-6 h-6" />
-              <h2 className="font-serif font-bold text-2xl text-stone-900 dark:text-stone-100">
-                Mesa para Bodas
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Creamos mesas de quesos espectaculares para cócteles de bodas y celebraciones. Diseños monumentales con frutas frescas, frutos secos, panes artesanos, confituras y una selección afinada que dejará impresionados a todos los invitados.
-            </p>
-            {!isSeller && (
-              <div className="pt-2">
-                <a
-                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20presupuesto%20para%20Mesa%20de%20Quesos%20para%20Boda/Evento"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
-                >
-                  <span>Pedir Presupuesto para Bodas</span>
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-3xl bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col justify-between">
-          <div className="relative h-64 overflow-hidden">
-            <img
-              src="/images/secciones/Quesos.JPG"
-              alt="Préstamo de Raclette"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-4 left-4 px-3.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-xs font-black uppercase tracking-wider rounded-full shadow-md">
-              Alquiler & Pack
-            </div>
-          </div>
-          <div className="p-6 sm:p-8 space-y-4">
-            <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
-              <Flame className="w-6 h-6" />
-              <h2 className="font-serif font-bold text-2xl text-stone-900 dark:text-stone-100">
-                Préstamo de Raclette
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              Te prestamos la máquina profesional de raclette tradicional suiza junto con el queso de raclette afinado cortado a la perfección, embutidos artesanos y patatas para que disfrutes de una velada única sin preocuparte por el equipamiento.
-            </p>
-            {!isSeller && (
-              <div className="pt-2">
-                <a
-                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20información%20sobre%20el%20Préstamo%20de%20Raclette%20y%20pack%20de%20queso"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all hover:scale-102 font-serif"
-                >
-                  <span>Consultar Disponibilidad de Raclette</span>
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

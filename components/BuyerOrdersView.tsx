@@ -1,12 +1,25 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
+import { LOCALE_MAP } from '@/lib/i18n/translations';
 import Link from 'next/link';
 import type { Order } from '@/types/database';
 import { Package, MessageCircle, MapPin, Store } from 'lucide-react';
 
 export function BuyerOrdersView({ orders }: { orders: Order[] }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pendiente': return t.orders_pending;
+      case 'confirmado': return t.orders_confirmed;
+      case 'preparando': return t.orders_preparing;
+      case 'listo_entrega': return t.orders_ready_delivery;
+      case 'entregado': return t.orders_delivered;
+      case 'cancelado': return t.orders_cancelled;
+      default: return status;
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-8">
@@ -14,7 +27,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
         <h1 className="text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
           {t.orders_title}
         </h1>
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
           {t.orders_subtitle_buyer}
         </p>
       </div>
@@ -23,6 +36,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
         <div className="space-y-6">
           {orders.map((order) => {
             const total = Number(order.total_price ?? order.total_amount ?? 0);
+            const isStorePickup = order.delivery_type === 'recogida_tienda' || order.delivery_method === 'recogida_tienda' || order.delivery_method === 'tienda';
 
             return (
               <div
@@ -35,17 +49,19 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                       {t.orders_order_number} #{order.id.slice(0, 8)}
                     </span>
                     <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                      {new Date(order.created_at).toLocaleDateString('es-ES', {
+                      {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
                       })}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <span className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259] font-black text-xs uppercase tracking-wider font-serif">
-                      {order.status}
+                      {getStatusText(order.status)}
                     </span>
                     <span className="text-base font-black font-serif text-stone-900 dark:text-stone-100">
                       {total.toFixed(2)} €
@@ -55,6 +71,9 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
 
                 {order.order_items && order.order_items.length > 0 && (
                   <div className="space-y-2">
+                    <h4 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300">
+                      {t.orders_products_label}
+                    </h4>
                     {order.order_items.map((item) => (
                       <div key={item.id} className="flex items-center justify-between text-xs py-1 border-b border-stone-100 dark:border-stone-800 last:border-0 font-sans">
                         <div className="flex items-center gap-2">
@@ -74,17 +93,17 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 )}
 
-                <div className="pt-2 flex items-center justify-between text-xs font-serif">
-                  <div className="flex items-center gap-1.5 text-stone-500 font-sans">
-                    {order.delivery_type === 'recogida_tienda' ? (
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs font-serif">
+                  <div className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300 font-sans">
+                    {isStorePickup ? (
                       <>
                         <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
-                        <span>Recogida en Tienda Lekeitio</span>
+                        <span>{t.deliv_store_pickup_tag}</span>
                       </>
                     ) : (
                       <>
                         <MapPin className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
-                        <span>{order.shipping_address || 'Envío a domicilio'}</span>
+                        <span>{order.shipping_address || t.deliv_home_tag}</span>
                       </>
                     )}
                   </div>
@@ -109,7 +128,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
           </h3>
           <Link
             href="/tienda"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider font-serif shadow-xs"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider font-serif shadow-xs hover:scale-105 transition-all"
           >
             <span>{t.cart_explore_btn}</span>
           </Link>
