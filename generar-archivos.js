@@ -3,7 +3,7 @@ const path = require('path');
 
 const files = {
   // =========================================================================
-  // 1. DICCIONARIO I18N (Incluye Perfil Completo, Dirección y Contraseñas)
+  // 1. DICCIONARIO I18N (Traducciones del perfil en lectura/edición y contraseña)
   // =========================================================================
   'lib/i18n/translations.ts': `export type Language = 'eu' | 'es' | 'en' | 'fr';
 
@@ -326,6 +326,9 @@ export interface TranslationDict {
   profile_confirm_password: string;
   profile_change_password_btn: string;
   profile_save_changes_btn: string;
+  profile_edit_btn: string;
+  profile_not_specified: string;
+  profile_full_address: string;
 
   // Roles & Auth
   role_buyer: string;
@@ -542,7 +545,7 @@ export const translations: Record<Language, TranslationDict> = {
     exp_b1_desc: 'Ikasi nazioarteko eta tokiko artisau gaztak dastatzen Lekeition.',
     exp_b1_btn: 'Kontsultatu Hurrengo Datak',
     exp_b2_title: 'Gazta Mahaiak Ezkontza & Festetarako',
-    exp_b2_desc: 'Cheese Corner ikusgarriak prestatzen ditugu.',
+    exp_b2_desc: 'Cheese Corner ikusgarriak prestatzen ditugu lore jangarriekin.',
     exp_b2_btn: 'Eskatu Ekitaldi Aurrekontua',
     exp_b3_title: 'Gourmet Saskiak & Enpresa Opariak',
     exp_b3_desc: 'Kaxa gastronomiko esklusiboak diseinatzen ditugu.',
@@ -562,7 +565,7 @@ export const translations: Record<Language, TranslationDict> = {
     exp_store_tasting_btn: 'Ikusi Datak & Erreserbatu Lekua',
     exp_wedding_title: 'Ezkontzetarako Mahaia',
     exp_wedding_badge: 'Ezkontzak & Ekitaldiak',
-    exp_wedding_desc: 'Gazta-mahai ikusgarriak sortzen ditugu.',
+    exp_wedding_desc: 'Gazta-mahai ikusgarriak sortzen ditugu ezkontzetako kokteletarako.',
     exp_wedding_btn: 'Eskatu Aurrekontua Ezkontzetarako',
     exp_raclette_title: 'Raclette Mailegua',
     exp_raclette_badge: 'Alokairua & Pack-a',
@@ -700,6 +703,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Berretsi Pasahitz Berria',
     profile_change_password_btn: 'Pasahitza Eguneratu',
     profile_save_changes_btn: 'Gorde Profilaren Datuak',
+    profile_edit_btn: 'Editatu Profila',
+    profile_not_specified: 'Zehaztu gabe',
+    profile_full_address: 'Helbide osoa',
 
     role_buyer: 'Bezeroa / Eroslea',
     role_seller: 'Ekoizlea / Saltzailea',
@@ -1062,6 +1068,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Confirmar Nueva Contraseña',
     profile_change_password_btn: 'Actualizar Contraseña',
     profile_save_changes_btn: 'Guardar Datos del Perfil',
+    profile_edit_btn: 'Editar Perfil',
+    profile_not_specified: 'No especificado',
+    profile_full_address: 'Dirección completa',
 
     role_buyer: 'Comprador / Gourmet',
     role_seller: 'Productor / Vendedor',
@@ -1424,6 +1433,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Confirm New Password',
     profile_change_password_btn: 'Update Password',
     profile_save_changes_btn: 'Save Profile Information',
+    profile_edit_btn: 'Edit Profile',
+    profile_not_specified: 'Not specified',
+    profile_full_address: 'Full address',
 
     role_buyer: 'Buyer / Gourmet',
     role_seller: 'Artisan / Seller',
@@ -1625,7 +1637,7 @@ export const translations: Record<Language, TranslationDict> = {
     exp_banner_badge: 'Ici il se passe des choses...',
     exp_banner_title: 'Dégustations, Événements & Expériences EkhiTeka',
     exp_b1_title: 'Dégustations Présentielles & Ateliers',
-    exp_b1_desc: 'Apprenez à déguster des fromages fermiers à Lekeitio.',
+    exp_b1_desc: 'Apprenez à degustar des fromages fermiers à Lekeitio.',
     exp_b1_btn: 'Consulter les Prochaines Dates',
     exp_b2_title: 'Buffets Fromages de Mariage & Fêtes',
     exp_b2_desc: 'Nous créons des Cheese Corners personnalisés.',
@@ -1786,6 +1798,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Confirmer le Nouveau Mot de Passe',
     profile_change_password_btn: 'Mettre à Jour le Mot de Passe',
     profile_save_changes_btn: 'Enregistrer les Informations du Profil',
+    profile_edit_btn: 'Modifier le Profil',
+    profile_not_specified: 'Non spécifié',
+    profile_full_address: 'Adresse complète',
 
     role_buyer: 'Client / Gourmet',
     role_seller: 'Artisan / Vendeur',
@@ -1844,1075 +1859,7 @@ export const translations: Record<Language, TranslationDict> = {
 `,
 
   // =========================================================================
-  // 2. SERVER ACTIONS (auth.ts: updateProfile con todos los campos y changeUserPassword)
-  // =========================================================================
-  'app/actions/auth.ts': `'use server';
-
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
-
-export async function login(formData: FormData) {
-  const supabase = await createClient();
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
-}
-
-export async function register(formData: FormData) {
-  const supabase = await createClient();
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-  const fullName = (formData.get('full_name') as string) || '';
-  const role = (formData.get('role') as string) || 'comprador';
-  const phone = (formData.get('phone') as string) || '';
-  const town = (formData.get('town') as string) || '';
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-        role,
-        phone,
-        town,
-      },
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  if (data.user) {
-    await supabase.from('profiles').upsert({
-      id: data.user.id,
-      full_name: fullName,
-      email,
-      role: role as any,
-      phone,
-      town,
-    });
-  }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
-}
-
-export async function signup(formData: FormData) {
-  return register(formData);
-}
-
-export async function updateProfile(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: 'No autenticado' };
-
-  const firstName = (formData.get('first_name') as string)?.trim() || '';
-  const lastName1 = (formData.get('last_name_1') as string)?.trim() || '';
-  const lastName2 = (formData.get('last_name_2') as string)?.trim() || null;
-  const birthDate = (formData.get('birth_date') as string)?.trim() || '';
-  const dni = (formData.get('dni') as string)?.trim()?.toUpperCase() || '';
-  const phone = (formData.get('phone') as string)?.trim() || '';
-  const province = (formData.get('province') as string)?.trim() || '';
-  const town = (formData.get('town') as string)?.trim() || '';
-  const postalCode = (formData.get('postal_code') as string)?.trim() || '';
-  const street = (formData.get('street') as string)?.trim() || '';
-  const number = (formData.get('number') as string)?.trim() || '';
-  const stair = (formData.get('stair') as string)?.trim() || null;
-  const floor = (formData.get('floor') as string)?.trim() || '';
-  const door = (formData.get('door') as string)?.trim() || '';
-
-  const fullNameInput = (formData.get('full_name') as string)?.trim() || '';
-  const fullName = [firstName, lastName1, lastName2].filter(Boolean).join(' ') || fullNameInput || 'Usuario EkhiTeka';
-
-  const formattedAddress = [
-    street,
-    number ? \`Nº \${number}\` : '',
-    stair ? \`Esc \${stair}\` : '',
-    floor ? \`Piso \${floor}\` : '',
-    door ? \`Pta \${door}\` : '',
-    postalCode,
-    town,
-    province,
-  ]
-    .filter(Boolean)
-    .join(', ');
-
-  const structuredBio = JSON.stringify({
-    first_name: firstName,
-    last_name_1: lastName1,
-    last_name_2: lastName2,
-    birth_date: birthDate,
-    dni,
-    phone,
-    province,
-    town,
-    postal_code: postalCode,
-    street,
-    number,
-    stair,
-    floor,
-    door,
-  });
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      full_name: fullName,
-      phone,
-      town,
-      address: formattedAddress,
-      bio: structuredBio,
-      first_name: firstName,
-      last_name_1: lastName1,
-      last_name_2: lastName2,
-      birth_date: birthDate || null,
-      dni,
-      province,
-      postal_code: postalCode,
-      street,
-      number,
-      stair,
-      floor,
-      door,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', user.id);
-
-  if (error) return { error: error.message };
-
-  revalidatePath('/perfil');
-  revalidatePath('/');
-  revalidatePath('/cesta');
-  return { success: true };
-}
-
-export async function changeUserPassword(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || !user.email) {
-    return { error: 'No autenticado. Por favor inicia sesión.' };
-  }
-
-  const currentPassword = (formData.get('current_password') as string) || '';
-  const newPassword = (formData.get('new_password') as string) || '';
-  const confirmPassword = (formData.get('confirm_password') as string) || '';
-
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    return { error: 'Por favor, completa todos los campos de contraseña.' };
-  }
-
-  if (newPassword !== confirmPassword) {
-    return { error: 'La nueva contraseña y su confirmación no coinciden.' };
-  }
-
-  if (newPassword.length < 6) {
-    return { error: 'La nueva contraseña debe tener al menos 6 caracteres.' };
-  }
-
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: currentPassword,
-  });
-
-  if (signInError) {
-    return { error: 'La contraseña actual no es correcta. Verifica e inténtalo de nuevo.' };
-  }
-
-  const { error: updateError } = await supabase.auth.updateUser({
-    password: newPassword,
-  });
-
-  if (updateError) {
-    return { error: \`Error al actualizar la contraseña: \${updateError.message}\` };
-  }
-
-  return { success: true };
-}
-
-export async function signout() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  revalidatePath('/', 'layout');
-  redirect('/');
-}
-`,
-
-  // =========================================================================
-  // 3. CART NAV BUTTON (Si la cesta está vacía, no se muestra)
-  // =========================================================================
-  'components/CartNavButton.tsx': `'use client';
-
-import { useCart } from '@/context/CartContext';
-import { useLanguage } from '@/context/LanguageContext';
-import { ShoppingBag } from 'lucide-react';
-
-export function CartNavButton() {
-  const { totalItems, setIsCartOpen } = useCart();
-  const { t } = useLanguage();
-
-  if (totalItems === 0) {
-    return null;
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={() => setIsCartOpen(true)}
-      className="group relative flex items-center gap-2 px-3.5 py-2 bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-stone-950 dark:hover:text-[#1D1D1B] border border-stone-300 dark:border-stone-700 hover:border-[#FFE259] dark:hover:border-[#FFE259] rounded-2xl font-black text-xs transition-all shadow-2xs cursor-pointer hover:scale-102"
-      title={t.nav_cart}
-    >
-      <ShoppingBag className="w-4 h-4 text-stone-800 dark:text-stone-200 group-hover:text-stone-950 dark:group-hover:text-[#1D1D1B] transition-colors" />
-      <span className="hidden sm:inline font-bold font-serif uppercase tracking-wider">{t.nav_cart}</span>
-      <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[11px] flex items-center justify-center shadow-xs border border-stone-800 animate-bounce">
-        {totalItems}
-      </span>
-    </button>
-  );
-}
-`,
-
-  // =========================================================================
-  // 4. NAVBAR (Logo y Título en el Menú Móvil llevan a Inicio "/")
-  // =========================================================================
-  'components/NavbarNavLinks.tsx': `'use client';
-
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useLanguage } from '@/context/LanguageContext';
-import { signout } from '@/app/actions/auth';
-import type { Profile } from '@/types/database';
-import { CartNavButton } from '@/components/CartNavButton';
-import {
-  User,
-  LogOut,
-  Menu,
-  X,
-  Store,
-  MessageCircle,
-} from 'lucide-react';
-
-interface NavbarNavLinksProps {
-  user: { id: string } | null;
-  profile: Profile | null;
-  unreadMessagesCount: number;
-  ordersCount: number;
-  activeOrders?: { id: string; status: string }[];
-}
-
-export function NavbarNavLinks({
-  user,
-  profile,
-  unreadMessagesCount,
-  ordersCount,
-  activeOrders = [],
-}: NavbarNavLinksProps) {
-  const pathname = usePathname();
-  const { t } = useLanguage();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isSeller = profile?.role === 'vendedor';
-  const isAdmin = profile?.role === 'admin';
-
-  useEffect(() => {
-    function checkUnseenOrders() {
-      if (!user || !activeOrders || activeOrders.length === 0) {
-        setHasUnseenOrderUpdates(false);
-        return;
-      }
-      const storageKey = isSeller ? 'ekhiteka_seen_orders_seller' : 'ekhiteka_seen_orders_buyer';
-      let seenMap: Record<string, string> = {};
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) seenMap = JSON.parse(stored);
-      } catch {}
-
-      const unseen = activeOrders.some((order) => {
-        const lastSeen = seenMap[order.id];
-        if (lastSeen) {
-          return lastSeen !== order.status;
-        }
-        return isSeller ? order.status === 'pendiente' : order.status !== 'pendiente';
-      });
-
-      setHasUnseenOrderUpdates(unseen);
-    }
-
-    checkUnseenOrders();
-    window.addEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
-    window.addEventListener('storage', checkUnseenOrders);
-    return () => {
-      window.removeEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
-      window.removeEventListener('storage', checkUnseenOrders);
-    };
-  }, [user, activeOrders, isSeller]);
-
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
-
-  return (
-    <div className="flex items-center justify-between w-full min-w-0 gap-3">
-      {/* 1. LADO IZQUIERDO */}
-      <div className="flex items-center gap-3 xl:gap-5 min-w-0">
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
-          aria-label="Menu"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-
-        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF8F5] shrink-0">
-            <img
-              src="/Logo.jpg"
-              alt="EkhiTeka Logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
-              Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
-            </span>
-            <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              Quesería & Selección Gourmet
-            </span>
-          </div>
-        </Link>
-
-        {/* Enlaces Desktop */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 font-serif">
-          <Link
-            href="/tienda"
-            className={\`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-bold transition-all whitespace-nowrap min-h-[38px] \${
-              pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
-          >
-            <span>{t.nav_shop}</span>
-          </Link>
-
-          <Link
-            href="/regalos-gourmet"
-            className={\`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] \${
-              pathname === '/regalos-gourmet'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
-          >
-            <span className="block text-center">{t.nav_gourmet_gifts_line1}</span>
-            <span className="block text-center">{t.nav_gourmet_gifts_line2}</span>
-          </Link>
-
-          <Link
-            href="/experiencias"
-            className={\`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] \${
-              pathname === '/experiencias'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
-          >
-            <span className="block text-center">{t.nav_tastings_line1}</span>
-            <span className="block text-center">{t.nav_tastings_line2}</span>
-          </Link>
-
-          <Link
-            href="/regalos-empresa"
-            className={\`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] \${
-              pathname === '/regalos-empresa'
-                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-            }\`}
-          >
-            <span className="block text-center">{t.nav_corporate_line1}</span>
-            <span className="block text-center">{t.nav_corporate_line2}</span>
-          </Link>
-
-          {user && (
-            <>
-              <Link
-                href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                className={\`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] \${
-                  pathname.includes('/pedidos')
-                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                    : hasUnseenOrderUpdates
-                    ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
-                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                }\`}
-              >
-                <span>{t.nav_orders}</span>
-                {hasUnseenOrderUpdates && (
-                  <span className="w-2 h-2 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
-                )}
-              </Link>
-
-              {isSeller && (
-                <Link
-                  href="/vendedor/eventos"
-                  className={\`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] \${
-                    pathname === '/vendedor/eventos'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                  }\`}
-                >
-                  <span>{t.nav_events}</span>
-                </Link>
-              )}
-
-              {isSeller && (
-                <Link
-                  href="/vendedor/productos/nuevo"
-                  className={\`flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 rounded-2xl transition-all font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px] \${
-                    pathname === '/vendedor/productos/nuevo'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] shadow-xs border border-stone-800/10'
-                      : 'border-2 border-[#FFE259] bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
-                  }\`}
-                >
-                  <span className="block text-center">{t.nav_add_product_line1}</span>
-                  <span className="block text-center">{t.nav_add_product_line2}</span>
-                </Link>
-              )}
-
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="flex items-center justify-center text-center px-3 py-2 bg-purple-100 dark:bg-purple-950/70 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-700 rounded-2xl transition-all font-semibold uppercase tracking-[0.14em] text-[11px] whitespace-nowrap min-h-[38px]"
-                >
-                  <span>{t.nav_admin}</span>
-                </Link>
-              )}
-            </>
-          )}
-        </nav>
-      </div>
-
-      {/* 2. LADO DERECHO */}
-      <div className="flex items-center gap-2 shrink-0">
-        {user ? (
-          <div className="flex items-center gap-2">
-            {(!profile || profile.role === 'comprador') && <CartNavButton />}
-
-            <Link
-              href="/chat"
-              className={\`relative p-2.5 rounded-2xl border transition-all shrink-0 \${
-                pathname.startsWith('/chat')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
-              }\`}
-              title={t.nav_chats}
-            >
-              <MessageCircle className="w-4 h-4" />
-              {unreadMessagesCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
-                  {unreadMessagesCount}
-                </span>
-              )}
-            </Link>
-
-            <Link
-              href="/perfil"
-              className={\`p-2.5 rounded-2xl border transition-colors shrink-0 \${
-                pathname === '/perfil'
-                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
-              }\`}
-              title={t.nav_profile}
-            >
-              <User className="w-4 h-4" />
-            </Link>
-
-            <form action={signout} className="shrink-0">
-              <button
-                type="submit"
-                className="p-2.5 rounded-2xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
-                title={t.nav_logout}
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="hidden sm:flex items-center gap-2">
-            <Link
-              href="/login"
-              className="px-4 py-2.5 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-            >
-              {t.nav_login}
-            </Link>
-            <Link
-              href="/register"
-              className="px-4 py-2.5 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
-            >
-              {t.nav_register}
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* 3. MENÚ MÓVIL (Con link a inicio en el logo y nombre) */}
-      {mounted && mobileMenuOpen && createPortal(
-        <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-
-          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-stone-800">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 cursor-pointer group"
-                >
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5] group-hover:scale-105 transition-transform shrink-0">
-                    <img
-                      src="/Logo.jpg"
-                      alt="EkhiTeka"
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-serif font-bold text-lg text-white tracking-wider">
-                      Ekhi<span className="text-[#FFE259]">Teka</span>
-                    </span>
-                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400">
-                      Lekeitio · Bizkaia
-                    </span>
-                  </div>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full text-stone-300 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
-                  aria-label="Close"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="space-y-2 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  {t.nav_explore_selection}
-                </p>
-                <Link
-                  href="/tienda"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/tienda'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_shop}</span>
-                </Link>
-                <Link
-                  href="/regalos-gourmet"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/regalos-gourmet'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_gourmet_gifts}</span>
-                </Link>
-                <Link
-                  href="/experiencias"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/experiencias'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_tastings_experiences}</span>
-                </Link>
-                <Link
-                  href="/regalos-empresa"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={\`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md \${
-                    pathname === '/regalos-empresa'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
-                  }\`}
-                >
-                  <span>{t.nav_corporate_gifts}</span>
-                </Link>
-              </div>
-
-              {/* SECCIÓN TU CUENTA */}
-              <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
-                  {t.nav_your_account}
-                </p>
-                {user ? (
-                  <>
-                    <Link
-                      href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={\`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                        pathname.includes('/pedidos')
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : hasUnseenOrderUpdates
-                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }\`}
-                    >
-                      <span>{t.nav_orders}</span>
-                      {hasUnseenOrderUpdates && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black uppercase">
-                          Nuevo
-                        </span>
-                      )}
-                    </Link>
-
-                    {isSeller && (
-                      <Link
-                        href="/vendedor/eventos"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={\`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                          pathname === '/vendedor/eventos'
-                            ? 'bg-[#FFE259] text-[#1D1D1B]'
-                            : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                        }\`}
-                      >
-                        <span>{t.nav_events}</span>
-                      </Link>
-                    )}
-
-                    {isSeller && (
-                      <Link
-                        href="/vendedor/productos/nuevo"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={\`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all \${
-                          pathname === '/vendedor/productos/nuevo'
-                            ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
-                            : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
-                        }\`}
-                      >
-                        <span>{t.nav_add_product}</span>
-                      </Link>
-                    )}
-
-                    <Link
-                      href="/chat"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={\`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                        pathname.startsWith('/chat')
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }\`}
-                    >
-                      <span>{t.nav_chats}</span>
-                      {unreadMessagesCount > 0 && (
-                        <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
-                          {unreadMessagesCount}
-                        </span>
-                      )}
-                    </Link>
-
-                    <Link
-                      href="/perfil"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={\`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all \${
-                        pathname === '/perfil'
-                          ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
-                      }\`}
-                    >
-                      <span>{t.nav_profile}</span>
-                    </Link>
-
-                    <form action={signout} className="pt-2">
-                      <button
-                        type="submit"
-                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
-                      >
-                        <span>{t.nav_logout}</span>
-                      </button>
-                    </form>
-                  </>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2 pt-1 font-serif">
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-white hover:border-[#FFE259] hover:text-[#FFE259] transition-all bg-stone-850"
-                    >
-                      {t.nav_login}
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#FFE259] font-black text-xs tracking-[0.14em] uppercase text-[#1D1D1B] shadow-md hover:scale-102 transition-all"
-                    >
-                      {t.nav_register}
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
-              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
-                <Store className="w-3.5 h-3.5 text-[#FFE259]" />
-                <span>Quesería & Tienda en Lekeitio</span>
-              </div>
-              <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
-              <p className="font-semibold text-[#FFE259]">WhatsApp: +34 600 000 000</p>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-    </div>
-  );
-}
-`,
-
-  // =========================================================================
-  // 5. HOME PAGE (Imagen de Regalos de Empresa y enlaces seguros)
-  // =========================================================================
-  'app/page.tsx': `'use client';
-
-import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
-import {
-  Sparkles,
-  ShoppingBag,
-  Gift,
-  ChevronRight,
-  MessageCircle,
-} from 'lucide-react';
-
-export default function HomePage() {
-  const { t } = useLanguage();
-
-  return (
-    <div className="space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* 1. Hero Principal de Bienvenida */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-18 border-2 border-stone-800 shadow-2xl min-h-[460px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/images/secciones/Tienda.JPG"
-            alt="EkhiTeka Quesería Gourmet Lekeitio"
-            className="w-full h-full object-cover object-center scale-100"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
-        </div>
-
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-          <div className="lg:col-span-8 space-y-6">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
-              <Sparkles className="w-3.5 h-3.5" /> {t.home_hero_badge}
-            </span>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif text-white drop-shadow-md">
-              Ekhi<span className="text-[#FFE259]">Teka</span>
-              <span className="block text-2xl sm:text-3xl lg:text-4xl font-light text-stone-200 mt-2">
-                {t.home_hero_subtitle}
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-white/95 leading-relaxed max-w-xl font-medium drop-shadow-md">
-              {t.home_hero_desc}
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link
-                href="/tienda"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 uppercase tracking-wider font-serif"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>{t.home_explore_btn}</span>
-              </Link>
-
-              <Link
-                href="/regalos-gourmet"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105 uppercase tracking-wider font-serif"
-              >
-                <Gift className="w-4 h-4 text-[#FFE259]" />
-                <span>{t.home_gourmet_gifts_btn}</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
-              <img
-                src="/Logo.jpg"
-                alt="EkhiTeka Lekeitio"
-                className="w-full h-full object-cover rounded-full"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Los 4 Pilares de EkhiTeka */}
-      <section className="space-y-6 font-serif">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-            {t.home_pillars_badge}
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-black text-stone-900 dark:text-stone-100 uppercase tracking-tight">
-            {t.home_pillars_title}
-          </h2>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans">
-            {t.home_pillars_desc}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Tarjeta 1: Tienda */}
-          <Link
-            href="/tienda"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Quesos.JPG"
-                alt={t.home_card1_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card1_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card1_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card1_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card1_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card1_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Tarjeta 2: Regalos Gourmet */}
-          <Link
-            href="/regalos-gourmet"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Cestas.JPG"
-                alt={t.home_card2_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card2_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card2_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card2_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card2_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card2_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Tarjeta 3: Catas & Experiencias */}
-          <Link
-            href="/experiencias"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Catas.JPG"
-                alt={t.home_card3_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card3_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card3_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card3_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card3_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card3_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-
-          {/* Tarjeta 4: Regalos de Empresa (Con imagen segura de Cestas) */}
-          <Link
-            href="/regalos-empresa"
-            className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
-              <img
-                src="/images/secciones/Cestas.JPG"
-                alt={t.home_card4_title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-                {t.home_card4_badge}
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFE259] block font-sans">
-                  {t.home_card4_sub}
-                </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
-                  {t.home_card4_title}
-                </h3>
-              </div>
-            </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-                {t.home_card4_desc}
-              </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#C68D07] dark:text-[#FFE259] pt-2 uppercase tracking-wider">
-                <span>{t.home_card4_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* 3. Nuestra Tienda Física en Lekeitio */}
-      <section className="relative rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border-2 border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 overflow-hidden shadow-sm">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-6 space-y-4">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              Bisitatu Lekeition · Km0
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif">
-              Gure Gaztategia & Gourmet Gunea
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              En nuestra web ves una selección, en nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
-            </p>
-            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300 font-sans">
-              <div className="flex items-center gap-2">
-                <span className="text-base">📍</span>
-                <span>Gamarra Kalea 4, Lekeitio · Bizkaia</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-base">🕒</span>
-                <span>{t.footer_schedule_weekdays}</span>
-              </div>
-            </div>
-            <div className="pt-2 flex flex-wrap gap-3 font-serif">
-              <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
-              >
-                <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-                <span>Kontaktatu Dendarekin</span>
-              </a>
-              <Link
-                href="/tienda"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>{t.nav_shop}</span>
-              </Link>
-            </div>
-          </div>
-          <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 h-64 sm:h-80 group">
-              <img
-                src="/images/secciones/Tienda.JPG"
-                alt="Tienda EkhiTeka Lekeitio"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute top-4 right-4 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black rounded-full uppercase tracking-wider shadow-md font-sans">
-                Lekeitio Centro
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-`,
-
-  // =========================================================================
-  // 6. PROFILE FORM (Formulario Completo: DNI, Dirección y Cambio de Contraseña)
+  // 2. PROFILE FORM (Vista con campos del bio + Modo Edición + Desplegable Contraseña)
   // =========================================================================
   'components/ProfileForm.tsx': `'use client';
 
@@ -2921,7 +1868,20 @@ import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile, changeUserPassword } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
 import { parseProfile } from '@/types/database';
-import { User, Phone, MapPin, Lock, Check, ShieldCheck, Home } from 'lucide-react';
+import {
+  User,
+  Phone,
+  MapPin,
+  Lock,
+  Check,
+  ShieldCheck,
+  Home,
+  Pencil,
+  X,
+  ChevronDown,
+  Calendar,
+  CreditCard,
+} from 'lucide-react';
 
 interface ProfileFormProps {
   profile?: Profile;
@@ -2932,6 +1892,9 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const raw = profile || userProfile || ({} as Profile);
   const p = parseProfile(raw);
   const { t } = useLanguage();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
 
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ text: string; isError: boolean } | null>(null);
@@ -2952,6 +1915,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
       setProfileMsg({ text: res.error, isError: true });
     } else {
       setProfileMsg({ text: t.common_success, isError: false });
+      setIsEditing(false);
       setTimeout(() => setProfileMsg(null), 3500);
     }
   };
@@ -2970,29 +1934,55 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     } else {
       setPasswordMsg({ text: '¡Contraseña actualizada con éxito!', isError: false });
       (e.target as HTMLFormElement).reset();
-      setTimeout(() => setPasswordMsg(null), 3500);
+      setTimeout(() => {
+        setPasswordMsg(null);
+        setIsPasswordOpen(false);
+      }, 2500);
     }
   };
 
+  const formattedAddress = [
+    p.street,
+    p.number ? \`Nº \${p.number}\` : '',
+    p.stair ? \`Esc \${p.stair}\` : '',
+    p.floor ? \`Piso \${p.floor}\` : '',
+    p.door ? \`Pta \${p.door}\` : '',
+    p.postal_code,
+    p.town,
+    p.province,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
-    <div className="space-y-10 font-serif">
-      {/* 1. SECCIÓN DATOS PERSONALES Y DIRECCIÓN */}
-      <form
-        onSubmit={handleProfileSubmit}
-        className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs"
-      >
-        <div className="flex items-center gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
-          <div className="p-2.5 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]">
-            <User className="w-5 h-5" />
+    <div className="space-y-8 font-serif">
+      {/* 1. TARJETA PRINCIPAL DE PERFIL */}
+      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
+        <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]">
+              <User className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100">
+                {t.profile_personal_data}
+              </h2>
+              <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                {t.profile_subtitle}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-base font-black text-stone-900 dark:text-stone-100">
-              {t.profile_personal_data}
-            </h2>
-            <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-              {t.profile_subtitle}
-            </p>
-          </div>
+
+          {!isEditing && (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer hover:scale-105"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>{t.profile_edit_btn}</span>
+            </button>
+          )}
         </div>
 
         {profileMsg && (
@@ -3007,317 +1997,406 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
           </div>
         )}
 
-        <div className="space-y-4 font-sans text-xs">
-          {/* Nombre y Apellidos */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_first_name} *
-              </label>
-              <input
-                type="text"
-                name="first_name"
-                required
-                defaultValue={p.first_name || ''}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_last_name_1} *
-              </label>
-              <input
-                type="text"
-                name="last_name_1"
-                required
-                defaultValue={p.last_name_1 || ''}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_last_name_2}
-              </label>
-              <input
-                type="text"
-                name="last_name_2"
-                defaultValue={p.last_name_2 || ''}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-          </div>
+        {/* MODO VISTA: CADA DATO VISIBLE UNO A UNO */}
+        {!isEditing ? (
+          <div className="space-y-6 font-sans text-xs">
+            {/* Bloque 1: Identificación y Contacto */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_first_name} & {t.profile_last_name_1}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {[p.first_name, p.last_name_1, p.last_name_2].filter(Boolean).join(' ') || p.full_name || t.profile_not_specified}
+                </p>
+              </div>
 
-          {/* DNI, Fecha Nacimiento y Teléfono */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_dni} *
-              </label>
-              <input
-                type="text"
-                name="dni"
-                required
-                defaultValue={p.dni || ''}
-                placeholder="12345678Z"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl uppercase"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_birth_date} *
-              </label>
-              <input
-                type="date"
-                name="birth_date"
-                required
-                defaultValue={p.birth_date || ''}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_phone} *
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                required
-                defaultValue={p.phone || ''}
-                placeholder="600 000 000"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-          </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_dni}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm uppercase">
+                  {p.dni || t.profile_not_specified}
+                </p>
+              </div>
 
-          {/* Subtítulo Dirección */}
-          <div className="pt-2">
-            <h3 className="text-xs font-black uppercase tracking-wider text-stone-800 dark:text-stone-200 font-serif flex items-center gap-1.5">
-              <Home className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
-              <span>{t.profile_address_data}</span>
-            </h3>
-          </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_birth_date}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.birth_date || t.profile_not_specified}
+                </p>
+              </div>
 
-          {/* Provincia, Municipio y Código Postal */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_province} *
-              </label>
-              <input
-                type="text"
-                name="province"
-                required
-                defaultValue={p.province || 'Bizkaia'}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_town} *
-              </label>
-              <input
-                type="text"
-                name="town"
-                required
-                defaultValue={p.town || 'Lekeitio'}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_postal_code} *
-              </label>
-              <input
-                type="text"
-                name="postal_code"
-                required
-                defaultValue={p.postal_code || ''}
-                placeholder="48280"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-          </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_phone}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.phone || t.profile_not_specified}
+                </p>
+              </div>
 
-          {/* Calle, Nº, Escalera, Piso y Puerta */}
-          <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-            <div className="col-span-2 sm:col-span-2">
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_street} *
-              </label>
-              <input
-                type="text"
-                name="street"
-                required
-                defaultValue={p.street || ''}
-                placeholder="Gamarra Kalea"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_number} *
-              </label>
-              <input
-                type="text"
-                name="number"
-                required
-                defaultValue={p.number || ''}
-                placeholder="4"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_stair}
-              </label>
-              <input
-                type="text"
-                name="stair"
-                defaultValue={p.stair || ''}
-                placeholder="A"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_floor} *
-              </label>
-              <input
-                type="text"
-                name="floor"
-                required
-                defaultValue={p.floor || ''}
-                placeholder="2"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.profile_door} *
-              </label>
-              <input
-                type="text"
-                name="door"
-                required
-                defaultValue={p.door || ''}
-                placeholder="B"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
-          </div>
-        </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.auth_email}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.email || t.profile_not_specified}
+                </p>
+              </div>
 
-        <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
-          <button
-            type="submit"
-            disabled={loadingProfile}
-            className="inline-flex items-center gap-2 px-7 py-3 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer font-serif disabled:opacity-50"
-          >
-            <Check className="w-4 h-4" />
-            <span>{loadingProfile ? t.common_loading : t.profile_save_changes_btn}</span>
-          </button>
-        </div>
-      </form>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_town} · {t.profile_province}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.town || 'Lekeitio'} ({p.province || 'Bizkaia'})
+                </p>
+              </div>
+            </div>
 
-      {/* 2. SECCIÓN CAMBIO DE CONTRASEÑA */}
-      <form
-        onSubmit={handlePasswordSubmit}
-        className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs"
-      >
-        <div className="flex items-center gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
-          <div className="p-2.5 rounded-2xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400">
-            <ShieldCheck className="w-5 h-5" />
+            {/* Bloque 2: Dirección Completa */}
+            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
+                <Home className="w-3.5 h-3.5" />
+                <span>{t.profile_address_data}</span>
+              </span>
+              <p className="text-sm font-bold text-stone-800 dark:text-stone-200">
+                {formattedAddress || t.profile_not_specified}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 text-[11px] text-stone-500 dark:text-stone-400">
+                <span><strong>{t.profile_street}:</strong> {p.street || '-'}</span>
+                <span><strong>{t.profile_number}:</strong> {p.number || '-'}</span>
+                <span><strong>{t.profile_floor}:</strong> {p.floor || '-'}</span>
+                <span><strong>{t.profile_door}:</strong> {p.door || '-'}</span>
+                <span><strong>{t.profile_postal_code}:</strong> {p.postal_code || '-'}</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <h2 className="text-base font-black text-stone-900 dark:text-stone-100">
-              {t.profile_security}
-            </h2>
-            <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-              Actualiza tu clave de acceso para proteger tu cuenta.
-            </p>
-          </div>
-        </div>
+        ) : (
+          /* MODO EDICIÓN: TODOS LOS CAMPOS EDITABLES */
+          <form onSubmit={handleProfileSubmit} className="space-y-4 font-sans text-xs animate-fadeIn">
+            {/* Nombre y Apellidos */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_first_name} *
+                </label>
+                <input
+                  type="text"
+                  name="first_name"
+                  required
+                  defaultValue={p.first_name || ''}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_last_name_1} *
+                </label>
+                <input
+                  type="text"
+                  name="last_name_1"
+                  required
+                  defaultValue={p.last_name_1 || ''}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_last_name_2}
+                </label>
+                <input
+                  type="text"
+                  name="last_name_2"
+                  defaultValue={p.last_name_2 || ''}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+            </div>
 
-        {passwordMsg && (
-          <div
-            className={\`p-4 rounded-2xl text-xs font-bold text-center font-sans \${
-              passwordMsg.isError
-                ? 'bg-red-100 dark:bg-red-950/70 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800'
-                : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
-            }\`}
-          >
-            {passwordMsg.text}
-          </div>
+            {/* DNI, Fecha Nacimiento y Teléfono */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_dni} *
+                </label>
+                <input
+                  type="text"
+                  name="dni"
+                  required
+                  defaultValue={p.dni || ''}
+                  placeholder="12345678Z"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl uppercase"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_birth_date} *
+                </label>
+                <input
+                  type="date"
+                  name="birth_date"
+                  required
+                  defaultValue={p.birth_date || ''}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_phone} *
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  required
+                  defaultValue={p.phone || ''}
+                  placeholder="600 000 000"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+            </div>
+
+            {/* Provincia, Municipio y Código Postal */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_province} *
+                </label>
+                <input
+                  type="text"
+                  name="province"
+                  required
+                  defaultValue={p.province || 'Bizkaia'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_town} *
+                </label>
+                <input
+                  type="text"
+                  name="town"
+                  required
+                  defaultValue={p.town || 'Lekeitio'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_postal_code} *
+                </label>
+                <input
+                  type="text"
+                  name="postal_code"
+                  required
+                  defaultValue={p.postal_code || ''}
+                  placeholder="48280"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+            </div>
+
+            {/* Calle, Nº, Escalera, Piso y Puerta */}
+            <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
+              <div className="col-span-2 sm:col-span-2">
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_street} *
+                </label>
+                <input
+                  type="text"
+                  name="street"
+                  required
+                  defaultValue={p.street || ''}
+                  placeholder="Gamarra Kalea"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_number} *
+                </label>
+                <input
+                  type="text"
+                  name="number"
+                  required
+                  defaultValue={p.number || ''}
+                  placeholder="4"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_stair}
+                </label>
+                <input
+                  type="text"
+                  name="stair"
+                  defaultValue={p.stair || ''}
+                  placeholder="A"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_floor} *
+                </label>
+                <input
+                  type="text"
+                  name="floor"
+                  required
+                  defaultValue={p.floor || ''}
+                  placeholder="2"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_door} *
+                </label>
+                <input
+                  type="text"
+                  name="door"
+                  required
+                  defaultValue={p.door || ''}
+                  placeholder="B"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold text-xs uppercase tracking-wider hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
+              >
+                {t.common_cancel}
+              </button>
+              <button
+                type="submit"
+                disabled={loadingProfile}
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition-all hover:scale-102 cursor-pointer font-serif disabled:opacity-50"
+              >
+                <Check className="w-4 h-4" />
+                <span>{loadingProfile ? t.common_loading : t.profile_save_changes_btn}</span>
+              </button>
+            </div>
+          </form>
         )}
+      </div>
 
-        <div className="space-y-4 font-sans text-xs max-w-md">
-          <div>
-            <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-              {t.profile_current_password} *
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="password"
-                name="current_password"
-                required
-                placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
+      {/* 2. TARJETA CAMBIAR CONTRASEÑA (Desplegable al pulsar) */}
+      <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
+        <button
+          type="button"
+          onClick={() => setIsPasswordOpen(!isPasswordOpen)}
+          className="w-full flex items-center justify-between text-left cursor-pointer group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
+              <Lock className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 font-serif">
+                {t.profile_security}
+              </h2>
+              <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                {isPasswordOpen ? 'Introduce tu contraseña actual y la nueva clave de acceso.' : 'Pulsa aquí para desplegar el formulario y cambiar tu contraseña.'}
+              </p>
             </div>
           </div>
 
-          <div>
-            <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-              {t.profile_new_password} *
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="password"
-                name="new_password"
-                required
-                placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
-            </div>
+          <div className={\`p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 transition-transform duration-200 \${isPasswordOpen ? 'rotate-180' : ''}\`}>
+            <ChevronDown className="w-4 h-4" />
           </div>
+        </button>
 
-          <div>
-            <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-              {t.profile_confirm_password} *
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="password"
-                name="confirm_password"
-                required
-                placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-              />
+        {isPasswordOpen && (
+          <form onSubmit={handlePasswordSubmit} className="mt-6 pt-6 border-t border-stone-100 dark:border-stone-800 space-y-4 font-sans text-xs max-w-md animate-fadeIn">
+            {passwordMsg && (
+              <div
+                className={\`p-3.5 rounded-2xl text-xs font-bold text-center \${
+                  passwordMsg.isError
+                    ? 'bg-red-100 dark:bg-red-950/70 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800'
+                    : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
+                }\`}
+              >
+                {passwordMsg.text}
+              </div>
+            )}
+
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                {t.profile_current_password} *
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  name="current_password"
+                  required
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
-          <button
-            type="submit"
-            disabled={loadingPassword}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#1D1D1B] dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-900 font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer font-serif disabled:opacity-50"
-          >
-            <Check className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-            <span>{loadingPassword ? t.common_loading : t.profile_change_password_btn}</span>
-          </button>
-        </div>
-      </form>
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                {t.profile_new_password} *
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  name="new_password"
+                  required
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                {t.profile_confirm_password} *
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  name="confirm_password"
+                  required
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={loadingPassword}
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1D1D1B] dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-900 font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition-all hover:scale-102 cursor-pointer font-serif disabled:opacity-50"
+              >
+                <Check className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
+                <span>{loadingPassword ? t.common_loading : t.profile_change_password_btn}</span>
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
 `,
 
   // =========================================================================
-  // 7. PÁGINA PERFIL
+  // 3. PÁGINA PERFIL
   // =========================================================================
   'app/perfil/page.tsx': `import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -3356,7 +2435,7 @@ export default async function ProfilePage() {
             Mi Perfil · Nire Profila
           </h1>
           <p className="text-xs text-stone-500 dark:text-stone-400">
-            Gestiona tus datos de contacto, dirección y contraseña.
+            Gestiona tus datos personales, dirección de envío y contraseña.
           </p>
         </div>
       </div>
@@ -3368,7 +2447,7 @@ export default async function ProfilePage() {
 `,
 };
 
-// Generar todos los archivos en disco
+// Generación en disco
 Object.entries(files).forEach(([filePath, content]) => {
   const fullPath = path.join(process.cwd(), filePath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
@@ -3376,4 +2455,4 @@ Object.entries(files).forEach(([filePath, content]) => {
   console.log(`✓ Actualizado correctamente: ${filePath}`);
 });
 
-console.log('\n🎉 ¡Móvil, cesta, imágenes y perfil restaurados al 100%!');
+console.log('\n🎉 ¡Perfil (lectura/edición y contraseña desplegable) completado!');

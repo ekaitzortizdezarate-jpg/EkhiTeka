@@ -35,7 +35,7 @@ export default async function ProfilePage() {
             Mi Perfil · Nire Profila
           </h1>
           <p className="text-xs text-stone-500 dark:text-stone-400">
-            Gestiona tus datos de contacto, dirección y contraseña.
+            Gestiona tus datos personales, dirección de envío y contraseña.
           </p>
         </div>
       </div>

@@ -319,6 +319,9 @@ export interface TranslationDict {
   profile_confirm_password: string;
   profile_change_password_btn: string;
   profile_save_changes_btn: string;
+  profile_edit_btn: string;
+  profile_not_specified: string;
+  profile_full_address: string;
 
   // Roles & Auth
   role_buyer: string;
@@ -535,7 +538,7 @@ export const translations: Record<Language, TranslationDict> = {
     exp_b1_desc: 'Ikasi nazioarteko eta tokiko artisau gaztak dastatzen Lekeition.',
     exp_b1_btn: 'Kontsultatu Hurrengo Datak',
     exp_b2_title: 'Gazta Mahaiak Ezkontza & Festetarako',
-    exp_b2_desc: 'Cheese Corner ikusgarriak prestatzen ditugu.',
+    exp_b2_desc: 'Cheese Corner ikusgarriak prestatzen ditugu lore jangarriekin.',
     exp_b2_btn: 'Eskatu Ekitaldi Aurrekontua',
     exp_b3_title: 'Gourmet Saskiak & Enpresa Opariak',
     exp_b3_desc: 'Kaxa gastronomiko esklusiboak diseinatzen ditugu.',
@@ -555,7 +558,7 @@ export const translations: Record<Language, TranslationDict> = {
     exp_store_tasting_btn: 'Ikusi Datak & Erreserbatu Lekua',
     exp_wedding_title: 'Ezkontzetarako Mahaia',
     exp_wedding_badge: 'Ezkontzak & Ekitaldiak',
-    exp_wedding_desc: 'Gazta-mahai ikusgarriak sortzen ditugu.',
+    exp_wedding_desc: 'Gazta-mahai ikusgarriak sortzen ditugu ezkontzetako kokteletarako.',
     exp_wedding_btn: 'Eskatu Aurrekontua Ezkontzetarako',
     exp_raclette_title: 'Raclette Mailegua',
     exp_raclette_badge: 'Alokairua & Pack-a',
@@ -693,6 +696,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Berretsi Pasahitz Berria',
     profile_change_password_btn: 'Pasahitza Eguneratu',
     profile_save_changes_btn: 'Gorde Profilaren Datuak',
+    profile_edit_btn: 'Editatu Profila',
+    profile_not_specified: 'Zehaztu gabe',
+    profile_full_address: 'Helbide osoa',
 
     role_buyer: 'Bezeroa / Eroslea',
     role_seller: 'Ekoizlea / Saltzailea',
@@ -1055,6 +1061,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Confirmar Nueva Contraseña',
     profile_change_password_btn: 'Actualizar Contraseña',
     profile_save_changes_btn: 'Guardar Datos del Perfil',
+    profile_edit_btn: 'Editar Perfil',
+    profile_not_specified: 'No especificado',
+    profile_full_address: 'Dirección completa',
 
     role_buyer: 'Comprador / Gourmet',
     role_seller: 'Productor / Vendedor',
@@ -1417,6 +1426,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Confirm New Password',
     profile_change_password_btn: 'Update Password',
     profile_save_changes_btn: 'Save Profile Information',
+    profile_edit_btn: 'Edit Profile',
+    profile_not_specified: 'Not specified',
+    profile_full_address: 'Full address',
 
     role_buyer: 'Buyer / Gourmet',
     role_seller: 'Artisan / Seller',
@@ -1618,7 +1630,7 @@ export const translations: Record<Language, TranslationDict> = {
     exp_banner_badge: 'Ici il se passe des choses...',
     exp_banner_title: 'Dégustations, Événements & Expériences EkhiTeka',
     exp_b1_title: 'Dégustations Présentielles & Ateliers',
-    exp_b1_desc: 'Apprenez à déguster des fromages fermiers à Lekeitio.',
+    exp_b1_desc: 'Apprenez à degustar des fromages fermiers à Lekeitio.',
     exp_b1_btn: 'Consulter les Prochaines Dates',
     exp_b2_title: 'Buffets Fromages de Mariage & Fêtes',
     exp_b2_desc: 'Nous créons des Cheese Corners personnalisés.',
@@ -1779,6 +1791,9 @@ export const translations: Record<Language, TranslationDict> = {
     profile_confirm_password: 'Confirmer le Nouveau Mot de Passe',
     profile_change_password_btn: 'Mettre à Jour le Mot de Passe',
     profile_save_changes_btn: 'Enregistrer les Informations du Profil',
+    profile_edit_btn: 'Modifier le Profil',
+    profile_not_specified: 'Non spécifié',
+    profile_full_address: 'Adresse complète',
 
     role_buyer: 'Client / Gourmet',
     role_seller: 'Artisan / Vendeur',
