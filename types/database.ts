@@ -80,7 +80,7 @@ export function parseProfile(raw?: any): Profile {
         details = parsed;
       }
     } catch {
-      // bio was plain text
+      // bio plain text
     }
   }
 
@@ -130,11 +130,13 @@ export function isProfileComplete(raw?: any): boolean {
 
 export interface Category {
   id: string;
+  slug?: string;
   name_es: string;
   name_eu: string;
   name_en: string;
   name_fr: string;
   icon: string;
+  image_url?: string;
   display_order?: number;
   is_active?: boolean;
   created_at?: string;
