@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import { signup } from '@/app/actions/auth';
+import { register } from '@/app/actions/auth';
 import { UserPlus, Mail, Lock, User, Phone, MapPin, AlertCircle } from 'lucide-react';
 
 export default function RegisterPage() {
@@ -17,7 +17,7 @@ export default function RegisterPage() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const res = await signup(formData);
+    const res = await register(formData);
     setLoading(false);
 
     if (res?.error) {
