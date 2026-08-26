@@ -25,22 +25,14 @@ export function CategoryCircleGrid({
 
   const getCategorySubtitle = (slug: string) => {
     switch (slug) {
-      case 'quesos':
-        return language === 'eu' ? 'Artisau & Afinatuak' : 'Artesanos & Afinados';
-      case 'atun':
-        return language === 'eu' ? 'Kantauri itsasoa' : 'Cantábrico Costera';
-      case 'salazones':
-        return language === 'eu' ? 'Antxoak & Gatzadurak' : 'Anchoas & Salazón';
-      case 'gildas':
-        return language === 'eu' ? 'Gilda & Ozpinetakoak' : 'Gildas & Encurtidos';
-      case 'cerveza':
-        return language === 'eu' ? 'Garagardo Bereziak' : 'Craft & Especiales';
-      case 'txakoli':
-        return language === 'eu' ? 'Bizkaiko Txakolina' : 'Bizkaiko Txakolina';
-      case 'sidra':
-        return language === 'eu' ? 'Euskal Sagardoa' : 'Euskal Sagardoa';
-      default:
-        return 'Gourmet Selection';
+      case 'quesos': return t.sub_quesos;
+      case 'atun': return t.sub_atun;
+      case 'salazones': return t.sub_salazones;
+      case 'gildas': return t.sub_gildas;
+      case 'cerveza': return t.sub_cerveza;
+      case 'txakoli': return t.sub_txakoli;
+      case 'sidra': return t.sub_sidra;
+      default: return 'Gourmet Selection';
     }
   };
 
@@ -52,7 +44,7 @@ export function CategoryCircleGrid({
             {t.cat_explore}
           </span>
           <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 uppercase font-serif tracking-tight">
-            Categorías Selección EkhiTeka
+            {t.cat_section_title}
           </h2>
         </div>
       </div>
@@ -60,6 +52,8 @@ export function CategoryCircleGrid({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.id;
+          const catSlug = cat.slug || cat.id || '';
+
           return (
             <button
               key={cat.id}
@@ -88,7 +82,7 @@ export function CategoryCircleGrid({
                 <span className={`block text-[9.5px] font-sans font-bold uppercase tracking-wider truncate ${
                   isSelected ? 'text-stone-800' : 'text-stone-400 dark:text-stone-500'
                 }`}>
-                  {getCategorySubtitle(cat.slug)}
+                  {getCategorySubtitle(catSlug)}
                 </span>
               </div>
             </button>

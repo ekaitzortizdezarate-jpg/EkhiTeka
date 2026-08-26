@@ -2,61 +2,14 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import Link from 'next/link';
-import {
-  ShoppingBag,
-  Clock,
-  CheckCircle2,
-  Truck,
-  XCircle,
-  MessageCircle,
-  Package,
-} from 'lucide-react';
-
-interface OrderItem {
-  id: string;
-  quantity: number;
-  unit_price: number;
-  subtotal: number;
-  products: {
-    id: string;
-    name: string;
-    image_url?: string | null;
-  } | null;
-}
-
-interface Order {
-  id: string;
-  created_at: string;
-  status: string;
-  total_amount: number;
-  shipping_address?: string | null;
-  delivery_method?: string | null;
-  seller_id?: string | null;
-  order_items: OrderItem[];
-}
+import type { Order } from '@/types/database';
+import { Package, MessageCircle, MapPin, Store } from 'lucide-react';
 
 export function BuyerOrdersView({ orders }: { orders: Order[] }) {
   const { t } = useLanguage();
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'confirmado':
-        return { label: t.orders_confirmed, bg: 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300' };
-      case 'preparando':
-        return { label: t.orders_preparing, bg: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300' };
-      case 'listo_entrega':
-        return { label: t.orders_ready_delivery, bg: 'bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-300' };
-      case 'entregado':
-        return { label: t.orders_delivered, bg: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300' };
-      case 'cancelado':
-        return { label: t.orders_cancelled, bg: 'bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-300' };
-      default:
-        return { label: t.orders_pending, bg: 'bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-300' };
-    }
-  };
-
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 space-y-8">
+    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-8">
       <div className="pb-4 border-b border-stone-200 dark:border-stone-800">
         <h1 className="text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
           {t.orders_title}
@@ -69,60 +22,76 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
       {orders.length > 0 ? (
         <div className="space-y-6">
           {orders.map((order) => {
-            const badge = getStatusBadge(order.status);
+            const total = Number(order.total_price ?? order.total_amount ?? 0);
+
             return (
               <div
                 key={order.id}
-                className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-4 shadow-xs"
+                className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-5 shadow-xs"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
                       {t.orders_order_number} #{order.id.slice(0, 8)}
                     </span>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
                       {new Date(order.created_at).toLocaleDateString('es-ES', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
                       })}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider font-serif ${badge.bg}`}>
-                      {badge.label}
+                    <span className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259] font-black text-xs uppercase tracking-wider font-serif">
+                      {order.status}
                     </span>
                     <span className="text-base font-black font-serif text-stone-900 dark:text-stone-100">
-                      {Number(order.total_amount).toFixed(2)} €
+                      {total.toFixed(2)} €
                     </span>
                   </div>
                 </div>
 
-                {/* Lista de productos */}
-                <div className="space-y-2">
-                  {order.order_items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between text-xs py-1">
-                      <div className="flex items-center gap-2">
-                        <Package className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
-                        <span className="font-bold text-stone-800 dark:text-stone-200">
-                          {item.products?.name || 'Producto'}
+                {order.order_items && order.order_items.length > 0 && (
+                  <div className="space-y-2">
+                    {order.order_items.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between text-xs py-1 border-b border-stone-100 dark:border-stone-800 last:border-0 font-sans">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
+                          <span className="font-bold text-stone-800 dark:text-stone-200">
+                            {item.products?.name || 'Producto Gourmet'}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-[#FFE259] text-[#1D1D1B] font-black text-[10px]">
+                            x{item.quantity}
+                          </span>
+                        </div>
+                        <span className="font-serif font-black text-stone-900 dark:text-stone-100">
+                          {Number(item.subtotal || item.unit_price * item.quantity).toFixed(2)} €
                         </span>
-                        <span className="text-stone-400">x{item.quantity}</span>
                       </div>
-                      <span className="font-serif font-black text-stone-900 dark:text-stone-100">
-                        {Number(item.subtotal || item.unit_price * item.quantity).toFixed(2)} €
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
 
-                <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
+                <div className="pt-2 flex items-center justify-between text-xs font-serif">
+                  <div className="flex items-center gap-1.5 text-stone-500 font-sans">
+                    {order.delivery_type === 'recogida_tienda' ? (
+                      <>
+                        <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+                        <span>Recogida en Tienda Lekeitio</span>
+                      </>
+                    ) : (
+                      <>
+                        <MapPin className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+                        <span>{order.shipping_address || 'Envío a domicilio'}</span>
+                      </>
+                    )}
+                  </div>
+
                   <Link
-                    href={`/chat/${order.seller_id || ''}?order_id=${order.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-black uppercase tracking-wider font-serif transition-all"
+                    href={`/chat/${order.seller_id}?order_id=${order.id}`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     <span>{t.orders_chat_with_seller}</span>
@@ -134,15 +103,15 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
         </div>
       ) : (
         <div className="py-16 text-center space-y-4 bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-8">
-          <ShoppingBag className="w-12 h-12 text-stone-300 dark:text-stone-700 mx-auto" />
+          <Package className="w-12 h-12 text-stone-300 dark:text-stone-700 mx-auto" />
           <h3 className="text-lg font-black font-serif text-stone-800 dark:text-stone-200">
             {t.orders_no_orders}
           </h3>
           <Link
             href="/tienda"
-            className="inline-block px-6 py-3 bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-full shadow-xs transition-all font-serif hover:scale-105"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#FFE259] text-[#1D1D1B] font-black text-xs uppercase tracking-wider font-serif shadow-xs"
           >
-            {t.cart_explore_btn}
+            <span>{t.cart_explore_btn}</span>
           </Link>
         </div>
       )}

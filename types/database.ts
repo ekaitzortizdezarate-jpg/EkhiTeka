@@ -80,7 +80,7 @@ export function parseProfile(raw?: any): Profile {
         details = parsed;
       }
     } catch {
-      // bio plain text
+      // bio text fallback
     }
   }
 
@@ -183,13 +183,15 @@ export interface Order {
   seller_id: string;
   status: OrderStatus;
   delivery_type: DeliveryType;
+  delivery_method?: string | null;
   shipping_address?: string | null;
   shipping_notes?: string | null;
   pickup_schedule?: string | null;
   total_price: number;
+  total_amount?: number;
   cancel_reason?: string | null;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
   profiles?: Profile | null;
   order_items?: OrderItem[];
 }
