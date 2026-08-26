@@ -16,7 +16,6 @@ export async function updateEventDetails(
     return { error: 'No autenticado.' };
   }
 
-  // Verificar rol de vendedor o admin
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -37,10 +36,11 @@ export async function updateEventDetails(
     return { error: 'Por favor, rellena todos los campos obligatorios del evento.' };
   }
 
-  // 1. Actualizar el evento en la tabla products
+  // Actualizar evento (compartido por cualquier vendedor) y registrar quién lo editó
   const { error: updateError } = await supabase
     .from('products')
     .update({
+      seller_id: user.id,
       name,
       price,
       stock,
@@ -48,14 +48,13 @@ export async function updateEventDetails(
       description,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', eventId)
-    .eq('seller_id', user.id);
+    .eq('id', eventId);
 
   if (updateError) {
     return { error: `Error al actualizar el evento: ${updateError.message}` };
   }
 
-  // 2. Obtener la lista única de compradores activos para este evento
+  // Notificar a los participantes activos
   const { data: orderItems } = await supabase
     .from('order_items')
     .select('order_id, orders!inner(id, buyer_id, status)')
@@ -71,7 +70,6 @@ export async function updateEventDetails(
     }
   }
 
-  // 3. Notificar automáticamente a cada participante a través del chat
   const notificationMessage = `📢 AVISO DE MODIFICACIÓN EN TU EVENTO / CATA:\n\nSe han actualizado los datos del evento "${name}".\n\n📌 Nuevos detalles:\n${description || 'Consulta la ficha actualizada del evento.'}\n\nSi tienes cualquier duda con respecto a la fecha, aforo o plazas, puedes consultarnos directamente por este chat.`;
 
   const chatPromises = Array.from(activeBuyerIds).map((buyerId) =>
@@ -109,7 +107,6 @@ export async function removeEventParticipant(
     return { error: 'No autenticado.' };
   }
 
-  // 1. Obtener la reserva, comprador y cantidad de plazas
   const { data: itemData, error: itemError } = await supabase
     .from('order_items')
     .select(`
@@ -139,7 +136,6 @@ export async function removeEventParticipant(
   const buyerId = order?.buyer_id;
   const quantity = itemData.quantity || 1;
 
-  // 2. Marcar el pedido como cancelado
   if (order?.id) {
     await supabase
       .from('orders')
@@ -151,7 +147,6 @@ export async function removeEventParticipant(
       .eq('id', order.id);
   }
 
-  // 3. Restaurar las plazas al stock disponible del evento
   if (product?.id) {
     const newStock = (product.stock ?? 0) + quantity;
     await supabase
@@ -160,7 +155,6 @@ export async function removeEventParticipant(
       .eq('id', product.id);
   }
 
-  // 4. Notificar automáticamente al comprador por chat
   if (buyerId) {
     const cancellationMsg = `⚠️ CANCELACIÓN DE PLAZAS:\n\nTu reserva de ${quantity} plaza(s) para el evento "${product?.name || 'Cata / Evento'}" ha sido dada de baja por el organizador.${
       reason ? `\n\nMotivo: ${reason}` : ''

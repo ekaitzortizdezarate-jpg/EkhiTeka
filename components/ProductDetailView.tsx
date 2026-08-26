@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   MessageCircle,
   Ticket,
+  UserCheck,
 } from 'lucide-react';
 
 interface ProductDetailViewProps {
@@ -40,7 +41,7 @@ export function ProductDetailView({
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
       {/* Botón Volver */}
-      <div>
+      <div className="flex items-center justify-between">
         <Link
           href="/tienda"
           className="inline-flex items-center gap-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white transition-colors p-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-[#1F1E1C] dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 shadow-2xs"
@@ -48,6 +49,15 @@ export function ProductDetailView({
           <ArrowLeft className="w-4 h-4" />
           <span>{t.prod_back_to_selection}</span>
         </Link>
+
+        {isSeller && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 text-xs font-bold font-sans">
+            <UserCheck className="w-4 h-4" />
+            <span>
+              Última edición por: <strong className="font-black">{product.profiles?.full_name || 'Vendedor EkhiTeka'}</strong>
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Grid Principal del Producto */}
@@ -130,7 +140,7 @@ export function ProductDetailView({
             </div>
           )}
 
-          {/* Caja de Consultas por Chat (Modo Oscuro Nítido) */}
+          {/* Caja de Consultas por Chat */}
           <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-4">
             <div className="space-y-0.5">
               <p className="text-xs font-bold font-serif text-stone-900 dark:text-[#F5F5F0]">
@@ -149,7 +159,7 @@ export function ProductDetailView({
             </Link>
           </div>
 
-          {/* Garantías de Entrega (Modo Oscuro Nítido) */}
+          {/* Garantías */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-600 dark:text-stone-400 font-sans">
             <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
               <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />

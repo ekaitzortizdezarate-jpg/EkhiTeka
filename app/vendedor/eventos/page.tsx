@@ -20,7 +20,7 @@ export default async function SellerEventsPage() {
     redirect('/');
   }
 
-  // Obtener productos/eventos del vendedor con sus reservas y datos de compradores
+  // Obtener todas las catas y eventos compartidos de la tienda
   const { data: rawEvents } = await supabase
     .from('products')
     .select(`
@@ -46,7 +46,6 @@ export default async function SellerEventsPage() {
         )
       )
     `)
-    .eq('seller_id', user.id)
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -56,7 +55,6 @@ export default async function SellerEventsPage() {
     const name = (p.name || '').toLowerCase();
     const desc = (p.description || '').toLowerCase();
 
-    // Descartar explícitamente catas para casa, cestas, lotes o tarjetas de regalo
     const isHomeOrGift =
       name.includes('casa') ||
       cat.includes('casa') ||
@@ -67,7 +65,6 @@ export default async function SellerEventsPage() {
 
     if (isHomeOrGift) return false;
 
-    // Aceptar únicamente Catas Presenciales
     return (
       cat === 'cata_presencial' ||
       name.includes('presencial') ||
