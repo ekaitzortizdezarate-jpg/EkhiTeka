@@ -11,154 +11,7 @@ function saveFile(relativeFilePath, content) {
   console.log(`✓ Archivo actualizado: ${relativeFilePath}`);
 }
 
-// 1. lib/productHelpers.ts
-saveFile('lib/productHelpers.ts', `
-export type PublishingType = 
-  | 'producto_suelto'
-  | 'cesta_gourmet'
-  | 'cata_casa'
-  | 'tarjeta_regalo'
-  | 'cata_presencial';
-
-export interface ExtraProductMeta {
-  publishingType?: PublishingType;
-  includedItems?: string[];
-  experienceDate?: string;
-  experienceTime?: string;
-  maxAttendees?: number;
-  tastingItems?: string[];
-  giftCardAmount?: number | string;
-  boxPresentation?: string;
-}
-
-export function getProductDiscount(product?: { description?: string | null }): { discountPercent: number; originalPrice?: number } | null {
-  if (!product?.description) return null;
-  const match = product.description.match(/<!-- META:({.*?}) -->/);
-  if (match && match[1]) {
-    try {
-      const meta = JSON.parse(match[1]);
-      if (meta.discount_percent && Number(meta.discount_percent) > 0) {
-        return {
-          discountPercent: Math.round(Number(meta.discount_percent)),
-          originalPrice: meta.original_price ? Number(meta.original_price) : undefined,
-        };
-      }
-    } catch {
-      // Ignore
-    }
-  }
-  return null;
-}
-
-export function getCleanDescription(description?: string | null): string {
-  if (!description) return '';
-  return description.replace(/<!-- META:{.*?} -->/g, '').trim();
-}
-
-export function getCategoryImage(category?: { id?: string; slug?: string; name_es?: string } | string): string {
-  if (!category) return '/images/secciones/Quesos.JPG';
-  const key = (typeof category === 'string' ? category : (category.slug || category.id || category.name_es || '')).toLowerCase();
-
-  if (key.includes('cesta') || key.includes('regalo') || key.includes('lote') || key.includes('pack') || key.includes('saski')) {
-    return '/images/secciones/Cestas.JPG';
-  }
-  if (key.includes('cata') || key.includes('experiencia') || key.includes('dastaketa') || key.includes('degustacion')) {
-    return '/images/secciones/Catas.JPG';
-  }
-  if (key.includes('mesa') || key.includes('boda') || key.includes('ezkontza') || key.includes('evento')) {
-    return '/images/secciones/Mesas.JPG';
-  }
-  if (key.includes('atun') || key.includes('bonito') || key.includes('hegaluze')) {
-    return '/images/secciones/Bonito.JPG';
-  }
-  if (key.includes('salazon') || key.includes('anchoa') || key.includes('antxoa') || key.includes('gatzadura')) {
-    return '/images/secciones/Salazones.JPG';
-  }
-  if (key.includes('gilda') || key.includes('jilda') || key.includes('encurtido') || key.includes('ozpinetako')) {
-    return '/images/secciones/Gildas.JPG';
-  }
-  if (key.includes('txakoli') || key.includes('vino') || key.includes('ardo')) {
-    return '/images/secciones/Txakoli.JPG';
-  }
-  if (key.includes('cerveza') || key.includes('garagardo')) {
-    return '/images/secciones/Cerveza.JPG';
-  }
-  if (key.includes('sidra') || key.includes('sagardo')) {
-    return '/images/secciones/Sidra.JPG';
-  }
-
-  return '/images/secciones/Quesos.JPG';
-}
-
-export function getProductImage(product?: {
-  image_url?: string | null;
-  category_id?: string;
-  name?: string;
-  format?: string;
-}): string {
-  if (!product) return '/images/secciones/Quesos.JPG';
-
-  if (product.image_url && product.image_url.trim()) {
-    return product.image_url;
-  }
-
-  const cat = (product.category_id || '').toLowerCase();
-  const name = (product.name || '').toLowerCase();
-
-  if (cat.includes('cesta') || name.includes('cesta') || name.includes('lote') || name.includes('pack') || name.includes('opari') || name.includes('saski') || name.includes('regalo')) {
-    return '/images/secciones/Cestas.JPG';
-  }
-  if (
-    cat.includes('cata') ||
-    cat.includes('experiencia') ||
-    name.includes('cata') ||
-    name.includes('dastaketa') ||
-    name.includes('taller') ||
-    name.includes('degustación')
-  ) {
-    return '/images/secciones/Catas.JPG';
-  }
-  if (cat.includes('tarjeta') || name.includes('tarjeta') || name.includes('mesa') || name.includes('txartel')) {
-    return '/images/secciones/Mesas.JPG';
-  }
-  if (cat.includes('atun') || name.includes('atun') || name.includes('atún') || name.includes('bonito') || name.includes('hegaluze')) {
-    return '/images/secciones/Bonito.JPG';
-  }
-  if (
-    cat.includes('salazon') ||
-    name.includes('anchoa') ||
-    name.includes('antxoa') ||
-    name.includes('salazón') ||
-    name.includes('salazon') ||
-    name.includes('gatzadura')
-  ) {
-    return '/images/secciones/Salazones.JPG';
-  }
-  if (
-    cat.includes('gilda') ||
-    cat.includes('jilda') ||
-    name.includes('gilda') ||
-    name.includes('jilda') ||
-    name.includes('piparra') ||
-    name.includes('encurtido')
-  ) {
-    return '/images/secciones/Gildas.JPG';
-  }
-  if (cat.includes('txakoli') || name.includes('txakoli') || name.includes('vino') || name.includes('ardo')) {
-    return '/images/secciones/Txakoli.JPG';
-  }
-  if (cat.includes('cerveza') || name.includes('cerveza') || name.includes('garagardo')) {
-    return '/images/secciones/Cerveza.JPG';
-  }
-  if (cat.includes('sidra') || name.includes('sidra') || name.includes('sagardo')) {
-    return '/images/secciones/Sidra.JPG';
-  }
-
-  return '/images/secciones/Quesos.JPG';
-}
-`);
-
-// 2. components/SellerProductForm.tsx
+// components/SellerProductForm.tsx
 saveFile('components/SellerProductForm.tsx', `
 'use client';
 
@@ -375,6 +228,7 @@ export function SellerProductForm({
     setIsCustomAccordionOpen(false);
   };
 
+  // Modificar cantidades o eliminar de "Productos de la lista"
   const handleUpdateItemQuantity = (id: string, newQty: number) => {
     if (newQty <= 0) {
       setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
@@ -389,6 +243,7 @@ export function SellerProductForm({
     setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
   };
 
+  // Suma total calculada de los productos sueltos
   const sumOfLooseItems = useMemo(() => {
     return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
   }, [selectedListItems]);
@@ -488,7 +343,6 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
-    // Componer descripción con lista y metadatos seguros de descuento
     const rawDesc = (formData.get('description') as string) || '';
     let composedDesc = rawDesc.trim();
 
@@ -502,7 +356,6 @@ export function SellerProductForm({
       }
     }
 
-    // Adjuntar metadatos de descuento solo si es positivo para que los compradores lo vean
     if (numericDiscount > 0 && sumOfLooseItems > 0) {
       const metaTag = \`\\n\\n<!-- META:{"discount_percent":\${numericDiscount},"original_price":\${sumOfLooseItems.toFixed(2)}} -->\`;
       composedDesc = \`\${composedDesc}\${metaTag}\`;
@@ -919,7 +772,7 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 4. PRODUCTOS DE LA LISTA (Suma total al final, no editable) */}
+          {/* 4. PRODUCTOS DE LA LISTA (Formato responsive vertical en móvil con cantidad encima del precio y papelera) */}
           {isPackOrEvent && (
             <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-3 font-sans">
               <div className="flex items-center gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
@@ -930,60 +783,67 @@ export function SellerProductForm({
               </div>
 
               {selectedListItems.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {selectedListItems.map((item) => (
                     <div
                       key={item.id}
-                      className="p-3 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-3 shadow-2xs"
+                      className="p-3 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      {/* Lado izquierdo: Foto + Info */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <img
                           src={item.imageUrl || '/images/secciones/Quesos.JPG'}
                           alt={item.name}
-                          className="w-10 h-10 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
+                          className="w-12 h-12 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
                         />
-                        <div className="min-w-0">
-                          <p className="font-bold text-stone-900 dark:text-stone-100 truncate text-xs">
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <p className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:truncate leading-snug">
                             {item.name}
                           </p>
-                          <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
+                          <p className="text-[10.5px] text-stone-500 dark:text-stone-400 leading-tight">
                             {item.price.toFixed(2)} € / ud {item.origin ? \`· \${item.origin}\` : ''} {item.isCustom ? '(Específico)' : ''}
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 shrink-0">
+                      {/* Lado derecho: Cantidad encima de precio y botón borrar en móvil */}
+                      <div className="flex sm:flex-row flex-col items-end sm:items-center gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100 dark:border-stone-800/60 w-full sm:w-auto justify-between sm:justify-end">
+                        {/* Control de cantidad */}
                         <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-[#141312] p-0.5">
                           <button
                             type="button"
                             onClick={() => handleUpdateItemQuantity(item.id, item.quantity - 1)}
-                            className="w-5 h-5 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                            className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
                           >
                             -
                           </button>
-                          <span className="w-6 text-center text-xs font-black">
+                          <span className="w-7 text-center text-xs font-black">
                             {item.quantity}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleUpdateItemQuantity(item.id, item.quantity + 1)}
-                            className="w-5 h-5 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                            className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
                           >
                             +
                           </button>
                         </div>
 
-                        <span className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 min-w-[55px] text-right">
-                          {(item.price * item.quantity).toFixed(2)} €
-                        </span>
+                        {/* Fila inferior móvil / lateral desktop: Precio y Borrar */}
+                        <div className="flex items-center gap-2.5">
+                          <span className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 text-right min-w-[55px]">
+                            {(item.price * item.quantity).toFixed(2)} €
+                          </span>
 
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveListItem(item.id)}
-                          className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
-                        >
-                          <Trash className="w-3.5 h-3.5" />
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveListItem(item.id)}
+                            className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                            title="Eliminar de la lista"
+                          >
+                            <Trash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1360,364 +1220,4 @@ export function SellerProductForm({
 }
 `);
 
-// 3. components/ProductCard.tsx
-saveFile('components/ProductCard.tsx', `
-'use client';
-
-import Link from 'next/link';
-import { useCart } from '@/context/CartContext';
-import { useLanguage } from '@/context/LanguageContext';
-import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
-import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, Ticket, MapPin, Eye } from 'lucide-react';
-
-interface ProductCardProps {
-  product: ProductWithSeller;
-  isSeller?: boolean;
-}
-
-export function ProductCard({ product, isSeller = false }: ProductCardProps) {
-  const { addToCart } = useCart();
-  const { t } = useLanguage();
-
-  const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
-  const isEvent =
-    product.category_id === 'catas' ||
-    product.category_id === 'cata_presencial' ||
-    product.category_id === 'experiencia' ||
-    product.name.toLowerCase().includes('cata');
-
-  const imageUrl = getProductImage(product);
-  const discountInfo = getProductDiscount(product);
-  const cleanDescription = getCleanDescription(product.description);
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isSoldOut) return;
-    addToCart(product, product.profiles?.full_name || 'EkhiTeka Selección');
-  };
-
-  return (
-    <Link
-      href={\`/producto/\${product.id}\`}
-      className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] p-4 flex flex-col justify-between shadow-xs transition-all font-serif overflow-hidden"
-    >
-      <div className="space-y-3">
-        {/* Imagen del Producto */}
-        <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700">
-          <img
-            src={imageUrl}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-            }}
-          />
-
-          {/* Badge de Descuento (Solo si > 0) */}
-          {discountInfo && discountInfo.discountPercent > 0 && !isSoldOut && (
-            <span className="absolute top-2.5 right-2.5 px-2.5 py-1 bg-emerald-600 text-white text-[10.5px] font-black rounded-full shadow-md font-sans">
-              -{discountInfo.discountPercent}%
-            </span>
-          )}
-
-          {/* Badge de Evento o Stock */}
-          {isSoldOut ? (
-            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-              {isEvent ? t.event_capacity_full : t.prod_sold_out}
-            </span>
-          ) : !product.is_unlimited_stock && (product.stock ?? 0) <= 5 ? (
-            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-amber-500 text-stone-900 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-              {isEvent ? t.event_last_seats : t.prod_last_units}
-            </span>
-          ) : null}
-        </div>
-
-        {/* Datos del Producto */}
-        <div className="space-y-1">
-          {product.origin_region && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center gap-1 font-sans truncate">
-              <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-              {product.origin_region}
-            </span>
-          )}
-
-          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-1 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
-            {product.name}
-          </h3>
-
-          {cleanDescription && (
-            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 font-sans font-medium">
-              {cleanDescription}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Precio y Botón */}
-      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
-        <div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-serif font-black text-base sm:text-lg text-stone-900 dark:text-stone-100 block leading-none">
-              {Number(product.price).toFixed(2)} €
-            </span>
-            {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
-              <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
-                {discountInfo.originalPrice.toFixed(2)} €
-              </span>
-            )}
-          </div>
-          <span className="text-[9.5px] font-sans font-semibold text-stone-400">
-            {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
-          </span>
-        </div>
-
-        {!isSeller ? (
-          <button
-            type="button"
-            disabled={isSoldOut}
-            onClick={handleAddToCart}
-            className={\`p-2.5 rounded-xl font-bold transition-all flex items-center justify-center cursor-pointer \${
-              isSoldOut
-                ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
-                : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] shadow-xs hover:scale-105'
-            }\`}
-            title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
-          >
-            {isEvent ? <Ticket className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-          </button>
-        ) : (
-          <span className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-500">
-            <Eye className="w-4 h-4" />
-          </span>
-        )}
-      </div>
-    </Link>
-  );
-}
-`);
-
-// 4. components/ProductDetailView.tsx
-saveFile('components/ProductDetailView.tsx', `
-'use client';
-
-import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
-import { ProductCard } from '@/components/ProductCard';
-import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
-import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
-import type { ProductWithSeller } from '@/types/database';
-import {
-  ArrowLeft,
-  MapPin,
-  Truck,
-  Store,
-  ShieldCheck,
-  MessageCircle,
-  Ticket,
-  UserCheck,
-  Percent,
-} from 'lucide-react';
-
-interface ProductDetailViewProps {
-  product: ProductWithSeller;
-  relatedProducts: ProductWithSeller[];
-  isSeller: boolean;
-}
-
-export function ProductDetailView({
-  product,
-  relatedProducts,
-  isSeller,
-}: ProductDetailViewProps) {
-  const { t } = useLanguage();
-
-  const isEvent =
-    product.category_id === 'catas' ||
-    product.category_id === 'cata_presencial' ||
-    product.category_id === 'experiencia' ||
-    (product.name && product.name.toLowerCase().includes('cata'));
-
-  const imageUrl = getProductImage(product);
-  const discountInfo = getProductDiscount(product);
-  const cleanDescription = getCleanDescription(product.description);
-
-  return (
-    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-      {/* Botón Volver & Info Vendedor */}
-      <div className="flex items-center justify-between">
-        <Link
-          href="/tienda"
-          className="inline-flex items-center gap-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white transition-colors p-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-[#1F1E1C] dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 shadow-2xs"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>{t.prod_back_to_selection}</span>
-        </Link>
-
-        {isSeller && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 text-xs font-bold font-sans">
-            <UserCheck className="w-4 h-4" />
-            <span>
-              Última edición por: <strong className="font-black">{product.profiles?.full_name || 'Vendedor EkhiTeka'}</strong>
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Grid Principal del Producto */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* Imagen del Producto */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="relative aspect-square w-full rounded-3xl overflow-hidden border-2 border-stone-200 dark:border-stone-800 bg-[#FAF7F2] dark:bg-[#1C1B19] shadow-lg">
-            <img
-              src={imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-              }}
-            />
-            {product.origin_region && (
-              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-xs text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-md font-sans">
-                <MapPin className="w-3.5 h-3.5 text-[#FFE259]" />
-                <span>{product.origin_region}</span>
-              </span>
-            )}
-            {isEvent && (
-              <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-xl uppercase tracking-wider shadow-md font-sans">
-                <Ticket className="w-3.5 h-3.5" />
-                <span>{product.stock} {t.event_seats_available}</span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Información & Checkout */}
-        <div className="lg:col-span-6 space-y-6">
-          <div className="space-y-2 border-b border-stone-200 dark:border-stone-800 pb-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] font-serif">
-              EkhiTeka Gourmet · Lekeitio
-            </span>
-            <h1 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 dark:text-stone-100 leading-tight">
-              {product.name}
-            </h1>
-            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-bold text-stone-500 dark:text-stone-400 font-sans">
-              {product.format && (
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
-                  {t.prod_format_label}: {product.format}
-                </span>
-              )}
-              {product.weight_g && (
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
-                  {t.prod_weight_label}: {product.weight_g}g
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Precio y Añadir a la Cesta */}
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-baseline gap-3">
-              <span className="text-3xl sm:text-4xl font-black font-serif text-[#1D1D1B] dark:text-[#F5F5F0]">
-                {Number(product.price).toFixed(2)} €
-              </span>
-
-              {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
-                <span className="text-lg text-stone-400 line-through font-serif font-bold">
-                  {discountInfo.originalPrice.toFixed(2)} €
-                </span>
-              )}
-
-              {discountInfo && discountInfo.discountPercent > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black text-xs uppercase tracking-wider font-sans">
-                  <Percent className="w-3.5 h-3.5" />
-                  <span>{discountInfo.discountPercent}% Descuento</span>
-                </span>
-              )}
-
-              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider font-sans ml-auto">
-                {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
-              </span>
-            </div>
-
-            <ProductDetailAddToCart
-              product={product}
-              isSeller={isSeller}
-            />
-          </div>
-
-          {/* Descripción & Notas de Cata */}
-          {cleanDescription && (
-            <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-              <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-800 dark:text-stone-200">
-                {t.prod_details}
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans whitespace-pre-line">
-                {cleanDescription}
-              </p>
-            </div>
-          )}
-
-          {/* Caja de Consultas por Chat */}
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-4">
-            <div className="space-y-0.5">
-              <p className="text-xs font-bold font-serif text-stone-900 dark:text-[#F5F5F0]">
-                {t.prod_doubt_title}
-              </p>
-              <p className="text-[11px] text-stone-500 dark:text-stone-400 font-sans">
-                {t.prod_doubt_desc}
-              </p>
-            </div>
-            <Link
-              href={\`/chat/\${product.seller_id || ''}?product_id=\${product.id}\`}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-black uppercase tracking-wider transition-all font-serif shrink-0 shadow-xs hover:scale-105"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>{t.prod_ask_btn}</span>
-            </Link>
-          </div>
-
-          {/* Garantías */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-600 dark:text-stone-400 font-sans">
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
-              <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-              <span>{t.prod_guarantee_cold}</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
-              <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-              <span>{t.prod_guarantee_pickup}</span>
-            </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
-              <ShieldCheck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-              <span>{t.prod_guarantee_km0}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Productos Relacionados */}
-      {relatedProducts && relatedProducts.length > 0 && (
-        <section className="space-y-6 pt-10 border-t border-stone-200 dark:border-stone-800 font-serif">
-          <div className="pb-2">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              {t.prod_related_subtitle}
-            </span>
-            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
-              {t.prod_related_title}
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {relatedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} isSeller={isSeller} />
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
-}
-`);
-
-console.log('\n✨ Suma total reubicada, colores de descuento dinámicos y visualización para compradores completada.');
+console.log('\n✨ Formulario de productos optimizado para móviles y soporte de vista previa completado.');

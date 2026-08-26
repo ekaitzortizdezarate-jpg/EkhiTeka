@@ -213,6 +213,7 @@ export function SellerProductForm({
     setIsCustomAccordionOpen(false);
   };
 
+  // Modificar cantidades o eliminar de "Productos de la lista"
   const handleUpdateItemQuantity = (id: string, newQty: number) => {
     if (newQty <= 0) {
       setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
@@ -227,6 +228,7 @@ export function SellerProductForm({
     setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
   };
 
+  // Suma total calculada de los productos sueltos
   const sumOfLooseItems = useMemo(() => {
     return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
   }, [selectedListItems]);
@@ -326,7 +328,6 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
-    // Componer descripción con lista y metadatos seguros de descuento
     const rawDesc = (formData.get('description') as string) || '';
     let composedDesc = rawDesc.trim();
 
@@ -340,7 +341,6 @@ export function SellerProductForm({
       }
     }
 
-    // Adjuntar metadatos de descuento solo si es positivo para que los compradores lo vean
     if (numericDiscount > 0 && sumOfLooseItems > 0) {
       const metaTag = `\n\n<!-- META:{"discount_percent":${numericDiscount},"original_price":${sumOfLooseItems.toFixed(2)}} -->`;
       composedDesc = `${composedDesc}${metaTag}`;
@@ -757,7 +757,7 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 4. PRODUCTOS DE LA LISTA (Suma total al final, no editable) */}
+          {/* 4. PRODUCTOS DE LA LISTA (Formato responsive vertical en móvil con cantidad encima del precio y papelera) */}
           {isPackOrEvent && (
             <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-3 font-sans">
               <div className="flex items-center gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
@@ -768,60 +768,67 @@ export function SellerProductForm({
               </div>
 
               {selectedListItems.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {selectedListItems.map((item) => (
                     <div
                       key={item.id}
-                      className="p-3 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-3 shadow-2xs"
+                      className="p-3 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      {/* Lado izquierdo: Foto + Info */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <img
                           src={item.imageUrl || '/images/secciones/Quesos.JPG'}
                           alt={item.name}
-                          className="w-10 h-10 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
+                          className="w-12 h-12 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
                         />
-                        <div className="min-w-0">
-                          <p className="font-bold text-stone-900 dark:text-stone-100 truncate text-xs">
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <p className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:truncate leading-snug">
                             {item.name}
                           </p>
-                          <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
+                          <p className="text-[10.5px] text-stone-500 dark:text-stone-400 leading-tight">
                             {item.price.toFixed(2)} € / ud {item.origin ? `· ${item.origin}` : ''} {item.isCustom ? '(Específico)' : ''}
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 shrink-0">
+                      {/* Lado derecho: Cantidad encima de precio y botón borrar en móvil */}
+                      <div className="flex sm:flex-row flex-col items-end sm:items-center gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-stone-100 dark:border-stone-800/60 w-full sm:w-auto justify-between sm:justify-end">
+                        {/* Control de cantidad */}
                         <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-[#141312] p-0.5">
                           <button
                             type="button"
                             onClick={() => handleUpdateItemQuantity(item.id, item.quantity - 1)}
-                            className="w-5 h-5 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                            className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
                           >
                             -
                           </button>
-                          <span className="w-6 text-center text-xs font-black">
+                          <span className="w-7 text-center text-xs font-black">
                             {item.quantity}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleUpdateItemQuantity(item.id, item.quantity + 1)}
-                            className="w-5 h-5 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                            className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
                           >
                             +
                           </button>
                         </div>
 
-                        <span className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 min-w-[55px] text-right">
-                          {(item.price * item.quantity).toFixed(2)} €
-                        </span>
+                        {/* Fila inferior móvil / lateral desktop: Precio y Borrar */}
+                        <div className="flex items-center gap-2.5">
+                          <span className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 text-right min-w-[55px]">
+                            {(item.price * item.quantity).toFixed(2)} €
+                          </span>
 
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveListItem(item.id)}
-                          className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
-                        >
-                          <Trash className="w-3.5 h-3.5" />
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveListItem(item.id)}
+                            className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                            title="Eliminar de la lista"
+                          >
+                            <Trash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
