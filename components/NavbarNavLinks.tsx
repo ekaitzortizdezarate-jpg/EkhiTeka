@@ -11,11 +11,10 @@ import { CartNavButton } from '@/components/CartNavButton';
 import {
   User,
   LogOut,
-  LogIn,
   Menu,
   X,
   Store,
-  Package,
+  MessageCircle,
 } from 'lucide-react';
 
 interface NavbarNavLinksProps {
@@ -90,8 +89,6 @@ export function NavbarNavLinks({
     };
   }, [mobileMenuOpen]);
 
-  const ordersUrl = isSeller ? '/vendedor/pedidos' : '/comprador/pedidos';
-
   return (
     <div className="flex items-center justify-between w-full min-w-0 gap-3">
       {/* 1. LADO IZQUIERDO */}
@@ -106,7 +103,7 @@ export function NavbarNavLinks({
         </button>
 
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF8F5] shrink-0">
+          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
             <img
               src="/Logo.jpg"
               alt="EkhiTeka Logo"
@@ -175,7 +172,7 @@ export function NavbarNavLinks({
           {user && (
             <>
               <Link
-                href={ordersUrl}
+                href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                 className={`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
                   pathname.includes('/pedidos')
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
@@ -230,27 +227,26 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO */}
+      {/* 2. LADO DERECHO (Botón de cesta siempre visible para visitantes y compradores) */}
       <div className="flex items-center gap-2 shrink-0">
+        {(!profile || profile.role === 'comprador') && <CartNavButton />}
+
         {user ? (
           <div className="flex items-center gap-2">
-            {(!profile || profile.role === 'comprador') && <CartNavButton />}
-
-            {/* Icono de Pedidos SOLO en Barra Superior Móvil (oculto en lg:hidden) */}
             <Link
-              href={ordersUrl}
-              className={`lg:hidden relative p-2.5 rounded-2xl border transition-all shrink-0 ${
-                pathname.includes('/pedidos')
+              href="/chat"
+              className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
+                pathname.startsWith('/chat')
                   ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : hasUnseenOrderUpdates
-                  ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse'
                   : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
               }`}
-              title={t.nav_orders}
+              title={t.nav_chats}
             >
-              <Package className="w-4 h-4" />
-              {hasUnseenOrderUpdates && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#FFE259] border-2 border-stone-900 animate-ping" />
+              <MessageCircle className="w-4 h-4" />
+              {unreadMessagesCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
+                  {unreadMessagesCount}
+                </span>
               )}
             </Link>
 
@@ -278,36 +274,23 @@ export function NavbarNavLinks({
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <CartNavButton />
-
             <Link
               href="/login"
-              className="flex sm:hidden p-2.5 rounded-2xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-800 dark:text-stone-200 hover:text-[#1D1D1B] dark:hover:text-[#1D1D1B] border border-stone-200 dark:border-stone-700 transition-all cursor-pointer shadow-2xs"
-              title={t.nav_login}
-              aria-label={t.nav_login}
+              className="px-3 sm:px-4 py-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             >
-              <LogIn className="w-4 h-4" />
+              {t.nav_login}
             </Link>
-
-            <div className="hidden sm:flex items-center gap-2">
-              <Link
-                href="/login"
-                className="px-4 py-2.5 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-              >
-                {t.nav_login}
-              </Link>
-              <Link
-                href="/register"
-                className="px-4 py-2.5 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
-              >
-                {t.nav_register}
-              </Link>
-            </div>
+            <Link
+              href="/register"
+              className="hidden sm:inline-flex px-4 py-2 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
+            >
+              {t.nav_register}
+            </Link>
           </div>
         )}
       </div>
 
-      {/* 3. MENÚ MÓVIL LATERAL */}
+      {/* 3. MENÚ MÓVIL */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
@@ -318,12 +301,8 @@ export function NavbarNavLinks({
           <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-stone-800">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 cursor-pointer group"
-                >
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5] group-hover:scale-105 transition-transform shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5]">
                     <img
                       src="/Logo.jpg"
                       alt="EkhiTeka"
@@ -338,7 +317,7 @@ export function NavbarNavLinks({
                       Lekeitio · Bizkaia
                     </span>
                   </div>
-                </Link>
+                </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
@@ -407,7 +386,7 @@ export function NavbarNavLinks({
                 {user ? (
                   <>
                     <Link
-                      href={ordersUrl}
+                      href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname.includes('/pedidos')
@@ -452,6 +431,23 @@ export function NavbarNavLinks({
                         <span>{t.nav_add_product}</span>
                       </Link>
                     )}
+
+                    <Link
+                      href="/chat"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        pathname.startsWith('/chat')
+                          ? 'bg-[#FFE259] text-[#1D1D1B]'
+                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                      }`}
+                    >
+                      <span>{t.nav_chats}</span>
+                      {unreadMessagesCount > 0 && (
+                        <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
+                          {unreadMessagesCount}
+                        </span>
+                      )}
+                    </Link>
 
                     <Link
                       href="/perfil"
