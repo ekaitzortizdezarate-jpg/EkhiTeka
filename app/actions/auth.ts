@@ -90,6 +90,17 @@ export async function updateProfile(formData: FormData) {
   const stair = (formData.get('stair') as string)?.trim() || '';
   const floor = (formData.get('floor') as string)?.trim() || '';
   const door = (formData.get('door') as string)?.trim() || '';
+  const whatsappEnabled = formData.get('whatsapp_enabled') === 'on';
+  const whatsappPhone = (formData.get('whatsapp_phone') as string)?.trim() || null;
+  const pickupAddressesInput = (formData.get('pickup_addresses') as string)?.trim() || '';
+  let pickupAddresses = undefined;
+  if (pickupAddressesInput) {
+    try {
+      pickupAddresses = JSON.parse(pickupAddressesInput);
+    } catch {
+      return { error: 'La configuración de la tienda no es válida.' };
+    }
+  }
 
   const fullNameInput = (formData.get('full_name') as string)?.trim() || '';
   const fullName = [firstName, lastName1, lastName2].filter(Boolean).join(' ') || fullNameInput || 'Usuario EkhiTeka';
@@ -122,6 +133,9 @@ export async function updateProfile(formData: FormData) {
     stair,
     floor,
     door,
+    whatsapp_phone: whatsappEnabled ? whatsappPhone : null,
+    whatsapp_enabled: whatsappEnabled,
+    pickup_addresses: pickupAddresses,
   };
 
   const structuredBio = JSON.stringify(profileData);

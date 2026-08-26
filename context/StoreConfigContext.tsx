@@ -6,6 +6,7 @@ import { parseProfile } from '@/types/database';
 
 interface StoreConfigContextType {
   whatsappPhone: string;
+  isWhatsAppEnabled: boolean;
   storeAddress: string;
   activePickupAddress: PickupAddress | null;
   pickupAddresses: PickupAddress[];
@@ -24,9 +25,12 @@ export function StoreConfigProvider({
   const seller = useMemo(() => parseProfile(initialSellerProfile), [initialSellerProfile]);
 
   const whatsappPhone = useMemo(() => {
+    if (seller.whatsapp_enabled === false) return '';
     const raw = seller.whatsapp_phone || seller.phone || '34600000000';
     return raw.replace(/[^0-9]/g, '');
   }, [seller]);
+
+  const isWhatsAppEnabled = seller.whatsapp_enabled !== false;
 
   const activePickupAddress = useMemo(() => {
     const addresses = seller.pickup_addresses || [];
@@ -42,6 +46,7 @@ export function StoreConfigProvider({
 
   const getWhatsAppUrl = useMemo(() => {
     return (message?: string) => {
+      if (!whatsappPhone) return '#';
       const cleanNumber = whatsappPhone.startsWith('34') || whatsappPhone.length > 10 ? whatsappPhone : `34${whatsappPhone}`;
       const encodedMsg = message ? encodeURIComponent(message) : '';
       return `https://wa.me/${cleanNumber}${encodedMsg ? `?text=${encodedMsg}` : ''}`;
@@ -52,6 +57,7 @@ export function StoreConfigProvider({
     <StoreConfigContext.Provider
       value={{
         whatsappPhone,
+        isWhatsAppEnabled,
         storeAddress,
         activePickupAddress,
         pickupAddresses: seller.pickup_addresses || [],
@@ -68,6 +74,7 @@ export function useStoreConfig() {
   if (!context) {
     return {
       whatsappPhone: '34600000000',
+      isWhatsAppEnabled: true,
       storeAddress: 'Gamarra Kalea 4, Lekeitio · Bizkaia',
       activePickupAddress: null,
       pickupAddresses: [],

@@ -7,7 +7,7 @@ import { Truck, Store } from 'lucide-react';
 
 export function Footer() {
   const { t } = useLanguage();
-  const { storeAddress, whatsappPhone, getWhatsAppUrl } = useStoreConfig();
+  const { storeAddress, whatsappPhone, isWhatsAppEnabled, getWhatsAppUrl } = useStoreConfig();
 
   return (
     <footer className="border-t border-stone-200 dark:border-stone-800 bg-[#1D1D1B] text-stone-300 transition-colors pt-0 pb-8">
@@ -26,14 +26,16 @@ export function Footer() {
             </p>
           </div>
 
-          <a
-            href={getWhatsAppUrl('Hola, quisiera unirme a las novedades del Club de Amigos de EkhiTeka')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] text-white hover:bg-stone-800 font-black text-xs uppercase tracking-wider transition-all shadow-md shrink-0 hover:scale-105"
-          >
-            <span>{t.footer_join_whatsapp}</span>
-          </a>
+          {isWhatsAppEnabled && (
+            <a
+              href={getWhatsAppUrl('Hola, quisiera unirme a las novedades del Club de Amigos de EkhiTeka')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] text-white hover:bg-stone-800 font-black text-xs uppercase tracking-wider transition-all shadow-md shrink-0 hover:scale-105"
+            >
+              <span>{t.footer_join_whatsapp}</span>
+            </a>
+          )}
         </div>
       </div>
 
@@ -138,9 +140,11 @@ export function Footer() {
               <p>{t.footer_schedule_weekdays}</p>
               <p>{t.footer_schedule_saturday}</p>
             </div>
-            <p className="text-stone-300 font-bold text-[11px]">
-              WhatsApp: +{whatsappPhone}
-            </p>
+            {isWhatsAppEnabled && (
+              <p className="text-stone-300 font-bold text-[11px]">
+                WhatsApp: +{whatsappPhone}
+              </p>
+            )}
           </div>
         </div>
 

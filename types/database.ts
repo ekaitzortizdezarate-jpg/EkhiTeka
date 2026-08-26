@@ -46,6 +46,7 @@ export interface ProfileDetails {
   floor?: string | null;
   door?: string | null;
   whatsapp_phone?: string | null;
+  whatsapp_enabled?: boolean;
   pickup_addresses?: PickupAddress[];
 }
 
@@ -84,6 +85,7 @@ export function parseProfile(raw?: any): Profile {
       floor: '',
       door: '',
       whatsapp_phone: '34600000000',
+      whatsapp_enabled: true,
       pickup_addresses: [],
     };
   }
@@ -130,7 +132,8 @@ export function parseProfile(raw?: any): Profile {
     stair: details.stair || raw.stair || '',
     floor: details.floor || raw.floor || '',
     door: details.door || raw.door || '',
-    whatsapp_phone: details.whatsapp_phone || raw.phone || '34600000000',
+    whatsapp_phone: details.whatsapp_phone ?? raw.whatsapp_phone ?? raw.phone ?? '34600000000',
+    whatsapp_enabled: details.whatsapp_enabled ?? raw.whatsapp_enabled ?? true,
     pickup_addresses: details.pickup_addresses && details.pickup_addresses.length > 0 ? details.pickup_addresses : defaultAddresses,
   };
 }

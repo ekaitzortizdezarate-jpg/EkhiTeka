@@ -40,7 +40,10 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     currentProfile.pickup_addresses || []
   );
   const [customWhatsApp, setCustomWhatsApp] = useState<string>(
-    currentProfile.whatsapp_phone || currentProfile.phone || '34600000000'
+    currentProfile.whatsapp_phone || ''
+  );
+  const [whatsAppEnabled, setWhatsAppEnabled] = useState(
+    currentProfile.whatsapp_enabled !== false
   );
   const [whatsAppMode, setWhatsAppMode] = useState<'registered' | 'custom'>(
     currentProfile.whatsapp_phone && currentProfile.whatsapp_phone !== currentProfile.phone
@@ -100,6 +103,13 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     setPickupAddresses(filtered);
   };
 
+  const handleClearWhatsApp = () => {
+    setCustomWhatsApp('');
+    setWhatsAppMode('custom');
+    setWhatsAppEnabled(false);
+    setIsEditing(true);
+  };
+
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoadingProfile(true);
@@ -108,6 +118,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     const formData = new FormData(e.currentTarget);
     const resolvedWhatsApp = whatsAppMode === 'registered' ? (formData.get('phone') as string) : customWhatsApp;
     formData.append('whatsapp_phone', resolvedWhatsApp);
+    if (whatsAppEnabled) formData.append('whatsapp_enabled', 'on');
     formData.append('pickup_addresses', JSON.stringify(pickupAddresses));
 
     const res = await updateProfile(formData);
@@ -297,16 +308,32 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
               <div className="space-y-4 pt-4 border-t border-stone-200/60 dark:border-stone-800">
                 {/* WhatsApp Tienda */}
                 <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block font-serif">
                         WhatsApp Oficial de la Tienda
                       </span>
                       <p className="text-sm font-black text-stone-900 dark:text-[#F5F5F0]">
-                        +{p.whatsapp_phone || p.phone || '34600000000'}
+                        {p.whatsapp_enabled === false ? 'Deshabilitado' : `+${p.whatsapp_phone || p.phone || '34600000000'}`}
                       </p>
                     </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                      className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3" /> Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearWhatsApp}
+                      className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-black text-[10px] uppercase cursor-pointer"
+                    >
+                      <Trash2 className="w-3 h-3" /> Borrar
+                    </button>
                   </div>
                 </div>
 
@@ -558,6 +585,17 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     Todos los botones de WhatsApp de la web se dirigirán a este número.
                   </p>
 
+                  <label className="flex items-center gap-2 cursor-pointer font-bold text-stone-800 dark:text-stone-200">
+                    <input
+                      type="checkbox"
+                      name="whatsapp_enabled"
+                      checked={whatsAppEnabled}
+                      onChange={(e) => setWhatsAppEnabled(e.target.checked)}
+                      className="h-4 w-4 accent-emerald-600"
+                    />
+                    <span>Habilitar WhatsApp oficial de la tienda</span>
+                  </label>
+
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer font-medium text-stone-800 dark:text-stone-200">
                       <input
@@ -590,6 +628,14 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                         />
                       </div>
                     )}
+
+                    <button
+                      type="button"
+                      onClick={handleClearWhatsApp}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 font-bold text-[10px] uppercase cursor-pointer"
+                    >
+                      <Trash2 className="w-3 h-3" /> Borrar
+                    </button>
                   </div>
                 </div>
 
