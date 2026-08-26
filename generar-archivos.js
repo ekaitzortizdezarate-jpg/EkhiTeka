@@ -145,23 +145,26 @@ export function SellerProductForm({
     return availableSingleProducts.find((p) => p.id === catalogSelectId) || availableSingleProducts[0];
   }, [availableSingleProducts, catalogSelectId]);
 
-  const parsedCatalogQty = parseInt(catalogQuantityStr, 10);
-  const isCatalogQtyValid = !isNaN(parsedCatalogQty) && parsedCatalogQty > 0;
-
   const handleAddCatalogProduct = () => {
-    if (!selectedCatalogProduct || !isCatalogQtyValid) return;
+    const qty = parseFloat(catalogQuantityStr);
+    if (isNaN(qty) || qty <= 0) {
+      alert('Por favor, introduce una cantidad mayor que 0.');
+      return;
+    }
+    if (!selectedCatalogProduct) return;
+
     const existingIndex = selectedListItems.findIndex((it) => it.id === selectedCatalogProduct.id);
 
     if (existingIndex > -1) {
       const updated = [...selectedListItems];
-      updated[existingIndex].quantity += parsedCatalogQty;
+      updated[existingIndex].quantity += Math.round(qty);
       setSelectedListItems(updated);
     } else {
       const newItem: AddedListItem = {
         id: selectedCatalogProduct.id,
         name: selectedCatalogProduct.name,
         price: Number(selectedCatalogProduct.price),
-        quantity: parsedCatalogQty,
+        quantity: Math.round(qty),
         imageUrl: getProductImage(selectedCatalogProduct),
         category: selectedCatalogProduct.category_id,
         format: selectedCatalogProduct.format,
@@ -194,21 +197,31 @@ export function SellerProductForm({
     }
   };
 
-  const parsedCustomQty = parseInt(customQuantityStr, 10);
-  const isCustomQtyValid = !isNaN(parsedCustomQty) && parsedCustomQty > 0;
+  const handleAddCustomProduct = (e?: React.MouseEvent | React.FormEvent) => {
+    if (e) e.preventDefault();
 
-  const handleAddCustomProduct = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customName.trim() || !customPrice || !isCustomQtyValid) {
-      alert('Por favor, indica al menos el nombre, precio y una cantidad válida (> 0).');
+    const qty = parseFloat(customQuantityStr);
+    if (isNaN(qty) || qty <= 0) {
+      alert('La cantidad de este producto suelto debe ser un número mayor de 0 (> 0).');
+      return;
+    }
+
+    if (!customName.trim()) {
+      alert('Por favor, indica el nombre del producto suelto.');
+      return;
+    }
+
+    const priceNum = parseFloat(customPrice);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      alert('Por favor, indica un precio válido mayor de 0.');
       return;
     }
 
     const newItem: AddedListItem = {
       id: 'custom_' + Date.now(),
       name: customName.trim(),
-      price: parseFloat(customPrice) || 0,
-      quantity: parsedCustomQty,
+      price: priceNum,
+      quantity: Math.round(qty),
       imageUrl: customImagePreview || customImageUrl.trim() || '/images/secciones/Quesos.JPG',
       category: customCategory,
       format: customFormat,
@@ -217,8 +230,9 @@ export function SellerProductForm({
       isCustom: true,
     };
 
-    setSelectedListItems([...selectedListItems, newItem]);
+    setSelectedListItems((prev) => [...prev, newItem]);
 
+    // Limpiar campos del formulario
     setCustomName('');
     setCustomImageUrl('');
     setCustomImagePreview('');
@@ -601,9 +615,8 @@ export function SellerProductForm({
 
                       <button
                         type="button"
-                        disabled={!isCatalogQtyValid}
                         onClick={handleAddCatalogProduct}
-                        className="px-4 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer font-serif flex items-center gap-1 disabled:opacity-40"
+                        className="px-4 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer font-serif flex items-center gap-1"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Añadir</span>
@@ -712,7 +725,7 @@ export function SellerProductForm({
                       <input
                         type="number"
                         step="0.01"
-                        min="0.10"
+                        min="0.01"
                         value={customPrice}
                         onChange={(e) => setCustomPrice(e.target.value)}
                         placeholder="7.50"
@@ -759,9 +772,8 @@ export function SellerProductForm({
                   <div className="pt-2 flex justify-end font-serif">
                     <button
                       type="button"
-                      disabled={!isCustomQtyValid}
                       onClick={handleAddCustomProduct}
-                      className="px-5 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5 disabled:opacity-40"
+                      className="px-5 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
                     >
                       <Plus className="w-3.5 h-3.5 text-[#FFE259] dark:text-[#1D1D1B]" />
                       <span>Añadir a la lista</span>
@@ -772,7 +784,7 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 4. PRODUCTOS DE LA LISTA (Móvil: Arriba izquierda imagen, derecha cantidad y precio/borrar. Abajo ancho completo nombre e info) */}
+          {/* 4. PRODUCTOS DE LA LISTA */}
           {isPackOrEvent && (
             <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-3 font-sans">
               <div className="flex items-center gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
@@ -789,9 +801,7 @@ export function SellerProductForm({
                       key={item.id}
                       className="p-3.5 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 shadow-2xs space-y-2.5"
                     >
-                      {/* Fila Superior: Izquierda Imagen (2 alturas) · Derecha Cantidad y debajo Precio/Borrar */}
                       <div className="flex items-center justify-between gap-3">
-                        {/* Imagen a la izquierda */}
                         <div className="w-16 h-16 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-stone-100 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 shrink-0">
                           <img
                             src={item.imageUrl || '/images/secciones/Quesos.JPG'}
@@ -800,9 +810,7 @@ export function SellerProductForm({
                           />
                         </div>
 
-                        {/* Derecha: Arriba Cantidad, Debajo Precio y Borrar */}
                         <div className="flex flex-col items-end gap-1.5 shrink-0">
-                          {/* Arriba: Cantidad */}
                           <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-[#141312] p-0.5">
                             <button
                               type="button"
@@ -823,7 +831,6 @@ export function SellerProductForm({
                             </button>
                           </div>
 
-                          {/* Debajo: Precio y Borrar */}
                           <div className="flex items-center gap-2">
                             <span className="font-serif font-black text-xs sm:text-sm text-stone-900 dark:text-stone-100 min-w-[55px] text-right">
                               {(item.price * item.quantity).toFixed(2)} €
@@ -841,7 +848,6 @@ export function SellerProductForm({
                         </div>
                       </div>
 
-                      {/* Fila Inferior: Ancho completo para Nombre y Resto de Información */}
                       <div className="pt-2 border-t border-stone-100 dark:border-stone-800/60 space-y-0.5 w-full">
                         <p className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:text-sm leading-snug break-words">
                           {item.name}
@@ -865,7 +871,6 @@ export function SellerProductForm({
                     </div>
                   ))}
 
-                  {/* Suma total al final de los productos individuales */}
                   <div className="pt-3 mt-3 border-t-2 border-stone-200 dark:border-stone-800 flex items-center justify-between px-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 font-serif">
                       Suma total de la lista:
@@ -883,7 +888,7 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 5. PRECIO (€) Y DESCUENTO (%) - Colores dinámicos y cálculo bidireccional */}
+          {/* 5. PRECIO (€) Y DESCUENTO (%) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
@@ -1130,7 +1135,6 @@ export function SellerProductForm({
               </div>
             </div>
 
-            {/* Puntos de Entrega con diseño unificado */}
             {hasPickup && (
               <div className="space-y-2 pt-2 animate-fadeIn">
                 <label className="font-bold text-stone-700 dark:text-stone-300 block">
@@ -1237,4 +1241,4 @@ export function SellerProductForm({
 }
 `);
 
-console.log('\n✨ Layout móvil en "Productos de la lista" actualizado exitosamente.');
+console.log('\n✨ Validación de cantidad arreglada con avisos explícitos y guardado completado.');
