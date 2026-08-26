@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { createProduct, updateProduct, deleteProduct } from '@/app/actions/products';
@@ -25,7 +25,6 @@ import {
   ChevronUp,
   UserCheck,
   Tag,
-  Percent,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -86,11 +85,6 @@ export function SellerProductForm({
   const [imagePreview, setImagePreview] = useState<string | null>(initialProduct?.image_url || null);
   const [isUnlimited, setIsUnlimited] = useState<boolean>(initialProduct?.is_unlimited_stock || false);
 
-  // Precio final y cálculo de descuento
-  const [finalPriceInput, setFinalPriceInput] = useState<string>(
-    initialProduct?.price ? String(initialProduct.price) : ''
-  );
-
   // Métodos de entrega
   const [deliveryMethods, setDeliveryMethods] = useState<string[]>(
     initialProduct?.delivery_methods || ['domicilio', 'recogida_tienda']
@@ -122,7 +116,7 @@ export function SellerProductForm({
   );
 
   // ==========================================
-  // ESTADOS DE "PRODUCTOS DE LA LISTA"
+  // PRODUCTOS DE LA LISTA
   // ==========================================
   const [selectedListItems, setSelectedListItems] = useState<AddedListItem[]>([]);
 
@@ -130,26 +124,29 @@ export function SellerProductForm({
   const [catalogSelectId, setCatalogSelectId] = useState<string>(
     availableSingleProducts[0]?.id || ''
   );
-  const [catalogQuantity, setCatalogQuantity] = useState<number>(1);
+  const [catalogQuantityStr, setCatalogQuantityStr] = useState<string>('1');
 
   const selectedCatalogProduct = useMemo(() => {
     return availableSingleProducts.find((p) => p.id === catalogSelectId) || availableSingleProducts[0];
   }, [availableSingleProducts, catalogSelectId]);
 
+  const parsedCatalogQty = parseInt(catalogQuantityStr, 10);
+  const isCatalogQtyValid = !isNaN(parsedCatalogQty) && parsedCatalogQty > 0;
+
   const handleAddCatalogProduct = () => {
-    if (!selectedCatalogProduct) return;
+    if (!selectedCatalogProduct || !isCatalogQtyValid) return;
     const existingIndex = selectedListItems.findIndex((it) => it.id === selectedCatalogProduct.id);
 
     if (existingIndex > -1) {
       const updated = [...selectedListItems];
-      updated[existingIndex].quantity += catalogQuantity;
+      updated[existingIndex].quantity += parsedCatalogQty;
       setSelectedListItems(updated);
     } else {
       const newItem: AddedListItem = {
         id: selectedCatalogProduct.id,
         name: selectedCatalogProduct.name,
         price: Number(selectedCatalogProduct.price),
-        quantity: catalogQuantity,
+        quantity: parsedCatalogQty,
         imageUrl: getProductImage(selectedCatalogProduct),
         category: selectedCatalogProduct.category_id,
         format: selectedCatalogProduct.format,
@@ -159,24 +156,36 @@ export function SellerProductForm({
       };
       setSelectedListItems([...selectedListItems, newItem]);
     }
-    setCatalogQuantity(1);
+    setCatalogQuantityStr('1');
   };
 
   // 2. Acordeón de Producto Específico / Manual
   const [isCustomAccordionOpen, setIsCustomAccordionOpen] = useState(false);
   const [customName, setCustomName] = useState('');
-  const [customImage, setCustomImage] = useState('');
+  const [customImageUrl, setCustomImageUrl] = useState('');
+  const [customImagePreview, setCustomImagePreview] = useState<string>('');
   const [customCategory, setCustomCategory] = useState('queso');
   const [customFormat, setCustomFormat] = useState('unidad');
   const [customPrice, setCustomPrice] = useState('');
   const [customOrigin, setCustomOrigin] = useState('Lekeitio / Bizkaia');
   const [customDesc, setCustomDesc] = useState('');
-  const [customQuantity, setCustomQuantity] = useState(1);
+  const [customQuantityStr, setCustomQuantityStr] = useState<string>('1');
+
+  const handleCustomFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setCustomImagePreview(url);
+    }
+  };
+
+  const parsedCustomQty = parseInt(customQuantityStr, 10);
+  const isCustomQtyValid = !isNaN(parsedCustomQty) && parsedCustomQty > 0;
 
   const handleAddCustomProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customName.trim() || !customPrice) {
-      alert('Por favor, indica al menos el nombre y el precio del producto suelto.');
+    if (!customName.trim() || !customPrice || !isCustomQtyValid) {
+      alert('Por favor, indica al menos el nombre, precio y una cantidad válida (> 0).');
       return;
     }
 
@@ -184,8 +193,8 @@ export function SellerProductForm({
       id: 'custom_' + Date.now(),
       name: customName.trim(),
       price: parseFloat(customPrice) || 0,
-      quantity: Math.max(1, customQuantity),
-      imageUrl: customImage.trim() || '/images/secciones/Quesos.JPG',
+      quantity: parsedCustomQty,
+      imageUrl: customImagePreview || customImageUrl.trim() || '/images/secciones/Quesos.JPG',
       category: customCategory,
       format: customFormat,
       origin: customOrigin.trim() || undefined,
@@ -195,12 +204,13 @@ export function SellerProductForm({
 
     setSelectedListItems([...selectedListItems, newItem]);
 
-    // Limpiar campos del formulario manual
+    // Limpiar campos
     setCustomName('');
-    setCustomImage('');
+    setCustomImageUrl('');
+    setCustomImagePreview('');
     setCustomPrice('');
     setCustomDesc('');
-    setCustomQuantity(1);
+    setCustomQuantityStr('1');
     setIsCustomAccordionOpen(false);
   };
 
@@ -224,15 +234,50 @@ export function SellerProductForm({
     return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
   }, [selectedListItems]);
 
-  // Cálculo del porcentaje de descuento
-  const discountPercentage = useMemo(() => {
-    const entered = parseFloat(finalPriceInput);
-    if (sumOfLooseItems > 0 && !isNaN(entered) && entered > 0) {
-      const diff = sumOfLooseItems - entered;
-      return Math.round((diff / sumOfLooseItems) * 100);
+  // ==========================================
+  // PRECIO Y DESCUENTO (%) BIDIRECCIONALES
+  // ==========================================
+  const [finalPriceInput, setFinalPriceInput] = useState<string>(
+    initialProduct?.price ? String(initialProduct.price) : ''
+  );
+  const [discountInput, setDiscountInput] = useState<string>('0');
+
+  // Cuando cambia la suma de productos sueltos, sincronizamos manteniendo el descuento actual
+  useEffect(() => {
+    if (sumOfLooseItems > 0) {
+      const disc = parseFloat(discountInput) || 0;
+      const newPrice = sumOfLooseItems * (1 - disc / 100);
+      setFinalPriceInput(Math.max(0, newPrice).toFixed(2));
     }
-    return null;
-  }, [sumOfLooseItems, finalPriceInput]);
+  }, [sumOfLooseItems]);
+
+  // Al escribir en Precio -> actualiza Descuento
+  const handlePriceChange = (val: string) => {
+    setFinalPriceInput(val);
+    const num = parseFloat(val);
+    if (sumOfLooseItems > 0 && !isNaN(num)) {
+      const calculatedDiscount = ((sumOfLooseItems - num) / sumOfLooseItems) * 100;
+      setDiscountInput(
+        calculatedDiscount % 1 === 0
+          ? calculatedDiscount.toFixed(0)
+          : calculatedDiscount.toFixed(1)
+      );
+    } else if (val === '') {
+      setDiscountInput('');
+    }
+  };
+
+  // Al escribir en Descuento -> actualiza Precio
+  const handleDiscountChange = (val: string) => {
+    setDiscountInput(val);
+    const num = parseFloat(val);
+    if (sumOfLooseItems > 0 && !isNaN(num)) {
+      const calculatedPrice = sumOfLooseItems * (1 - num / 100);
+      setFinalPriceInput(Math.max(0, calculatedPrice).toFixed(2));
+    } else if (val === '') {
+      setFinalPriceInput('');
+    }
+  };
 
   const handleTogglePickup = (id: string) => {
     if (selectedPickupIds.includes(id)) {
@@ -285,7 +330,6 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
-    // Auto-generar lista de artículos en la descripción si se crearon en "Productos de la lista"
     if (isPackOrEvent && selectedListItems.length > 0) {
       const rawDesc = (formData.get('description') as string) || '';
       const itemsFormatted = selectedListItems.map(
@@ -456,7 +500,7 @@ export function SellerProductForm({
             2. Datos del Producto o Evento
           </span>
 
-          {/* 1. Nombre del Producto */}
+          {/* 1. Nombre del Producto / Evento */}
           <div>
             <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
               {publishingType === 'cata_presencial' ? 'Nombre del Evento / Cata *' : 'Nombre del Producto *'}
@@ -489,7 +533,6 @@ export function SellerProductForm({
                 </p>
               </div>
 
-              {/* Selector desplegable con vista previa */}
               <div className="space-y-3">
                 <select
                   value={catalogSelectId}
@@ -503,7 +546,6 @@ export function SellerProductForm({
                   ))}
                 </select>
 
-                {/* Tarjeta de visualización previa del producto seleccionado */}
                 {selectedCatalogProduct && (
                   <div className="p-3 bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0 w-full">
@@ -529,16 +571,18 @@ export function SellerProductForm({
                           type="number"
                           min="1"
                           max="99"
-                          value={catalogQuantity}
-                          onChange={(e) => setCatalogQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="w-14 px-2 py-1 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-lg text-center font-bold"
+                          value={catalogQuantityStr}
+                          onChange={(e) => setCatalogQuantityStr(e.target.value)}
+                          placeholder="1"
+                          className="w-14 px-2 py-1 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-lg text-center font-bold text-stone-900 dark:text-stone-100"
                         />
                       </div>
 
                       <button
                         type="button"
+                        disabled={!isCatalogQtyValid}
                         onClick={handleAddCatalogProduct}
-                        className="px-4 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer font-serif flex items-center gap-1"
+                        className="px-4 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer font-serif flex items-center gap-1 disabled:opacity-40"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Añadir</span>
@@ -553,7 +597,6 @@ export function SellerProductForm({
           {/* 3. Meter productos sueltos específicos (uno a uno) - Acordeón Recogido */}
           {isPackOrEvent && (
             <div className="rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50/50 dark:bg-[#141312]">
-              {/* Título clickeable del acordeón */}
               <button
                 type="button"
                 onClick={() => setIsCustomAccordionOpen(!isCustomAccordionOpen)}
@@ -572,30 +615,45 @@ export function SellerProductForm({
                 </div>
               </button>
 
-              {/* Formulario desplegable */}
               {isCustomAccordionOpen && (
                 <div className="p-4 border-t border-stone-200 dark:border-stone-800 space-y-3 bg-white dark:bg-[#1C1B19] animate-fadeIn font-sans">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Nombre *</label>
-                      <input
-                        type="text"
-                        value={customName}
-                        onChange={(e) => setCustomName(e.target.value)}
-                        placeholder="Ej: Cuña Queso Ahumado Artesano 250g"
-                        className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl font-bold"
-                      />
-                    </div>
+                  <div>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Nombre *</label>
+                    <input
+                      type="text"
+                      value={customName}
+                      onChange={(e) => setCustomName(e.target.value)}
+                      placeholder="Ej: Cuña Queso Ahumado Artesano 250g"
+                      className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl font-bold"
+                    />
+                  </div>
 
-                    <div>
-                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Imagen (URL directa)</label>
-                      <input
-                        type="text"
-                        value={customImage}
-                        onChange={(e) => setCustomImage(e.target.value)}
-                        placeholder="https://... o /images/secciones/Quesos.JPG"
-                        className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl text-[11px]"
-                      />
+                  {/* Selector de Foto desde Archivo y URL */}
+                  <div>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Fotografía del Producto</label>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-stone-100 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 shrink-0 flex items-center justify-center">
+                        {customImagePreview || customImageUrl ? (
+                          <img src={customImagePreview || customImageUrl} alt="Custom Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <ImageIcon className="w-5 h-5 text-stone-400" />
+                        )}
+                      </div>
+                      <div className="space-y-1.5 flex-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleCustomFileChange}
+                          className="w-full text-xs text-stone-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-stone-200 dark:file:bg-stone-800 file:text-stone-800 dark:file:text-stone-200 hover:file:bg-[#FFE259] cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={customImageUrl}
+                          onChange={(e) => setCustomImageUrl(e.target.value)}
+                          placeholder="O escribe una URL directa de imagen (opcional)"
+                          className="w-full px-2.5 py-1 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-lg text-[10.5px]"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -643,14 +701,15 @@ export function SellerProductForm({
                     </div>
 
                     <div>
-                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Cantidad</label>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Cantidad *</label>
                       <input
                         type="number"
                         min="1"
                         max="99"
-                        value={customQuantity}
-                        onChange={(e) => setCustomQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl font-bold"
+                        value={customQuantityStr}
+                        onChange={(e) => setCustomQuantityStr(e.target.value)}
+                        placeholder="1"
+                        className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                       />
                     </div>
                   </div>
@@ -680,8 +739,9 @@ export function SellerProductForm({
                   <div className="pt-2 flex justify-end font-serif">
                     <button
                       type="button"
+                      disabled={!isCustomQtyValid}
                       onClick={handleAddCustomProduct}
-                      className="px-5 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
+                      className="px-5 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5 disabled:opacity-40"
                     >
                       <Plus className="w-3.5 h-3.5 text-[#FFE259] dark:text-[#1D1D1B]" />
                       <span>Añadir a la lista</span>
@@ -731,7 +791,6 @@ export function SellerProductForm({
                       </div>
 
                       <div className="flex items-center gap-3 shrink-0">
-                        {/* Control de cantidad */}
                         <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-[#141312] p-0.5">
                           <button
                             type="button"
@@ -775,30 +834,12 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 5. Precio con sugerencia de fondo y Porcentaje de Descuento */}
+          {/* 5. PRECIO (€) Y DESCUENTO (%) - Lado a Lado con Cálculo Automático */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="font-bold text-stone-700 dark:text-stone-300">
-                  {publishingType === 'cata_presencial' ? 'Precio por Plaza (€) *' : 'Precio de Venta (€) *'}
-                </label>
-                {discountPercentage !== null && (
-                  <span
-                    className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md font-black text-[10.5px] ${
-                      discountPercentage > 0
-                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300'
-                        : discountPercentage === 0
-                        ? 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
-                        : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300'
-                    }`}
-                  >
-                    <Percent className="w-3 h-3" />
-                    <span>
-                      {discountPercentage > 0 ? `${discountPercentage}% Dto. vs suma` : `+${Math.abs(discountPercentage)}% vs suma`}
-                    </span>
-                  </span>
-                )}
-              </div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                {publishingType === 'cata_presencial' ? 'Precio por Plaza (€) *' : 'Precio de Venta (€) *'}
+              </label>
               <input
                 type="number"
                 step="0.01"
@@ -806,17 +847,42 @@ export function SellerProductForm({
                 name="price"
                 required
                 value={finalPriceInput}
-                onChange={(e) => setFinalPriceInput(e.target.value)}
+                onChange={(e) => handlePriceChange(e.target.value)}
                 placeholder={sumOfLooseItems > 0 ? sumOfLooseItems.toFixed(2) : '25.00'}
                 className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
               />
-              {sumOfLooseItems > 0 && !finalPriceInput && (
-                <span className="text-[10px] text-stone-400 block mt-1">
-                  Sugerencia calculada de productos sueltos: {sumOfLooseItems.toFixed(2)} €
+              {sumOfLooseItems > 0 && (
+                <span className="text-[10.5px] text-stone-400 block mt-1">
+                  Suma suelta original: {sumOfLooseItems.toFixed(2)} €
                 </span>
               )}
             </div>
 
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                Descuento (%)
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.1"
+                  disabled={sumOfLooseItems === 0}
+                  value={discountInput}
+                  onChange={(e) => handleDiscountChange(e.target.value)}
+                  placeholder="0"
+                  className="w-full pl-3.5 pr-8 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-stone-400 text-xs">
+                  %
+                </span>
+              </div>
+              <span className="text-[10.5px] text-stone-400 block mt-1">
+                {sumOfLooseItems > 0 ? 'Calcula el precio automáticamente' : 'Añade productos sueltos para calcular'}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="font-bold text-stone-700 dark:text-stone-300">
@@ -844,9 +910,7 @@ export function SellerProductForm({
                 className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {publishingType === 'producto_suelto' && (
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
@@ -866,27 +930,27 @@ export function SellerProductForm({
                 </select>
               </div>
             )}
-
-            {publishingType === 'producto_suelto' && (
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Formato / Unidad de Venta
-                </label>
-                <select
-                  name="format"
-                  defaultValue={initialProduct?.format || 'unidad'}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-                >
-                  <option value="unidad">Unidad / Pieza</option>
-                  <option value="peso_kg">Peso (Kg / Cuña)</option>
-                  <option value="tarro">Tarro / Bote</option>
-                  <option value="lata">Lata Conserva</option>
-                  <option value="botella">Botella</option>
-                  <option value="pack">Pack Degustación</option>
-                </select>
-              </div>
-            )}
           </div>
+
+          {publishingType === 'producto_suelto' && (
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                Formato / Unidad de Venta
+              </label>
+              <select
+                name="format"
+                defaultValue={initialProduct?.format || 'unidad'}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+              >
+                <option value="unidad">Unidad / Pieza</option>
+                <option value="peso_kg">Peso (Kg / Cuña)</option>
+                <option value="tarro">Tarro / Bote</option>
+                <option value="lata">Lata Conserva</option>
+                <option value="botella">Botella</option>
+                <option value="pack">Pack Degustación</option>
+              </select>
+            </div>
+          )}
 
           {publishingType !== 'cata_presencial' && (
             <div>
@@ -967,7 +1031,6 @@ export function SellerProductForm({
               <span>3. Métodos de Entrega & Puntos de Recogida en Tienda</span>
             </span>
 
-            {/* Opciones con diseño idéntico */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div
                 onClick={() => toggleDeliveryMethod('domicilio')}
