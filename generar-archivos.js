@@ -15,11 +15,12 @@ function saveFile(relativeFilePath, content) {
 saveFile('components/SellerProductForm.tsx', `
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { createProduct, updateProduct, deleteProduct } from '@/app/actions/products';
 import type { Category, Product, StoreAddress, EventAddress } from '@/types/database';
+import { getProductImage } from '@/lib/productHelpers';
 import {
   Package,
   ArrowLeft,
@@ -34,8 +35,12 @@ import {
   Truck,
   AlertCircle,
   Plus,
-  X,
+  Trash,
+  ChevronDown,
+  ChevronUp,
   UserCheck,
+  Tag,
+  Percent,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -45,6 +50,19 @@ export type PublishingType =
   | 'cata_presencial'
   | 'cata_casa'
   | 'tarjeta_regalo';
+
+export interface AddedListItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string;
+  category?: string;
+  format?: string;
+  origin?: string;
+  description?: string;
+  isCustom?: boolean;
+}
 
 export interface SellerProductFormProps {
   categories: Category[];
@@ -83,6 +101,11 @@ export function SellerProductForm({
   const [imagePreview, setImagePreview] = useState<string | null>(initialProduct?.image_url || null);
   const [isUnlimited, setIsUnlimited] = useState<boolean>(initialProduct?.is_unlimited_stock || false);
 
+  // Precio final y cálculo de descuento
+  const [finalPriceInput, setFinalPriceInput] = useState<string>(
+    initialProduct?.price ? String(initialProduct.price) : ''
+  );
+
   // Métodos de entrega
   const [deliveryMethods, setDeliveryMethods] = useState<string[]>(
     initialProduct?.delivery_methods || ['domicilio', 'recogida_tienda']
@@ -99,7 +122,7 @@ export function SellerProductForm({
     }
   };
 
-  // Puntos de entrega
+  // Puntos de entrega y eventos
   const activePickupList = pickupAddresses.filter((a) => a.is_active);
   const activeEventList = eventAddresses.filter((a) => a.is_active);
 
@@ -113,39 +136,118 @@ export function SellerProductForm({
     initialProduct?.event_address_id || activeEventList[0]?.id || ''
   );
 
-  // 1. Productos seleccionados del catálogo (vía dropdown)
-  const [catalogProductIds, setCatalogProductIds] = useState<string[]>([]);
-  const [selectedCatalogIdToAdd, setSelectedCatalogIdToAdd] = useState<string>(
+  // ==========================================
+  // ESTADOS DE "PRODUCTOS DE LA LISTA"
+  // ==========================================
+  const [selectedListItems, setSelectedListItems] = useState<AddedListItem[]>([]);
+
+  // 1. Selector de Catálogo
+  const [catalogSelectId, setCatalogSelectId] = useState<string>(
     availableSingleProducts[0]?.id || ''
   );
+  const [catalogQuantity, setCatalogQuantity] = useState<number>(1);
+
+  const selectedCatalogProduct = useMemo(() => {
+    return availableSingleProducts.find((p) => p.id === catalogSelectId) || availableSingleProducts[0];
+  }, [availableSingleProducts, catalogSelectId]);
 
   const handleAddCatalogProduct = () => {
-    if (!selectedCatalogIdToAdd) return;
-    if (!catalogProductIds.includes(selectedCatalogIdToAdd)) {
-      setCatalogProductIds([...catalogProductIds, selectedCatalogIdToAdd]);
+    if (!selectedCatalogProduct) return;
+    const existingIndex = selectedListItems.findIndex((it) => it.id === selectedCatalogProduct.id);
+
+    if (existingIndex > -1) {
+      const updated = [...selectedListItems];
+      updated[existingIndex].quantity += catalogQuantity;
+      setSelectedListItems(updated);
+    } else {
+      const newItem: AddedListItem = {
+        id: selectedCatalogProduct.id,
+        name: selectedCatalogProduct.name,
+        price: Number(selectedCatalogProduct.price),
+        quantity: catalogQuantity,
+        imageUrl: getProductImage(selectedCatalogProduct),
+        category: selectedCatalogProduct.category_id,
+        format: selectedCatalogProduct.format,
+        origin: selectedCatalogProduct.origin_region || undefined,
+        description: selectedCatalogProduct.description || undefined,
+        isCustom: false,
+      };
+      setSelectedListItems([...selectedListItems, newItem]);
     }
+    setCatalogQuantity(1);
   };
 
-  const handleRemoveCatalogProduct = (id: string) => {
-    setCatalogProductIds(catalogProductIds.filter((pId) => pId !== id));
-  };
+  // 2. Acordeón de Producto Específico / Manual
+  const [isCustomAccordionOpen, setIsCustomAccordionOpen] = useState(false);
+  const [customName, setCustomName] = useState('');
+  const [customImage, setCustomImage] = useState('');
+  const [customCategory, setCustomCategory] = useState('queso');
+  const [customFormat, setCustomFormat] = useState('unidad');
+  const [customPrice, setCustomPrice] = useState('');
+  const [customOrigin, setCustomOrigin] = useState('Lekeitio / Bizkaia');
+  const [customDesc, setCustomDesc] = useState('');
+  const [customQuantity, setCustomQuantity] = useState(1);
 
-  // 2. Productos sueltos creados manualmente sólo para este lote/evento
-  const [customItems, setCustomItems] = useState<string[]>([]);
-  const [newCustomInput, setNewCustomInput] = useState('');
-
-  const handleAddCustomItem = () => {
-    const trimmed = newCustomInput.trim();
-    if (!trimmed) return;
-    if (!customItems.includes(trimmed)) {
-      setCustomItems([...customItems, trimmed]);
-      setNewCustomInput('');
+  const handleAddCustomProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customName.trim() || !customPrice) {
+      alert('Por favor, indica al menos el nombre y el precio del producto suelto.');
+      return;
     }
+
+    const newItem: AddedListItem = {
+      id: 'custom_' + Date.now(),
+      name: customName.trim(),
+      price: parseFloat(customPrice) || 0,
+      quantity: Math.max(1, customQuantity),
+      imageUrl: customImage.trim() || '/images/secciones/Quesos.JPG',
+      category: customCategory,
+      format: customFormat,
+      origin: customOrigin.trim() || undefined,
+      description: customDesc.trim() || undefined,
+      isCustom: true,
+    };
+
+    setSelectedListItems([...selectedListItems, newItem]);
+
+    // Limpiar campos del formulario manual
+    setCustomName('');
+    setCustomImage('');
+    setCustomPrice('');
+    setCustomDesc('');
+    setCustomQuantity(1);
+    setIsCustomAccordionOpen(false);
   };
 
-  const handleRemoveCustomItem = (indexToRemove: number) => {
-    setCustomItems(customItems.filter((_, idx) => idx !== indexToRemove));
+  // Modificar cantidades o eliminar de "Productos de la lista"
+  const handleUpdateItemQuantity = (id: string, newQty: number) => {
+    if (newQty <= 0) {
+      setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
+      return;
+    }
+    setSelectedListItems(
+      selectedListItems.map((it) => (it.id === id ? { ...it, quantity: newQty } : it))
+    );
   };
+
+  const handleRemoveListItem = (id: string) => {
+    setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
+  };
+
+  // Suma total calculada de los productos sueltos
+  const sumOfLooseItems = useMemo(() => {
+    return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
+  }, [selectedListItems]);
+
+  // Cálculo del porcentaje de descuento
+  const discountPercentage = useMemo(() => {
+    const entered = parseFloat(finalPriceInput);
+    if (sumOfLooseItems > 0 && !isNaN(entered) && entered > 0) {
+      const diff = sumOfLooseItems - entered;
+      return Math.round((diff / sumOfLooseItems) * 100);
+    }
+    return null;
+  }, [sumOfLooseItems, finalPriceInput]);
 
   const handleTogglePickup = (id: string) => {
     if (selectedPickupIds.includes(id)) {
@@ -198,23 +300,15 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
-    // Componer descripción unificada si hay artículos incluidos (del catálogo o manuales)
-    const catalogSelectedNames = availableSingleProducts
-      .filter((p) => catalogProductIds.includes(p.id))
-      .map((p) => \`• \${p.name}\`);
-
-    const manualItemNames = customItems.map((it) => \`• \${it}\`);
-    const allIncluded = [...catalogSelectedNames, ...manualItemNames];
-
-    if (
-      (publishingType === 'cesta_gourmet' ||
-        publishingType === 'cata_presencial' ||
-        publishingType === 'cata_casa') &&
-      allIncluded.length > 0
-    ) {
+    // Auto-generar lista de artículos en la descripción si se crearon en "Productos de la lista"
+    if (isPackOrEvent && selectedListItems.length > 0) {
       const rawDesc = (formData.get('description') as string) || '';
-      if (!rawDesc.includes('Artículos incluidos')) {
-        const fullDesc = \`\${rawDesc.trim()}\\n\\n📦 Artículos incluidos en esta selección:\\n\${allIncluded.join('\\n')}\`;
+      const itemsFormatted = selectedListItems.map(
+        (it) => \`• \${it.name} (x\${it.quantity}) — \${(it.price * it.quantity).toFixed(2)} €\`
+      );
+
+      if (!rawDesc.includes('Productos incluidos')) {
+        const fullDesc = \`\${rawDesc.trim()}\\n\\n📦 Productos incluidos en esta selección:\\n\${itemsFormatted.join('\\n')}\\n\\nValor suma productos: \${sumOfLooseItems.toFixed(2)} €\`;
         formData.set('description', fullDesc);
       }
     }
@@ -372,7 +466,7 @@ export function SellerProductForm({
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs font-sans text-xs">
-        <div className="space-y-4">
+        <div className="space-y-5">
           <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
             2. Datos del Producto o Evento
           </span>
@@ -380,7 +474,7 @@ export function SellerProductForm({
           {/* 1. Nombre del Producto */}
           <div>
             <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-              {publishingType === 'cata_presencial' ? 'Título de la Cata Presencial *' : 'Nombre del Producto *'}
+              {publishingType === 'cata_presencial' ? 'Nombre del Evento / Cata *' : 'Nombre del Producto *'}
             </label>
             <input
               type="text"
@@ -398,7 +492,7 @@ export function SellerProductForm({
             />
           </div>
 
-          {/* 2. Añadir Productos Sueltos del Catálogo a esta Selección (Desplegable) */}
+          {/* 2. Añadir Productos Sueltos del Catálogo a esta Selección */}
           {isPackOrEvent && (
             <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-[#141312] border border-amber-200 dark:border-stone-800 space-y-3">
               <div>
@@ -406,142 +500,336 @@ export function SellerProductForm({
                   Añadir Productos Sueltos del Catálogo a esta Selección
                 </span>
                 <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
-                  Selecciona en la lista desplegable los artículos de la tienda que componen este pack o experiencia.
+                  Selecciona en la lista desplegable un producto existente para ver su ficha, indicar cantidad y añadirlo.
                 </p>
               </div>
 
-              <div className="flex gap-2">
+              {/* Selector desplegable con vista previa */}
+              <div className="space-y-3">
                 <select
-                  value={selectedCatalogIdToAdd}
-                  onChange={(e) => setSelectedCatalogIdToAdd(e.target.value)}
-                  className="flex-1 px-3.5 py-2 bg-white dark:bg-[#1F1E1C] border border-stone-300 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  value={catalogSelectId}
+                  onChange={(e) => setCatalogSelectId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-[#1F1E1C] border border-stone-300 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
-                  {availableSingleProducts.length > 0 ? (
-                    availableSingleProducts.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} ({Number(p.price).toFixed(2)} €)
-                      </option>
-                    ))
-                  ) : (
-                    <option value="">No hay productos individuales en catálogo</option>
-                  )}
+                  {availableSingleProducts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({Number(p.price).toFixed(2)} €)
+                    </option>
+                  ))}
                 </select>
 
-                <button
-                  type="button"
-                  onClick={handleAddCatalogProduct}
-                  disabled={!selectedCatalogIdToAdd}
-                  className="px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer disabled:opacity-50 shrink-0 flex items-center gap-1 font-serif"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Añadir</span>
-                </button>
-              </div>
-
-              {/* Lista de productos del catálogo agregados */}
-              {catalogProductIds.length > 0 && (
-                <div className="space-y-1.5 pt-1">
-                  {availableSingleProducts
-                    .filter((p) => catalogProductIds.includes(p.id))
-                    .map((p) => (
-                      <div
-                        key={p.id}
-                        className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700"
-                      >
-                        <span className="font-bold text-stone-800 dark:text-stone-200 truncate">
-                          • {p.name} ({Number(p.price).toFixed(2)} €)
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCatalogProduct(p.id)}
-                          className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
+                {/* Tarjeta de visualización previa del producto seleccionado */}
+                {selectedCatalogProduct && (
+                  <div className="p-3 bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0 w-full">
+                      <img
+                        src={getProductImage(selectedCatalogProduct)}
+                        alt={selectedCatalogProduct.name}
+                        className="w-12 h-12 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
+                      />
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="font-bold text-stone-900 dark:text-stone-100 text-xs truncate">
+                          {selectedCatalogProduct.name}
+                        </p>
+                        <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                          Precio: <strong className="text-amber-600 dark:text-[#FFE259]">{Number(selectedCatalogProduct.price).toFixed(2)} €</strong> · {selectedCatalogProduct.format || 'unidad'} · {selectedCatalogProduct.origin_region || 'Lekeitio'}
+                        </p>
                       </div>
-                    ))}
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                      <div className="flex items-center gap-1.5">
+                        <label className="text-[11px] font-bold text-stone-500">Cantidad:</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="99"
+                          value={catalogQuantity}
+                          onChange={(e) => setCatalogQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-14 px-2 py-1 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-lg text-center font-bold"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleAddCatalogProduct}
+                        className="px-4 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer font-serif flex items-center gap-1"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Añadir</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 3. Meter productos sueltos específicos (uno a uno) - Acordeón Recogido */}
+          {isPackOrEvent && (
+            <div className="rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50/50 dark:bg-[#141312]">
+              {/* Título clickeable del acordeón */}
+              <button
+                type="button"
+                onClick={() => setIsCustomAccordionOpen(!isCustomAccordionOpen)}
+                className="w-full p-4 flex items-center justify-between text-left hover:bg-stone-100 dark:hover:bg-[#1F1E1C] transition-colors cursor-pointer"
+              >
+                <div>
+                  <span className="text-[11px] font-black uppercase tracking-wider text-stone-900 dark:text-stone-100 block font-serif">
+                    Meter productos sueltos específicos (uno a uno)
+                  </span>
+                  <p className="text-[10.5px] text-stone-500 dark:text-stone-400 font-sans">
+                    Pulsa aquí para desplegar el formulario y crear un artículo nuevo exclusivo para esta selección.
+                  </p>
+                </div>
+                <div className="p-1.5 rounded-xl bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
+                  {isCustomAccordionOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </div>
+              </button>
+
+              {/* Formulario desplegable */}
+              {isCustomAccordionOpen && (
+                <div className="p-4 border-t border-stone-200 dark:border-stone-800 space-y-3 bg-white dark:bg-[#1C1B19] animate-fadeIn font-sans">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Nombre *</label>
+                      <input
+                        type="text"
+                        value={customName}
+                        onChange={(e) => setCustomName(e.target.value)}
+                        placeholder="Ej: Cuña Queso Ahumado Artesano 250g"
+                        className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Imagen (URL directa)</label>
+                      <input
+                        type="text"
+                        value={customImage}
+                        onChange={(e) => setCustomImage(e.target.value)}
+                        placeholder="https://... o /images/secciones/Quesos.JPG"
+                        className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl text-[11px]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Categoría</label>
+                      <select
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl"
+                      >
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id}>{c.name_es}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Formato</label>
+                      <select
+                        value={customFormat}
+                        onChange={(e) => setCustomFormat(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl"
+                      >
+                        <option value="unidad">Unidad</option>
+                        <option value="peso_kg">Kg / Cuña</option>
+                        <option value="tarro">Tarro</option>
+                        <option value="lata">Lata</option>
+                        <option value="botella">Botella</option>
+                        <option value="pack">Pack</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Precio (€) *</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0.10"
+                        value={customPrice}
+                        onChange={(e) => setCustomPrice(e.target.value)}
+                        placeholder="7.50"
+                        className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Cantidad</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="99"
+                        value={customQuantity}
+                        onChange={(e) => setCustomQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                        className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Denominación / Origen</label>
+                    <input
+                      type="text"
+                      value={customOrigin}
+                      onChange={(e) => setCustomOrigin(e.target.value)}
+                      placeholder="Ej: Lekeitio · Bizkaia / Idiazabal"
+                      className="w-full px-3 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl text-[11px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Descripción</label>
+                    <textarea
+                      rows={2}
+                      value={customDesc}
+                      onChange={(e) => setCustomDesc(e.target.value)}
+                      placeholder="Características, curación o notas de este producto..."
+                      className="w-full px-3 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl text-[11px]"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex justify-end font-serif">
+                    <button
+                      type="button"
+                      onClick={handleAddCustomProduct}
+                      className="px-5 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-[#FFE259] dark:text-[#1D1D1B]" />
+                      <span>Añadir a la lista</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* 3. Meter productos sueltos, uno a uno, generados sólo para este producto/evento */}
+          {/* 4. PRODUCTOS DE LA LISTA */}
           {isPackOrEvent && (
-            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 space-y-3">
-              <div>
-                <span className="text-[11px] font-black uppercase tracking-wider text-stone-700 dark:text-stone-300 block font-serif">
-                  Meter productos sueltos específicos (uno a uno)
+            <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-4 font-sans">
+              <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
+                <div className="flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-amber-600 dark:text-[#FFE259]" />
+                  <h3 className="font-black text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
+                    Productos de la lista ({selectedListItems.length})
+                  </h3>
+                </div>
+                <span className="text-xs font-black text-stone-900 dark:text-[#F5F5F0]">
+                  Suma total: <strong className="text-amber-600 dark:text-[#FFE259] font-serif text-sm">{sumOfLooseItems.toFixed(2)} €</strong>
                 </span>
-                <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
-                  Escribe artículos o complementos exclusivos que se generarán únicamente para esta selección.
-                </p>
               </div>
 
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newCustomInput}
-                  onChange={(e) => setNewCustomInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddCustomItem();
-                    }
-                  }}
-                  placeholder="Ej: Cuña Queso Ahumado de Caserío 250g..."
-                  className="flex-1 px-3.5 py-2 bg-white dark:bg-[#1F1E1C] border border-stone-300 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100 font-medium"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddCustomItem}
-                  className="px-4 py-2 bg-stone-800 dark:bg-stone-200 hover:bg-stone-900 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer shrink-0 flex items-center gap-1 font-serif"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Meter</span>
-                </button>
-              </div>
-
-              {/* Lista de productos específicos agregados */}
-              {customItems.length > 0 && (
-                <div className="space-y-1.5 pt-1">
-                  {customItems.map((item, idx) => (
+              {selectedListItems.length > 0 ? (
+                <div className="space-y-2">
+                  {selectedListItems.map((item) => (
                     <div
-                      key={idx}
-                      className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700"
+                      key={item.id}
+                      className="p-3 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-3 shadow-2xs"
                     >
-                      <span className="font-bold text-stone-800 dark:text-stone-200 truncate">
-                        • {item}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCustomItem(idx)}
-                        className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src={item.imageUrl || '/images/secciones/Quesos.JPG'}
+                          alt={item.name}
+                          className="w-10 h-10 rounded-xl object-cover border border-stone-200 dark:border-stone-700 shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <p className="font-bold text-stone-900 dark:text-stone-100 truncate text-xs">
+                            {item.name}
+                          </p>
+                          <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
+                            {item.price.toFixed(2)} € / ud {item.origin ? \`· \${item.origin}\` : ''} {item.isCustom ? '(Específico)' : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        {/* Control de cantidad */}
+                        <div className="flex items-center border border-stone-200 dark:border-stone-700 rounded-lg bg-stone-50 dark:bg-[#141312] p-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateItemQuantity(item.id, item.quantity - 1)}
+                            className="w-5 h-5 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="w-6 text-center text-xs font-black">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateItemQuantity(item.id, item.quantity + 1)}
+                            className="w-5 h-5 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <span className="font-serif font-black text-xs text-stone-900 dark:text-stone-100 min-w-[55px] text-right">
+                          {(item.price * item.quantity).toFixed(2)} €
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveListItem(item.id)}
+                          className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                        >
+                          <Trash className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-white/60 dark:bg-[#1C1B19]/60 border border-dashed border-stone-300 dark:border-stone-700 text-center text-stone-400 text-xs">
+                  Aún no has añadido productos sueltos a esta lista.
+                </div>
               )}
             </div>
           )}
 
-          {/* 4. Precio y Campos siguientes */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* 5. Precio con sugerencia de fondo y Porcentaje de Descuento */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {publishingType === 'cata_presencial' ? 'Precio por Plaza (€) *' : 'Precio (€) *'}
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="font-bold text-stone-700 dark:text-stone-300">
+                  {publishingType === 'cata_presencial' ? 'Precio por Plaza (€) *' : 'Precio de Venta (€) *'}
+                </label>
+                {discountPercentage !== null && (
+                  <span
+                    className={\`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md font-black text-[10.5px] \${
+                      discountPercentage > 0
+                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300'
+                        : discountPercentage === 0
+                        ? 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
+                        : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300'
+                    }\`}
+                  >
+                    <Percent className="w-3 h-3" />
+                    <span>
+                      {discountPercentage > 0 ? \`\${discountPercentage}% Dto. vs suma\` : \`+\${Math.abs(discountPercentage)}% vs suma\`}
+                    </span>
+                  </span>
+                )}
+              </div>
               <input
                 type="number"
                 step="0.01"
                 min="0.10"
                 name="price"
                 required
-                defaultValue={initialProduct?.price || ''}
-                placeholder="25.00"
+                value={finalPriceInput}
+                onChange={(e) => setFinalPriceInput(e.target.value)}
+                placeholder={sumOfLooseItems > 0 ? sumOfLooseItems.toFixed(2) : '25.00'}
                 className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
               />
+              {sumOfLooseItems > 0 && !finalPriceInput && (
+                <span className="text-[10px] text-stone-400 block mt-1">
+                  Sugerencia calculada de productos sueltos: {sumOfLooseItems.toFixed(2)} €
+                </span>
+              )}
             </div>
 
             <div>
@@ -634,7 +922,7 @@ export function SellerProductForm({
             <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
               {publishingType === 'cata_presencial'
                 ? 'Detalles, Fecha, Hora & Maridaje *'
-                : 'Descripción, notas de cata y maridaje sugerido'}
+                : 'Descripción, notas de cata y presentación'}
             </label>
             <textarea
               name="description"
@@ -651,7 +939,7 @@ export function SellerProductForm({
           </div>
         </div>
 
-        {/* Ubicación de Evento (Catas Presenciales) */}
+        {/* 6. Ubicación de Evento (Catas Presenciales) */}
         {publishingType === 'cata_presencial' && (
           <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 block font-serif flex items-center gap-1.5">
@@ -686,7 +974,7 @@ export function SellerProductForm({
           </div>
         )}
 
-        {/* Métodos de Entrega & Puntos de Recogida (Estilo unificado) */}
+        {/* 7. Métodos de Entrega & Puntos de Recogida */}
         {publishingType !== 'cata_presencial' && (
           <div className="space-y-4 pt-4 border-t border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] block font-serif flex items-center gap-1.5">
@@ -731,7 +1019,7 @@ export function SellerProductForm({
               </div>
             </div>
 
-            {/* Puntos de Entrega con el MISMO ESTILO que las opciones de arriba */}
+            {/* Puntos de Entrega (Se muestra SOLO si se selecciona Recogida en Tienda) */}
             {hasPickup && (
               <div className="space-y-2 pt-2 animate-fadeIn">
                 <label className="font-bold text-stone-700 dark:text-stone-300 block">
@@ -779,7 +1067,7 @@ export function SellerProductForm({
           </div>
         )}
 
-        {/* 5. Fotografía del Producto */}
+        {/* 8. Fotografía del Producto */}
         <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
           <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif flex items-center gap-1.5">
             <ImageIcon className="w-4 h-4" />
@@ -838,4 +1126,4 @@ export function SellerProductForm({
 }
 `);
 
-console.log('\n✨ Formulario de productos reordenado y puntos de recogida sincronizados con éxito.');
+console.log('\n✨ Formulario de producto actualizado con orden exacto, lista interactiva de productos, acordeón y cálculo de descuento.');
