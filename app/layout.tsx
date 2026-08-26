@@ -4,10 +4,12 @@ import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { CartProvider } from '@/context/CartContext';
+import { StoreConfigProvider } from '@/context/StoreConfigContext';
 import Navbar from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { CartDrawer } from '@/components/CartDrawer';
 import { CookieBanner } from '@/components/CookieBanner';
+import { createClient } from '@/lib/supabase/server';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -32,8 +34,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Script bloqueante anti-flash: aplica dark/light ANTES de que React hidrate
-// Se ejecuta sincrónicamente en el navegador para evitar parpadeo de tema
 const themeScript = `
 (function() {
   try {
@@ -47,33 +47,41 @@ const themeScript = `
 })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const { data: sellerRaw } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'vendedor')
+    .limit(1)
+    .maybeSingle();
+
   return (
     <html lang="eu" className={`${dmSans.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <head>
-        {/* Script anti-flash: aplica el tema correcto antes del primer render */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen flex flex-col antialiased selection:bg-[#FFE259] selection:text-[#1D1D1B] bg-[#FAF8F5] dark:bg-[#141312] text-[#1D1D1B] dark:text-[#F5F5F0]">
         <ThemeProvider>
           <LanguageProvider>
-            <CartProvider>
-              <Navbar />
-              <main className="flex-1 w-full">
-                {children}
-              </main>
-              <Footer />
-              <CartDrawer />
-              <CookieBanner />
-            </CartProvider>
+            <StoreConfigProvider initialSellerProfile={sellerRaw}>
+              <CartProvider>
+                <Navbar />
+                <main className="flex-1 w-full">
+                  {children}
+                </main>
+                <Footer />
+                <CartDrawer />
+                <CookieBanner />
+              </CartProvider>
+            </StoreConfigProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
-

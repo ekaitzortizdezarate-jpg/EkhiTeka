@@ -18,6 +18,18 @@ export type OrderStatus =
   | 'entregado'
   | 'cancelado';
 
+export interface PickupAddress {
+  id: string;
+  title: string;
+  street: string;
+  number?: string;
+  town: string;
+  province: string;
+  postal_code?: string;
+  schedule?: string;
+  is_active: boolean;
+}
+
 export interface ProfileDetails {
   first_name?: string | null;
   last_name_1?: string | null;
@@ -33,6 +45,8 @@ export interface ProfileDetails {
   stair?: string | null;
   floor?: string | null;
   door?: string | null;
+  whatsapp_phone?: string | null;
+  pickup_addresses?: PickupAddress[];
 }
 
 export interface Profile extends ProfileDetails {
@@ -61,14 +75,16 @@ export function parseProfile(raw?: any): Profile {
       birth_date: '',
       dni: '',
       phone: '',
-      province: '',
-      town: '',
-      postal_code: '',
-      street: '',
-      number: '',
+      province: 'Bizkaia',
+      town: 'Lekeitio',
+      postal_code: '48280',
+      street: 'Gamarra Kalea',
+      number: '4',
       stair: '',
       floor: '',
       door: '',
+      whatsapp_phone: '34600000000',
+      pickup_addresses: [],
     };
   }
 
@@ -83,6 +99,20 @@ export function parseProfile(raw?: any): Profile {
       // bio text fallback
     }
   }
+
+  const defaultAddresses: PickupAddress[] = [
+    {
+      id: 'default_store_1',
+      title: 'Quesería & Tienda Principal Lekeitio',
+      street: details.street || raw.street || 'Gamarra Kalea',
+      number: details.number || raw.number || '4',
+      town: details.town || raw.town || 'Lekeitio',
+      province: details.province || raw.province || 'Bizkaia',
+      postal_code: details.postal_code || raw.postal_code || '48280',
+      schedule: 'Lun-Vie: 10:00 - 14:30 | 17:00 - 20:30 · Sáb: 10:30 - 15:00',
+      is_active: true,
+    },
+  ];
 
   return {
     ...raw,
@@ -100,6 +130,8 @@ export function parseProfile(raw?: any): Profile {
     stair: details.stair || raw.stair || '',
     floor: details.floor || raw.floor || '',
     door: details.door || raw.door || '',
+    whatsapp_phone: details.whatsapp_phone || raw.phone || '34600000000',
+    pickup_addresses: details.pickup_addresses && details.pickup_addresses.length > 0 ? details.pickup_addresses : defaultAddresses,
   };
 }
 

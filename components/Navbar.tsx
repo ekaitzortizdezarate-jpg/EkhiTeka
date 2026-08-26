@@ -23,8 +23,9 @@ export default async function Navbar() {
     .maybeSingle();
 
   const sellerProfile = parseProfile(sellerRaw);
-  const storeAddress = sellerProfile.street
-    ? `${sellerProfile.street}${sellerProfile.number ? ` ${sellerProfile.number}` : ''}, ${sellerProfile.town || 'Lekeitio'}${sellerProfile.province ? ` · ${sellerProfile.province}` : ''}`
+  const activeAddr = sellerProfile.pickup_addresses?.find((a) => a.is_active) || sellerProfile.pickup_addresses?.[0];
+  const storeAddress = activeAddr
+    ? `${activeAddr.street}${activeAddr.number ? ` ${activeAddr.number}` : ''}, ${activeAddr.town} · ${activeAddr.province}`
     : 'Gamarra Kalea 4, Lekeitio · Bizkaia';
 
   if (user) {

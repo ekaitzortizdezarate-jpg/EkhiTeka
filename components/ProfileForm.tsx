@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile, changeUserPassword } from '@/app/actions/auth';
-import type { Profile } from '@/types/database';
+import type { Profile, PickupAddress } from '@/types/database';
 import { parseProfile, isProfileComplete } from '@/types/database';
 import {
   User,
@@ -14,11 +14,11 @@ import {
   ShieldCheck,
   Home,
   Pencil,
-  X,
+  Plus,
+  Trash2,
   ChevronDown,
-  Calendar,
-  CreditCard,
-  Mail,
+  MessageCircle,
+  Store,
   CheckCircle2,
   AlertCircle,
 } from 'lucide-react';
@@ -36,6 +36,19 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
 
+  // Estados específicos de vendedor
+  const [pickupAddresses, setPickupAddresses] = useState<PickupAddress[]>(
+    currentProfile.pickup_addresses || []
+  );
+  const [customWhatsApp, setCustomWhatsApp] = useState<string>(
+    currentProfile.whatsapp_phone || currentProfile.phone || '34600000000'
+  );
+  const [whatsAppMode, setWhatsAppMode] = useState<'registered' | 'custom'>(
+    currentProfile.whatsapp_phone && currentProfile.whatsapp_phone !== currentProfile.phone
+      ? 'custom'
+      : 'registered'
+  );
+
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ text: string; isError: boolean } | null>(null);
 
@@ -43,7 +56,51 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
   const [passwordMsg, setPasswordMsg] = useState<{ text: string; isError: boolean } | null>(null);
 
   const p = currentProfile;
+  const isSeller = p.role === 'vendedor' || p.role === 'admin';
   const isComplete = isProfileComplete(p);
+
+  // Gestión de puntos de recogida del vendedor
+  const handleSetActiveAddress = (id: string) => {
+    const updated = pickupAddresses.map((addr) => ({
+      ...addr,
+      is_active: addr.id === id,
+    }));
+    setPickupAddresses(updated);
+  };
+
+  const handleAddAddress = () => {
+    const newAddr: PickupAddress = {
+      id: 'addr_' + Date.now(),
+      title: 'Punto de Recogida #' + (pickupAddresses.length + 1),
+      street: 'Gamarra Kalea',
+      number: '4',
+      town: 'Lekeitio',
+      province: 'Bizkaia',
+      postal_code: '48280',
+      schedule: '10:00 - 14:30 | 17:00 - 20:30',
+      is_active: pickupAddresses.length === 0,
+    };
+    setPickupAddresses([...pickupAddresses, newAddr]);
+  };
+
+  const handleUpdateAddress = (id: string, field: keyof PickupAddress, value: any) => {
+    const updated = pickupAddresses.map((addr) =>
+      addr.id === id ? { ...addr, [field]: value } : addr
+    );
+    setPickupAddresses(updated);
+  };
+
+  const handleDeleteAddress = (id: string) => {
+    if (pickupAddresses.length <= 1) {
+      alert('Debe haber al menos una dirección de tienda/recogida registrada.');
+      return;
+    }
+    const filtered = pickupAddresses.filter((addr) => addr.id !== id);
+    if (!filtered.some((a) => a.is_active)) {
+      filtered[0].is_active = true;
+    }
+    setPickupAddresses(filtered);
+  };
 
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -51,6 +108,10 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
     setProfileMsg(null);
 
     const formData = new FormData(e.currentTarget);
+    const resolvedWhatsApp = whatsAppMode === 'registered' ? (formData.get('phone') as string) : customWhatsApp;
+    formData.append('whatsapp_phone', resolvedWhatsApp);
+    formData.append('pickup_addresses', JSON.stringify(pickupAddresses));
+
     const res = await updateProfile(formData);
     setLoadingProfile(false);
 
@@ -163,153 +224,169 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
           </div>
         )}
 
-        {/* ----------------- MODO VISTA: CADA CAMPO UNO A UNO ----------------- */}
+        {/* MODO VISTA: CADA CAMPO VISIBLE UNO A UNO */}
         {!isEditing ? (
           <div className="space-y-6 font-sans text-xs">
-            {/* Bloque: Identificación Personal */}
-            <div className="space-y-3">
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
-                <CreditCard className="w-3.5 h-3.5" />
-                <span>{t.profile_personal_data}</span>
-              </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_first_name} & {t.profile_last_name_1}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {[p.first_name, p.last_name_1, p.last_name_2].filter(Boolean).join(' ') || p.full_name || t.profile_not_specified}
+                </p>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_first_name}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.first_name || t.profile_not_specified}
-                  </p>
-                </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_dni}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm uppercase">
+                  {p.dni || t.profile_not_specified}
+                </p>
+              </div>
 
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_last_name_1}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.last_name_1 || t.profile_not_specified}
-                  </p>
-                </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_birth_date}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.birth_date || t.profile_not_specified}
+                </p>
+              </div>
 
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_last_name_2}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.last_name_2 || t.profile_not_specified}
-                  </p>
-                </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_phone}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.phone || t.profile_not_specified}
+                </p>
+              </div>
 
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_dni}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm uppercase">
-                    {p.dni || t.profile_not_specified}
-                  </p>
-                </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.auth_email}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.email || t.profile_not_specified}
+                </p>
+              </div>
 
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_birth_date}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.birth_date || t.profile_not_specified}
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
-                    {t.profile_phone}
-                  </span>
-                  <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
-                    {p.phone || t.profile_not_specified}
-                  </p>
-                </div>
+              <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block">
+                  {t.profile_town} · {t.profile_province}
+                </span>
+                <p className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+                  {p.town || 'Lekeitio'} ({p.province || 'Bizkaia'})
+                </p>
               </div>
             </div>
 
-            {/* Bloque: Dirección de Entrega Completa */}
-            <div className="space-y-3 pt-2">
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
+            {/* Dirección Personal */}
+            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
                 <Home className="w-3.5 h-3.5" />
                 <span>{t.profile_address_data}</span>
               </span>
+              <p className="text-sm font-bold text-stone-800 dark:text-stone-200">
+                {formattedAddress || t.profile_not_specified}
+              </p>
+            </div>
 
-              <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/80 dark:border-stone-700/80 space-y-3">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                  <p className="text-sm font-bold text-stone-900 dark:text-stone-100">
-                    {formattedAddress || t.profile_not_specified}
-                  </p>
+            {/* SECCIÓN VENDEDOR: WHATSAPP Y TIENDAS (MODO VISTA) */}
+            {isSeller && (
+              <div className="space-y-4 pt-4 border-t border-stone-200/60 dark:border-stone-800">
+                {/* WhatsApp Tienda */}
+                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block font-serif">
+                        WhatsApp Oficial de la Tienda
+                      </span>
+                      <p className="text-sm font-black text-stone-900 dark:text-stone-100">
+                        +{p.whatsapp_phone || p.phone || '34600000000'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-stone-200/50 dark:border-stone-700/50 text-[11px] text-stone-600 dark:text-stone-300">
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_street}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">{p.street || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_number} / {t.profile_floor}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">Nº {p.number || '-'} · Piso {p.floor || '-'} {p.door ? `(${p.door})` : ''}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_postal_code}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">{p.postal_code || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase font-black text-stone-400 block">{t.profile_town} / {t.profile_province}</span>
-                    <span className="font-bold text-stone-800 dark:text-stone-200">{p.town || 'Lekeitio'} ({p.province || 'Bizkaia'})</span>
+                {/* Direcciones de Recogida en Tienda */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block font-serif">
+                    Puntos de Entrega & Recogida en Tienda ({pickupAddresses.length})
+                  </span>
+                  <div className="space-y-2">
+                    {pickupAddresses.map((addr) => (
+                      <div
+                        key={addr.id}
+                        className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
+                          addr.is_active
+                            ? 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700'
+                            : 'bg-stone-50 dark:bg-stone-850 border-stone-200 dark:border-stone-700'
+                        }`}
+                      >
+                        <div className="space-y-0.5 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                            <h4 className="font-bold text-stone-900 dark:text-stone-100 truncate">{addr.title}</h4>
+                            {addr.is_active && (
+                              <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase">
+                                Activa
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-stone-600 dark:text-stone-400 text-[11px] truncate">
+                            {addr.street} {addr.number || ''}, {addr.town} ({addr.province}) · {addr.schedule || ''}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         ) : (
-          /* ----------------- MODO EDICIÓN: CAMPOS EDITABLES ----------------- */
-          <form onSubmit={handleProfileSubmit} className="space-y-5 font-sans text-xs animate-fadeIn">
+          /* MODO EDICIÓN */
+          <form onSubmit={handleProfileSubmit} className="space-y-6 font-sans text-xs animate-fadeIn">
             {/* 1. Nombre y Apellidos */}
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block mb-2 font-serif">
-                {t.profile_personal_data}
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_first_name} *
-                  </label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    required
-                    defaultValue={p.first_name || ''}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_last_name_1} *
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name_1"
-                    required
-                    defaultValue={p.last_name_1 || ''}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.profile_last_name_2}
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name_2"
-                    defaultValue={p.last_name_2 || ''}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                  />
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_first_name} *
+                </label>
+                <input
+                  type="text"
+                  name="first_name"
+                  required
+                  defaultValue={p.first_name || ''}
+                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_last_name_1} *
+                </label>
+                <input
+                  type="text"
+                  name="last_name_1"
+                  required
+                  defaultValue={p.last_name_1 || ''}
+                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.profile_last_name_2}
+                </label>
+                <input
+                  type="text"
+                  name="last_name_2"
+                  defaultValue={p.last_name_2 || ''}
+                  className="w-full px-3.5 py-2.5 rounded-xl border"
+                />
               </div>
             </div>
 
@@ -325,7 +402,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   required
                   defaultValue={p.dni || ''}
                   placeholder="12345678Z"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl uppercase"
+                  className="w-full px-3.5 py-2.5 rounded-xl border uppercase"
                 />
               </div>
               <div>
@@ -337,7 +414,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="birth_date"
                   required
                   defaultValue={p.birth_date || ''}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                  className="w-full px-3.5 py-2.5 rounded-xl border"
                 />
               </div>
               <div>
@@ -350,14 +427,14 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   required
                   defaultValue={p.phone || ''}
                   placeholder="600 000 000"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                  className="w-full px-3.5 py-2.5 rounded-xl border"
                 />
               </div>
             </div>
 
-            {/* 3. Dirección de Entrega */}
-            <div className="pt-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block mb-2 font-serif">
+            {/* 3. Dirección Personal */}
+            <div className="space-y-3 pt-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block font-serif">
                 {t.profile_address_data}
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -370,7 +447,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="province"
                     required
                     defaultValue={p.province || 'Bizkaia'}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
                   />
                 </div>
                 <div>
@@ -382,7 +459,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     name="town"
                     required
                     defaultValue={p.town || 'Lekeitio'}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
                   />
                 </div>
                 <div>
@@ -395,79 +472,236 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     required
                     defaultValue={p.postal_code || ''}
                     placeholder="48280"
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
+                <div className="col-span-2 sm:col-span-2">
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                    {t.profile_street} *
+                  </label>
+                  <input
+                    type="text"
+                    name="street"
+                    required
+                    defaultValue={p.street || ''}
+                    placeholder="Gamarra Kalea"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                    {t.profile_number} *
+                  </label>
+                  <input
+                    type="text"
+                    name="number"
+                    required
+                    defaultValue={p.number || ''}
+                    placeholder="4"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                    {t.profile_stair}
+                  </label>
+                  <input
+                    type="text"
+                    name="stair"
+                    defaultValue={p.stair || ''}
+                    placeholder="A"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                    {t.profile_floor} *
+                  </label>
+                  <input
+                    type="text"
+                    name="floor"
+                    required
+                    defaultValue={p.floor || ''}
+                    placeholder="2"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                    {t.profile_door} *
+                  </label>
+                  <input
+                    type="text"
+                    name="door"
+                    required
+                    defaultValue={p.door || ''}
+                    placeholder="B"
+                    className="w-full px-3.5 py-2.5 rounded-xl border"
                   />
                 </div>
               </div>
             </div>
 
-            {/* 4. Calle, Número, Escalera, Piso y Puerta */}
-            <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-              <div className="col-span-2 sm:col-span-2">
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_street} *
-                </label>
-                <input
-                  type="text"
-                  name="street"
-                  required
-                  defaultValue={p.street || ''}
-                  placeholder="Gamarra Kalea"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
+            {/* SECCIÓN VENDEDOR: CONFIGURACIÓN WHATSAPP Y PUNTOS DE RECOGIDA (MODO EDICIÓN) */}
+            {isSeller && (
+              <div className="space-y-6 pt-4 border-t border-stone-200 dark:border-stone-800">
+                {/* WhatsApp Config */}
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-emerald-600" />
+                    <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 font-serif">
+                      WhatsApp Oficial de la Tienda
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                    Todos los botones de WhatsApp de la web se dirigirán a este número.
+                  </p>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 cursor-pointer font-medium text-stone-800 dark:text-stone-200">
+                      <input
+                        type="radio"
+                        name="whatsapp_choice"
+                        checked={whatsAppMode === 'registered'}
+                        onChange={() => setWhatsAppMode('registered')}
+                      />
+                      <span>Usar el teléfono de contacto principal ({p.phone || 'registrado'})</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer font-medium text-stone-800 dark:text-stone-200">
+                      <input
+                        type="radio"
+                        name="whatsapp_choice"
+                        checked={whatsAppMode === 'custom'}
+                        onChange={() => setWhatsAppMode('custom')}
+                      />
+                      <span>Introducir otro número de WhatsApp para la tienda</span>
+                    </label>
+
+                    {whatsAppMode === 'custom' && (
+                      <div className="pt-1">
+                        <input
+                          type="text"
+                          value={customWhatsApp}
+                          onChange={(e) => setCustomWhatsApp(e.target.value)}
+                          placeholder="Ej: 34600000000"
+                          className="w-full sm:max-w-xs px-3.5 py-2 rounded-xl border font-bold"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Gestor de Direcciones de Tienda */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+                      <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 font-serif">
+                        Direcciones de Recogida / Puntos de Venta
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddAddress}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Añadir Punto</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {pickupAddresses.map((addr, idx) => (
+                      <div
+                        key={addr.id}
+                        className={`p-4 rounded-2xl border-2 space-y-3 ${
+                          addr.is_active
+                            ? 'border-[#FFE259] bg-amber-50/40 dark:bg-amber-950/20'
+                            : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-850'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={addr.title}
+                              onChange={(e) => handleUpdateAddress(addr.id, 'title', e.target.value)}
+                              placeholder="Nombre de la tienda / sede"
+                              className="font-bold px-2 py-1 rounded-lg border text-xs"
+                            />
+                            {addr.is_active ? (
+                              <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase">
+                                Activa para clientes
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleSetActiveAddress(addr.id)}
+                                className="px-2 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 hover:bg-[#FFE259] text-stone-800 dark:text-stone-200 hover:text-[#1D1D1B] font-bold text-[9px] uppercase transition-colors cursor-pointer"
+                              >
+                                Activar esta
+                              </button>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAddress(addr.id)}
+                            className="p-1.5 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                            title="Eliminar punto"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          <input
+                            type="text"
+                            value={addr.street}
+                            onChange={(e) => handleUpdateAddress(addr.id, 'street', e.target.value)}
+                            placeholder="Calle"
+                            className="px-2.5 py-1.5 rounded-lg border"
+                          />
+                          <input
+                            type="text"
+                            value={addr.number || ''}
+                            onChange={(e) => handleUpdateAddress(addr.id, 'number', e.target.value)}
+                            placeholder="Nº"
+                            className="px-2.5 py-1.5 rounded-lg border"
+                          />
+                          <input
+                            type="text"
+                            value={addr.town}
+                            onChange={(e) => handleUpdateAddress(addr.id, 'town', e.target.value)}
+                            placeholder="Municipio"
+                            className="px-2.5 py-1.5 rounded-lg border"
+                          />
+                          <input
+                            type="text"
+                            value={addr.province}
+                            onChange={(e) => handleUpdateAddress(addr.id, 'province', e.target.value)}
+                            placeholder="Provincia"
+                            className="px-2.5 py-1.5 rounded-lg border"
+                          />
+                        </div>
+
+                        <input
+                          type="text"
+                          value={addr.schedule || ''}
+                          onChange={(e) => handleUpdateAddress(addr.id, 'schedule', e.target.value)}
+                          placeholder="Horario de atención (Ej: Lun-Vie 10:00-14:30 | 17:00-20:30)"
+                          className="w-full px-2.5 py-1.5 rounded-lg border text-[11px]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_number} *
-                </label>
-                <input
-                  type="text"
-                  name="number"
-                  required
-                  defaultValue={p.number || ''}
-                  placeholder="4"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_stair}
-                </label>
-                <input
-                  type="text"
-                  name="stair"
-                  defaultValue={p.stair || ''}
-                  placeholder="A"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_floor} *
-                </label>
-                <input
-                  type="text"
-                  name="floor"
-                  required
-                  defaultValue={p.floor || ''}
-                  placeholder="2"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.profile_door} *
-                </label>
-                <input
-                  type="text"
-                  name="door"
-                  required
-                  defaultValue={p.door || ''}
-                  placeholder="B"
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
-                />
-              </div>
-            </div>
+            )}
 
             <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-end gap-3 font-serif">
               <button
@@ -490,7 +724,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
         )}
       </div>
 
-      {/* 2. TARJETA CAMBIAR CONTRASEÑA (Desplegable) */}
+      {/* 2. TARJETA CAMBIAR CONTRASEÑA */}
       <div className="bg-white dark:bg-stone-900 rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
         <button
           type="button"
@@ -541,7 +775,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="current_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
                 />
               </div>
             </div>
@@ -557,7 +791,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="new_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
                 />
               </div>
             </div>
@@ -573,7 +807,7 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                   name="confirm_password"
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border"
                 />
               </div>
             </div>

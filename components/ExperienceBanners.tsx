@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import { MessageCircle, Sparkles, Gift } from 'lucide-react';
 
 export function ExperienceBanners() {
   const { t } = useLanguage();
+  const { getWhatsAppUrl } = useStoreConfig();
 
   return (
     <section id="experiencias" className="space-y-8 pt-8">
@@ -27,6 +29,9 @@ export function ExperienceBanners() {
                 src="/images/secciones/Catas.JPG"
                 alt={t.exp_b1_title}
                 className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
               />
             </div>
 
@@ -34,14 +39,14 @@ export function ExperienceBanners() {
               <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
                 {t.exp_b1_title}
               </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
+              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
                 {t.exp_b1_desc}
               </p>
             </div>
           </div>
 
           <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20información%20sobre%20las%20catas%20presenciales%20de%20EkhiTeka"
+            href={getWhatsAppUrl('Hola, quisiera información sobre las catas presenciales de EkhiTeka')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-xs"
@@ -59,6 +64,9 @@ export function ExperienceBanners() {
                 src="/images/secciones/Mesas.JPG"
                 alt={t.exp_b2_title}
                 className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
               />
             </div>
 
@@ -66,14 +74,14 @@ export function ExperienceBanners() {
               <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
                 {t.exp_b2_title}
               </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
+              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
                 {t.exp_b2_desc}
               </p>
             </div>
           </div>
 
           <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20presupuesto%20para%20un%20evento/boda%20con%20mesa%20de%20quesos"
+            href={getWhatsAppUrl('Hola, quisiera presupuesto para un evento o boda con mesa de quesos')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 font-black text-xs transition-all shadow-xs"
@@ -91,6 +99,9 @@ export function ExperienceBanners() {
                 src="/images/secciones/Cestas.JPG"
                 alt={t.exp_b3_title}
                 className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
               />
             </div>
 
@@ -98,7 +109,7 @@ export function ExperienceBanners() {
               <h3 className="text-lg font-black text-stone-900 dark:text-stone-100 leading-snug">
                 {t.exp_b3_title}
               </h3>
-              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
+              <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium font-sans">
                 {t.exp_b3_desc}
               </p>
             </div>

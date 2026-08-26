@@ -5,12 +5,14 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import { signout } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
 import { CartNavButton } from '@/components/CartNavButton';
 import {
   User,
   LogOut,
+  LogIn,
   Menu,
   X,
   Store,
@@ -34,6 +36,7 @@ export function NavbarNavLinks({
 }: NavbarNavLinksProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const { whatsappPhone, storeAddress } = useStoreConfig();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
@@ -273,19 +276,30 @@ export function NavbarNavLinks({
             </form>
           </div>
         ) : (
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {/* Icono Iniciar Sesión en Móvil */}
             <Link
               href="/login"
-              className="px-4 py-2.5 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="lg:hidden p-2.5 rounded-2xl bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 text-stone-800 dark:text-stone-200 hover:text-[#1D1D1B] border border-stone-200 dark:border-stone-700 transition-all shadow-2xs"
+              title={t.nav_login}
             >
-              {t.nav_login}
+              <LogIn className="w-4 h-4" />
             </Link>
-            <Link
-              href="/register"
-              className="px-4 py-2.5 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
-            >
-              {t.nav_register}
-            </Link>
+
+            <div className="hidden sm:flex items-center gap-2">
+              <Link
+                href="/login"
+                className="px-4 py-2.5 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                {t.nav_login}
+              </Link>
+              <Link
+                href="/register"
+                className="px-4 py-2.5 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
+              >
+                {t.nav_register}
+              </Link>
+            </div>
           </div>
         )}
       </div>
@@ -500,8 +514,8 @@ export function NavbarNavLinks({
                 <Store className="w-3.5 h-3.5 text-[#FFE259]" />
                 <span>Quesería & Tienda en Lekeitio</span>
               </div>
-              <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
-              <p className="font-semibold text-[#FFE259]">WhatsApp: +34 600 000 000</p>
+              <p>{storeAddress}</p>
+              <p className="font-semibold text-[#FFE259]">WhatsApp: +{whatsappPhone}</p>
             </div>
           </div>
         </div>,

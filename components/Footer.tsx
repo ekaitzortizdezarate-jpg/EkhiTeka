@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import { Truck, Store } from 'lucide-react';
 
 export function Footer() {
   const { t } = useLanguage();
+  const { storeAddress, whatsappPhone, getWhatsAppUrl } = useStoreConfig();
 
   return (
     <footer className="border-t border-stone-200 dark:border-stone-800 bg-[#1D1D1B] text-stone-300 transition-colors pt-0 pb-8">
@@ -25,7 +27,7 @@ export function Footer() {
           </div>
 
           <a
-            href="https://wa.me/34600000000?text=Hola,%20quisiera%20unirme%20a%20las%20novedades%20de%20EkhiTeka"
+            href={getWhatsAppUrl('Hola, quisiera unirme a las novedades del Club de Amigos de EkhiTeka')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] text-white hover:bg-stone-800 font-black text-xs uppercase tracking-wider transition-all shadow-md shrink-0 hover:scale-105"
@@ -129,7 +131,7 @@ export function Footer() {
             </div>
 
             <p className="text-stone-400 leading-relaxed font-medium">
-              Gamarra Kalea 4, Lekeitio · Bizkaia
+              {storeAddress}
             </p>
             <div className="text-stone-400 font-medium space-y-0.5 text-[11px]">
               <p className="font-bold text-stone-300">{t.footer_schedule_title}</p>
@@ -137,7 +139,7 @@ export function Footer() {
               <p>{t.footer_schedule_saturday}</p>
             </div>
             <p className="text-stone-300 font-bold text-[11px]">
-              WhatsApp: +34 600 000 000
+              WhatsApp: +{whatsappPhone}
             </p>
           </div>
         </div>
