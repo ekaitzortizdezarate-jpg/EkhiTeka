@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import type { ProfileDetails } from '@/types/database';
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -77,7 +78,7 @@ export async function updateProfile(formData: FormData) {
 
   const firstName = (formData.get('first_name') as string)?.trim() || '';
   const lastName1 = (formData.get('last_name_1') as string)?.trim() || '';
-  const lastName2 = (formData.get('last_name_2') as string)?.trim() || null;
+  const lastName2 = (formData.get('last_name_2') as string)?.trim() || '';
   const birthDate = (formData.get('birth_date') as string)?.trim() || '';
   const dni = (formData.get('dni') as string)?.trim()?.toUpperCase() || '';
   const phone = (formData.get('phone') as string)?.trim() || '';
@@ -86,7 +87,7 @@ export async function updateProfile(formData: FormData) {
   const postalCode = (formData.get('postal_code') as string)?.trim() || '';
   const street = (formData.get('street') as string)?.trim() || '';
   const number = (formData.get('number') as string)?.trim() || '';
-  const stair = (formData.get('stair') as string)?.trim() || null;
+  const stair = (formData.get('stair') as string)?.trim() || '';
   const floor = (formData.get('floor') as string)?.trim() || '';
   const door = (formData.get('door') as string)?.trim() || '';
 
@@ -106,7 +107,7 @@ export async function updateProfile(formData: FormData) {
     .filter(Boolean)
     .join(', ');
 
-  const structuredBio = JSON.stringify({
+  const profileData: ProfileDetails = {
     first_name: firstName,
     last_name_1: lastName1,
     last_name_2: lastName2,
@@ -121,8 +122,11 @@ export async function updateProfile(formData: FormData) {
     stair,
     floor,
     door,
-  });
+  };
 
+  const structuredBio = JSON.stringify(profileData);
+
+  // Actualizamos únicamente las columnas seguras de la tabla profiles
   const { error } = await supabase
     .from('profiles')
     .update({
@@ -131,18 +135,6 @@ export async function updateProfile(formData: FormData) {
       town,
       address: formattedAddress,
       bio: structuredBio,
-      first_name: firstName,
-      last_name_1: lastName1,
-      last_name_2: lastName2,
-      birth_date: birthDate || null,
-      dni,
-      province,
-      postal_code: postalCode,
-      street,
-      number,
-      stair,
-      floor,
-      door,
       updated_at: new Date().toISOString(),
     })
     .eq('id', user.id);
@@ -152,7 +144,17 @@ export async function updateProfile(formData: FormData) {
   revalidatePath('/perfil');
   revalidatePath('/');
   revalidatePath('/cesta');
-  return { success: true };
+  return {
+    success: true,
+    updatedProfile: {
+      ...profileData,
+      full_name: fullName,
+      phone,
+      town,
+      address: formattedAddress,
+      bio: structuredBio,
+    },
+  };
 }
 
 export async function changeUserPassword(formData: FormData) {

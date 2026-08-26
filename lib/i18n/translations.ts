@@ -299,6 +299,7 @@ export interface TranslationDict {
   profile_subtitle: string;
   profile_personal_data: string;
   profile_address_data: string;
+  profile_contact_data: string;
   profile_security: string;
   profile_first_name: string;
   profile_last_name_1: string;
@@ -322,6 +323,8 @@ export interface TranslationDict {
   profile_edit_btn: string;
   profile_not_specified: string;
   profile_full_address: string;
+  profile_status_complete: string;
+  profile_status_incomplete: string;
 
   // Roles & Auth
   role_buyer: string;
@@ -558,7 +561,7 @@ export const translations: Record<Language, TranslationDict> = {
     exp_store_tasting_btn: 'Ikusi Datak & Erreserbatu Lekua',
     exp_wedding_title: 'Ezkontzetarako Mahaia',
     exp_wedding_badge: 'Ezkontzak & Ekitaldiak',
-    exp_wedding_desc: 'Gazta-mahai ikusgarriak sortzen ditugu ezkontzetako kokteletarako.',
+    exp_wedding_desc: 'Gazta-mahai ikusgarriak sortzen ditugu.',
     exp_wedding_btn: 'Eskatu Aurrekontua Ezkontzetarako',
     exp_raclette_title: 'Raclette Mailegua',
     exp_raclette_badge: 'Alokairua & Pack-a',
@@ -675,7 +678,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_title: 'Nire Profila',
     profile_subtitle: 'Kudeatu zure harremanetarako datuak, bidalketa helbidea eta segurtasuna.',
     profile_personal_data: 'Datu Pertsonalak',
-    profile_address_data: 'Bidalketa Helbidea & Harremana',
+    profile_address_data: 'Bidalketa Helbidea',
+    profile_contact_data: 'Harremanetarako Datuak',
     profile_security: 'Segurtasuna & Pasahitza Aldatu',
     profile_first_name: 'Izena',
     profile_last_name_1: '1. Abizena',
@@ -699,6 +703,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_edit_btn: 'Editatu Profila',
     profile_not_specified: 'Zehaztu gabe',
     profile_full_address: 'Helbide osoa',
+    profile_status_complete: 'Profila Osatua',
+    profile_status_incomplete: 'Profila Osatu Gabea',
 
     role_buyer: 'Bezeroa / Eroslea',
     role_seller: 'Ekoizlea / Saltzailea',
@@ -1040,7 +1046,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_title: 'Mi Perfil',
     profile_subtitle: 'Gestiona tus datos personales, dirección de entrega y seguridad.',
     profile_personal_data: 'Datos Personales',
-    profile_address_data: 'Dirección de Entrega y Contacto',
+    profile_address_data: 'Dirección de Entrega',
+    profile_contact_data: 'Datos de Contacto',
     profile_security: 'Seguridad y Cambio de Contraseña',
     profile_first_name: 'Nombre',
     profile_last_name_1: 'Primer Apellido',
@@ -1064,6 +1071,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_edit_btn: 'Editar Perfil',
     profile_not_specified: 'No especificado',
     profile_full_address: 'Dirección completa',
+    profile_status_complete: 'Perfil Completo',
+    profile_status_incomplete: 'Perfil Incompleto',
 
     role_buyer: 'Comprador / Gourmet',
     role_seller: 'Productor / Vendedor',
@@ -1405,7 +1414,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_title: 'My Profile',
     profile_subtitle: 'Manage your contact information, shipping address and password.',
     profile_personal_data: 'Personal Information',
-    profile_address_data: 'Shipping Address & Contact',
+    profile_address_data: 'Shipping Address',
+    profile_contact_data: 'Contact Information',
     profile_security: 'Security & Change Password',
     profile_first_name: 'First Name',
     profile_last_name_1: 'First Surname',
@@ -1429,6 +1439,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_edit_btn: 'Edit Profile',
     profile_not_specified: 'Not specified',
     profile_full_address: 'Full address',
+    profile_status_complete: 'Complete Profile',
+    profile_status_incomplete: 'Incomplete Profile',
 
     role_buyer: 'Buyer / Gourmet',
     role_seller: 'Artisan / Seller',
@@ -1770,7 +1782,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_title: 'Mon Profil',
     profile_subtitle: 'Gérez vos données personnelles, adresse de livraison et sécurité.',
     profile_personal_data: 'Données Personnelles',
-    profile_address_data: 'Adresse de Livraison & Contact',
+    profile_address_data: 'Adresse de Livraison',
+    profile_contact_data: 'Coordonnées de Contact',
     profile_security: 'Sécurité & Changer de Mot de Passe',
     profile_first_name: 'Prénom',
     profile_last_name_1: 'Premier Nom',
@@ -1794,6 +1807,8 @@ export const translations: Record<Language, TranslationDict> = {
     profile_edit_btn: 'Modifier le Profil',
     profile_not_specified: 'Non spécifié',
     profile_full_address: 'Adresse complète',
+    profile_status_complete: 'Profil Complet',
+    profile_status_incomplete: 'Profil Incomplet',
 
     role_buyer: 'Client / Gourmet',
     role_seller: 'Artisan / Vendeur',
