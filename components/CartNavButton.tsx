@@ -8,6 +8,10 @@ export function CartNavButton() {
   const { totalItems, setIsCartOpen } = useCart();
   const { t } = useLanguage();
 
+  if (totalItems === 0) {
+    return null;
+  }
+
   return (
     <button
       type="button"
@@ -17,11 +21,9 @@ export function CartNavButton() {
     >
       <ShoppingBag className="w-4 h-4 text-stone-800 dark:text-stone-200 group-hover:text-stone-950 dark:group-hover:text-[#1D1D1B] transition-colors" />
       <span className="hidden sm:inline font-bold font-serif uppercase tracking-wider">{t.nav_cart}</span>
-      {totalItems > 0 && (
-        <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[11px] flex items-center justify-center shadow-xs border border-stone-800 animate-bounce">
-          {totalItems}
-        </span>
-      )}
+      <span className="min-w-5 h-5 px-1.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[11px] flex items-center justify-center shadow-xs border border-stone-800 animate-bounce">
+        {totalItems}
+      </span>
     </button>
   );
 }

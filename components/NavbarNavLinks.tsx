@@ -103,7 +103,7 @@ export function NavbarNavLinks({
         </button>
 
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
+          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF8F5] shrink-0">
             <img
               src="/Logo.jpg"
               alt="EkhiTeka Logo"
@@ -290,7 +290,7 @@ export function NavbarNavLinks({
         )}
       </div>
 
-      {/* 3. MENÚ MÓVIL */}
+      {/* 3. MENÚ MÓVIL (Con link a inicio en el logo y nombre) */}
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
@@ -301,8 +301,12 @@ export function NavbarNavLinks({
           <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-stone-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5]">
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5] group-hover:scale-105 transition-transform shrink-0">
                     <img
                       src="/Logo.jpg"
                       alt="EkhiTeka"
@@ -317,7 +321,7 @@ export function NavbarNavLinks({
                       Lekeitio · Bizkaia
                     </span>
                   </div>
-                </div>
+                </Link>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
@@ -385,7 +389,6 @@ export function NavbarNavLinks({
                 </p>
                 {user ? (
                   <>
-                    {/* 1. Pedidos */}
                     <Link
                       href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                       onClick={() => setMobileMenuOpen(false)}
@@ -405,7 +408,6 @@ export function NavbarNavLinks({
                       )}
                     </Link>
 
-                    {/* 2. Eventos */}
                     {isSeller && (
                       <Link
                         href="/vendedor/eventos"
@@ -420,7 +422,6 @@ export function NavbarNavLinks({
                       </Link>
                     )}
 
-                    {/* 3. Añadir Producto */}
                     {isSeller && (
                       <Link
                         href="/vendedor/productos/nuevo"
@@ -435,7 +436,6 @@ export function NavbarNavLinks({
                       </Link>
                     )}
 
-                    {/* 4. Mensajes */}
                     <Link
                       href="/chat"
                       onClick={() => setMobileMenuOpen(false)}
@@ -453,7 +453,6 @@ export function NavbarNavLinks({
                       )}
                     </Link>
 
-                    {/* 5. Perfil */}
                     <Link
                       href="/perfil"
                       onClick={() => setMobileMenuOpen(false)}
@@ -466,7 +465,6 @@ export function NavbarNavLinks({
                       <span>{t.nav_profile}</span>
                     </Link>
 
-                    {/* 6. Cerrar Sesión */}
                     <form action={signout} className="pt-2">
                       <button
                         type="submit"

@@ -22,7 +22,7 @@ export default async function ProfilePage() {
   const userProfile = profile as Profile;
 
   return (
-    <div className="max-w-xl mx-auto py-6 space-y-6">
+    <div className="max-w-3xl mx-auto py-6 px-4 sm:px-6 space-y-6">
       <div className="flex items-center gap-3">
         <Link
           href="/"
@@ -31,11 +31,11 @@ export default async function ProfilePage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
-            Mi Perfil
+          <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 font-serif">
+            Mi Perfil · Nire Profila
           </h1>
           <p className="text-xs text-stone-500 dark:text-stone-400">
-            Gestiona tus datos de contacto y preferencias.
+            Gestiona tus datos de contacto, dirección y contraseña.
           </p>
         </div>
       </div>

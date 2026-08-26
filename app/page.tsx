@@ -22,6 +22,9 @@ export default function HomePage() {
             src="/images/secciones/Tienda.JPG"
             alt="EkhiTeka Quesería Gourmet Lekeitio"
             className="w-full h-full object-cover object-center scale-100"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
         </div>
@@ -63,7 +66,7 @@ export default function HomePage() {
           </div>
 
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] hover:scale-105 transition-transform duration-500">
+            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
               <img
                 src="/Logo.jpg"
                 alt="EkhiTeka Lekeitio"
@@ -194,16 +197,19 @@ export default function HomePage() {
             </div>
           </Link>
 
-          {/* Tarjeta 4: Regalos de Empresa */}
+          {/* Tarjeta 4: Regalos de Empresa (Con imagen segura de Cestas) */}
           <Link
             href="/regalos-empresa"
             className="group relative rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
           >
             <div className="relative h-52 overflow-hidden">
               <img
-                src="/images/secciones/Empresas.JPG"
+                src="/images/secciones/Cestas.JPG"
                 alt={t.home_card4_title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
@@ -236,15 +242,15 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-4">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
-              {t.shop_visit_subtitle}
+              Bisitatu Lekeition · Km0
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif">
-              {t.shop_visit_title}
+              Gure Gaztategia & Gourmet Gunea
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
-              {t.shop_visit_desc}
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              En nuestra web ves una selección, en nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
             </p>
-            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
+            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300 font-sans">
               <div className="flex items-center gap-2">
                 <span className="text-base">📍</span>
                 <span>Gamarra Kalea 4, Lekeitio · Bizkaia</span>
@@ -262,7 +268,7 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-                <span>{t.shop_visit_contact}</span>
+                <span>Kontaktatu Dendarekin</span>
               </a>
               <Link
                 href="/tienda"
@@ -280,7 +286,7 @@ export default function HomePage() {
                 alt="Tienda EkhiTeka Lekeitio"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-4 right-4 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black rounded-full uppercase tracking-wider shadow-md">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black rounded-full uppercase tracking-wider shadow-md font-sans">
                 Lekeitio Centro
               </div>
             </div>
