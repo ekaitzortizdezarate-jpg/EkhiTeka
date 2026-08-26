@@ -82,7 +82,7 @@ export default function RegalosEmpresaPage() {
         {/* Tarjeta 1: Lotes y Cestas de Navidad */}
         <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-4">
-            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-stone-200/60 dark:border-stone-700 relative">
               <img
                 src="/images/secciones/Cestas.JPG"
                 alt={t.corp_card1_title}
@@ -110,7 +110,7 @@ export default function RegalosEmpresaPage() {
         {/* Tarjeta 2: Catas Privadas & Team Building */}
         <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-4">
-            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-stone-200/60 dark:border-stone-700 relative">
               <img
                 src="/images/secciones/Catas.JPG"
                 alt={t.corp_card2_title}
@@ -138,7 +138,7 @@ export default function RegalosEmpresaPage() {
         {/* Tarjeta 3: Personalización con tu Marca */}
         <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-4">
-            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-stone-200/60 dark:border-stone-700 relative">
               <img
                 src="/images/secciones/Mesas.JPG"
                 alt={t.corp_card3_title}
@@ -164,7 +164,7 @@ export default function RegalosEmpresaPage() {
         </div>
       </section>
 
-      {/* 3. Garantías de Logística */}
+      {/* 3. Garantías de Logística (Modo Oscuro Nítido Corregido) */}
       <section className="rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 shadow-sm space-y-6 font-serif">
         <div className="max-w-2xl space-y-2">
           <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
@@ -179,23 +179,23 @@ export default function RegalosEmpresaPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 font-sans">
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 shadow-2xs">
             <Truck className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
+            <span className="text-xs font-bold text-stone-800 dark:text-[#F5F5F0]">
               {t.corp_logistics_feat1}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 shadow-2xs">
             <ShieldCheck className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
+            <span className="text-xs font-bold text-stone-800 dark:text-[#F5F5F0]">
               {t.corp_logistics_feat2}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-700">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 shadow-2xs">
             <CheckCircle2 className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-            <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
+            <span className="text-xs font-bold text-stone-800 dark:text-[#F5F5F0]">
               {t.corp_logistics_feat3}
             </span>
           </div>
