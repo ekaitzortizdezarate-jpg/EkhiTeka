@@ -1,11 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-
-const files = {
-  // =========================================================================
-  // 1. COMPONENTE CLIENTE DE DETALLE DE PRODUCTO (100% Traducido y Modo Oscuro)
-  // =========================================================================
-  'components/ProductDetailView.tsx': `'use client';
+'use client';
 
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
@@ -148,7 +141,7 @@ export function ProductDetailView({
               </p>
             </div>
             <Link
-              href={\`/chat/\${product.seller_id || ''}?product_id=\${product.id}\`}
+              href={`/chat/${product.seller_id || ''}?product_id=${product.id}`}
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-black uppercase tracking-wider transition-all font-serif shrink-0 shadow-xs hover:scale-105"
             >
               <MessageCircle className="w-4 h-4" />
@@ -196,110 +189,3 @@ export function ProductDetailView({
     </div>
   );
 }
-`,
-
-  // =========================================================================
-  // 2. PÁGINA SERVIDOR DE DETALLE DE PRODUCTO (Carga a prueba de fallos)
-  // =========================================================================
-  'app/producto/[id]/page.tsx': `import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
-import { ProductDetailView } from '@/components/ProductDetailView';
-import type { ProductWithSeller } from '@/types/database';
-
-export const revalidate = 0;
-
-interface ProductPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function ProductDetailPage({ params }: ProductPageProps) {
-  const { id } = await params;
-  const decodedId = decodeURIComponent(id);
-  const supabase = await createClient();
-
-  // 1. Verificación segura de usuario
-  let user = null;
-  try {
-    const { data: authData } = await supabase.auth.getUser();
-    user = authData?.user || null;
-  } catch {
-    user = null;
-  }
-
-  // 2. Carga segura del producto con fallback
-  let product: ProductWithSeller | null = null;
-  try {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, profiles(id, full_name, town, avatar_url, phone, role)')
-      .eq('id', decodedId)
-      .maybeSingle();
-
-    if (!data || error) {
-      const { data: fallbackData } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', decodedId)
-        .maybeSingle();
-      product = fallbackData as ProductWithSeller;
-    } else {
-      product = data as unknown as ProductWithSeller;
-    }
-  } catch (e) {
-    console.error('Error cargando producto:', e);
-  }
-
-  if (!product) {
-    notFound();
-  }
-
-  // 3. Verificación de permisos de vendedor
-  let isSeller = false;
-  if (user) {
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle();
-      if (profile?.role === 'vendedor' || profile?.role === 'admin') {
-        isSeller = true;
-      }
-    } catch {}
-  }
-
-  // 4. Carga segura de productos relacionados
-  let relatedProducts: ProductWithSeller[] = [];
-  if (product.category_id) {
-    try {
-      const { data: relatedData } = await supabase
-        .from('products')
-        .select('*, profiles(id, full_name, town, avatar_url, phone)')
-        .eq('category_id', product.category_id)
-        .neq('id', product.id)
-        .eq('is_active', true)
-        .limit(4);
-      relatedProducts = (relatedData || []) as unknown as ProductWithSeller[];
-    } catch {}
-  }
-
-  return (
-    <ProductDetailView
-      product={product}
-      relatedProducts={relatedProducts}
-      isSeller={isSeller}
-    />
-  );
-}
-`,
-};
-
-// Generación en disco
-Object.entries(files).forEach(([filePath, content]) => {
-  const fullPath = path.join(process.cwd(), filePath);
-  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-  fs.writeFileSync(fullPath, content.trimStart(), 'utf8');
-  console.log(`✓ Actualizado: ${filePath}`);
-});
-
-console.log('\n🎉 ¡Ventana de detalle de producto corregida al 100%!');
