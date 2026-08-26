@@ -85,6 +85,36 @@ export function SellerProductForm({
   const [imagePreview, setImagePreview] = useState<string | null>(initialProduct?.image_url || null);
   const [isUnlimited, setIsUnlimited] = useState<boolean>(initialProduct?.is_unlimited_stock || false);
 
+  // Filtrar estrictamente solo productos sueltos reales (excluyendo cestas, catas y tarjetas de regalo)
+  const cleanSingleProducts = useMemo(() => {
+    return availableSingleProducts.filter((p) => {
+      const cat = (p.category_id || '').toLowerCase();
+      const name = (p.name || '').toLowerCase();
+      const format = (p.format || '').toLowerCase();
+
+      const isExcludedCategory =
+        cat === 'cesta' ||
+        cat === 'cesta_gourmet' ||
+        cat === 'cata' ||
+        cat === 'cata_presencial' ||
+        cat === 'cata_casa' ||
+        cat === 'tarjeta_regalo' ||
+        cat === 'experiencia';
+
+      const isExcludedName =
+        name.includes('cesta') ||
+        name.includes('cata') ||
+        name.includes('tarjeta') ||
+        name.includes('dastaketa') ||
+        name.includes('pack') ||
+        name.includes('lote');
+
+      const isExcludedFormat = format === 'pack';
+
+      return !isExcludedCategory && !isExcludedName && !isExcludedFormat;
+    });
+  }, [availableSingleProducts]);
+
   // Métodos de entrega
   const [deliveryMethods, setDeliveryMethods] = useState<string[]>(
     initialProduct?.delivery_methods || ['domicilio', 'recogida_tienda']
@@ -122,13 +152,22 @@ export function SellerProductForm({
 
   // 1. Selector de Catálogo
   const [catalogSelectId, setCatalogSelectId] = useState<string>(
-    availableSingleProducts[0]?.id || ''
+    cleanSingleProducts[0]?.id || ''
   );
   const [catalogQuantityStr, setCatalogQuantityStr] = useState<string>('1');
 
+  useEffect(() => {
+    if (!catalogSelectId && cleanSingleProducts.length > 0) {
+      setCatalogSelectId(cleanSingleProducts[0].id);
+    }
+  }, [cleanSingleProducts, catalogSelectId]);
+
   const selectedCatalogProduct = useMemo(() => {
-    return availableSingleProducts.find((p) => p.id === catalogSelectId) || availableSingleProducts[0];
-  }, [availableSingleProducts, catalogSelectId]);
+    return cleanSingleProducts.find((p) => p.id === catalogSelectId) || cleanSingleProducts[0];
+  }, [cleanSingleProducts, catalogSelectId]);
+
+  const parsedCatalogQty = parseInt(catalogQuantityStr, 10);
+  const isCatalogQtyValid = !isNaN(parsedCatalogQty) && parsedCatalogQty > 0;
 
   const handleAddCatalogProduct = () => {
     const qty = parseFloat(catalogQuantityStr);
@@ -217,7 +256,6 @@ export function SellerProductForm({
 
     setSelectedListItems((prev) => [...prev, newItem]);
 
-    // Limpiar campos del formulario
     setCustomName('');
     setCustomImageUrl('');
     setCustomImagePreview('');
@@ -227,7 +265,6 @@ export function SellerProductForm({
     setIsCustomAccordionOpen(false);
   };
 
-  // Modificar cantidades o eliminar de "Productos de la lista"
   const handleUpdateItemQuantity = (id: string, newQty: number) => {
     if (newQty <= 0) {
       setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
@@ -242,7 +279,6 @@ export function SellerProductForm({
     setSelectedListItems(selectedListItems.filter((it) => it.id !== id));
   };
 
-  // Suma total calculada de los productos sueltos
   const sumOfLooseItems = useMemo(() => {
     return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
   }, [selectedListItems]);
@@ -541,7 +577,7 @@ export function SellerProductForm({
             />
           </div>
 
-          {/* 2. Añadir Productos Sueltos del Catálogo a esta Selección */}
+          {/* 2. Añadir Productos Sueltos del Catálogo a esta Selección (Solo productos individuales) */}
           {isPackOrEvent && (
             <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-[#141312] border border-amber-200 dark:border-stone-800 space-y-3">
               <div>
@@ -549,7 +585,7 @@ export function SellerProductForm({
                   Añadir Productos Sueltos del Catálogo a esta Selección
                 </span>
                 <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
-                  Selecciona en la lista desplegable un producto existente para ver su ficha, indicar cantidad y añadirlo.
+                  Selecciona en la lista desplegable un producto individual suelto para ver su ficha, indicar cantidad y añadirlo.
                 </p>
               </div>
 
@@ -559,11 +595,15 @@ export function SellerProductForm({
                   onChange={(e) => setCatalogSelectId(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-white dark:bg-[#1F1E1C] border border-stone-300 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
-                  {availableSingleProducts.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({Number(p.price).toFixed(2)} €)
-                    </option>
-                  ))}
+                  {cleanSingleProducts.length > 0 ? (
+                    cleanSingleProducts.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} ({Number(p.price).toFixed(2)} €)
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">No hay productos sueltos registrados en el catálogo</option>
+                  )}
                 </select>
 
                 {selectedCatalogProduct && (
