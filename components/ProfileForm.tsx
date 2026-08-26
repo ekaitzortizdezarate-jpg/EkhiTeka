@@ -320,19 +320,18 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <label className="inline-flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 font-black text-[10px] uppercase cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={whatsAppEnabled}
-                        onChange={(e) => {
-                          setWhatsAppEnabled(e.target.checked);
-                          setIsEditing(true);
-                        }}
-                        className="h-4 w-4 accent-emerald-600"
-                        aria-label="Habilitar WhatsApp oficial de la tienda"
-                      />
-                      <span>Habilitado</span>
-                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setWhatsAppEnabled((enabled) => !enabled)}
+                      className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl border font-black text-[10px] uppercase cursor-pointer ${
+                        whatsAppEnabled
+                          ? 'border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
+                          : 'border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300'
+                      }`}
+                    >
+                      <Check className="w-3 h-3" />
+                      {whatsAppEnabled ? 'Habilitado' : 'Deshabilitado'}
+                    </button>
                     <button
                       type="button"
                       onClick={() => setIsEditing(true)}
@@ -596,16 +595,18 @@ export function ProfileForm({ profile, userProfile }: ProfileFormProps) {
                     </h3>
                     </div>
                     <div className="flex items-center gap-2">
-                      <label className="inline-flex items-center gap-1.5 text-stone-800 dark:text-stone-200 font-bold text-[10px] uppercase cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={whatsAppEnabled}
-                          onChange={(e) => setWhatsAppEnabled(e.target.checked)}
-                          className="h-4 w-4 accent-emerald-600"
-                          aria-label="Habilitar WhatsApp oficial de la tienda"
-                        />
-                        <span>Habilitar</span>
-                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsAppEnabled((enabled) => !enabled)}
+                        className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl border font-black text-[10px] uppercase cursor-pointer ${
+                          whatsAppEnabled
+                            ? 'border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
+                            : 'border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300'
+                        }`}
+                      >
+                        <Check className="w-3 h-3" />
+                        {whatsAppEnabled ? 'Habilitado' : 'Deshabilitado'}
+                      </button>
                       <button
                         type="button"
                         onClick={handleClearWhatsApp}
