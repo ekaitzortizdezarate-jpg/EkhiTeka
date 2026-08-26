@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
+import { getCategoryImage } from '@/lib/productHelpers';
 import type { Category } from '@/types/database';
 
 interface CategoryCircleGridProps {
@@ -53,6 +54,7 @@ export function CategoryCircleGrid({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.id;
+          const imageSrc = cat.image_url && cat.image_url.trim() ? cat.image_url : getCategoryImage(cat);
 
           return (
             <button
@@ -67,9 +69,12 @@ export function CategoryCircleGrid({
             >
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] mb-2 p-0.5 bg-[#FAF8F5]">
                 <img
-                  src={cat.image_url || '/images/secciones/Quesos.JPG'}
+                  src={imageSrc}
                   alt={getCategoryName(cat)}
                   className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                  }}
                 />
               </div>
 

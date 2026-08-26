@@ -1,13 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { deleteProduct } from '@/app/actions/products';
 import { getProductImage } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, MessageCircle, MapPin, Check, Pencil, Trash2, Ticket } from 'lucide-react';
+import { ShoppingBag, Ticket, MapPin, Eye } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductWithSeller;
@@ -17,181 +15,104 @@ interface ProductCardProps {
 export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const { addToCart } = useCart();
   const { t } = useLanguage();
-  const [added, setAdded] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
-  const isLowStock = !product.is_unlimited_stock && (product.stock ?? 0) > 0 && (product.stock ?? 0) <= 5;
   const isEvent =
     product.category_id === 'catas' ||
     product.category_id === 'cata_presencial' ||
     product.category_id === 'experiencia' ||
     product.name.toLowerCase().includes('cata');
 
-  const handleQuickAdd = (e: React.MouseEvent) => {
+  const imageUrl = getProductImage(product);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isSoldOut) return;
-    addToCart(product, 'EkhiTeka Selección');
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    addToCart(product, product.profiles?.full_name || 'EkhiTeka Selección');
   };
-
-  const handleDelete = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (confirm(`¿Eliminar "${product.name}" del catálogo de EkhiTeka?`)) {
-      setIsDeleting(true);
-      await deleteProduct(product.id);
-      window.location.reload();
-    }
-  };
-
-  const sellerName = 'EkhiTeka Gourmet Lekeitio';
-  const sellerId = product.seller_id;
-  const imageUrl = getProductImage(product);
 
   return (
-    <article
-      aria-label={product.name}
-      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col justify-between overflow-hidden transition-all duration-300 ${
-        isDeleting ? 'opacity-40 pointer-events-none' : ''
-      }`}
+    <Link
+      href={`/producto/${product.id}`}
+      className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] p-4 flex flex-col justify-between shadow-xs transition-all font-serif overflow-hidden"
     >
-      <div className="relative aspect-4/3 w-full bg-[#FAF7F2] dark:bg-stone-850 overflow-hidden shrink-0">
-        <img
-          src={imageUrl}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-          }}
-        />
+      <div className="space-y-3">
+        {/* Imagen del Producto */}
+        <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700">
+          <img
+            src={imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+            }}
+          />
 
-        {product.origin_region && (
-          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2.5 py-1 bg-[#1D1D1B]/85 dark:bg-black/85 backdrop-blur-xs text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-xs max-w-[55%] truncate">
-            <MapPin className="w-3 h-3 text-[#FFE259] shrink-0" />
-            <span className="truncate">{product.origin_region}</span>
-          </span>
-        )}
-
-        <div className="absolute top-2.5 right-2.5 flex items-center">
+          {/* Badge de Evento o Stock */}
           {isSoldOut ? (
-            <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-md animate-pulse">
-              {isEvent ? 'Sin Plazas' : 'Agotado'}
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+              {isEvent ? t.event_capacity_full : t.prod_sold_out}
             </span>
-          ) : isLowStock ? (
-            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
-              {isEvent ? `¡${product.stock} plazas!` : `¡${product.stock} uds!`}
+          ) : !product.is_unlimited_stock && (product.stock ?? 0) <= 5 ? (
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-amber-500 text-stone-900 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+              {isEvent ? t.event_last_seats : t.prod_last_units}
             </span>
-          ) : isEvent ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
-              <Ticket className="w-3 h-3" />
-              <span>{product.stock} plazas</span>
-            </span>
-          ) : (
-            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-xs">
-              Artisau
-            </span>
-          )}
+          ) : null}
         </div>
 
-        <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-tight shadow-xs border border-stone-200/80 dark:border-stone-700/80">
-          {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
-        </span>
-      </div>
+        {/* Datos del Producto */}
+        <div className="space-y-1">
+          {product.origin_region && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center gap-1 font-sans truncate">
+              <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+              {product.origin_region}
+            </span>
+          )}
 
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
-        <div className="space-y-1.5">
-          <p className="text-[10px] sm:text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider truncate">
-            {sellerName}
-          </p>
-
-          <Link
-            href={`/producto/${product.id}`}
-            className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors"
-          >
-            <h2 className="font-serif font-black text-stone-900 dark:text-stone-100 text-base sm:text-lg leading-snug break-words">
-              {product.name}
-            </h2>
-          </Link>
+          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-1 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+            {product.name}
+          </h3>
 
           {product.description && (
-            <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed pt-0.5 font-medium whitespace-pre-line line-clamp-4">
+            <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 font-sans font-medium">
               {product.description}
             </p>
           )}
         </div>
-
-        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
-          <div className="shrink-0">
-            <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider block">
-              {isEvent ? 'Precio / Plaza' : t.prod_price}
-            </span>
-            <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
-              {Number(product.price).toFixed(2)} €
-            </span>
-          </div>
-
-          {isSeller ? (
-            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
-              <Link
-                href={`/vendedor/productos/${product.id}/editar`}
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-102 font-serif uppercase tracking-wider cursor-pointer"
-                title="Editar Producto"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-                <span>Editar</span>
-              </Link>
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer border border-red-200 dark:border-red-800"
-                title="Eliminar Producto"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
-              <Link
-                href={`/chat/${sellerId}?product_id=${product.id}`}
-                className="p-2.5 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 shrink-0"
-                title={t.prod_ask_artisan}
-              >
-                <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-200" />
-              </Link>
-
-              <button
-                type="button"
-                disabled={isSoldOut}
-                onClick={handleQuickAdd}
-                className={`flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xs active:scale-95 font-serif cursor-pointer shrink-0 ${
-                  isSoldOut
-                    ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed shadow-none'
-                    : added
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-102'
-                }`}
-              >
-                {isSoldOut ? (
-                  <span>{isEvent ? 'Sin plazas' : 'Agotado'}</span>
-                ) : added ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>Añadido</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>{isEvent ? 'Reservar' : t.prod_add_to_cart}</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
       </div>
-    </article>
+
+      {/* Precio y Botón */}
+      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
+        <div>
+          <span className="font-serif font-black text-base sm:text-lg text-stone-900 dark:text-stone-100 block leading-none">
+            {Number(product.price).toFixed(2)} €
+          </span>
+          <span className="text-[9.5px] font-sans font-semibold text-stone-400">
+            {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
+          </span>
+        </div>
+
+        {!isSeller ? (
+          <button
+            type="button"
+            disabled={isSoldOut}
+            onClick={handleAddToCart}
+            className={`p-2.5 rounded-xl font-bold transition-all flex items-center justify-center cursor-pointer ${
+              isSoldOut
+                ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
+                : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] shadow-xs hover:scale-105'
+            }`}
+            title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
+          >
+            {isEvent ? <Ticket className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+          </button>
+        ) : (
+          <span className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-500">
+            <Eye className="w-4 h-4" />
+          </span>
+        )}
+      </div>
+    </Link>
   );
 }
