@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
+import { ProductDescription } from '@/components/ProductDescription';
 import {
   getProductImage,
   getProductDiscount,
@@ -162,9 +163,7 @@ export function ProductDetailView({
                 {isEvent ? t.event_details_title : t.prod_details}
               </h3>
               <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27]">
-                <p className="text-xs sm:text-[13px] text-stone-700 dark:text-stone-300 leading-relaxed font-serif whitespace-pre-line">
-                  {cleanDescription}
-                </p>
+                <ProductDescription description={product.description} language={language} />
               </div>
             </div>
           )}

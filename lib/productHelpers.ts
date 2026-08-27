@@ -142,15 +142,28 @@ export function formatProductDescription(
   const clean = description.replace(/<!-- META:{.*?} -->/g, '').trim();
   if (!clean) return '';
 
-  const lines = clean.split('\n');
-  const formattedLines = lines.map((line) => {
+  // Clean emojis anywhere in the text
+  let normalized = clean.replace(/[📦🧀📅🕒⏰📍👥💳🏠✨🎉🍷⭐👉✔]/gu, ' ').trim();
+
+  // Split concatenated tokens onto separate lines for clean rendering
+  normalized = normalized.replace(/\s+(HORARIO|Horario|ORDUTEGIA|Ordutegia|HORA|Hora|TIME|Time|HEURE|Heure|SCHEDULE|Schedule)\s*:\s*/gi, '\nHorario: ');
+  normalized = normalized.replace(/\s+(PLAZAS DISPONIBLES|Plazas disponibles|PLAZAS|Plazas|AFORO|Aforo|LEKU LIBREAK|Leku libreak|AVAILABLE SEATS|Available seats|PLACES DISPONIBLES|Places disponibles)\s*:\s*/gi, '\nPlazas disponibles: ');
+  normalized = normalized.replace(/\s+(OPCIONES CANJEABLES|Opciones canjeables|AUKERA ERABILGARRIAK|Aukera erabilgarriak|OPTIONS ÉCHANGEABLES|Options échangeables|REDEEMABLE OPTIONS|Redeemable options)\s*:\s*/gi, '\nOpciones canjeables: ');
+
+  const rawLines = normalized.split('\n');
+  const formattedLines = rawLines.map((line) => {
     let l = line.trim();
+    if (!l) return '';
 
-    // Clean emojis anywhere in the line for clean Maisons du Monde aesthetic
-    l = l.replace(/[📦🧀📅🕒⏰📍👥💳🏠✨🎉🍷⭐👉✔]/gu, '').trim();
+    // 1. Pack de Cata, Lote Gourmet & Cestas Gourmet - Header translations
+    if (/^(LOTE GOURMET (INCLUYE)?|EL LOTE GOURMET INCLUYE|LOTE DE PRODUCTOS INCLUYE|ESTE LOTE INCLUYE|CONTENIDO DEL LOTE|CONTENIDO DEL LOTE GOURMET|PRODUCTOS INCLUIDOS EN ESTE LOTE|GOURMET LOTEAK DAKARRENA|LE COFFRET GOURMET COMPREND|GOURMET SET INCLUDES)\s*:?/i.test(l)) {
+      if (language === 'eu') return 'GOURMET LOTEAK DAKARRENA:';
+      if (language === 'fr') return 'LE COFFRET GOURMET COMPREND :';
+      if (language === 'en') return 'GOURMET SET INCLUDES:';
+      return 'EL LOTE GOURMET INCLUYE:';
+    }
 
-    // 1. Pack de Cata & Cestas Gourmet - Header translations
-    if (/^(PACK DE CATA (EN CASA )?INCLUYE|EL PACK DE CATA INCLUYE|PACK DE CATA|EL PACK INCLUYE|ESTE PACK INCLUYE|DASTAKETA PACK-AK DAKARRENA|TASTING PACK INCLUDES|LE PACK DE DÉGUSTATION COMPREND|PRODUCTOS INCLUIDOS EN ESTA SELECCI[OÓ]N|PRODUCTOS INCLUIDOS|CONTENIDO DE LA CESTA|CONTENIDO DEL LOTE|HAUTAKETA HONETAN SARTUTAKO PRODUKTUAK|PRODUCTS INCLUDED IN THIS SELECTION|PRODUITS INCLUS DANS CETTE SÉLECTION)\s*:?/i.test(l)) {
+    if (/^(PACK DE CATA (EN CASA )?INCLUYE|EL PACK DE CATA INCLUYE|PACK DE CATA|EL PACK INCLUYE|ESTE PACK INCLUYE|DASTAKETA PACK-AK DAKARRENA|TASTING PACK INCLUDES|LE PACK DE DÉGUSTATION COMPREND|PRODUCTOS INCLUIDOS EN ESTA SELECCI[OÓ]N|PRODUCTOS INCLUIDOS|CONTENIDO DE LA CESTA|HAUTAKETA HONETAN SARTUTAKO PRODUKTUAK|PRODUCTS INCLUDED IN THIS SELECTION|PRODUITS INCLUS DANS CETTE SÉLECTION)\s*:?/i.test(l)) {
       if (language === 'eu') return 'DASTAKETA PACK-AK DAKARRENA:';
       if (language === 'fr') return 'LE PACK DE DÉGUSTATION COMPREND :';
       if (language === 'en') return 'TASTING PACK INCLUDES:';
@@ -210,7 +223,7 @@ export function formatProductDescription(
       return 'Canjeable en tienda física y online';
     });
 
-    // 4. Catas Presenciales / Events - Inline Tokens (even when concatenated on one line)
+    // 4. Catas Presenciales / Events - Inline Tokens
     l = l.replace(/\b(FECHA|Fecha|DATA|Data|DATE|Date)\s*:\s*/g, () => {
       if (language === 'eu') return 'Data: ';
       if (language === 'fr') return 'Date : ';
@@ -253,7 +266,7 @@ export function formatProductDescription(
       return 'Duración: ';
     });
 
-    // 5. Item list modifier tags (e.g., (Tienda), (Casa), (Online), etc.)
+    // 5. Item list modifier tags
     l = l.replace(/\((Tienda|Denda|Dendan|Boutique|En boutique|Store|In store)\)/gi, () => {
       if (language === 'eu') return '(Dendan)';
       if (language === 'fr') return '(En boutique)';
@@ -276,10 +289,17 @@ export function formatProductDescription(
       return 'Cesta Degustación Gourmet Lekeitio';
     });
 
+    l = l.replace(/Lote Degustaci[oó]n Gourmet Lekeitio/gi, () => {
+      if (language === 'eu') return 'Lekeitioko Gourmet Dastaketa Lotea';
+      if (language === 'fr') return 'Coffret Dégustation Gourmet Lekeitio';
+      if (language === 'en') return 'Lekeitio Gourmet Tasting Set';
+      return 'Lote Degustación Gourmet Lekeitio';
+    });
+
     return l;
   });
 
-  return formattedLines.join('\n');
+  return formattedLines.filter(Boolean).join('\n');
 }
 
 export function formatEventDescription(

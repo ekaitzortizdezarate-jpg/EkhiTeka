@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
+import { ProductDescription } from '@/components/ProductDescription';
 import {
   getProductImage,
   getProductDiscount,
@@ -181,9 +182,12 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           </Link>
 
           {cleanDescription && (
-            <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed pt-0.5 font-normal whitespace-pre-line line-clamp-3 font-serif">
-              {cleanDescription}
-            </p>
+            <ProductDescription
+              description={product.description}
+              language={language}
+              isCompact={true}
+              className="pt-0.5"
+            />
           )}
         </div>
 
