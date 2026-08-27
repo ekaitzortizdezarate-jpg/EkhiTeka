@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductWithSeller } from '@/types/database';
 import {
@@ -17,6 +18,7 @@ import {
 
 export default function RegalosGourmetPage() {
   const { t } = useLanguage();
+  const { getSiteImage } = useStoreConfig();
   const [products, setProducts] = useState<ProductWithSeller[]>([]);
   const [isSeller, setIsSeller] = useState(false);
 
@@ -76,7 +78,7 @@ export default function RegalosGourmetPage() {
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[380px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/secciones/Cestas.JPG"
+            src={getSiteImage('gifts_hero', '/images/secciones/Cestas.JPG')}
             alt={t.gifts_hero_title}
             className="w-full h-full object-cover object-center"
             onError={(e) => {
@@ -147,7 +149,7 @@ export default function RegalosGourmetPage() {
           <div className="space-y-4">
             <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
-                src="/images/secciones/Cestas.JPG"
+                src={getSiteImage('gifts_card1', '/images/secciones/Cestas.JPG')}
                 alt={t.gifts_card1_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
@@ -179,7 +181,7 @@ export default function RegalosGourmetPage() {
           <div className="space-y-4">
             <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
-                src="/images/secciones/Quesos.JPG"
+                src={getSiteImage('gifts_card2', '/images/secciones/Quesos.JPG')}
                 alt={t.gifts_card2_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
@@ -211,7 +213,7 @@ export default function RegalosGourmetPage() {
           <div className="space-y-4">
             <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
-                src="/images/secciones/Mesas.JPG"
+                src={getSiteImage('gifts_card3', '/images/secciones/Mesas.JPG')}
                 alt={t.gifts_card3_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {

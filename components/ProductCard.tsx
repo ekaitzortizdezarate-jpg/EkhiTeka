@@ -201,7 +201,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
         {/* Badge de Descuento (Bottom Right) */}
         {discountInfo && discountInfo.discountPercent > 0 && !isSoldOut && (
-          <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-[#1D1D1B] text-white text-[10.5px] font-bold rounded-xl shadow-md font-serif tracking-[0.12em] border border-stone-700/60">
+          <span className="absolute bottom-2.5 right-2.5 px-3 py-1.5 bg-emerald-600 dark:bg-emerald-500 text-white text-xs sm:text-sm font-black rounded-xl shadow-lg font-serif tracking-[0.12em] border border-emerald-700/80 dark:border-emerald-400/80">
             -{discountInfo.discountPercent}%
           </span>
         )}
@@ -364,9 +364,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                   {Number(product.price).toFixed(2)} €
                 </span>
                 {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
-                  <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
-                    {discountInfo.originalPrice.toFixed(2)} €
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
+                      {discountInfo.originalPrice.toFixed(2)} €
+                    </span>
+                    <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 font-serif">
+                      (-{discountInfo.discountPercent}%)
+                    </span>
+                  </div>
                 )}
               </div>
             </div>

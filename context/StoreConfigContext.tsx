@@ -14,6 +14,8 @@ interface StoreConfigContextType {
   eventAddresses: EventAddress[];
   activeEventAddresses: EventAddress[];
   getWhatsAppUrl: (message?: string) => string;
+  siteImages: Record<string, string>;
+  getSiteImage: (key: string, defaultPath: string) => string;
 }
 
 const StoreConfigContext = createContext<StoreConfigContextType | undefined>(undefined);
@@ -26,6 +28,14 @@ export function StoreConfigProvider({
   initialSellerProfile?: Profile | null;
 }) {
   const seller = useMemo(() => parseProfile(initialSellerProfile), [initialSellerProfile]);
+
+  const siteImages = useMemo(() => (seller as any).site_images || {}, [seller]);
+
+  const getSiteImage = useMemo(() => {
+    return (key: string, defaultPath: string) => {
+      return siteImages[key] || defaultPath;
+    };
+  }, [siteImages]);
 
   const activeWhatsAppContact = useMemo(() => {
     const contacts = seller.whatsapp_contacts || [];
@@ -74,6 +84,8 @@ export function StoreConfigProvider({
         eventAddresses,
         activeEventAddresses,
         getWhatsAppUrl,
+        siteImages,
+        getSiteImage,
       }}
     >
       {children}
@@ -94,6 +106,8 @@ export function useStoreConfig() {
       eventAddresses: [],
       activeEventAddresses: [],
       getWhatsAppUrl: () => '',
+      siteImages: {},
+      getSiteImage: (_key: string, defaultPath: string) => defaultPath,
     };
   }
   return context;

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import { ProductCard } from '@/components/ProductCard';
 import { CategoryCircleGrid } from '@/components/CategoryCircleGrid';
 import { ExperienceBanners } from '@/components/ExperienceBanners';
@@ -24,6 +25,7 @@ export function CatalogView({
   isSeller = false,
 }: CatalogViewProps) {
   const { t, language } = useLanguage();
+  const { getSiteImage } = useStoreConfig();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<'name_asc' | 'name_desc' | 'price_asc' | 'price_desc'>('name_asc');
@@ -71,7 +73,7 @@ export function CatalogView({
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[420px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/secciones/Tienda.JPG"
+            src={getSiteImage('tienda_hero', '/images/secciones/Tienda.JPG')}
             alt="Tienda EkhiTeka Lekeitio"
             className="w-full h-full object-cover object-center scale-100"
           />

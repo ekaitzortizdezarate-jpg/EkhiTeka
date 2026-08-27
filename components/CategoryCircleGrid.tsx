@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import { getCategoryImage } from '@/lib/productHelpers';
 import type { Category } from '@/types/database';
 
@@ -16,6 +17,18 @@ export function CategoryCircleGrid({
   onSelectCategory,
 }: CategoryCircleGridProps) {
   const { t, language } = useLanguage();
+  const { getSiteImage } = useStoreConfig();
+
+  const getCategorySiteKey = (slug: string) => {
+    if (slug.includes('queso')) return 'cat_quesos';
+    if (slug.includes('atun') || slug.includes('bonito') || slug.includes('hegaluze')) return 'cat_bonito';
+    if (slug.includes('salazon') || slug.includes('anchoa') || slug.includes('antxoa')) return 'cat_salazones';
+    if (slug.includes('gilda') || slug.includes('jilda')) return 'cat_gildas';
+    if (slug.includes('cerveza') || slug.includes('garagardo')) return 'cat_cerveza';
+    if (slug.includes('txakoli')) return 'cat_txakoli';
+    if (slug.includes('sidra') || slug.includes('sagardo')) return 'cat_sidra';
+    return null;
+  };
 
   const getCategoryName = (cat: Category) => {
     if (language === 'eu') return cat.name_eu || cat.name_es;
@@ -54,7 +67,14 @@ export function CategoryCircleGrid({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.id;
-          const imageSrc = cat.image_url && cat.image_url.trim() ? cat.image_url : getCategoryImage(cat);
+          const siteKey = getCategorySiteKey((cat.slug || cat.id || '').toLowerCase());
+          const fallbackImg = getCategoryImage(cat);
+          const imageSrc =
+            cat.image_url && cat.image_url.trim()
+              ? cat.image_url
+              : siteKey
+              ? getSiteImage(siteKey, fallbackImg)
+              : fallbackImg;
 
           return (
             <button

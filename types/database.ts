@@ -92,6 +92,7 @@ export interface ProfileDetails {
   event_addresses?: EventAddress[];
   delivery_addresses?: DeliveryAddress[];
   cart_data?: any[];
+  site_images?: Record<string, string>;
 }
 
 export interface Profile extends ProfileDetails {
@@ -170,6 +171,7 @@ export function parseProfile(raw?: any): Profile {
     event_addresses: details.event_addresses || [],
     delivery_addresses: details.delivery_addresses || [],
     cart_data: details.cart_data || [],
+    site_images: details.site_images || {},
   };
 }
 

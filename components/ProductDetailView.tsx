@@ -141,8 +141,8 @@ export function ProductDetailView({
               )}
 
               {discountInfo && discountInfo.discountPercent > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#1D1D1B] text-white font-bold text-xs uppercase tracking-[0.14em] font-serif border border-stone-700">
-                  <Percent className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white font-black text-sm uppercase tracking-[0.14em] font-serif shadow-md border border-emerald-700 dark:border-emerald-400">
+                  <Percent className="w-4 h-4 stroke-[2.2]" />
                   <span>-{discountInfo.discountPercent}% {language === 'eu' ? 'Deskontua' : language === 'fr' ? 'Remise' : language === 'en' ? 'Discount' : 'Descuento'}</span>
                 </span>
               )}

@@ -254,6 +254,19 @@ export function NavbarNavLinks({
                 </Link>
               )}
 
+              {isSeller && (
+                <Link
+                  href="/vendedor/productos"
+                  className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
+                    pathname === '/vendedor/productos'
+                      ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <span>{t.nav_my_products || 'Productos'}</span>
+                </Link>
+              )}
+
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -447,6 +460,20 @@ export function NavbarNavLinks({
                         }`}
                       >
                         <span>{t.nav_add_product}</span>
+                      </Link>
+                    )}
+
+                    {isSeller && (
+                      <Link
+                        href="/vendedor/productos"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                          pathname === '/vendedor/productos'
+                            ? 'bg-[#FFE259] text-[#1D1D1B]'
+                            : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
+                        }`}
+                      >
+                        <span>{t.nav_my_products || 'Productos'}</span>
                       </Link>
                     )}
 

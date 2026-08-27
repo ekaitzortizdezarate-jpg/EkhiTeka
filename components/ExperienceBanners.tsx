@@ -7,7 +7,7 @@ import { MessageCircle, Sparkles, Gift } from 'lucide-react';
 
 export function ExperienceBanners() {
   const { t } = useLanguage();
-  const { getWhatsAppUrl, hasActiveWhatsApp } = useStoreConfig();
+  const { getWhatsAppUrl, hasActiveWhatsApp, getSiteImage } = useStoreConfig();
 
   return (
     <section id="experiencias" className="space-y-8 pt-8">
@@ -26,7 +26,7 @@ export function ExperienceBanners() {
           <div className="space-y-4">
             <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
               <img
-                src="/images/secciones/Catas.JPG"
+                src={getSiteImage('exp_catas', '/images/secciones/Catas.JPG')}
                 alt={t.exp_b1_title}
                 className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
                 onError={(e) => {
@@ -71,7 +71,7 @@ export function ExperienceBanners() {
           <div className="space-y-4">
             <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
               <img
-                src="/images/secciones/Mesas.JPG"
+                src={getSiteImage('exp_mesas', '/images/secciones/Mesas.JPG')}
                 alt={t.exp_b2_title}
                 className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
                 onError={(e) => {
@@ -116,7 +116,7 @@ export function ExperienceBanners() {
           <div className="space-y-4">
             <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
               <img
-                src="/images/secciones/Cestas.JPG"
+                src={getSiteImage('exp_cestas', '/images/secciones/Cestas.JPG')}
                 alt={t.exp_b3_title}
                 className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
                 onError={(e) => {
