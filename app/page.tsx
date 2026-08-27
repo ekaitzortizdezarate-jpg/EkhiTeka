@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { useStoreConfig } from '@/context/StoreConfigContext';
 import {
   Sparkles,
   ShoppingBag,
@@ -14,6 +15,13 @@ import {
 
 export default function HomePage() {
   const { t } = useLanguage();
+  const { getSiteImage } = useStoreConfig();
+
+  const heroHomeImage = getSiteImage('home_hero', '/images/secciones/Tienda.JPG');
+  const card1Image = getSiteImage('cat_quesos', '/images/secciones/Quesos.JPG');
+  const card2Image = getSiteImage('gifts_hero', '/images/secciones/Cestas.JPG');
+  const card3Image = getSiteImage('exp_catas', '/images/secciones/Catas.JPG');
+  const card4Image = getSiteImage('exp_cestas', '/images/secciones/Cestas.JPG');
 
   return (
     <div className="space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
@@ -21,11 +29,11 @@ export default function HomePage() {
       <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-18 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[460px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/secciones/Tienda.JPG"
+            src={heroHomeImage}
             alt="EkhiTeka Quesería Gourmet Lekeitio"
             className="w-full h-full object-cover object-center scale-100"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+              (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
@@ -101,7 +109,7 @@ export default function HomePage() {
           >
             <div className="relative h-56 overflow-hidden">
               <img
-                src="/images/secciones/Quesos.JPG"
+                src={card1Image}
                 alt={t.home_card1_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -136,7 +144,7 @@ export default function HomePage() {
           >
             <div className="relative h-56 overflow-hidden">
               <img
-                src="/images/secciones/Cestas.JPG"
+                src={card2Image}
                 alt={t.home_card2_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -171,7 +179,7 @@ export default function HomePage() {
           >
             <div className="relative h-56 overflow-hidden">
               <img
-                src="/images/secciones/Catas.JPG"
+                src={card3Image}
                 alt={t.home_card3_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -206,7 +214,7 @@ export default function HomePage() {
           >
             <div className="relative h-56 overflow-hidden">
               <img
-                src="/images/secciones/Cestas.JPG"
+                src={card4Image}
                 alt={t.home_card4_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {

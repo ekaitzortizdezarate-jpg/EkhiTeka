@@ -28,12 +28,21 @@ interface SiteImageDef {
 }
 
 const SITE_IMAGE_DEFS: SiteImageDef[] = [
+  // 0. Inicio / Portada
+  {
+    key: 'home_hero',
+    section: 'Inicio / Portada',
+    title: 'Banner Principal de la Pantalla de Inicio',
+    description: 'Imagen de fondo de la cabecera principal de bienvenida en la pantalla de inicio.',
+    defaultPath: '/images/secciones/Tienda.JPG',
+    icon: Sparkles,
+  },
   // 1. Tienda
   {
     key: 'tienda_hero',
     section: 'Tienda & Catálogo',
     title: 'Banner Principal de la Tienda',
-    description: 'Imagen de cabecera hero en la página de inicio y catálogo principal.',
+    description: 'Imagen de cabecera hero en la página de catálogo de la tienda.',
     defaultPath: '/images/secciones/Tienda.JPG',
     icon: ShoppingBag,
   },
