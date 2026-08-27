@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useMemo } from 'react';
-import type { Profile, StoreAddress, EventAddress, WhatsAppContact } from '@/types/database';
+import type { Profile, StoreAddress, EventAddress, WhatsAppContact, SiteImageMeta } from '@/types/database';
 import { parseProfile } from '@/types/database';
 
 interface StoreConfigContextType {
@@ -15,7 +15,9 @@ interface StoreConfigContextType {
   activeEventAddresses: EventAddress[];
   getWhatsAppUrl: (message?: string) => string;
   siteImages: Record<string, string>;
+  siteImagesMeta: Record<string, SiteImageMeta>;
   getSiteImage: (key: string, defaultPath: string) => string;
+  getSiteImageMeta: (key: string) => SiteImageMeta | null;
 }
 
 const StoreConfigContext = createContext<StoreConfigContextType | undefined>(undefined);
@@ -30,12 +32,19 @@ export function StoreConfigProvider({
   const seller = useMemo(() => parseProfile(initialSellerProfile), [initialSellerProfile]);
 
   const siteImages = useMemo(() => (seller as any).site_images || {}, [seller]);
+  const siteImagesMeta = useMemo(() => (seller as any).site_images_meta || {}, [seller]);
 
   const getSiteImage = useMemo(() => {
     return (key: string, defaultPath: string) => {
       return siteImages[key] || defaultPath;
     };
   }, [siteImages]);
+
+  const getSiteImageMeta = useMemo(() => {
+    return (key: string) => {
+      return siteImagesMeta[key] || null;
+    };
+  }, [siteImagesMeta]);
 
   const activeWhatsAppContact = useMemo(() => {
     const contacts = seller.whatsapp_contacts || [];
@@ -85,7 +94,9 @@ export function StoreConfigProvider({
         activeEventAddresses,
         getWhatsAppUrl,
         siteImages,
+        siteImagesMeta,
         getSiteImage,
+        getSiteImageMeta,
       }}
     >
       {children}
@@ -107,7 +118,9 @@ export function useStoreConfig() {
       activeEventAddresses: [],
       getWhatsAppUrl: () => '',
       siteImages: {},
+      siteImagesMeta: {},
       getSiteImage: (_key: string, defaultPath: string) => defaultPath,
+      getSiteImageMeta: (_key: string) => null,
     };
   }
   return context;

@@ -72,6 +72,12 @@ export interface DeliveryAddress {
   is_default?: boolean;
 }
 
+export interface SiteImageMeta {
+  author_name?: string;
+  author_id?: string;
+  updated_at?: string;
+}
+
 export interface ProfileDetails {
   first_name?: string | null;
   last_name_1?: string | null;
@@ -94,6 +100,7 @@ export interface ProfileDetails {
   delivery_addresses?: DeliveryAddress[];
   cart_data?: any[];
   site_images?: Record<string, string>;
+  site_images_meta?: Record<string, SiteImageMeta>;
 }
 
 export interface Profile extends ProfileDetails {
@@ -173,6 +180,7 @@ export function parseProfile(raw?: any): Profile {
     delivery_addresses: details.delivery_addresses || [],
     cart_data: details.cart_data || [],
     site_images: details.site_images || {},
+    site_images_meta: details.site_images_meta || {},
   };
 }
 

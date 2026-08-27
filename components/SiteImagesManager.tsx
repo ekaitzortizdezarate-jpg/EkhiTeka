@@ -156,7 +156,7 @@ const SITE_IMAGE_DEFS: SiteImageDef[] = [
 
 export function SiteImagesManager() {
   const { language } = useLanguage();
-  const { siteImages, getSiteImage } = useStoreConfig();
+  const { siteImages, getSiteImage, getSiteImageMeta } = useStoreConfig();
   const [activeModalKey, setActiveModalKey] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -287,6 +287,7 @@ export function SiteImagesManager() {
               {items.map((item) => {
                 const currentImg = getSiteImage(item.key, item.defaultPath);
                 const isCustomized = Boolean(siteImages[item.key]);
+                const imgMeta = getSiteImageMeta(item.key);
                 const IconComponent = item.icon;
 
                 return (
@@ -306,9 +307,22 @@ export function SiteImagesManager() {
                           }}
                         />
                         {isCustomized && (
-                          <span className="absolute top-2.5 right-2.5 px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-black rounded-xl uppercase tracking-wider shadow-md">
-                            {language === 'eu' ? 'Pertsonalizatua' : 'Personalizada'}
-                          </span>
+                          <div className="absolute top-2.5 right-2.5 max-w-[85%] bg-[#1D1D1B]/95 dark:bg-black/95 backdrop-blur-xs text-white px-2.5 py-1 rounded-xl shadow-md border border-stone-700/60 font-sans text-right">
+                            <p className="text-[10px] font-black text-[#FFE259] leading-tight truncate">
+                              {imgMeta?.author_name || (language === 'eu' ? 'Aldatuta' : 'Modificada')}
+                            </p>
+                            <p className="text-[9px] text-stone-300 font-medium leading-tight">
+                              {imgMeta?.updated_at
+                                ? new Date(imgMeta.updated_at).toLocaleDateString(language === 'eu' ? 'eu-ES' : 'es-ES', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })
+                                : new Date().toLocaleDateString(language === 'eu' ? 'eu-ES' : 'es-ES')}
+                            </p>
+                          </div>
                         )}
                       </div>
 
@@ -322,6 +336,23 @@ export function SiteImagesManager() {
                         <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 font-sans">
                           {item.description}
                         </p>
+                        {isCustomized && imgMeta?.author_name && (
+                          <div className="pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between text-[10.5px] font-sans text-stone-500 dark:text-stone-400">
+                            <span className="truncate">
+                              {language === 'eu' ? 'Aldatzailea:' : 'Modificado por:'}{' '}
+                              <strong className="font-bold text-stone-800 dark:text-stone-200">{imgMeta.author_name}</strong>
+                            </span>
+                            {imgMeta.updated_at && (
+                              <span className="shrink-0 text-[10px] text-stone-400">
+                                {new Date(imgMeta.updated_at).toLocaleDateString(language === 'eu' ? 'eu-ES' : 'es-ES', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                })}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 

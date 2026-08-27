@@ -71,7 +71,17 @@ export async function updateSiteImage(formData: FormData) {
     }
   }
 
-  // Actualizar site_images en todos los vendedores/admins para coherencia global
+  // Obtener nombre del usuario que realiza la modificación
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .single();
+
+  const authorName = userProfile?.full_name || 'Vendedor EkhiTeka';
+  const modifiedAt = new Date().toISOString();
+
+  // Actualizar site_images y site_images_meta en todos los vendedores/admins para coherencia global
   const { data: allSellers } = await supabase
     .from('profiles')
     .select('id, bio')
@@ -81,12 +91,20 @@ export async function updateSiteImage(formData: FormData) {
     for (const seller of allSellers) {
       const parsed = parseProfile(seller);
       const currentImages = (parsed as any).site_images || {};
+      const currentMeta = (parsed as any).site_images_meta || {};
       const updatedImages = { ...currentImages };
+      const updatedMeta = { ...currentMeta };
 
       if (resetToDefault) {
         delete updatedImages[imageKey];
+        delete updatedMeta[imageKey];
       } else if (imageUrl) {
         updatedImages[imageKey] = imageUrl;
+        updatedMeta[imageKey] = {
+          author_name: authorName,
+          author_id: user.id,
+          updated_at: modifiedAt,
+        };
       }
 
       let details: Partial<ProfileDetails> = {};
@@ -99,6 +117,7 @@ export async function updateSiteImage(formData: FormData) {
       const updatedBio = JSON.stringify({
         ...details,
         site_images: updatedImages,
+        site_images_meta: updatedMeta,
       });
 
       await supabase
