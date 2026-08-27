@@ -573,24 +573,24 @@ export function SellerProductsListView({
         </div>
       </div>
 
-      {/* 2. SELECTOR CENTRAL DESTACADO (Productos / Eventos / Imágenes sin iconos) */}
+      {/* 2. SELECTOR CENTRAL DESTACADO (Productos / Eventos / Imágenes con cantidad debajo) */}
       <div className="w-full max-w-xl mx-auto px-1">
         <div className="grid grid-cols-3 p-1.5 rounded-3xl bg-white dark:bg-[#1C1B19] border-2 border-stone-200 dark:border-stone-800 shadow-sm gap-1 sm:gap-2 font-serif w-full">
           {/* Botón 1: Productos */}
           <button
             type="button"
             onClick={() => setActiveMainTab('productos')}
-            className={`flex items-center justify-center text-center py-2.5 sm:py-3 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer gap-1.5 ${
+            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'productos'
                 ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
                 : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
             }`}
           >
-            <span className="text-xs sm:text-sm uppercase tracking-wider block">
+            <span className="text-xs sm:text-sm uppercase tracking-wider block leading-tight">
               {language === 'eu' ? 'Produktuak' : language === 'fr' ? 'Produits' : language === 'en' ? 'Products' : 'Productos'}
             </span>
-            <span className="px-1.5 py-0.2 rounded-full bg-stone-900/10 dark:bg-white/15 text-[9.5px] sm:text-[10.5px] font-mono">
-              {products.length}
+            <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-80 block leading-none">
+              ({products.length})
             </span>
           </button>
 
@@ -598,17 +598,17 @@ export function SellerProductsListView({
           <button
             type="button"
             onClick={() => setActiveMainTab('eventos')}
-            className={`flex items-center justify-center text-center py-2.5 sm:py-3 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer gap-1.5 ${
+            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'eventos'
                 ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
                 : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
             }`}
           >
-            <span className="text-xs sm:text-sm uppercase tracking-wider block">
+            <span className="text-xs sm:text-sm uppercase tracking-wider block leading-tight">
               {language === 'eu' ? 'Ekitaldiak' : language === 'fr' ? 'Événements' : language === 'en' ? 'Events' : 'Eventos'}
             </span>
-            <span className="px-1.5 py-0.2 rounded-full bg-stone-900/10 dark:bg-white/15 text-[9.5px] sm:text-[10.5px] font-mono">
-              {catasPresenciales.length}
+            <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-80 block leading-none">
+              ({catasPresenciales.length})
             </span>
           </button>
 
@@ -616,14 +616,17 @@ export function SellerProductsListView({
           <button
             type="button"
             onClick={() => setActiveMainTab('imagenes')}
-            className={`flex items-center justify-center text-center py-2.5 sm:py-3 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
+            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'imagenes'
                 ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
                 : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
             }`}
           >
-            <span className="text-xs sm:text-sm uppercase tracking-wider block">
+            <span className="text-xs sm:text-sm uppercase tracking-wider block leading-tight">
               {language === 'eu' ? 'Irudiak' : language === 'fr' ? 'Images' : language === 'en' ? 'Images' : 'Imágenes'}
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-0 block leading-none select-none">
+              -
             </span>
           </button>
         </div>

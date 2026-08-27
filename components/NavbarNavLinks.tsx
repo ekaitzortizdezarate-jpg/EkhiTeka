@@ -534,10 +534,9 @@ export function NavbarNavLinks({
             </div>
 
             <div className="pt-6 border-t border-[#E8E5DF] dark:border-stone-800 text-[11px] text-stone-500 dark:text-stone-400 space-y-1 text-center font-sans">
-              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-800 dark:text-stone-200">
-                <Store className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
-                <span>Quesería & Tienda en Lekeitio</span>
-              </div>
+              <p className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider text-[11px]">
+                {t.header_subtitle}
+              </p>
               <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
               <p className="font-semibold text-[#C68D07] dark:text-[#FFE259]">WhatsApp: +34 600 000 000</p>
             </div>
