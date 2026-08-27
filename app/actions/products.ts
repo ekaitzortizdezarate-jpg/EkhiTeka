@@ -79,6 +79,46 @@ async function getSafeCategoryId(supabase: any, requestedCategoryId: string): Pr
   return firstValid?.id || 'queso';
 }
 
+async function processProductImage(
+  supabase: any,
+  userId: string,
+  imageFile: File | null,
+  fallbackUrl: string | null
+): Promise<string | null> {
+  if (imageFile && imageFile.size > 0 && typeof imageFile !== 'string') {
+    const fileExt = imageFile.name.split('.').pop() || 'jpg';
+    const fileName = `${userId}_${Date.now()}.${fileExt}`;
+
+    try {
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, imageFile, { upsert: true });
+
+      if (!uploadError && uploadData) {
+        const { data: publicUrlData } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(uploadData.path);
+        if (publicUrlData?.publicUrl) {
+          return publicUrlData.publicUrl;
+        }
+      }
+    } catch {
+      // Fall through to Base64 data URL
+    }
+
+    try {
+      const bytes = await imageFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const mimeType = imageFile.type || 'image/jpeg';
+      return `data:${mimeType};base64,${buffer.toString('base64')}`;
+    } catch {
+      // Fall through to fallback URL
+    }
+  }
+
+  return fallbackUrl || null;
+}
+
 export async function createProduct(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -118,23 +158,9 @@ export async function createProduct(formData: FormData) {
 
   const safeCategoryId = await getSafeCategoryId(supabase, categoryId);
 
-  let imageUrl = (formData.get('image_url_fallback') as string) || null;
+  const fallbackUrl = (formData.get('image_url_fallback') as string) || null;
   const imageFile = formData.get('image_file') as File | null;
-
-  if (imageFile && imageFile.size > 0) {
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${user.id}_${Date.now()}.${fileExt}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(fileName, imageFile, { upsert: true });
-
-    if (!uploadError && uploadData) {
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(uploadData.path);
-      imageUrl = publicUrlData.publicUrl;
-    }
-  }
+  const imageUrl = await processProductImage(supabase, user.id, imageFile, fallbackUrl);
 
   const { data, error } = await supabase
     .from('products')
@@ -197,23 +223,12 @@ export async function updateProduct(productId: string, formData: FormData) {
 
   const safeCategoryId = await getSafeCategoryId(supabase, categoryId);
 
-  let imageUrl = (formData.get('existing_image_url') as string) || (formData.get('image_url_fallback') as string) || null;
+  const fallbackUrl =
+    (formData.get('existing_image_url') as string) ||
+    (formData.get('image_url_fallback') as string) ||
+    null;
   const imageFile = formData.get('image_file') as File | null;
-
-  if (imageFile && imageFile.size > 0) {
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${user.id}_${Date.now()}.${fileExt}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(fileName, imageFile, { upsert: true });
-
-    if (!uploadError && uploadData) {
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(uploadData.path);
-      imageUrl = publicUrlData.publicUrl;
-    }
-  }
+  const imageUrl = await processProductImage(supabase, user.id, imageFile, fallbackUrl);
 
   const { error } = await supabase
     .from('products')
