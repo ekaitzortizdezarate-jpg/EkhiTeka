@@ -144,7 +144,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   return (
     <article
       aria-label={product.name}
-      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs flex flex-col justify-between overflow-hidden transition-all duration-300 font-serif ${
+      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs flex flex-col justify-between overflow-hidden transition-all duration-300 font-serif self-start w-full ${
         isDeleting ? 'opacity-40 pointer-events-none' : ''
       }`}
     >
