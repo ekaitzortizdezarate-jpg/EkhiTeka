@@ -1419,7 +1419,21 @@ export function SellerProductForm({
               {imagePreview ? (
                 <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-3xl">🧀</span>
+                <svg
+                  className="w-10 h-10 text-stone-400 dark:text-stone-500"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2 19h20L19 7 4 12v7z" />
+                  <path d="M4 12l15-5" />
+                  <circle cx="9" cy="16" r="1.5" />
+                  <circle cx="15" cy="15" r="1" />
+                  <circle cx="13" cy="11" r="1" />
+                </svg>
               )}
             </div>
 
