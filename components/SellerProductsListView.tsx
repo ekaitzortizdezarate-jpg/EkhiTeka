@@ -128,7 +128,23 @@ export function SellerProductsListView({
 
   // Agrupaciones principales
   const catasCasa = useMemo(() => filteredProducts.filter((p) => getItemTypeKey(p) === 'cata_casa'), [filteredProducts]);
-  const catasPresenciales = useMemo(() => products.filter((p) => getItemTypeKey(p) === 'cata_presencial'), [products]);
+  const catasPresenciales = useMemo(() => {
+    const list = products.filter((p) => getItemTypeKey(p) === 'cata_presencial');
+    return list.sort((a, b) => {
+      const metaA = getEventMeta(a);
+      const metaB = getEventMeta(b);
+      const dateAStr = metaA?.event_date || (a as Record<string, any>).event_date;
+      const dateBStr = metaB?.event_date || (b as Record<string, any>).event_date;
+
+      if (!dateAStr && !dateBStr) return 0;
+      if (!dateAStr) return 1;
+      if (!dateBStr) return -1;
+
+      const timeA = new Date(dateAStr).getTime();
+      const timeB = new Date(dateBStr).getTime();
+      return timeA - timeB; // De más cercana a más lejana
+    });
+  }, [products]);
   const cestasGourmet = useMemo(() => filteredProducts.filter((p) => getItemTypeKey(p) === 'cesta_gourmet'), [filteredProducts]);
   const lotesGourmet = useMemo(() => filteredProducts.filter((p) => getItemTypeKey(p) === 'lote_gourmet'), [filteredProducts]);
   const tarjetasRegalo = useMemo(() => filteredProducts.filter((p) => getItemTypeKey(p) === 'tarjeta_regalo'), [filteredProducts]);
@@ -652,11 +668,11 @@ export function SellerProductsListView({
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none font-serif">
                 {[
                   { id: 'all', label: language === 'eu' ? 'Guztiak' : 'Todos' },
-                  { id: 'cata_casa', label: language === 'eu' ? 'Etxeko Dastaketak' : 'Catas en Casa' },
+                  { id: 'producto_suelto', label: language === 'eu' ? 'Produktu Solteak' : 'Productos Sueltos' },
                   { id: 'cesta_gourmet', label: language === 'eu' ? 'Saski Gourmetak' : 'Cestas Gourmet' },
                   { id: 'lote_gourmet', label: language === 'eu' ? 'Loteak & Packak' : 'Lotes Gourmet' },
+                  { id: 'cata_casa', label: language === 'eu' ? 'Etxeko Dastaketak' : 'Catas en Casa' },
                   { id: 'tarjeta_regalo', label: language === 'eu' ? 'Opari Txartelak' : 'Tarjetas Regalo' },
-                  { id: 'producto_suelto', label: language === 'eu' ? 'Produktu Solteak' : 'Productos Sueltos' },
                 ].map((f) => (
                   <button
                     key={f.id}
@@ -675,91 +691,11 @@ export function SellerProductsListView({
             </div>
           </div>
 
-          {/* Listas Agrupadas */}
+          {/* Listas Agrupadas en Orden Solicitado */}
           <div className="space-y-12">
-            {/* SECCIÓN: Catas en Casa */}
-            {(typeFilter === 'all' || typeFilter === 'cata_casa') && catasCasa.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
-                      <Sparkles className="w-5 h-5" />
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
-                      {language === 'eu' ? 'Etxeko Dastaketak' : 'Catas en Casa'}
-                    </h2>
-                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
-                      {catasCasa.length}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-4">{catasCasa.map((p) => renderProductRow(p))}</div>
-              </section>
-            )}
-
-            {/* SECCIÓN: Cestas Gourmet */}
-            {(typeFilter === 'all' || typeFilter === 'cesta_gourmet') && cestasGourmet.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
-                      <Gift className="w-5 h-5" />
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
-                      {language === 'eu' ? 'Saski Gourmetak' : 'Cestas Gourmet'}
-                    </h2>
-                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
-                      {cestasGourmet.length}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-4">{cestasGourmet.map((p) => renderProductRow(p))}</div>
-              </section>
-            )}
-
-            {/* SECCIÓN: Lotes Gourmet */}
-            {(typeFilter === 'all' || typeFilter === 'lote_gourmet') && lotesGourmet.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
-                      <Package className="w-5 h-5" />
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
-                      {language === 'eu' ? 'Loteak eta Pack Degustazioak' : 'Lotes Gourmet y Packs'}
-                    </h2>
-                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
-                      {lotesGourmet.length}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-4">{lotesGourmet.map((p) => renderProductRow(p))}</div>
-              </section>
-            )}
-
-            {/* SECCIÓN: Tarjetas Regalo */}
-            {(typeFilter === 'all' || typeFilter === 'tarjeta_regalo') && tarjetasRegalo.length > 0 && (
-              <section className="space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
-                      <CreditCard className="w-5 h-5" />
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
-                      {language === 'eu' ? 'Opari Txartel Birtualak' : 'Tarjetas Regalo Virtuales'}
-                    </h2>
-                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
-                      {tarjetasRegalo.length}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-4">{tarjetasRegalo.map((p) => renderProductRow(p))}</div>
-              </section>
-            )}
-
-            {/* SECCIÓN: Productos Sueltos por Categoría */}
+            {/* 1. SECCIÓN: Productos Sueltos por Categoría */}
             {(typeFilter === 'all' || typeFilter === 'producto_suelto') && looseByCategory.length > 0 && (
-              <section className="space-y-8 pt-4">
+              <section className="space-y-8 pt-2">
                 <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
                   <div className="flex items-center gap-2">
                     <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
@@ -788,6 +724,86 @@ export function SellerProductsListView({
                     <div className="space-y-4">{group.items.map((p) => renderProductRow(p))}</div>
                   </div>
                 ))}
+              </section>
+            )}
+
+            {/* 2. SECCIÓN: Cestas Gourmet */}
+            {(typeFilter === 'all' || typeFilter === 'cesta_gourmet') && cestasGourmet.length > 0 && (
+              <section className="space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
+                      <Gift className="w-5 h-5" />
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
+                      {language === 'eu' ? 'Saski Gourmetak' : 'Cestas Gourmet'}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
+                      {cestasGourmet.length}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-4">{cestasGourmet.map((p) => renderProductRow(p))}</div>
+              </section>
+            )}
+
+            {/* SECCIÓN: Lotes Gourmet y Packs */}
+            {(typeFilter === 'all' || typeFilter === 'lote_gourmet') && lotesGourmet.length > 0 && (
+              <section className="space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
+                      <Package className="w-5 h-5" />
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
+                      {language === 'eu' ? 'Loteak eta Pack Degustazioak' : 'Lotes Gourmet y Packs'}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
+                      {lotesGourmet.length}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-4">{lotesGourmet.map((p) => renderProductRow(p))}</div>
+              </section>
+            )}
+
+            {/* 3. SECCIÓN: Catas en Casa */}
+            {(typeFilter === 'all' || typeFilter === 'cata_casa') && catasCasa.length > 0 && (
+              <section className="space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
+                      <Sparkles className="w-5 h-5" />
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
+                      {language === 'eu' ? 'Etxeko Dastaketak' : 'Catas en Casa'}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
+                      {catasCasa.length}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-4">{catasCasa.map((p) => renderProductRow(p))}</div>
+              </section>
+            )}
+
+            {/* 4. SECCIÓN: Tarjetas Regalo */}
+            {(typeFilter === 'all' || typeFilter === 'tarjeta_regalo') && tarjetasRegalo.length > 0 && (
+              <section className="space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200">
+                      <CreditCard className="w-5 h-5" />
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100">
+                      {language === 'eu' ? 'Opari Txartel Birtualak' : 'Tarjetas Regalo Virtuales'}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs font-bold">
+                      {tarjetasRegalo.length}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-4">{tarjetasRegalo.map((p) => renderProductRow(p))}</div>
               </section>
             )}
           </div>
