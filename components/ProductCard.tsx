@@ -156,119 +156,124 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           )}
         </div>
 
-        {/* 3. Footer con Precio y Acciones */}
-        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
-          <div className="shrink-0">
-            <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider block font-sans">
-              {isEvent ? (t.prod_price_per_seat || 'Precio / Plaza') : t.prod_price}
-            </span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
-                {Number(product.price).toFixed(2)} €
+        {/* 3. Footer con Precio, Selector y Botón Principal Abajo */}
+        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 space-y-3">
+          {/* Fila 1: Precio y Selector de Cantidad / Chat */}
+          <div className="flex items-center justify-between gap-2.5">
+            <div className="shrink-0">
+              <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider block font-sans">
+                {isEvent ? (t.prod_price_per_seat || 'Precio / Plaza') : t.prod_price}
               </span>
-              {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
-                <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
-                  {discountInfo.originalPrice.toFixed(2)} €
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
+                  {Number(product.price).toFixed(2)} €
                 </span>
-              )}
+                {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
+                  <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
+                    {discountInfo.originalPrice.toFixed(2)} €
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
 
-          {isSeller ? (
-            <div className="flex items-center gap-2 ml-auto sm:ml-0">
-              {/* Indicador de stock para el vendedor */}
+            {isSeller ? (
               <span className="px-2.5 py-1.5 rounded-xl text-xs font-black bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 font-sans">
                 Stock: {product.is_unlimited_stock ? t.prod_unlimited : `${product.stock ?? 0} uds`}
               </span>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                {/* Selector de Cantidad */}
+                {!isSoldOut && (
+                  <div className="flex items-center rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 p-0.5 shadow-2xs font-serif">
+                    <button
+                      type="button"
+                      disabled={quantity <= 1}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setQuantity((q) => Math.max(1, q - 1));
+                      }}
+                      className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-700 dark:text-stone-300 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer text-xs"
+                    >
+                      -
+                    </button>
+                    <span className="w-5 text-center text-xs font-black text-stone-900 dark:text-stone-100">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={quantity >= maxStock}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setQuantity((q) => Math.min(maxStock, q + 1));
+                      }}
+                      className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-700 dark:text-stone-300 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer text-xs"
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
 
+                <Link
+                  href={`/chat/${sellerId || ''}?product_id=${product.id}`}
+                  className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 shrink-0"
+                  title={t.prod_ask_artisan}
+                >
+                  <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-200" />
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Fila 2: Botón Principal Abajo a Ancho Completo */}
+          {isSeller ? (
+            <div className="w-full flex items-center gap-2">
               <Link
                 href={`/vendedor/productos/${product.id}/editar`}
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-102 font-serif uppercase tracking-wider cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-[1.01] font-serif uppercase tracking-wider cursor-pointer text-center"
                 title="Editar Producto"
               >
                 <Pencil className="w-3.5 h-3.5" />
-                <span>Editar</span>
+                <span>Editar variables</span>
               </Link>
               <button
                 type="button"
                 onClick={handleDelete}
-                className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer border border-red-200 dark:border-red-800"
+                className="p-2.5 rounded-2xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer border border-red-200 dark:border-red-800 shrink-0"
                 title="Eliminar Producto"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
-              {/* Selector de Cantidad */}
-              {!isSoldOut && (
-                <div className="flex items-center rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 p-0.5 shadow-2xs font-serif">
-                  <button
-                    type="button"
-                    disabled={quantity <= 1}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setQuantity((q) => Math.max(1, q - 1));
-                    }}
-                    className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-700 dark:text-stone-300 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer text-xs"
-                  >
-                    -
-                  </button>
-                  <span className="w-5 text-center text-xs font-black text-stone-900 dark:text-stone-100">
-                    {quantity}
-                  </span>
-                  <button
-                    type="button"
-                    disabled={quantity >= maxStock}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setQuantity((q) => Math.min(maxStock, q + 1));
-                    }}
-                    className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-700 dark:text-stone-300 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer text-xs"
-                  >
-                    +
-                  </button>
-                </div>
+            <button
+              type="button"
+              disabled={isSoldOut}
+              onClick={handleAddToCart}
+              className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xs active:scale-98 font-serif cursor-pointer ${
+                isSoldOut
+                  ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed shadow-none'
+                  : added
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-[1.01]'
+              }`}
+              title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
+            >
+              {isSoldOut ? (
+                <span>{isEvent ? (t.event_capacity_full || 'Sin plazas') : t.prod_sold_out}</span>
+              ) : added ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>{t.prod_added}</span>
+                </>
+              ) : (
+                <>
+                  {isEvent ? <Ticket className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                  <span>{isEvent ? t.event_reserve_seat : t.prod_add_to_cart}</span>
+                </>
               )}
-
-              <Link
-                href={`/chat/${sellerId || ''}?product_id=${product.id}`}
-                className="p-2.5 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 shrink-0"
-                title={t.prod_ask_artisan}
-              >
-                <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-200" />
-              </Link>
-
-              <button
-                type="button"
-                disabled={isSoldOut}
-                onClick={handleAddToCart}
-                className={`flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xs active:scale-95 font-serif cursor-pointer shrink-0 ${
-                  isSoldOut
-                    ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed shadow-none'
-                    : added
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-102'
-                }`}
-                title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
-              >
-                {isSoldOut ? (
-                  <span>{isEvent ? (t.event_capacity_full || 'Sin plazas') : t.prod_sold_out}</span>
-                ) : added ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>{t.prod_added}</span>
-                  </>
-                ) : (
-                  <>
-                    {isEvent ? <Ticket className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-                    <span>{isEvent ? t.event_reserve_seat : t.prod_add_to_cart}</span>
-                  </>
-                )}
-              </button>
-            </div>
+            </button>
           )}
         </div>
       </div>
