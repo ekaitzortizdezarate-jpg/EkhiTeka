@@ -24,9 +24,12 @@ export interface PackItem {
   imageUrl?: string | null;
   format?: string | null;
   origin?: string | null;
+  description?: string | null;
+  weight_g?: number | null;
+  weight_display?: string | null;
 }
 
-export function getPackItems(product?: { description?: string | null }): PackItem[] {
+export function getPackItems(product?: { description?: string | null } | null): PackItem[] {
   if (!product?.description) return [];
   // 1. Check META
   const match = product.description.match(/<!-- META:({.*?}) -->/);
@@ -34,7 +37,16 @@ export function getPackItems(product?: { description?: string | null }): PackIte
     try {
       const meta = JSON.parse(match[1]);
       if (Array.isArray(meta.pack_items) && meta.pack_items.length > 0) {
-        return meta.pack_items;
+        return meta.pack_items.map((it: any) => ({
+          ...it,
+          weight_display:
+            it.weight_display ||
+            (it.weight_g
+              ? it.weight_g >= 1000 && it.weight_g % 100 === 0
+                ? `${(it.weight_g / 1000).toFixed(it.weight_g % 1000 === 0 ? 0 : 1)} kg`
+                : `${it.weight_g}g`
+              : null),
+        }));
       }
     } catch {}
   }
@@ -61,7 +73,123 @@ export function getPackItems(product?: { description?: string | null }): PackIte
   return items;
 }
 
-export function getPeopleRange(product?: { description?: string | null }, language: string = 'es'): string | null {
+export function getSellerDescription(description?: string | null): string {
+  if (!description) return '';
+  // 1. Remove META tags
+  let text = description.replace(/<!-- META:[\s\S]*?-->/g, '').trim();
+  // 2. Remove "Personas recomendadas: ..." or "Gomendatutako..."
+  text = text.replace(/^(Personas recomendadas|Gomendatutako lagunak|Recommended people|Nombre de personnes recommandé)[\s\S]*?\n/i, '').trim();
+  // 3. Remove "Productos incluidos en esta selección: ..." and anything that follows
+  text = text.replace(/(Productos incluidos en esta selección|Productos incluidos en el pack|Productos incluidos en la cesta|Productos incluidos|Saski honek dakarrena|Contenu du pack|Products included)[\s\S]*$/i, '').trim();
+  // 4. Remove any loose bullet point lines
+  const lines = text.split('\n').filter((l) => !l.trim().startsWith('•') && !l.trim().startsWith('-'));
+  text = lines.join('\n').trim();
+  // 5. Remove any remaining HTML comment tags or leftover code
+  text = text.replace(/<!--[\s\S]*?-->/g, '').trim();
+  return text;
+}
+
+export function getOrderTypeBadge(order?: any, language: string = 'es'): string {
+  if (!order || !order.order_items || order.order_items.length === 0) {
+    if (language === 'eu') return 'Eskaera';
+    if (language === 'fr') return 'Commande';
+    if (language === 'en') return 'Order';
+    return 'Pedido';
+  }
+
+  const items = order.order_items;
+  const hasCataCasa = items.some((it: any) => {
+    const cat = (it.products?.category_id || '').toLowerCase();
+    const name = (it.products?.name || '').toLowerCase();
+    return cat === 'cata_casa' || name.includes('cata en casa');
+  });
+
+  if (hasCataCasa) {
+    if (language === 'eu') return 'Cata en Casa';
+    if (language === 'fr') return 'Dégustation à Domicile';
+    if (language === 'en') return 'Home Tasting';
+    return 'Cata en Casa';
+  }
+
+  const hasCataTienda = items.some((it: any) => {
+    const cat = (it.products?.category_id || '').toLowerCase();
+    const name = (it.products?.name || '').toLowerCase();
+    return (
+      cat === 'cata_presencial' ||
+      cat === 'catas' ||
+      name.includes('cata presencial') ||
+      name.includes('dastaketa presentziala') ||
+      (name.includes('cata') && !name.includes('casa'))
+    );
+  });
+
+  if (hasCataTienda) {
+    if (language === 'eu') return 'Dastaketa Dendan';
+    if (language === 'fr') return 'Dégustation en Boutique';
+    if (language === 'en') return 'In-Store Tasting';
+    return 'Cata en Tienda';
+  }
+
+  const hasCesta = items.some((it: any) => {
+    const cat = (it.products?.category_id || '').toLowerCase();
+    const name = (it.products?.name || '').toLowerCase();
+    return cat === 'cesta_gourmet' || cat === 'cesta' || name.includes('cesta');
+  });
+
+  if (hasCesta) {
+    if (language === 'eu') return 'Saski Gourmet';
+    if (language === 'fr') return 'Coffret Gourmet';
+    if (language === 'en') return 'Gourmet Hamper';
+    return 'Cesta Gourmet';
+  }
+
+  const hasTarjeta = items.some((it: any) => {
+    const cat = (it.products?.category_id || '').toLowerCase();
+    const name = (it.products?.name || '').toLowerCase();
+    return cat === 'tarjeta_regalo' || name.includes('tarjeta') || name.includes('txartel');
+  });
+
+  if (hasTarjeta) {
+    if (language === 'eu') return 'Opari Txartela';
+    if (language === 'fr') return 'Carte Cadeau';
+    if (language === 'en') return 'Gift Card';
+    return 'Tarjeta Regalo';
+  }
+
+  const hasLote = items.some((it: any) => {
+    const cat = (it.products?.category_id || '').toLowerCase();
+    const name = (it.products?.name || '').toLowerCase();
+    const format = (it.products?.format || '').toLowerCase();
+    return (
+      cat === 'lote' ||
+      cat === 'lote_gourmet' ||
+      format === 'pack' ||
+      name.includes('lote') ||
+      name.includes('pack')
+    );
+  });
+
+  if (hasLote) {
+    if (language === 'eu') return 'Gourmet Lotea';
+    if (language === 'fr') return 'Lot Gourmet';
+    if (language === 'en') return 'Gourmet Pack';
+    return 'Lote Gourmet';
+  }
+
+  if (items.length === 1) {
+    if (language === 'eu') return 'Banakako Produktua';
+    if (language === 'fr') return 'Produit Individuel';
+    if (language === 'en') return 'Single Product';
+    return 'Producto Individual';
+  }
+
+  if (language === 'eu') return 'Hainbat Produktu';
+  if (language === 'fr') return 'Produits Divers';
+  if (language === 'en') return 'Multiple Products';
+  return 'Varios Productos';
+}
+
+export function getPeopleRange(product?: { description?: string | null } | null, language: string = 'es'): string | null {
   if (!product?.description) return null;
   
   // 1. Check META
@@ -101,7 +229,7 @@ export function getPeopleRange(product?: { description?: string | null }, langua
 }
 
 export function getProductWeightOrVolume(
-  product?: { weight_g?: number | null; format?: string | null; description?: string | null },
+  product?: { weight_g?: number | null; format?: string | null; description?: string | null } | null,
   language: string = 'es'
 ): string | null {
   if (!product) return null;
@@ -136,7 +264,7 @@ export function getProductWeightOrVolume(
   return null;
 }
 
-export function getProductDiscount(product?: { description?: string | null }): { discountPercent: number; originalPrice?: number } | null {
+export function getProductDiscount(product?: { description?: string | null } | null): { discountPercent: number; originalPrice?: number } | null {
   if (!product?.description) return null;
   const match = product.description.match(/<!-- META:({.*?}) -->/);
   if (match && match[1]) {

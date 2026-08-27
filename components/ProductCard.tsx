@@ -19,6 +19,7 @@ import {
   getPackItems,
   getPeopleRange,
   getProductWeightOrVolume,
+  getSellerDescription,
 } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle, CreditCard, Package } from 'lucide-react';
@@ -80,6 +81,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
       product.name.toLowerCase().includes('pack')
     ) && !isCataCasa && !isCataTienda && !isGiftCard);
 
+  const sellerDescription = getSellerDescription(product.description);
   const isPackType = isCataCasa || isCataTienda || isLoteGourmet;
   const isEvent = isCataTienda;
 
@@ -251,50 +253,63 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               )}
             </div>
           ) : isPackType ? (
-            <div className="space-y-2 pt-1 font-serif">
+            <div className="space-y-2.5 pt-1 font-serif">
               <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-stone-900 dark:text-stone-100 uppercase tracking-[0.14em]">
                 <Package className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0" />
                 <span>
                   {language === 'eu'
-                    ? 'DASTAKETA PACK-AK DAKARRENA:'
+                    ? 'PACK-AK DAKARRENA:'
                     : language === 'fr'
-                    ? 'LE PACK DE DÉGUSTATION COMPREND :'
+                    ? 'LE PACK COMPREND :'
                     : language === 'en'
-                    ? 'TASTING PACK INCLUDES:'
-                    : 'EL PACK DE CATA INCLUYE:'}
+                    ? 'THE PACK INCLUDES:'
+                    : 'EL PACK INCLUYE:'}
                 </span>
               </div>
 
               {packItems.length > 0 && (
-                <div className="grid grid-cols-1 gap-1.5">
+                <div className="grid grid-cols-1 gap-2">
                   {packItems.slice(0, 4).map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2 p-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27]"
+                      className="p-2 rounded-2xl bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] space-y-1"
                     >
-                      <div className="w-7 h-7 rounded-lg overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200/60 dark:border-stone-700">
-                        <img
-                          src={item.imageUrl || '/images/secciones/Quesos.JPG'}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                          }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-stone-900 dark:text-stone-100 truncate leading-tight">
-                          {item.name}
-                        </p>
-                        <div className="flex items-center gap-1.5 text-[10px] text-stone-500 dark:text-stone-400">
-                          {item.quantity && item.quantity > 1 && (
-                            <span className="font-bold text-stone-700 dark:text-stone-300">
-                              x{item.quantity}
-                            </span>
-                          )}
-                          {item.format && <span>· {item.format}</span>}
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200/60 dark:border-stone-700">
+                          <img
+                            src={item.imageUrl || '/images/secciones/Quesos.JPG'}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate leading-tight">
+                            {item.name}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-1.5 text-[10.5px] text-stone-500 dark:text-stone-400">
+                            {item.quantity && item.quantity > 1 && (
+                              <span className="font-bold text-[#C68D07] dark:text-[#FFE259]">
+                                x{item.quantity}
+                              </span>
+                            )}
+                            {item.weight_display && (
+                              <span className="font-bold text-stone-700 dark:text-stone-300">
+                                · {item.weight_display}
+                              </span>
+                            )}
+                            {item.format && <span>· {item.format}</span>}
+                          </div>
                         </div>
                       </div>
+
+                      {item.description && (
+                        <p className="text-[11px] text-stone-600 dark:text-stone-400 leading-snug pl-0.5 line-clamp-2 italic font-sans">
+                          {item.description}
+                        </p>
+                      )}
                     </div>
                   ))}
                   {packItems.length > 4 && (
@@ -305,13 +320,21 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                 </div>
               )}
 
-              {cleanDescription && (
-                <ProductDescription
-                  description={product.description}
-                  language={language}
-                  isCompact={true}
-                  className="pt-0.5"
-                />
+              {sellerDescription && (
+                <div className="space-y-1 pt-1.5 border-t border-stone-100 dark:border-stone-800">
+                  <span className="text-[10.5px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block font-serif">
+                    {language === 'eu'
+                      ? 'Deskribapena:'
+                      : language === 'fr'
+                      ? 'Description :'
+                      : language === 'en'
+                      ? 'Description:'
+                      : 'Descripción:'}
+                  </span>
+                  <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed font-normal whitespace-pre-line line-clamp-3">
+                    {sellerDescription}
+                  </p>
+                </div>
               )}
             </div>
           ) : (

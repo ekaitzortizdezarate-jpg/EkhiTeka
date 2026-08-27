@@ -5,7 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { createProduct, updateProduct, deleteProduct } from '@/app/actions/products';
 import type { Category, Product, StoreAddress, EventAddress } from '@/types/database';
-import { getProductImage } from '@/lib/productHelpers';
+import {
+  getProductImage,
+  getSellerDescription,
+  getProductWeightOrVolume,
+  getCleanDescription,
+} from '@/lib/productHelpers';
 import {
   Package,
   ArrowLeft,
@@ -45,6 +50,8 @@ export interface AddedListItem {
   format?: string;
   origin?: string;
   description?: string;
+  weight_g?: number | null;
+  weight_display?: string | null;
   isCustom?: boolean;
 }
 
@@ -237,7 +244,12 @@ export function SellerProductForm({
         category: selectedCatalogProduct.category_id,
         format: selectedCatalogProduct.format,
         origin: selectedCatalogProduct.origin_region || undefined,
-        description: selectedCatalogProduct.description || undefined,
+        description:
+          getSellerDescription(selectedCatalogProduct.description) ||
+          getCleanDescription(selectedCatalogProduct.description) ||
+          undefined,
+        weight_g: selectedCatalogProduct.weight_g || undefined,
+        weight_display: getProductWeightOrVolume(selectedCatalogProduct) || undefined,
         isCustom: false,
       };
       setSelectedListItems([...selectedListItems, newItem]);
@@ -506,6 +518,9 @@ export function SellerProductForm({
         imageUrl: it.imageUrl || null,
         format: it.format || null,
         origin: it.origin || null,
+        description: it.description || null,
+        weight_g: it.weight_g || null,
+        weight_display: it.weight_display || null,
       }));
     }
 
