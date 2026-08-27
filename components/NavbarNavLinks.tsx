@@ -274,20 +274,6 @@ export function NavbarNavLinks({
         {user ? (
           <div className="flex items-center gap-2">
             <Link
-              href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-              className={`relative p-2.5 rounded-2xl border transition-all shrink-0 ${
-                pathname.startsWith('/vendedor/pedidos') || pathname.startsWith('/comprador/pedidos')
-                  ? 'bg-[#FFE259] text-[#1D1D1B] border-stone-800 shadow-xs'
-                  : hasUnseenOrderUpdates
-                  ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-[0_0_12px_rgba(255,226,89,0.5)] animate-pulse'
-                  : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700'
-              }`}
-              title={isSeller ? t.orders_title_seller : t.nav_orders}
-            >
-              <ClipboardList className="w-4 h-4" />
-            </Link>
-
-            <Link
               href="/perfil"
               className={`p-2.5 rounded-2xl border transition-colors shrink-0 ${
                 pathname === '/perfil'
