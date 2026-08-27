@@ -11,13 +11,14 @@ import {
   getProductDiscount,
   getCleanDescription,
   formatProductDescription,
+  getGiftCardDescription,
   getTranslatedFormat,
   getTranslatedOrigin,
   getUnitsSuffix,
   getSeatsSuffix,
 } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle } from 'lucide-react';
+import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle, CreditCard } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductWithSeller;
@@ -47,9 +48,19 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
     product.category_id === 'experiencia' ||
     product.name.toLowerCase().includes('cata');
 
+  const isGiftCard =
+    product.category_id === 'tarjeta_regalo' ||
+    (product.name && (
+      product.name.toLowerCase().includes('tarjeta') ||
+      product.name.toLowerCase().includes('txartel') ||
+      product.name.toLowerCase().includes('gift card') ||
+      product.name.toLowerCase().includes('carte cadeau')
+    ));
+
   const imageUrl = getProductImage(product);
   const discountInfo = getProductDiscount(product);
   const cleanDescription = formatProductDescription(product.description, language);
+  const giftCardDescription = getGiftCardDescription(product.description, language);
 
   const sellerName = product.profiles?.full_name || 'EkhiTeka Gourmet Lekeitio';
   const sellerId = product.seller_id;
@@ -181,13 +192,35 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             </h2>
           </Link>
 
-          {cleanDescription && (
-            <ProductDescription
-              description={product.description}
-              language={language}
-              isCompact={true}
-              className="pt-0.5"
-            />
+          {isGiftCard ? (
+            <div className="space-y-1 pt-1 font-serif">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-stone-900 dark:text-stone-100 uppercase tracking-[0.14em]">
+                <CreditCard className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0" />
+                <span>
+                  {language === 'eu'
+                    ? 'OPARI TXARTEL BIRTUALA:'
+                    : language === 'fr'
+                    ? 'CARTE CADEAU VIRTUELLE :'
+                    : language === 'en'
+                    ? 'VIRTUAL GIFT CARD:'
+                    : 'TARJETA REGALO VIRTUAL:'}
+                </span>
+              </div>
+              {giftCardDescription && (
+                <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal whitespace-pre-line line-clamp-2">
+                  {giftCardDescription}
+                </p>
+              )}
+            </div>
+          ) : (
+            cleanDescription && (
+              <ProductDescription
+                description={product.description}
+                language={language}
+                isCompact={true}
+                className="pt-0.5"
+              />
+            )
           )}
         </div>
 

@@ -326,6 +326,18 @@ export function formatProductDescription(
   return formattedLines.filter(Boolean).join('\n');
 }
 
+export function getGiftCardDescription(
+  description?: string | null,
+  language: string = 'es'
+): string {
+  if (!description) return '';
+  const formatted = formatProductDescription(description, language);
+  const cleaned = formatted
+    .replace(/^(OPARI TXARTEL BIRTUALA:|TARJETA REGALO VIRTUAL:|CARTE CADEAU VIRTUELLE :|VIRTUAL GIFT CARD:)\s*/i, '')
+    .trim();
+  return cleaned;
+}
+
 export function formatEventDescription(
   description?: string | null,
   labels?: {
