@@ -22,7 +22,7 @@ import {
   getSellerDescription,
 } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle, CreditCard, Package } from 'lucide-react';
+import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle, CreditCard, Package, ChevronDown } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductWithSeller;
@@ -35,6 +35,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPackExpanded, setIsPackExpanded] = useState(false);
 
   const isUnlimited = Boolean(
     product.is_unlimited_stock ||
@@ -210,9 +211,11 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
       {/* 2. Cuerpo con Datos del Producto */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
         <div className="space-y-1.5">
-          <p className="text-[10px] sm:text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-[0.16em] truncate font-serif">
-            {sellerName}
-          </p>
+          {isSeller && (
+            <p className="text-[10px] sm:text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-[0.16em] truncate font-serif">
+              {sellerName}
+            </p>
+          )}
 
           <Link
             href={`/producto/${product.id}`}
@@ -253,87 +256,112 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               )}
             </div>
           ) : isPackType ? (
-            <div className="space-y-2.5 pt-1 font-serif">
-              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-stone-900 dark:text-stone-100 uppercase tracking-[0.14em]">
-                <Package className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0" />
-                <span>
-                  {language === 'eu'
-                    ? 'PACK-AK DAKARRENA:'
-                    : language === 'fr'
-                    ? 'LE PACK COMPREND :'
-                    : language === 'en'
-                    ? 'THE PACK INCLUDES:'
-                    : 'EL PACK INCLUYE:'}
-                </span>
-              </div>
-
-              {packItems.length > 0 && (
-                <div className="grid grid-cols-1 gap-2">
-                  {packItems.slice(0, 4).map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2 rounded-2xl bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] space-y-1"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200/60 dark:border-stone-700">
-                          <img
-                            src={item.imageUrl || '/images/secciones/Quesos.JPG'}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                            }}
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate leading-tight">
-                            {item.name}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-1.5 text-[10.5px] text-stone-500 dark:text-stone-400">
-                            {item.quantity && item.quantity > 1 && (
-                              <span className="font-bold text-[#C68D07] dark:text-[#FFE259]">
-                                x{item.quantity}
-                              </span>
-                            )}
-                            {item.weight_display && (
-                              <span className="font-bold text-stone-700 dark:text-stone-300">
-                                · {item.weight_display}
-                              </span>
-                            )}
-                            {item.format && <span>· {item.format}</span>}
-                          </div>
-                        </div>
-                      </div>
-
-                      {item.description && (
-                        <p className="text-[11px] text-stone-600 dark:text-stone-400 leading-snug pl-0.5 line-clamp-2 italic font-sans">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                  {packItems.length > 4 && (
-                    <span className="text-[10px] font-bold text-stone-500 dark:text-stone-400 block text-right pr-1">
-                      +{packItems.length - 4} {language === 'eu' ? 'gehiago' : language === 'fr' ? 'de plus' : language === 'en' ? 'more' : 'más'}
+            <div className="space-y-2 pt-1 font-serif">
+              {/* Botón desplegable / recogido para lo que incluye el pack */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsPackExpanded((prev) => !prev);
+                }}
+                className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-[#FAF8F5] hover:bg-[#F5F2EC] dark:bg-[#141312] dark:hover:bg-stone-800/80 border border-[#E8E5DF] dark:border-[#2D2B27] transition-all cursor-pointer text-left shadow-2xs group/pack"
+              >
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-stone-900 dark:text-stone-100 uppercase tracking-[0.12em] min-w-0">
+                  <Package className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259] stroke-[1.75] shrink-0" />
+                  <span className="truncate">
+                    {language === 'eu'
+                      ? 'Pack-ak dakarrena'
+                      : language === 'fr'
+                      ? 'Le pack comprend'
+                      : language === 'en'
+                      ? 'The pack includes'
+                      : 'El pack incluye'}
+                  </span>
+                  {packItems.length > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-200 text-[10px] font-mono font-bold shrink-0">
+                      ({packItems.length})
                     </span>
                   )}
                 </div>
-              )}
 
-              {sellerDescription && (
-                <div className="space-y-1 pt-1.5 border-t border-stone-100 dark:border-stone-800">
-                  <span className="text-[10.5px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block font-serif">
-                    {language === 'eu'
-                      ? 'Deskribapena:'
-                      : language === 'fr'
-                      ? 'Description :'
-                      : language === 'en'
-                      ? 'Description:'
-                      : 'Descripción:'}
-                  </span>
-                  <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed font-normal whitespace-pre-line line-clamp-3">
-                    {sellerDescription}
-                  </p>
+                <div className="flex items-center gap-1 text-[11px] text-stone-500 dark:text-stone-400 font-bold shrink-0">
+                  <span>{isPackExpanded ? (language === 'eu' ? 'Itxi' : 'Ocultar') : (language === 'eu' ? 'Ikusi' : 'Ver')}</span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                      isPackExpanded ? 'rotate-180 text-stone-900 dark:text-stone-100' : ''
+                    }`}
+                  />
+                </div>
+              </button>
+
+              {/* Contenido desplegado al pulsar */}
+              {isPackExpanded && (
+                <div className="space-y-2 pt-1 animate-in fade-in duration-200">
+                  {packItems.length > 0 && (
+                    <div className="grid grid-cols-1 gap-2">
+                      {packItems.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2 rounded-2xl bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] space-y-1"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200/60 dark:border-stone-700">
+                              <img
+                                src={item.imageUrl || '/images/secciones/Quesos.JPG'}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate leading-tight">
+                                {item.name}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-1.5 text-[10.5px] text-stone-500 dark:text-stone-400">
+                                {item.quantity && item.quantity > 1 && (
+                                  <span className="font-bold text-[#C68D07] dark:text-[#FFE259]">
+                                    x{item.quantity}
+                                  </span>
+                                )}
+                                {item.weight_display && (
+                                  <span className="font-bold text-stone-700 dark:text-stone-300">
+                                    · {item.weight_display}
+                                  </span>
+                                )}
+                                {item.format && <span>· {item.format}</span>}
+                              </div>
+                            </div>
+                          </div>
+
+                          {item.description && (
+                            <p className="text-[11px] text-stone-600 dark:text-stone-400 leading-snug pl-0.5 line-clamp-2 italic font-sans">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {sellerDescription && (
+                    <div className="space-y-1 pt-1.5 border-t border-stone-100 dark:border-stone-800">
+                      <span className="text-[10.5px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block font-serif">
+                        {language === 'eu'
+                          ? 'Deskribapena:'
+                          : language === 'fr'
+                          ? 'Description :'
+                          : language === 'en'
+                          ? 'Description:'
+                          : 'Descripción:'}
+                      </span>
+                      <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed font-normal whitespace-pre-line line-clamp-3">
+                        {sellerDescription}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
