@@ -334,18 +334,53 @@ export function SellerProductForm({
     return pickupAddresses.filter((a) => a.is_active !== false);
   }, [pickupAddresses]);
 
+  const activeEventList = useMemo(() => {
+    return eventAddresses.filter((a) => a.is_active !== false);
+  }, [eventAddresses]);
+
   const availableVenues = useMemo(() => {
-    return activePickupList.map((addr) => ({
-      id: addr.id,
-      title: addr.title
-        ? `${addr.title} — ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`
-        : `${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`,
-      street: addr.street,
-      number: addr.number,
-      town: addr.town,
-      province: addr.province,
-    }));
-  }, [activePickupList]);
+    const list: {
+      id: string;
+      title: string;
+      street: string;
+      number?: string;
+      town: string;
+      province: string;
+      type: 'pickup' | 'event';
+    }[] = [];
+
+    // 1. Puntos de entrega / Tienda
+    activePickupList.forEach((addr) => {
+      list.push({
+        id: addr.id,
+        title: addr.title
+          ? `[${language === 'eu' ? 'Denda' : 'Tienda'}] ${addr.title} — ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`
+          : `[${language === 'eu' ? 'Denda' : 'Tienda'}] ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`,
+        street: addr.street,
+        number: addr.number,
+        town: addr.town,
+        province: addr.province,
+        type: 'pickup',
+      });
+    });
+
+    // 2. Puntos de Evento
+    activeEventList.forEach((addr) => {
+      list.push({
+        id: addr.id,
+        title: addr.title
+          ? `[${language === 'eu' ? 'Ekitaldi Puntua' : 'Punto Evento'}] ${addr.title} — ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`
+          : `[${language === 'eu' ? 'Ekitaldi Puntua' : 'Punto Evento'}] ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`,
+        street: addr.street,
+        number: addr.number,
+        town: addr.town,
+        province: addr.province,
+        type: 'event',
+      });
+    });
+
+    return list;
+  }, [activePickupList, activeEventList, language]);
 
   const [selectedPickupIds, setSelectedPickupIds] = useState<string[]>(
     initialProduct?.pickup_address_ids && initialProduct.pickup_address_ids.length > 0
@@ -354,13 +389,13 @@ export function SellerProductForm({
   );
 
   const [selectedEventId, setSelectedEventId] = useState<string>(() => {
-    if (initialProduct?.event_address_id && activePickupList.some((a) => a.id === initialProduct.event_address_id)) {
+    if (initialProduct?.event_address_id && availableVenues.some((a) => a.id === initialProduct.event_address_id)) {
       return initialProduct.event_address_id;
     }
-    if (initialMeta?.event_address_id && activePickupList.some((a) => a.id === initialMeta.event_address_id)) {
+    if (initialMeta?.event_address_id && availableVenues.some((a) => a.id === initialMeta.event_address_id)) {
       return initialMeta.event_address_id;
     }
-    return activePickupList[0]?.id || '';
+    return availableVenues[0]?.id || '';
   });
 
   const initialPackList = useMemo<AddedListItem[]>(() => {
@@ -1730,8 +1765,8 @@ export function SellerProductForm({
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>
                   {language === 'eu'
-                    ? 'Ez dago puntu / dendarik konfiguratuta. Zure profilean gehi ditzakezu.'
-                    : 'No hay puntos de entrega o tiendas físicas activas. Puedes configurarlos en tu perfil o locales.'}
+                    ? 'Ez dago dendarik edo ekitaldi-punturik konfiguratuta. Zure profilean / dendan gehi ditzakezu.'
+                    : 'No hay tiendas o puntos de evento activos. Puedes configurarlos en tu perfil / tienda.'}
                 </span>
               </div>
             )}

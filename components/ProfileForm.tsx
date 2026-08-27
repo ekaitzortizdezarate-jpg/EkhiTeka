@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile, changeUserPassword, updateStoreConfig, updateDeliveryAddresses } from '@/app/actions/auth';
+import { SiteImagesManager } from '@/components/SiteImagesManager';
 import type { Profile, WhatsAppContact, StoreAddress, StoreScheduleDetails, EventAddress, DeliveryAddress } from '@/types/database';
 import { parseProfile, isProfileComplete } from '@/types/database';
 import {
@@ -1583,6 +1584,11 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* 4. IMÁGENES Y BANNERS DE LA WEB */}
+          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-5 shadow-xs">
+            <SiteImagesManager />
           </div>
         </div>
       )}

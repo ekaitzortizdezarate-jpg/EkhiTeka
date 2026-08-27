@@ -203,7 +203,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         {/* Badge de Descuento (Bottom Right) */}
         {discountInfo && discountInfo.discountPercent > 0 && !isSoldOut && (
           <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-emerald-600 dark:bg-emerald-500 text-white text-xs sm:text-sm font-black rounded-xl shadow-lg font-sans tracking-tight border border-emerald-700/80 dark:border-emerald-400/80">
-            -{discountInfo.discountPercent}%
+            {language === 'eu' ? 'Deskontua:' : language === 'fr' ? 'Remise :' : language === 'en' ? 'Discount:' : 'Descuento:'} -{discountInfo.discountPercent}%
           </span>
         )}
       </div>
@@ -397,7 +397,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                       {discountInfo.originalPrice.toFixed(2)} €
                     </span>
                     <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 font-serif">
-                      (-{discountInfo.discountPercent}%)
+                      ({language === 'eu' ? 'Deskontua:' : language === 'fr' ? 'Remise :' : language === 'en' ? 'Discount:' : 'Descuento:'} -{discountInfo.discountPercent}%)
                     </span>
                   </div>
                 )}
@@ -421,7 +421,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                         {discountInfo.originalPrice.toFixed(2)} €
                       </span>
                       <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 font-serif">
-                        (-{discountInfo.discountPercent}%)
+                        ({language === 'eu' ? 'Deskontua:' : language === 'fr' ? 'Remise :' : language === 'en' ? 'Discount:' : 'Descuento:'} -{discountInfo.discountPercent}%)
                       </span>
                     </div>
                   )}

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
-import { SiteImagesManager } from '@/components/SiteImagesManager';
 import type { Category, Product, StoreAddress, EventAddress } from '@/types/database';
 import {
   getProductImage,
@@ -60,8 +59,8 @@ export function SellerProductsListView({
   const { t, language } = useLanguage();
   const router = useRouter();
 
-  // Selector central: 'productos' | 'eventos' | 'imagenes'
-  const [activeMainTab, setActiveMainTab] = useState<'productos' | 'eventos' | 'imagenes'>('productos');
+  // Selector central: 'productos' | 'eventos'
+  const [activeMainTab, setActiveMainTab] = useState<'productos' | 'eventos'>('productos');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -230,7 +229,7 @@ export function SellerProductsListView({
             />
             {discountInfo && discountInfo.discountPercent > 0 && (
               <span className="absolute bottom-2 right-2 px-2.5 py-1 bg-emerald-600 dark:bg-emerald-500 text-white text-xs sm:text-sm font-black rounded-xl shadow-lg font-serif border border-emerald-700 dark:border-emerald-400">
-                -{discountInfo.discountPercent}%
+                {language === 'eu' ? 'Deskontua:' : language === 'fr' ? 'Remise :' : language === 'en' ? 'Discount:' : 'Descuento:'} -{discountInfo.discountPercent}%
               </span>
             )}
           </div>
@@ -331,7 +330,7 @@ export function SellerProductsListView({
             </div>
             {discountInfo && discountInfo.discountPercent > 0 && (
               <span className="inline-block text-xs font-black text-emerald-600 dark:text-emerald-400 font-sans text-center">
-                Ahorro del {discountInfo.discountPercent}%
+                {language === 'eu' ? 'Deskontua:' : language === 'fr' ? 'Remise :' : language === 'en' ? 'Discount:' : 'Descuento:'} -{discountInfo.discountPercent}%
               </span>
             )}
           </div>
@@ -370,7 +369,7 @@ export function SellerProductsListView({
         ? `${meta.event_start_time} - ${meta.event_end_time}`
         : meta?.event_time || meta?.event_start_time || '19:00 - 21:00';
     const eventAddrId = meta?.event_address_id || eventProduct.event_address_id;
-    const matchedVenue = pickupAddresses.find((a) => a.id === eventAddrId) || null;
+    const matchedVenue = pickupAddresses.find((a) => a.id === eventAddrId) || eventAddresses.find((a) => a.id === eventAddrId) || null;
     const venueText = matchedVenue
       ? `${matchedVenue.title ? matchedVenue.title + ' — ' : ''}${matchedVenue.street}${matchedVenue.number ? ' ' + matchedVenue.number : ''}, ${matchedVenue.town} (${matchedVenue.province})`
       : eventProduct.origin_region || 'Tienda EkhiTeka';
@@ -567,25 +566,25 @@ export function SellerProductsListView({
             </span>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight">
               {language === 'eu'
-                ? 'Nire Denda eta Kudeaketa'
+                ? 'Nire Produktuak eta Ekitaldiak'
                 : language === 'fr'
-                ? 'Mon Magasin et Gestion'
+                ? 'Mes Produits et Événements'
                 : language === 'en'
-                ? 'My Store & Management'
-                : 'Mis Productos, Eventos e Imágenes'}
+                ? 'My Products & Events'
+                : 'Mis Productos y Eventos'}
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans">
             {language === 'eu'
-              ? 'Kudeatu zure produktuak, ekitaldiak eta webguneko banner guztiak leku bakarretik.'
-              : 'Gestiona todos tus productos de la tienda, catas presenciales (eventos) y las imágenes de la web.'}
+              ? 'Kudeatu zure dendako produktuak eta dastaketa presentzialak (ekitaldiak) leku bakarretik.'
+              : 'Gestiona todos tus productos de la tienda y catas presenciales (eventos) desde un único lugar.'}
           </p>
         </div>
       </div>
 
-      {/* 2. SELECTOR CENTRAL DESTACADO (Productos / Eventos / Imágenes con cantidad debajo) */}
-      <div className="w-full max-w-xl mx-auto px-1">
-        <div className="grid grid-cols-3 p-1.5 rounded-3xl bg-white dark:bg-[#1C1B19] border-2 border-stone-200 dark:border-stone-800 shadow-sm gap-1 sm:gap-2 font-serif w-full">
+      {/* 2. SELECTOR CENTRAL DESTACADO (Productos / Eventos con cantidad debajo) */}
+      <div className="w-full max-w-md mx-auto px-1">
+        <div className="grid grid-cols-2 p-1.5 rounded-3xl bg-white dark:bg-[#1C1B19] border-2 border-stone-200 dark:border-stone-800 shadow-sm gap-1 sm:gap-2 font-serif w-full">
           {/* Botón 1: Productos */}
           <button
             type="button"
@@ -619,24 +618,6 @@ export function SellerProductsListView({
             </span>
             <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-80 block leading-none">
               ({catasPresenciales.length})
-            </span>
-          </button>
-
-          {/* Botón 3: Imágenes */}
-          <button
-            type="button"
-            onClick={() => setActiveMainTab('imagenes')}
-            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
-              activeMainTab === 'imagenes'
-                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
-                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
-            }`}
-          >
-            <span className="text-xs sm:text-sm uppercase tracking-wider block leading-tight">
-              {language === 'eu' ? 'Irudiak' : language === 'fr' ? 'Images' : language === 'en' ? 'Images' : 'Imágenes'}
-            </span>
-            <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-0 block leading-none select-none">
-              -
             </span>
           </button>
         </div>
@@ -854,13 +835,6 @@ export function SellerProductsListView({
               </Link>
             </div>
           )}
-        </div>
-      )}
-
-      {/* 5. VISTA 3: MIS IMÁGENES (GESTOR DE BANNERS Y SECCIONES DE LA WEB) */}
-      {activeMainTab === 'imagenes' && (
-        <div className="animate-in fade-in duration-200">
-          <SiteImagesManager />
         </div>
       )}
     </div>
