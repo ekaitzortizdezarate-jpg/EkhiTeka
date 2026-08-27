@@ -40,13 +40,18 @@ export function ProductDetailAddToCart({
 
   if (isSeller) {
     return (
-      <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-3">
-        <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
-          Modo Vendedor: Estás previsualizando la ficha de este producto.
-        </p>
+      <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-3 font-serif">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
+            Modo Vendedor: Estás previsualizando la ficha de este producto.
+          </p>
+          <span className="px-3 py-1 bg-white dark:bg-stone-900 border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-black text-amber-950 dark:text-amber-300 font-sans">
+            {t.prod_stock}: {product.is_unlimited_stock ? t.prod_unlimited : `${product.stock ?? 0} ${isEvent ? t.event_seats : 'uds'}`}
+          </span>
+        </div>
         <Link
           href={`/vendedor/productos/${product.id}/editar`}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-xs font-serif"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-xs font-serif cursor-pointer hover:scale-102"
         >
           <Pencil className="w-4 h-4" />
           <span>Editar variables del producto</span>
