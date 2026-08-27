@@ -115,7 +115,7 @@ export function NavbarNavLinks({
               Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
             </span>
             <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              Quesería & Selección Gourmet
+              {t.header_subtitle}
             </span>
           </div>
         </Link>

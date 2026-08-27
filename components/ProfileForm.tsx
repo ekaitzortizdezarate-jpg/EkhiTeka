@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile, changeUserPassword, updateStoreConfig } from '@/app/actions/auth';
 import type { Profile, WhatsAppContact, StoreAddress, EventAddress } from '@/types/database';
@@ -22,6 +23,7 @@ import {
   AlertCircle,
   Power,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface SellerOption {
@@ -315,6 +317,24 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
   return (
     <div className="space-y-6 font-serif">
+      {/* Cabecera del Perfil */}
+      <div className="flex items-center gap-3 pb-2 border-b border-stone-200 dark:border-stone-800">
+        <Link
+          href="/"
+          className="p-2.5 rounded-2xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition-colors shadow-2xs cursor-pointer"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 font-serif">
+            {t.profile_main_title}
+          </h1>
+          <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+            {t.profile_main_subtitle}
+          </p>
+        </div>
+      </div>
+
       {/* Selector de Pestañas: Usuario y Tienda */}
       {isSeller && (
         <div className="flex items-center gap-3 p-1.5 bg-stone-100 dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 max-w-md">

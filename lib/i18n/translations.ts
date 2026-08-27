@@ -4,6 +4,7 @@ export interface TranslationDict {
   brand_name: string;
   brand_tagline: string;
   brand_subtitle: string;
+  header_subtitle: string;
   top_refrigerated_shipping: string;
   top_custom_orders: string;
   top_store_pickup: string;
@@ -297,6 +298,8 @@ export interface TranslationDict {
   // Profile Page & Fields
   profile_title: string;
   profile_subtitle: string;
+  profile_main_title: string;
+  profile_main_subtitle: string;
   profile_personal_data: string;
   profile_address_data: string;
   profile_contact_data: string;
@@ -446,6 +449,23 @@ export interface TranslationDict {
   seller_events_col_date: string;
   seller_events_col_total: string;
   seller_events_col_actions: string;
+  seller_events_badge_store: string;
+  seller_events_occupied_seats: string;
+  seller_events_no_reservations: string;
+  seller_events_open_chat_title: string;
+  seller_events_remove_participant_title: string;
+  seller_events_modal_title: string;
+  seller_events_modal_notice: string;
+  seller_events_modal_name_label: string;
+  seller_events_modal_price_label: string;
+  seller_events_modal_stock_label: string;
+  seller_events_modal_location_label: string;
+  seller_events_modal_desc_label: string;
+  seller_events_modal_desc_placeholder: string;
+  seller_events_modal_save_notify: string;
+  seller_events_modal_saving_notify: string;
+  seller_events_remove_prompt: string;
+  seller_events_edit_success: string;
 
   // Seller Product Form (extended)
   seller_shared_catalog_subtitle: string;
@@ -518,6 +538,8 @@ export interface TranslationDict {
 
   seller_step4_photo_label: string;
   seller_photo_url_placeholder: string;
+  seller_choose_file: string;
+  seller_no_file_chosen: string;
 
   seller_publish_btn: string;
   seller_save_changes_btn: string;
@@ -593,6 +615,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Gourmet Denda & Artisau Produktuak',
     brand_subtitle: 'Gaztak, hegaluzea, gatzadurak, gildak, garagardo artisaua, txakolina eta sagardo hautatua.',
+    header_subtitle: 'Gaztandegia & Gourmet Hautaketa',
     top_refrigerated_shipping: 'Bidalpen hoztua 24/48h penintsulan',
     top_custom_orders: 'Eskari bereziak eta aholkularitza',
     top_store_pickup: 'Dendan jasotzeko aukera',
@@ -874,6 +897,8 @@ export const translations: Record<Language, TranslationDict> = {
     // Perfil
     profile_title: 'Nire Profila',
     profile_subtitle: 'Kudeatu zure harremanetarako datuak, bidalketa helbidea eta segurtasuna.',
+    profile_main_title: 'Nire Profila',
+    profile_main_subtitle: 'Kudeatu zure datu pertsonalak eta dendako datu partekatuak.',
     profile_personal_data: 'Datu Pertsonalak',
     profile_address_data: 'Bidalketa Helbidea',
     profile_contact_data: 'Harremanetarako Datuak',
@@ -1023,6 +1048,23 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Erosketa Data',
     seller_events_col_total: 'Guztira',
     seller_events_col_actions: 'Ekintzak',
+    seller_events_badge_store: 'Dastaketa Presentziala · Lekeitioko Denda',
+    seller_events_occupied_seats: 'Leku beteak:',
+    seller_events_no_reservations: 'Oraindik ez dago erreserbarik erregistratuta dastaketa presentzial honetarako.',
+    seller_events_open_chat_title: 'Ireki txata eroslearekin',
+    seller_events_remove_participant_title: 'Eman baja parte-hartzaileari eta jakinarazi txat bidez',
+    seller_events_modal_title: 'Editatu Dastaketa Presentzialaren Datuak',
+    seller_events_modal_notice: 'Dastaketaren data, ordua edo baldintzetan egindako edozein aldaketa automatikoki jakinaraziko zaie txat bidez plaza erreserbatua duten parte-hartzaile guztiei.',
+    seller_events_modal_name_label: 'Dastaketa Presentzialaren Titulua *',
+    seller_events_modal_price_label: 'Prezioa Lekuko (€) *',
+    seller_events_modal_stock_label: 'Leku Erabilgarriak *',
+    seller_events_modal_location_label: 'Tokia / Kokapena *',
+    seller_events_modal_desc_label: 'Deskribapena, Data/Ordua & Maridajea *',
+    seller_events_modal_desc_placeholder: 'Adib: Data: Irailak 20, Larunbata · 19:30\nDastatuko diren gaztak: 5 artisau gazta eta euskal maridajea...',
+    seller_events_modal_save_notify: 'Gorde eta Jakinarazi',
+    seller_events_modal_saving_notify: 'Gordetzen eta jakinarazten...',
+    seller_events_remove_prompt: 'Nahi duzu parte-hartzaile honi baja eman dastaketa honetan? Erreserba bertan behera geratuko da, plazak berreskuratuko dira eta jakinarazpen automatiko bat bidaliko zaio txat bidez.\n\nArrazoia (aukerakoa):',
+    seller_events_edit_success: 'Dastaketa ongi aldatu da! Txat bidez jakinarazi zaie parte-hartzaileei.',
 
     // Seller Product Form (extended)
     seller_shared_catalog_subtitle: 'EkhiTeka saltzaile talde osoarentzako katalogo partekatua.',
@@ -1095,6 +1137,8 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_step4_photo_label: '4. Produktuaren / Ekitaldiaren Argazkia',
     seller_photo_url_placeholder: 'Edo itsatsi zuzeneko irudi esteka bat (aukerakoa)',
+    seller_choose_file: 'Aukeratu fitxategia',
+    seller_no_file_chosen: 'Ez da fitxategirik hautatu',
 
     seller_publish_btn: 'Argitaratu Dendan',
     seller_save_changes_btn: 'Gorde Aldaketak',
@@ -1158,6 +1202,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Tienda Gourmet & Productos Artesanos',
     brand_subtitle: 'Quesos de autor, bonito del norte, salazones, gildas, cerveza artesanal, txakoli y sidra selecta.',
+    header_subtitle: 'Quesería & Selección Gourmet',
     top_refrigerated_shipping: 'Envío refrigerado 24/48h en península',
     top_custom_orders: 'Encargos a medida y asesoramiento gourmet',
     top_store_pickup: 'Recogida gratuita en tienda',
@@ -1439,6 +1484,8 @@ export const translations: Record<Language, TranslationDict> = {
     // Perfil
     profile_title: 'Mi Perfil',
     profile_subtitle: 'Gestiona tus datos personales, dirección de entrega y seguridad.',
+    profile_main_title: 'Mi Perfil',
+    profile_main_subtitle: 'Gestiona tus datos personales y los datos compartidos de la tienda.',
     profile_personal_data: 'Datos Personales',
     profile_address_data: 'Dirección de Entrega',
     profile_contact_data: 'Datos de Contacto',
@@ -1588,6 +1635,23 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Fecha Compra',
     seller_events_col_total: 'Total',
     seller_events_col_actions: 'Acciones',
+    seller_events_badge_store: 'Cata Presencial · Tienda Lekeitio',
+    seller_events_occupied_seats: 'Plazas ocupadas:',
+    seller_events_no_reservations: 'Aún no hay reservas registradas para esta cata presencial.',
+    seller_events_open_chat_title: 'Abrir chat con el comprador',
+    seller_events_remove_participant_title: 'Dar de baja participante y notificar por chat',
+    seller_events_modal_title: 'Editar Variables de la Cata Presencial',
+    seller_events_modal_notice: 'Cualquier cambio en la fecha, hora o condiciones de la cata se notificará automáticamente por el chat a todos los participantes con plaza reservada.',
+    seller_events_modal_name_label: 'Título de la Cata Presencial *',
+    seller_events_modal_price_label: 'Precio por Plaza (€) *',
+    seller_events_modal_stock_label: 'Plazas Disponibles Restantes *',
+    seller_events_modal_location_label: 'Lugar / Ubicación *',
+    seller_events_modal_desc_label: 'Descripción, Fecha/Hora & Maridaje *',
+    seller_events_modal_desc_placeholder: 'Ej: Fecha: Sábado 20 de Septiembre · 19:30h\nQuesos a probar: 5 quesos de autor y maridaje vasco...',
+    seller_events_modal_save_notify: 'Guardar y Notificar',
+    seller_events_modal_saving_notify: 'Guardando & Notificando...',
+    seller_events_remove_prompt: '¿Deseas dar de baja a este participante de esta cata presencial? Se cancelará la reserva, se restablecerán las plazas y se le enviará un aviso automático por chat.\n\nMotivo (opcional):',
+    seller_events_edit_success: '¡Cata modificada con éxito! Se ha notificado a los participantes por el chat.',
 
     // Seller Product Form (extended)
     seller_shared_catalog_subtitle: 'Catálogo compartido para todo el equipo de vendedores de EkhiTeka.',
@@ -1660,6 +1724,8 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_step4_photo_label: '4. Fotografía del Producto / Evento',
     seller_photo_url_placeholder: 'O pega una URL de imagen directa (opcional)',
+    seller_choose_file: 'Seleccionar archivo',
+    seller_no_file_chosen: 'Ningún archivo seleccionado',
 
     seller_publish_btn: 'Publicar en la Tienda',
     seller_save_changes_btn: 'Guardar Cambios',
@@ -1723,6 +1789,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Gourmet Store & Artisan Delicacies',
     brand_subtitle: 'Artisan cheeses, white tuna, salted anchovies, gildas, craft beer, txakoli wine and Basque cider.',
+    header_subtitle: 'Cheese Shop & Gourmet Selection',
     top_refrigerated_shipping: 'Refrigerated 24/48h shipping in mainland',
     top_custom_orders: 'Custom gourmet gifts & expert advice',
     top_store_pickup: 'Free in-store pickup',
@@ -2004,6 +2071,8 @@ export const translations: Record<Language, TranslationDict> = {
     // Profile
     profile_title: 'My Profile',
     profile_subtitle: 'Manage your contact information, shipping address and password.',
+    profile_main_title: 'My Profile',
+    profile_main_subtitle: 'Manage your personal details and shared store settings.',
     profile_personal_data: 'Personal Information',
     profile_address_data: 'Shipping Address',
     profile_contact_data: 'Contact Information',
@@ -2153,6 +2222,23 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Purchase Date',
     seller_events_col_total: 'Total',
     seller_events_col_actions: 'Actions',
+    seller_events_badge_store: 'In-Person Tasting · Lekeitio Shop',
+    seller_events_occupied_seats: 'Occupied seats:',
+    seller_events_no_reservations: 'No bookings registered yet for this in-person tasting.',
+    seller_events_open_chat_title: 'Open chat with buyer',
+    seller_events_remove_participant_title: 'Cancel participant and notify via chat',
+    seller_events_modal_title: 'Edit In-Person Tasting Details',
+    seller_events_modal_notice: 'Any change to the date, time or tasting conditions will be automatically notified via chat to all attendees with a reserved seat.',
+    seller_events_modal_name_label: 'In-Person Tasting Title *',
+    seller_events_modal_price_label: 'Price per Seat (€) *',
+    seller_events_modal_stock_label: 'Remaining Available Seats *',
+    seller_events_modal_location_label: 'Venue / Location *',
+    seller_events_modal_desc_label: 'Description, Date/Time & Pairing *',
+    seller_events_modal_desc_placeholder: 'e.g. Date: Saturday 20 September · 19:30\nCheeses to taste: 5 artisan cheeses with Basque pairing...',
+    seller_events_modal_save_notify: 'Save & Notify',
+    seller_events_modal_saving_notify: 'Saving & Notifying...',
+    seller_events_remove_prompt: 'Do you want to cancel this participant from this tasting? The reservation will be cancelled, seats will be restored, and an automatic chat notice will be sent.\n\nReason (optional):',
+    seller_events_edit_success: 'Tasting updated successfully! Participants have been notified via chat.',
 
     // Seller Product Form (extended)
     seller_shared_catalog_subtitle: 'Shared catalogue for all EkhiTeka sellers.',
@@ -2225,6 +2311,8 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_step4_photo_label: '4. Product / Event Photo',
     seller_photo_url_placeholder: 'Or paste direct image URL (optional)',
+    seller_choose_file: 'Choose file',
+    seller_no_file_chosen: 'No file chosen',
 
     seller_publish_btn: 'Publish in Store',
     seller_save_changes_btn: 'Save Changes',
@@ -2288,6 +2376,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Épicerie Fine & Produits Artisanaux',
     brand_subtitle: 'Fromages fermiers, thon blanc, salaisons, gildas, bière artisanale, vin txakoli et cidre basque.',
+    header_subtitle: 'Fromagerie & Sélection Gourmet',
     top_refrigerated_shipping: 'Livraison réfrigérée 24/48h',
     top_custom_orders: 'Coffrets sur mesure et conseils d\'experts',
     top_store_pickup: 'Retrait gratuit en boutique',
@@ -2569,6 +2658,8 @@ export const translations: Record<Language, TranslationDict> = {
     // Profil
     profile_title: 'Mon Profil',
     profile_subtitle: 'Gérez vos données personnelles, adresse de livraison et sécurité.',
+    profile_main_title: 'Mon Profil',
+    profile_main_subtitle: 'Gérez vos données personnelles et les paramètres partagés de la boutique.',
     profile_personal_data: 'Données Personnelles',
     profile_address_data: 'Adresse de Livraison',
     profile_contact_data: 'Coordonnées de Contact',
@@ -2718,6 +2809,23 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Date d\'Achat',
     seller_events_col_total: 'Total',
     seller_events_col_actions: 'Actions',
+    seller_events_badge_store: 'Dégustation Présentielle · Boutique Lekeitio',
+    seller_events_occupied_seats: 'Places occupées :',
+    seller_events_no_reservations: 'Aucune réservation enregistrée pour cette dégustation en boutique.',
+    seller_events_open_chat_title: 'Ouvrir le chat avec l\'acheteur',
+    seller_events_remove_participant_title: 'Annuler le participant et notifier par chat',
+    seller_events_modal_title: 'Modifier les Variables de la Dégustation',
+    seller_events_modal_notice: 'Toute modification de la date, de l\'heure ou des conditions de la dégustation sera automatiquement notifiée par chat à tous les participants ayant réservé une place.',
+    seller_events_modal_name_label: 'Titre de la Dégustation Présentielle *',
+    seller_events_modal_price_label: 'Prix par Place (€) *',
+    seller_events_modal_stock_label: 'Places Disponibles Restantes *',
+    seller_events_modal_location_label: 'Lieu / Emplacement *',
+    seller_events_modal_desc_label: 'Description, Date/Heure & Accords *',
+    seller_events_modal_desc_placeholder: 'Ex : Date : Samedi 20 Septembre · 19h30\nFromages à déguster : 5 fromages fermiers et accords basques...',
+    seller_events_modal_save_notify: 'Enregistrer et Notifier',
+    seller_events_modal_saving_notify: 'Enregistrement et notification...',
+    seller_events_remove_prompt: 'Souhaitez-vous annuler l\'inscription de ce participant à cette dégustation ? La réservation sera annulée, les places seront rétablies et une notification automatique lui sera envoyée par chat.\n\nMotif (facultatif) :',
+    seller_events_edit_success: 'Dégustation modifiée avec succès ! Les participants ont été informés par chat.',
 
     // Seller Product Form (extended)
     seller_shared_catalog_subtitle: 'Catalogue partagé pour tous les vendeurs d\'EkhiTeka.',
@@ -2790,6 +2898,8 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_step4_photo_label: '4. Photo du Produit / Événement',
     seller_photo_url_placeholder: 'Ou collez une URL d\'image directe (facultatif)',
+    seller_choose_file: 'Choisir un fichier',
+    seller_no_file_chosen: 'Aucun fichier sélectionné',
 
     seller_publish_btn: 'Publier dans la Boutique',
     seller_save_changes_btn: 'Enregistrer les Modifications',

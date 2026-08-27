@@ -83,6 +83,7 @@ export function SellerProductForm({
 
   const [publishingType, setPublishingType] = useState<PublishingType>(inferInitialType());
   const [imagePreview, setImagePreview] = useState<string | null>(initialProduct?.image_url || null);
+  const [imageFileName, setImageFileName] = useState<string | null>(null);
   const [isUnlimited, setIsUnlimited] = useState<boolean>(initialProduct?.is_unlimited_stock || false);
 
   const cleanSingleProducts = useMemo(() => {
@@ -191,10 +192,12 @@ export function SellerProductForm({
     setCatalogQuantityStr('1');
   };
 
+  // 2. Acordeón de Producto Específico / Manual
   const [isCustomAccordionOpen, setIsCustomAccordionOpen] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customImageUrl, setCustomImageUrl] = useState('');
   const [customImagePreview, setCustomImagePreview] = useState<string>('');
+  const [customImageFileName, setCustomImageFileName] = useState<string | null>(null);
   const [customCategory, setCustomCategory] = useState('queso');
   const [customFormat, setCustomFormat] = useState('unidad');
   const [customPrice, setCustomPrice] = useState('');
@@ -205,8 +208,11 @@ export function SellerProductForm({
   const handleCustomFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setCustomImageFileName(file.name);
       const url = URL.createObjectURL(file);
       setCustomImagePreview(url);
+    } else {
+      setCustomImageFileName(null);
     }
   };
 
@@ -248,6 +254,7 @@ export function SellerProductForm({
     setCustomName('');
     setCustomImageUrl('');
     setCustomImagePreview('');
+    setCustomImageFileName(null);
     setCustomPrice('');
     setCustomDesc('');
     setCustomQuantityStr('1');
@@ -324,8 +331,11 @@ export function SellerProductForm({
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFileName(file.name);
       const url = URL.createObjectURL(file);
       setImagePreview(url);
+    } else {
+      setImageFileName(null);
     }
   };
 
@@ -684,13 +694,21 @@ export function SellerProductForm({
                           <ImageIcon className="w-5 h-5 text-stone-400" />
                         )}
                       </div>
-                      <div className="space-y-1.5 flex-1">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleCustomFileChange}
-                          className="w-full text-xs text-stone-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-stone-200 dark:file:bg-stone-800 file:text-stone-800 dark:file:text-stone-200 hover:file:bg-[#FFE259] cursor-pointer"
-                        />
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <label className="flex items-center gap-2 cursor-pointer w-full">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCustomFileChange}
+                            className="sr-only"
+                          />
+                          <span className="px-3 py-1.5 rounded-lg bg-stone-200 dark:bg-stone-800 hover:bg-[#FFE259] dark:hover:bg-[#FFE259] text-stone-800 dark:text-stone-200 hover:text-stone-900 dark:hover:text-stone-900 font-bold text-xs transition-colors shrink-0">
+                            {t.seller_choose_file}
+                          </span>
+                          <span className="text-xs text-stone-500 dark:text-stone-400 truncate max-w-[180px] sm:max-w-xs">
+                            {customImageFileName || t.seller_no_file_chosen}
+                          </span>
+                        </label>
                         <input
                           type="text"
                           value={customImageUrl}
@@ -1207,14 +1225,22 @@ export function SellerProductForm({
               )}
             </div>
 
-            <div className="space-y-2 flex-1 w-full">
-              <input
-                type="file"
-                name="image_file"
-                accept="image/*"
-                onChange={handleImageFileChange}
-                className="w-full text-xs text-stone-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-stone-100 dark:file:bg-stone-800 file:text-stone-800 dark:file:text-stone-200 hover:file:bg-[#FFE259] cursor-pointer"
-              />
+            <div className="space-y-2 flex-1 w-full min-w-0">
+              <label className="flex items-center gap-3 cursor-pointer w-full p-2.5 rounded-xl border border-dashed border-stone-300 dark:border-stone-700 bg-stone-50/70 dark:bg-[#141312] hover:border-[#FFE259] transition-colors">
+                <input
+                  type="file"
+                  name="image_file"
+                  accept="image/*"
+                  onChange={handleImageFileChange}
+                  className="sr-only"
+                />
+                <span className="px-3.5 py-2 rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-[#FFE259] dark:hover:bg-[#FFE259] text-stone-800 dark:text-stone-200 hover:text-stone-900 dark:hover:text-stone-900 font-black text-xs uppercase tracking-wider transition-colors shrink-0">
+                  {t.seller_choose_file}
+                </span>
+                <span className="text-xs text-stone-600 dark:text-stone-400 truncate flex-1 font-medium">
+                  {imageFileName || t.seller_no_file_chosen}
+                </span>
+              </label>
               <input
                 type="text"
                 name="image_url_fallback"
