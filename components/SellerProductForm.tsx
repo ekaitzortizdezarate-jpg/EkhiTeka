@@ -213,42 +213,22 @@ export function SellerProductForm({
     }
   };
 
-  const activePickupList = pickupAddresses.filter((a) => a.is_active);
-  const activeEventList = eventAddresses.filter((a) => a.is_active);
+  const activePickupList = useMemo(() => {
+    return pickupAddresses.filter((a) => a.is_active !== false);
+  }, [pickupAddresses]);
 
   const availableVenues = useMemo(() => {
-    const list: { id: string; title: string; street: string; number?: string; town: string; province: string }[] = [];
-
-    // 1. Puntos de entrega / tiendas generados en la tienda
-    activePickupList.forEach((addr) => {
-      list.push({
-        id: addr.id,
-        title: addr.title
-          ? `${addr.title} — ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`
-          : `${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`,
-        street: addr.street,
-        number: addr.number,
-        town: addr.town,
-        province: addr.province,
-      });
-    });
-
-    // 2. Locales adicionales de eventos
-    activeEventList.forEach((ev) => {
-      if (!list.some((l) => l.id === ev.id)) {
-        list.push({
-          id: ev.id,
-          title: `${ev.title} — ${ev.street} ${ev.number || ''}, ${ev.town} (${ev.province})`,
-          street: ev.street,
-          number: ev.number,
-          town: ev.town,
-          province: ev.province,
-        });
-      }
-    });
-
-    return list;
-  }, [activePickupList, activeEventList]);
+    return activePickupList.map((addr) => ({
+      id: addr.id,
+      title: addr.title
+        ? `${addr.title} — ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`
+        : `${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`,
+      street: addr.street,
+      number: addr.number,
+      town: addr.town,
+      province: addr.province,
+    }));
+  }, [activePickupList]);
 
   const [selectedPickupIds, setSelectedPickupIds] = useState<string[]>(
     initialProduct?.pickup_address_ids && initialProduct.pickup_address_ids.length > 0
@@ -257,9 +237,13 @@ export function SellerProductForm({
   );
 
   const [selectedEventId, setSelectedEventId] = useState<string>(() => {
-    if (initialProduct?.event_address_id) return initialProduct.event_address_id;
-    if (initialMeta?.event_address_id) return initialMeta.event_address_id;
-    return activePickupList[0]?.id || activeEventList[0]?.id || '';
+    if (initialProduct?.event_address_id && activePickupList.some((a) => a.id === initialProduct.event_address_id)) {
+      return initialProduct.event_address_id;
+    }
+    if (initialMeta?.event_address_id && activePickupList.some((a) => a.id === initialMeta.event_address_id)) {
+      return initialMeta.event_address_id;
+    }
+    return activePickupList[0]?.id || '';
   });
 
   const initialPackList = useMemo<AddedListItem[]>(() => {
@@ -340,20 +324,12 @@ export function SellerProductForm({
   }, [initialProduct, initialMeta, availableSingleProducts]);
 
   const [selectedListItems, setSelectedListItems] = useState<AddedListItem[]>(initialPackList);
-
-  const [catalogSelectId, setCatalogSelectId] = useState<string>(
-    cleanSingleProducts[0]?.id || ''
-  );
+  const [catalogSelectId, setCatalogSelectId] = useState<string>('');
   const [catalogQuantityStr, setCatalogQuantityStr] = useState<string>('1');
 
-  useEffect(() => {
-    if (!catalogSelectId && cleanSingleProducts.length > 0) {
-      setCatalogSelectId(cleanSingleProducts[0].id);
-    }
-  }, [cleanSingleProducts, catalogSelectId]);
-
   const selectedCatalogProduct = useMemo(() => {
-    return cleanSingleProducts.find((p) => p.id === catalogSelectId) || cleanSingleProducts[0];
+    if (!catalogSelectId) return null;
+    return cleanSingleProducts.find((p) => p.id === catalogSelectId) || null;
   }, [cleanSingleProducts, catalogSelectId]);
 
   const handleAddCatalogProduct = () => {
@@ -390,6 +366,7 @@ export function SellerProductForm({
       };
       setSelectedListItems([...selectedListItems, newItem]);
     }
+    setCatalogSelectId('');
     setCatalogQuantityStr('1');
   };
 
@@ -877,15 +854,16 @@ export function SellerProductForm({
                   onChange={(e) => setCatalogSelectId(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-white dark:bg-[#1F1E1C] border border-stone-300 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
-                  {cleanSingleProducts.length > 0 ? (
-                    cleanSingleProducts.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} ({Number(p.price).toFixed(2)} €)
-                      </option>
-                    ))
-                  ) : (
-                    <option value="">{t.seller_catalog_no_singles}</option>
-                  )}
+                  <option value="">
+                    {language === 'eu'
+                      ? '-- Hautatu katalogoko produktu bat gehitzeko --'
+                      : '-- Selecciona un producto del catálogo para añadir --'}
+                  </option>
+                  {cleanSingleProducts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({Number(p.price).toFixed(2)} €)
+                    </option>
+                  ))}
                 </select>
 
                 {selectedCatalogProduct && (
