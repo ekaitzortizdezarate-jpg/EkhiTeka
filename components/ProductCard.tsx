@@ -17,10 +17,12 @@ interface ProductCardProps {
 export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const { addToCart } = useCart();
   const { t } = useLanguage();
+  const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
+  const maxStock = product.is_unlimited_stock ? 99 : Math.max(1, product.stock ?? 1);
   const isEvent =
     product.category_id === 'catas' ||
     product.category_id === 'cata_presencial' ||
@@ -41,10 +43,13 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isSoldOut) return;
-    addToCart(product, product.profiles?.full_name || 'EkhiTeka Selección');
+    if (isSoldOut || quantity <= 0) return;
+    addToCart(product, product.profiles?.full_name || 'EkhiTeka Selección', quantity);
     setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    setTimeout(() => {
+      setAdded(false);
+      setQuantity(1);
+    }, 1500);
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -125,8 +130,8 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Precio y Botones de Acción */}
-      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
+      {/* Precio y Botones de Acción con Selector de Cantidad */}
+      <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="flex items-baseline gap-1.5">
             <span className="font-serif font-black text-base sm:text-lg text-stone-900 dark:text-stone-100 block leading-none">
@@ -164,6 +169,39 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           </div>
         ) : (
           <div className="flex items-center gap-1.5">
+            {/* Selector de Cantidad */}
+            {!isSoldOut && (
+              <div className="flex items-center rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 p-0.5 shadow-2xs font-serif">
+                <button
+                  type="button"
+                  disabled={quantity <= 1}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setQuantity((q) => Math.max(1, q - 1));
+                  }}
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-700 dark:text-stone-300 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer text-xs"
+                >
+                  -
+                </button>
+                <span className="w-5 text-center text-xs font-black text-stone-900 dark:text-stone-100">
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  disabled={quantity >= maxStock}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setQuantity((q) => Math.min(maxStock, q + 1));
+                  }}
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-stone-700 dark:text-stone-300 font-bold hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-30 cursor-pointer text-xs"
+                >
+                  +
+                </button>
+              </div>
+            )}
+
             <Link
               href={`/chat/${product.seller_id || ''}?product_id=${product.id}`}
               className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 shrink-0"

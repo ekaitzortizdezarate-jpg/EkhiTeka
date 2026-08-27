@@ -133,7 +133,7 @@ export function getProductImage(product?: {
   category_id?: string;
   name?: string;
   format?: string;
-}): string {
+} | null): string {
   if (!product) return '/images/secciones/Quesos.JPG';
 
   if (product.image_url && product.image_url.trim()) {

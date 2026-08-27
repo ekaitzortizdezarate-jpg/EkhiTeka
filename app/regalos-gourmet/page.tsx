@@ -115,7 +115,27 @@ export default function RegalosGourmetPage() {
         </div>
       </section>
 
-      {/* 2. Tres Bloques con Imagen: Cestas, Packs y Tarjetas */}
+      {/* 2. Catálogo de Packs y Regalos Disponibles */}
+      {products.length > 0 && (
+        <section className="space-y-6 pt-2 font-serif">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              {t.gifts_catalog_badge}
+            </span>
+            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
+              {t.gifts_catalog_title}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 3. Tres Bloques Editoriales con Imagen: Cestas, Packs y Tarjetas */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
         {/* Tarjeta 1: Cestas Gourmet a Medida */}
         <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
@@ -213,26 +233,6 @@ export default function RegalosGourmetPage() {
           </div>
         </div>
       </section>
-
-      {/* 3. Catálogo de Packs y Regalos */}
-      {products.length > 0 && (
-        <section className="space-y-6 pt-2 font-serif">
-          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              {t.gifts_catalog_badge}
-            </span>
-            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
-              {t.gifts_catalog_title}
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} isSeller={isSeller} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
