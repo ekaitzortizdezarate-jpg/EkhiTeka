@@ -232,6 +232,21 @@ export function formatProductDescription(
       return 'Canjeable en tienda física y online';
     });
 
+    // Replace "MODALIDAD: Canjeable por productos EkhiTeka..."
+    l = l.replace(/(MODALIDAD|Modalidad)\s*:\s*Canjeable por productos(\s+EkhiTeka(\s+Gourmet)?)?(\.\.\.|\.)?/gi, () => {
+      if (language === 'eu') return 'Produktuekin trukagarria';
+      if (language === 'fr') return 'Échangeable contre des produits';
+      if (language === 'en') return 'Redeemable for products';
+      return 'Canjeable por productos';
+    });
+
+    l = l.replace(/^Canjeable por productos(\s+EkhiTeka(\s+Gourmet)?)?(\.\.\.|\.)?/gi, () => {
+      if (language === 'eu') return 'Produktuekin trukagarria';
+      if (language === 'fr') return 'Échangeable contre des produits';
+      if (language === 'en') return 'Redeemable for products';
+      return 'Canjeable por productos';
+    });
+
     // 4. Catas Presenciales / Events - Inline Tokens
     l = l.replace(/\b(FECHA|Fecha|DATA|Data|DATE|Date)\s*:\s*/g, () => {
       if (language === 'eu') return 'Data: ';
