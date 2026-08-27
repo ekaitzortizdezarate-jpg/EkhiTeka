@@ -35,6 +35,7 @@ import {
   Ticket,
   MapPin,
   AlignLeft,
+  Home,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -775,7 +776,7 @@ export function SellerProductForm({
                 : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
             }`}
           >
-            <Sparkles className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
+            <Home className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
             <span className="text-xs font-bold">{t.seller_type_home_tasting}</span>
           </button>
 
