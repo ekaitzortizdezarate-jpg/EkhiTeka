@@ -385,6 +385,11 @@ export function SellerProductForm({
       formData.set('is_unlimited_stock', 'true');
     }
 
+    if (isUnlimited || publishingType === 'tarjeta_regalo') {
+      formData.set('is_unlimited_stock', 'true');
+      formData.set('stock', '999');
+    }
+
     const rawDesc = (formData.get('description') as string) || '';
     let composedDesc = rawDesc.trim();
 

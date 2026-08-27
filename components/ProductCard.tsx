@@ -21,9 +21,16 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const [added, setAdded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
-  const isLowStock = !product.is_unlimited_stock && (product.stock ?? 0) <= 5 && (product.stock ?? 0) > 0;
-  const maxStock = product.is_unlimited_stock ? 99 : Math.max(1, product.stock ?? 1);
+  const isUnlimited = Boolean(
+    product.is_unlimited_stock ||
+    product.stock === null ||
+    product.stock === undefined ||
+    (typeof product.stock === 'number' && product.stock >= 900)
+  );
+
+  const isSoldOut = !isUnlimited && (product.stock ?? 0) <= 0;
+  const isLowStock = !isUnlimited && (product.stock ?? 0) <= 5 && (product.stock ?? 0) > 0;
+  const maxStock = isUnlimited ? 99 : Math.max(1, product.stock ?? 1);
   const isEvent =
     product.category_id === 'catas' ||
     product.category_id === 'cata_presencial' ||
@@ -98,7 +105,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-md animate-pulse">
               {isEvent ? (t.event_capacity_full || 'Sin Plazas') : t.prod_sold_out}
             </span>
-          ) : product.is_unlimited_stock ? (
+          ) : isUnlimited ? (
             <span className="px-2.5 py-1 bg-[#1D1D1B]/85 dark:bg-black/85 backdrop-blur-xs text-amber-300 border border-amber-400/30 text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
               Stock: {t.prod_unlimited}
             </span>
@@ -178,7 +185,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
             {isSeller ? (
               <span className="px-2.5 py-1.5 rounded-xl text-xs font-black bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 font-sans">
-                Stock: {product.is_unlimited_stock ? t.prod_unlimited : `${product.stock ?? 0} uds`}
+                Stock: {isUnlimited ? t.prod_unlimited : `${product.stock ?? 0} uds`}
               </span>
             ) : (
               <div className="flex items-center gap-1.5">

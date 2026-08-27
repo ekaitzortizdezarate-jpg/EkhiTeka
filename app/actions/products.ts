@@ -67,8 +67,8 @@ export async function createProduct(formData: FormData) {
   const price = parseFloat(formData.get('price') as string);
   const format = (formData.get('format') as string) || 'unidad';
   const weightG = formData.get('weight_g') ? parseInt(formData.get('weight_g') as string) : null;
-  const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : 10;
   const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
+  const stock = isUnlimitedStock ? 999 : (formData.get('stock') ? parseInt(formData.get('stock') as string) : 10);
   const originRegion = (formData.get('origin_region') as string)?.trim() || 'Lekeitio / Bizkaia';
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
   const pickupAddressIds = formData.getAll('pickup_address_ids') as string[];
@@ -152,8 +152,8 @@ export async function updateProduct(productId: string, formData: FormData) {
   const price = parseFloat(formData.get('price') as string);
   const format = (formData.get('format') as string) || 'unidad';
   const weightG = formData.get('weight_g') ? parseInt(formData.get('weight_g') as string) : null;
-  const stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : 10;
   const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
+  const stock = isUnlimitedStock ? 999 : (formData.get('stock') ? parseInt(formData.get('stock') as string) : 10);
   const originRegion = (formData.get('origin_region') as string)?.trim() || 'Lekeitio / Bizkaia';
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
 
