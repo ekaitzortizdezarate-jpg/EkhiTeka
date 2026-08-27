@@ -1,18 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
 import { updateOrderStatus } from '@/app/actions/orders';
 import Link from 'next/link';
 import type { Order, OrderStatus } from '@/types/database';
-import { Package, MessageCircle, User, MapPin, Store } from 'lucide-react';
+import { Package, MessageCircle, User, MapPin, Store, CheckCircle, Sparkles } from 'lucide-react';
 
 export function SellerOrdersView({ orders }: { orders: Order[] }) {
   const { t, language } = useLanguage();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('ekhiteka_seen_orders_seller');
+      if (stored) {
+        setSeenMap(JSON.parse(stored));
+      }
+    } catch {}
+  }, []);
+
+  const handleMarkAsSeen = (orderId: string, currentStatus?: string) => {
+    const updated = { ...seenMap, [orderId]: currentStatus || 'pendiente' };
+    setSeenMap(updated);
+    try {
+      localStorage.setItem('ekhiteka_seen_orders_seller', JSON.stringify(updated));
+      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+    } catch {}
+  };
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    // Al cambiar de estado, se marca automáticamente como visto
+    const updated = { ...seenMap, [orderId]: newStatus };
+    setSeenMap(updated);
+    try {
+      localStorage.setItem('ekhiteka_seen_orders_seller', JSON.stringify(updated));
+      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+    } catch {}
+
     setLoadingId(orderId);
     await updateOrderStatus(orderId, newStatus);
     setLoadingId(null);
@@ -46,12 +73,34 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
           {orders.map((order) => {
             const total = Number(order.total_price ?? order.total_amount ?? 0);
             const isStorePickup = order.delivery_type === 'recogida_tienda' || order.delivery_method === 'recogida_tienda' || order.delivery_method === 'tienda';
+            const isNew = !seenMap[order.id] && (order.status === 'pendiente' || !order.status);
 
             return (
               <div
                 key={order.id}
-                className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 space-y-6 shadow-xs"
+                className={`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-6 shadow-xs transition-all ${
+                  isNew
+                    ? 'border-[#FFE259] ring-2 ring-[#FFE259]/50 shadow-lg bg-amber-50/20 dark:bg-amber-950/15'
+                    : 'border-stone-200 dark:border-stone-800'
+                }`}
               >
+                {/* Banner de Novedad / Nuevo Pedido con botón 'Visto' */}
+                {isNew && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-sans animate-fadeIn">
+                    <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
+                      <Sparkles className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                      <span>{t.orders_new_order_received}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleMarkAsSeen(order.id, order.status)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-xs hover:scale-105"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>{t.orders_mark_seen}</span>
+                    </button>
+                  </div>
+                )}
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">

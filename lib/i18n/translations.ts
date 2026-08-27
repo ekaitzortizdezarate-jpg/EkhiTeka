@@ -291,6 +291,7 @@ export interface TranslationDict {
   orders_order_number: string;
   orders_total_to_charge: string;
   orders_new_status: string;
+  orders_new_order_received: string;
   orders_mark_seen: string;
   orders_client_label: string;
   orders_qty_label: string;
@@ -895,6 +896,7 @@ export const translations: Record<Language, TranslationDict> = {
     orders_order_number: 'Eskaera:',
     orders_total_to_charge: 'Kobratzekoa:',
     orders_new_status: 'Egoera berria! Zure eskaera aldatu da:',
+    orders_new_order_received: 'Eskaera Berria Jaso da!',
     orders_mark_seen: 'Ikusia markatu',
     orders_client_label: 'Bezeroa',
     orders_qty_label: 'Kantitatea',
@@ -1487,6 +1489,7 @@ export const translations: Record<Language, TranslationDict> = {
     orders_order_number: 'Pedido:',
     orders_total_to_charge: 'Total a cobrar:',
     orders_new_status: '¡Novedad! El estado de tu pedido ha cambiado a:',
+    orders_new_order_received: '¡Nuevo Pedido Recibido!',
     orders_mark_seen: 'Marcar como Visto',
     orders_client_label: 'Cliente',
     orders_qty_label: 'Cantidad',
@@ -2079,6 +2082,7 @@ export const translations: Record<Language, TranslationDict> = {
     orders_order_number: 'Order:',
     orders_total_to_charge: 'Total to charge:',
     orders_new_status: 'Update! Your order status changed to:',
+    orders_new_order_received: 'New Order Received!',
     orders_mark_seen: 'Mark as Seen',
     orders_client_label: 'Customer',
     orders_qty_label: 'Quantity',
@@ -2671,7 +2675,8 @@ export const translations: Record<Language, TranslationDict> = {
     orders_order_number: 'Commande :',
     orders_total_to_charge: 'Total à encaisser :',
     orders_new_status: 'Le statut de votre commande a changé :',
-    orders_mark_seen: 'Marquer como lu',
+    orders_new_order_received: 'Nouvelle Commande Reçue !',
+    orders_mark_seen: 'Marquer comme Vu',
     orders_client_label: 'Client',
     orders_qty_label: 'Quantité',
 

@@ -173,18 +173,15 @@ export function NavbarNavLinks({
             <>
               <Link
                 href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
-                className={`relative flex items-center justify-center text-center gap-1.5 px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
+                className={`relative flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
                   pathname.includes('/pedidos')
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                     : hasUnseenOrderUpdates
-                    ? 'bg-[#FFE259]/30 text-stone-900 dark:text-stone-100 border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold shadow-md'
+                    ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-2 border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-md animate-pulse'
                     : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                 }`}
               >
                 <span>{t.nav_orders}</span>
-                {hasUnseenOrderUpdates && (
-                  <span className="w-2 h-2 rounded-full bg-[#FFE259] border border-stone-900 animate-ping" />
-                )}
               </Link>
 
               {isSeller && (
@@ -388,20 +385,15 @@ export function NavbarNavLinks({
                     <Link
                       href={isSeller ? '/vendedor/pedidos' : '/comprador/pedidos'}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                      className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname.includes('/pedidos')
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
                           : hasUnseenOrderUpdates
-                          ? 'bg-[#FFE259]/30 text-stone-900 dark:text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
+                          ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-2 border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-md animate-pulse'
                           : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
                       }`}
                     >
                       <span>{t.nav_orders}</span>
-                      {hasUnseenOrderUpdates && (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-black uppercase">
-                          Nuevo
-                        </span>
-                      )}
                     </Link>
 
                     {isSeller && (
