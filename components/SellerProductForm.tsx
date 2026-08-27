@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { createProduct, updateProduct, deleteProduct } from '@/app/actions/products';
@@ -10,6 +10,7 @@ import {
   getSellerDescription,
   getProductWeightOrVolume,
   getCleanDescription,
+  getPackItems,
 } from '@/lib/productHelpers';
 import {
   Package,
@@ -203,7 +204,84 @@ export function SellerProductForm({
     initialProduct?.event_address_id || activeEventList[0]?.id || ''
   );
 
-  const [selectedListItems, setSelectedListItems] = useState<AddedListItem[]>([]);
+  const initialPackList = useMemo<AddedListItem[]>(() => {
+    if (!initialProduct) return [];
+
+    // 1. From initialMeta.pack_items
+    if (Array.isArray(initialMeta?.pack_items) && initialMeta.pack_items.length > 0) {
+      return initialMeta.pack_items.map((it: any) => {
+        const matched = availableSingleProducts.find(
+          (p) => p.id === it.id || p.name.toLowerCase() === (it.name || '').toLowerCase()
+        );
+        return {
+          id: it.id || matched?.id || Math.random().toString(),
+          name: it.name || matched?.name || '',
+          price: it.price !== undefined ? Number(it.price) : Number(matched?.price || 0),
+          quantity: it.quantity || 1,
+          imageUrl: it.imageUrl || (matched ? getProductImage(matched) : null),
+          category: it.category || matched?.category_id,
+          format: it.format || matched?.format,
+          origin: it.origin || matched?.origin_region || undefined,
+          description:
+            it.description ||
+            (matched
+              ? getSellerDescription(matched.description) || getCleanDescription(matched.description)
+              : undefined),
+          weight_g: it.weight_g !== undefined ? it.weight_g : matched?.weight_g,
+          weight_display:
+            it.weight_display ||
+            (it.weight_g
+              ? it.weight_g >= 1000 && it.weight_g % 100 === 0
+                ? `${(it.weight_g / 1000).toFixed(it.weight_g % 1000 === 0 ? 0 : 1)} kg`
+                : `${it.weight_g}g`
+              : matched?.weight_g
+              ? matched.weight_g >= 1000 && matched.weight_g % 100 === 0
+                ? `${(matched.weight_g / 1000).toFixed(matched.weight_g % 1000 === 0 ? 0 : 1)} kg`
+                : `${matched.weight_g}g`
+              : undefined),
+          isCustom: !matched,
+        };
+      });
+    }
+
+    // 2. Fallback to getPackItems from description
+    const packItems = getPackItems(initialProduct);
+    if (packItems.length > 0) {
+      return packItems.map((it) => {
+        const matched = availableSingleProducts.find(
+          (p) => (it.id && p.id === it.id) || p.name.toLowerCase() === it.name.toLowerCase()
+        );
+        return {
+          id: it.id || matched?.id || Math.random().toString(),
+          name: it.name || matched?.name || '',
+          price: it.price !== undefined ? Number(it.price) : Number(matched?.price || 0),
+          quantity: it.quantity || 1,
+          imageUrl: it.imageUrl || (matched ? getProductImage(matched) : null),
+          category: matched?.category_id,
+          format: it.format || matched?.format,
+          origin: it.origin || matched?.origin_region || undefined,
+          description:
+            it.description ||
+            (matched
+              ? getSellerDescription(matched.description) || getCleanDescription(matched.description)
+              : undefined),
+          weight_g: it.weight_g !== undefined ? it.weight_g : matched?.weight_g,
+          weight_display:
+            it.weight_display ||
+            (matched?.weight_g
+              ? matched.weight_g >= 1000 && matched.weight_g % 100 === 0
+                ? `${(matched.weight_g / 1000).toFixed(matched.weight_g % 1000 === 0 ? 0 : 1)} kg`
+                : `${matched.weight_g}g`
+              : undefined),
+          isCustom: !matched,
+        };
+      });
+    }
+
+    return [];
+  }, [initialProduct, initialMeta, availableSingleProducts]);
+
+  const [selectedListItems, setSelectedListItems] = useState<AddedListItem[]>(initialPackList);
 
   const [catalogSelectId, setCatalogSelectId] = useState<string>(
     cleanSingleProducts[0]?.id || ''
@@ -347,9 +425,20 @@ export function SellerProductForm({
   const [finalPriceInput, setFinalPriceInput] = useState<string>(
     initialProduct?.price ? String(initialProduct.price) : ''
   );
-  const [discountInput, setDiscountInput] = useState<string>('0');
+  const [discountInput, setDiscountInput] = useState<string>(() => {
+    if (initialMeta?.discount_percent !== undefined) {
+      return String(initialMeta.discount_percent);
+    }
+    return '0';
+  });
+
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     if (sumOfLooseItems > 0) {
       const disc = parseFloat(discountInput) || 0;
       const newPrice = sumOfLooseItems * (1 - disc / 100);
@@ -473,24 +562,8 @@ export function SellerProductForm({
     }
 
     const rawDesc = (formData.get('description') as string) || '';
-    let composedDesc = rawDesc.trim();
-
-    if (publishingType === 'cata_casa') {
-      const peopleNotice = `Personas recomendadas: ${minPeople} - ${maxPeople} personas`;
-      if (!composedDesc.includes('Personas recomendadas') && !composedDesc.includes('lagun')) {
-        composedDesc = `${peopleNotice}\n${composedDesc}`.trim();
-      }
-    }
-
-    if (isPackOrEvent && selectedListItems.length > 0) {
-      const itemsFormatted = selectedListItems.map(
-        (it) => `• ${it.name} (x${it.quantity}) — ${(it.price * it.quantity).toFixed(2)} €`
-      );
-
-      if (!composedDesc.includes('Productos incluidos')) {
-        composedDesc = `${composedDesc}\n\nProductos incluidos en esta selección:\n${itemsFormatted.join('\n')}`.trim();
-      }
-    }
+    const cleanSellerDesc = getSellerDescription(rawDesc) || rawDesc.replace(/<!--[\s\S]*?-->/g, '').trim();
+    let composedDesc = cleanSellerDesc;
 
     const metaObj: Record<string, any> = {};
 
@@ -1273,7 +1346,7 @@ export function SellerProductForm({
               name="description"
               rows={4}
               required={publishingType === 'cata_presencial'}
-              defaultValue={initialProduct?.description || ''}
+              defaultValue={getSellerDescription(initialProduct?.description) || ''}
               placeholder={
                 publishingType === 'cata_presencial'
                   ? t.seller_event_details_placeholder
