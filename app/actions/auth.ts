@@ -136,6 +136,7 @@ export async function updateProfile(formData: FormData) {
     pickup_addresses: currentParsed.pickup_addresses,
     event_addresses: currentParsed.event_addresses,
     delivery_addresses: currentParsed.delivery_addresses,
+    cart_data: currentParsed.cart_data,
   };
 
   const structuredBio = JSON.stringify(profileData);

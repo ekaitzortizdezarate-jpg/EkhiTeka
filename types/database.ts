@@ -91,6 +91,7 @@ export interface ProfileDetails {
   pickup_addresses?: StoreAddress[];
   event_addresses?: EventAddress[];
   delivery_addresses?: DeliveryAddress[];
+  cart_data?: any[];
 }
 
 export interface Profile extends ProfileDetails {
@@ -168,6 +169,7 @@ export function parseProfile(raw?: any): Profile {
     pickup_addresses: details.pickup_addresses || [],
     event_addresses: details.event_addresses || [],
     delivery_addresses: details.delivery_addresses || [],
+    cart_data: details.cart_data || [],
   };
 }
 
