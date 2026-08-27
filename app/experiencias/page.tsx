@@ -104,166 +104,29 @@ export default function ExperienciasPage() {
         </div>
       </section>
 
-      {/* 2. Cuatro Tarjetas de Experiencias con Botones Amarillos Unificados */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 font-serif">
-        {/* Tarjeta 1: Catas en Casa */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-3">
-            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Cestas.JPG"
-                alt={t.exp_home_tasting_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between pt-1">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Home className="w-4 h-4" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
-                {t.exp_home_tasting_badge}
-              </span>
-            </div>
-            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
-              {t.exp_home_tasting_title}
-            </h2>
-            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              {t.exp_home_tasting_desc}
-            </p>
+      {/* 2. Kits de Catas en Casa Disponibles */}
+      {homeTastingKits.length > 0 && (
+        <section className="space-y-6 pt-2 font-serif">
+          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
+              {t.event_home_catalog_subtitle}
+            </span>
+            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
+              {t.event_home_catalog_title}
+            </h3>
           </div>
-          <a
-            href={getWhatsAppUrl('Hola, quisiera solicitar un Kit de Cata en Casa')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            <span>{t.exp_home_tasting_btn}</span>
-          </a>
-        </div>
 
-        {/* Tarjeta 2: Catas en la Tienda */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-3">
-            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Catas.JPG"
-                alt={t.exp_store_tasting_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between pt-1">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Wine className="w-4 h-4" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
-                {t.exp_store_tasting_badge}
-              </span>
-            </div>
-            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
-              {t.exp_store_tasting_title}
-            </h2>
-            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              {t.exp_store_tasting_desc}
-            </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {homeTastingKits.map((product) => (
+              <ProductCard key={product.id} product={product} isSeller={isSeller} />
+            ))}
           </div>
-          <a
-            href="#catas-tienda"
-            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
-          >
-            <Ticket className="w-3.5 h-3.5" />
-            <span>{t.exp_store_tasting_btn}</span>
-          </a>
-        </div>
+        </section>
+      )}
 
-        {/* Tarjeta 3: Mesas para Bodas */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-3">
-            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Mesas.JPG"
-                alt={t.exp_wedding_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between pt-1">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <HeartHandshake className="w-4 h-4" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
-                {t.exp_wedding_badge}
-              </span>
-            </div>
-            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
-              {t.exp_wedding_title}
-            </h2>
-            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              {t.exp_wedding_desc}
-            </p>
-          </div>
-          <a
-            href={getWhatsAppUrl('Hola, quisiera pedir presupuesto para Mesa de Quesos de Boda')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            <span>{t.exp_wedding_btn}</span>
-          </a>
-        </div>
-
-        {/* Tarjeta 4: Préstamo de Raclette */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-5 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-3">
-            <div className="w-full h-40 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
-              <img
-                src="/images/secciones/Quesos.JPG"
-                alt={t.exp_raclette_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between pt-1">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Flame className="w-4 h-4" />
-              </div>
-              <span className="px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-[10px] font-black uppercase text-stone-600 dark:text-stone-300 font-sans">
-                {t.exp_raclette_badge}
-              </span>
-            </div>
-            <h2 className="text-base font-black text-stone-900 dark:text-stone-100 leading-tight">
-              {t.exp_raclette_title}
-            </h2>
-            <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
-              {t.exp_raclette_desc}
-            </p>
-          </div>
-          <a
-            href={getWhatsAppUrl('Hola, quisiera consultar disponibilidad para préstamo de Raclette')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 shadow-xs"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            <span>{t.exp_raclette_btn}</span>
-          </a>
-        </div>
-      </section>
-
-      {/* 3. Catas Presenciales Disponibles */}
+      {/* 3. Próximos Eventos de Catas Presenciales */}
       {storeTastings.length > 0 && (
-        <section id="catas-tienda" className="space-y-6 pt-4 font-serif">
+        <section id="catas-tienda" className="space-y-6 pt-2 font-serif">
           <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
               {t.event_upcoming_subtitle}
@@ -281,25 +144,165 @@ export default function ExperienciasPage() {
         </section>
       )}
 
-      {/* 4. Kits de Cata para Casa */}
-      {homeTastingKits.length > 0 && (
-        <section className="space-y-6 pt-4 font-serif">
-          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              {t.event_home_catalog_subtitle}
-            </span>
-            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
-              {t.event_home_catalog_title}
-            </h3>
+      {/* 4. Catas en Casa y Catas en la Tienda (2 Tarjetas Informativas) */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 font-serif">
+        {/* Tarjeta 1: Catas en Casa */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-5 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-52 sm:h-60 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Cestas.JPG"
+                alt={t.exp_home_tasting_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.exp_home_tasting_badge}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+                <Home className="w-5 h-5" />
+                <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                  {t.exp_home_tasting_title}
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.exp_home_tasting_desc}
+              </p>
+            </div>
           </div>
+          <a
+            href={getWhatsAppUrl('Hola, quisiera solicitar un Kit de Cata en Casa')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-2 shadow-xs hover:scale-102"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>{t.exp_home_tasting_btn}</span>
+          </a>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {homeTastingKits.map((product) => (
-              <ProductCard key={product.id} product={product} isSeller={isSeller} />
-            ))}
+        {/* Tarjeta 2: Catas en la Tienda */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-5 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-52 sm:h-60 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Catas.JPG"
+                alt={t.exp_store_tasting_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.exp_store_tasting_badge}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+                <Wine className="w-5 h-5" />
+                <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                  {t.exp_store_tasting_title}
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.exp_store_tasting_desc}
+              </p>
+            </div>
           </div>
-        </section>
-      )}
+          <a
+            href="#catas-tienda"
+            className="w-full py-3 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-2 shadow-xs hover:scale-102"
+          >
+            <Ticket className="w-4 h-4" />
+            <span>{t.exp_store_tasting_btn}</span>
+          </a>
+        </div>
+      </section>
+
+      {/* 5. Mesa para Bodas y Préstamo de Raclette (2 Tarjetas Informativas) */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 font-serif">
+        {/* Tarjeta 3: Mesas para Bodas */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-5 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-52 sm:h-60 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Mesas.JPG"
+                alt={t.exp_wedding_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.exp_wedding_badge}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+                <HeartHandshake className="w-5 h-5" />
+                <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                  {t.exp_wedding_title}
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.exp_wedding_desc}
+              </p>
+            </div>
+          </div>
+          <a
+            href={getWhatsAppUrl('Hola, quisiera pedir presupuesto para Mesa de Quesos de Boda')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-2 shadow-xs hover:scale-102"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>{t.exp_wedding_btn}</span>
+          </a>
+        </div>
+
+        {/* Tarjeta 4: Préstamo de Raclette */}
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-5 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-4">
+            <div className="w-full h-52 sm:h-60 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+              <img
+                src="/images/secciones/Quesos.JPG"
+                alt={t.exp_raclette_title}
+                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
+                }}
+              />
+              <div className="absolute top-3 left-3 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+                {t.exp_raclette_badge}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+                <Flame className="w-5 h-5" />
+                <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
+                  {t.exp_raclette_title}
+                </h2>
+              </div>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+                {t.exp_raclette_desc}
+              </p>
+            </div>
+          </div>
+          <a
+            href={getWhatsAppUrl('Hola, quisiera consultar disponibilidad para préstamo de Raclette')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-2 shadow-xs hover:scale-102"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>{t.exp_raclette_btn}</span>
+          </a>
+        </div>
+      </section>
     </div>
   );
 }

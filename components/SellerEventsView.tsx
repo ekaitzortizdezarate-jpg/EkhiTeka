@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateEventDetails, removeEventParticipant } from '@/app/actions/events';
-import { formatEventDescription } from '@/lib/productHelpers';
+import { formatEventDescription, getProductImage } from '@/lib/productHelpers';
 import {
   Users,
   MapPin,
@@ -48,6 +48,8 @@ export interface EventProduct {
   price: number;
   stock: number;
   origin_region?: string | null;
+  image_url?: string | null;
+  category_id?: string;
   order_items?: AttendeeReservation[];
 }
 
@@ -155,34 +157,48 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 key={event.id}
                 className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs"
               >
-                {/* Cabecera de la Cata Presencial */}
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
-                  <div className="space-y-1.5 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-300/60 dark:border-amber-700/60 font-sans">
-                        {t.seller_events_badge_store}
-                      </span>
-                      {event.origin_region && (
-                        <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 font-sans">
-                          <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259]" /> {event.origin_region}
-                        </span>
-                      )}
+                {/* Cabecera de la Cata Presencial con Foto */}
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-5 pb-4 border-b border-stone-200 dark:border-stone-800">
+                  <div className="flex flex-col sm:flex-row items-start gap-4 flex-1 min-w-0">
+                    {/* Foto del Evento */}
+                    <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 shrink-0 shadow-2xs">
+                      <img
+                        src={getProductImage(event)}
+                        alt={event.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/secciones/Catas.JPG';
+                        }}
+                      />
                     </div>
 
-                    <h2 className="text-xl sm:text-2xl font-black font-serif text-stone-900 dark:text-stone-100">
-                      {event.name}
-                    </h2>
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-300/60 dark:border-amber-700/60 font-sans">
+                          {t.seller_events_badge_store}
+                        </span>
+                        {event.origin_region && (
+                          <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 font-sans">
+                            <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259]" /> {event.origin_region}
+                          </span>
+                        )}
+                      </div>
 
-                    {event.description && (
-                      <p className="text-xs text-stone-600 dark:text-stone-300 whitespace-pre-line leading-relaxed max-w-2xl font-medium font-sans">
-                        {formatEventDescription(event.description, {
-                          date: t.event_field_date,
-                          time: t.event_field_time,
-                          seats: t.event_field_seats,
-                          itemsToTaste: t.event_field_items_to_taste,
-                        })}
-                      </p>
-                    )}
+                      <h2 className="text-xl sm:text-2xl font-black font-serif text-stone-900 dark:text-stone-100">
+                        {event.name}
+                      </h2>
+
+                      {event.description && (
+                        <p className="text-xs text-stone-600 dark:text-stone-300 whitespace-pre-line leading-relaxed max-w-2xl font-medium font-sans">
+                          {formatEventDescription(event.description, {
+                            date: t.event_field_date,
+                            time: t.event_field_time,
+                            seats: t.event_field_seats,
+                            itemsToTaste: t.event_field_items_to_taste,
+                          })}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   {/* Acciones y Métricas */}
