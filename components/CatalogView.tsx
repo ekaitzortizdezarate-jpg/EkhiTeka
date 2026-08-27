@@ -7,6 +7,7 @@ import { CategoryCircleGrid } from '@/components/CategoryCircleGrid';
 import { ExperienceBanners } from '@/components/ExperienceBanners';
 import { CustomerReviews } from '@/components/CustomerReviews';
 import type { Category, ProductWithSeller } from '@/types/database';
+import { getProductCategoryId } from '@/lib/productHelpers';
 import { Search, SlidersHorizontal, Sparkles, ArrowDown, MessageCircle, MapPin, Clock } from 'lucide-react';
 
 interface CatalogViewProps {
@@ -30,7 +31,7 @@ export function CatalogView({
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
-        if (selectedCat !== 'all' && p.category_id !== selectedCat) return false;
+        if (selectedCat !== 'all' && getProductCategoryId(p) !== selectedCat) return false;
         if (search.trim()) {
           const q = search.toLowerCase();
           const matchName = p.name.toLowerCase().includes(q);
@@ -170,7 +171,7 @@ export function CatalogView({
           </button>
 
           {categories.map((cat) => {
-            const count = products.filter((p) => p.category_id === cat.id).length;
+            const count = products.filter((p) => getProductCategoryId(p) === cat.id).length;
             return (
               <button
                 key={cat.id}

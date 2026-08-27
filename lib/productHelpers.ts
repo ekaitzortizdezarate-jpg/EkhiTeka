@@ -288,6 +288,20 @@ export function getCleanDescription(description?: string | null): string {
   return description.replace(/<!-- META:{.*?} -->/g, '').trim();
 }
 
+export function getProductCategoryId(product?: { category_id?: string | null; description?: string | null } | null): string {
+  if (!product) return 'queso';
+  if (product.description) {
+    const match = product.description.match(/<!-- META:({.*?}) -->/);
+    if (match && match[1]) {
+      try {
+        const meta = JSON.parse(match[1]);
+        if (meta.category) return meta.category;
+      } catch {}
+    }
+  }
+  return product.category_id || 'queso';
+}
+
 export function getTranslatedFormat(format?: string | null, language: string = 'es'): string {
   if (!format) return '';
   const f = format.toLowerCase().trim();

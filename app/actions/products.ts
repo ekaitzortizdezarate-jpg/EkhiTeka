@@ -15,9 +15,21 @@ async function checkSellerPermission(supabase: any, userId: string) {
   return profile?.role === 'vendedor' || profile?.role === 'admin';
 }
 
-async function ensureCategoryExists(supabase: any, categoryId: string) {
-  if (!categoryId) return;
+async function getSafeCategoryId(supabase: any, requestedCategoryId: string): Promise<string> {
+  if (!requestedCategoryId) return 'queso';
 
+  // 1. Check if category exists
+  const { data: existing } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('id', requestedCategoryId)
+    .maybeSingle();
+
+  if (existing?.id) {
+    return existing.id;
+  }
+
+  // 2. Try to insert it
   const specialCategories: Record<string, { es: string; eu: string; en: string; fr: string; icon: string }> = {
     producto_unico: { es: 'Producto único', eu: 'Produktu bakarra', en: 'Unique product', fr: 'Produit unique', icon: '✨' },
     cesta_gourmet: { es: 'Cesta Gourmet', eu: 'Gourmet Saskia', en: 'Gourmet Hamper', fr: 'Coffret Gourmet', icon: '🎁' },
@@ -25,47 +37,46 @@ async function ensureCategoryExists(supabase: any, categoryId: string) {
     cata_presencial: { es: 'Cata Presencial', eu: 'Aurrez Aurreko Dastaketa', en: 'In-Person Tasting', fr: 'Dégustation Présentielle', icon: '🍷' },
     tarjeta_regalo: { es: 'Tarjeta Regalo', eu: 'Opari Txartela', en: 'Gift Card', fr: 'Carte Cadeau', icon: '💳' },
     queso: { es: 'Quesos', eu: 'Gaztak', en: 'Cheeses', fr: 'Fromages', icon: '🧀' },
-    embutido: { es: 'Embutidos', eu: 'Embutituak', en: 'Charcuterie', fr: 'Charcuterie', icon: '🥩' },
-    conservas: { es: 'Conservas', eu: 'Kontserbak', en: 'Preserves', fr: 'Conserves', icon: '🥫' },
-    vino: { es: 'Vinos', eu: 'Ardoak', en: 'Wines', fr: 'Vins', icon: '🍷' },
-    sidra: { es: 'Sidras', eu: 'Sagardoak', en: 'Ciders', fr: 'Cidres', icon: '🍏' },
-    txakoli: { es: 'Txakoli', eu: 'Txakolina', en: 'Txakoli', fr: 'Txakoli', icon: '🍾' },
-    cerveza: { es: 'Cervezas', eu: 'Garagardoak', en: 'Beers', fr: 'Bières', icon: '🍺' },
-    dulces: { es: 'Dulces', eu: 'Goxokiak', en: 'Sweets', fr: 'Douceurs', icon: '🍯' },
-    aceite: { es: 'Aceites', eu: 'Olioak', en: 'Oils', fr: 'Huiles', icon: '🫒' },
-    miel: { es: 'Miel', eu: 'Eztia', en: 'Honey', fr: 'Miel', icon: '🍯' },
-    otros: { es: 'Otros', eu: 'Besteak', en: 'Others', fr: 'Autres', icon: '✨' },
+    atun: { es: 'Atún y Bonito', eu: 'Hegaluzea', en: 'Tuna & White Tuna', fr: 'Thon blanc', icon: '🐟' },
+    salazon: { es: 'Salazón y Anchoas', eu: 'Gatzadura', en: 'Salted Fish & Anchovies', fr: 'Salaisons & Anchois', icon: '🧂' },
+    jildas: { es: 'Gildas y Encurtidos', eu: 'Gildak', en: 'Gildas & Pickles', fr: 'Gildas', icon: '🫒' },
+    cerveza: { es: 'Cerveza artesanal', eu: 'Garagardo artisaua', en: 'Craft Beer', fr: 'Bière artisanale', icon: '🍺' },
+    txakoli: { es: 'Txakoli', eu: 'Txakolina', en: 'Txakoli Wine', fr: 'Vin Txakoli', icon: '🍾' },
+    sidra: { es: 'Sidra', eu: 'Sagardoa', en: 'Natural Cider', fr: 'Cidre naturel', icon: '🍏' },
   };
 
-  const { data: existing } = await supabase
+  const spec = specialCategories[requestedCategoryId] || {
+    es: requestedCategoryId.replace(/_/g, ' '),
+    eu: requestedCategoryId.replace(/_/g, ' '),
+    en: requestedCategoryId.replace(/_/g, ' '),
+    fr: requestedCategoryId.replace(/_/g, ' '),
+    icon: '✨',
+  };
+
+  const { error: insertError } = await supabase.from('categories').insert({
+    id: requestedCategoryId,
+    name_es: spec.es,
+    name_eu: spec.eu,
+    name_en: spec.en,
+    name_fr: spec.fr,
+    icon: spec.icon,
+    display_order: 99,
+    is_active: true,
+  });
+
+  if (!insertError) {
+    return requestedCategoryId;
+  }
+
+  // 3. If RLS blocked category creation, fetch any existing valid category
+  const { data: firstValid } = await supabase
     .from('categories')
     .select('id')
-    .eq('id', categoryId)
+    .eq('is_active', true)
+    .limit(1)
     .maybeSingle();
 
-  if (!existing) {
-    const spec = specialCategories[categoryId] || {
-      es: categoryId.replace(/_/g, ' '),
-      eu: categoryId.replace(/_/g, ' '),
-      en: categoryId.replace(/_/g, ' '),
-      fr: categoryId.replace(/_/g, ' '),
-      icon: '✨',
-    };
-
-    await supabase.from('categories').upsert(
-      {
-        id: categoryId,
-        name_es: spec.es,
-        name_eu: spec.eu,
-        name_en: spec.en,
-        name_fr: spec.fr,
-        icon: spec.icon,
-        display_order: 99,
-        is_active: true,
-      },
-      { onConflict: 'id' }
-    );
-  }
+  return firstValid?.id || 'queso';
 }
 
 export async function createProduct(formData: FormData) {
@@ -105,7 +116,7 @@ export async function createProduct(formData: FormData) {
     return { error: 'Por favor, rellena los campos obligatorios (Nombre y Precio).' };
   }
 
-  await ensureCategoryExists(supabase, categoryId);
+  const safeCategoryId = await getSafeCategoryId(supabase, categoryId);
 
   let imageUrl = (formData.get('image_url_fallback') as string) || null;
   const imageFile = formData.get('image_file') as File | null;
@@ -129,7 +140,7 @@ export async function createProduct(formData: FormData) {
     .from('products')
     .insert({
       seller_id: user.id,
-      category_id: categoryId,
+      category_id: safeCategoryId,
       name,
       description,
       price,
@@ -184,7 +195,7 @@ export async function updateProduct(productId: string, formData: FormData) {
   const originRegion = (formData.get('origin_region') as string)?.trim() || 'Lekeitio / Bizkaia';
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
 
-  await ensureCategoryExists(supabase, categoryId);
+  const safeCategoryId = await getSafeCategoryId(supabase, categoryId);
 
   let imageUrl = (formData.get('existing_image_url') as string) || (formData.get('image_url_fallback') as string) || null;
   const imageFile = formData.get('image_file') as File | null;
@@ -207,7 +218,7 @@ export async function updateProduct(productId: string, formData: FormData) {
   const { error } = await supabase
     .from('products')
     .update({
-      category_id: categoryId,
+      category_id: safeCategoryId,
       name,
       description,
       price,

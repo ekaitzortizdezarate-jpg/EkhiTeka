@@ -499,9 +499,15 @@ export function SellerProductForm({
       metaObj.original_price = sumOfLooseItems.toFixed(2);
     }
 
-    if (publishingType === 'producto_suelto' && weightAmount && !isNaN(parseFloat(weightAmount))) {
-      metaObj.unit = weightUnit;
-      metaObj.amount = parseFloat(weightAmount);
+    if (publishingType === 'producto_suelto') {
+      const selectedCategory = formData.get('category_id') as string;
+      if (selectedCategory === 'producto_unico') {
+        metaObj.category = 'producto_unico';
+      }
+      if (weightAmount && !isNaN(parseFloat(weightAmount))) {
+        metaObj.unit = weightUnit;
+        metaObj.amount = parseFloat(weightAmount);
+      }
     }
 
     if (publishingType === 'cata_casa') {
@@ -1143,7 +1149,7 @@ export function SellerProductForm({
                 <select
                   name="category_id"
                   required
-                  defaultValue={initialProduct?.category_id || allCategories[0]?.id || 'queso'}
+                  defaultValue={initialMeta?.category || initialProduct?.category_id || allCategories[0]?.id || 'queso'}
                   className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
                   {allCategories.map((c) => (
