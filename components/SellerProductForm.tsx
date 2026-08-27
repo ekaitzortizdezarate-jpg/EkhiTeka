@@ -399,7 +399,7 @@ export function SellerProductForm({
       );
 
       if (!composedDesc.includes('Productos incluidos')) {
-        composedDesc = `${composedDesc}\n\n📦 Productos incluidos en esta selección:\n${itemsFormatted.join('\n')}`;
+        composedDesc = `${composedDesc}\n\nProductos incluidos en esta selección:\n${itemsFormatted.join('\n')}`;
       }
     }
 

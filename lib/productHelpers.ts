@@ -142,8 +142,8 @@ export function formatProductDescription(
   const clean = description.replace(/<!-- META:{.*?} -->/g, '').trim();
   if (!clean) return '';
 
-  // Clean emojis anywhere in the text
-  let normalized = clean.replace(/[📦🧀📅🕒⏰📍👥💳🏠✨🎉🍷⭐👉✔]/gu, ' ').trim();
+  // Clean all unicode emojis anywhere in the text for clean Maisons du Monde aesthetic
+  let normalized = clean.replace(/[\p{Extended_Pictographic}\uFE0F\u200D\u20E3]/gu, ' ').trim();
 
   // Split concatenated tokens onto separate lines for clean rendering
   normalized = normalized.replace(/\s+(HORARIO|Horario|ORDUTEGIA|Ordutegia|HORA|Hora|TIME|Time|HEURE|Heure|SCHEDULE|Schedule)\s*:\s*/gi, '\nHorario: ');
@@ -155,7 +155,15 @@ export function formatProductDescription(
     let l = line.trim();
     if (!l) return '';
 
-    // 1. Pack de Cata, Lote Gourmet & Cestas Gourmet - Header translations
+    // 1. Cestas Gourmet - Header translations
+    if (/^(PRODUCTOS INCLUIDOS EN LA CESTA|PRODUCTOS INCLUIDOS EN ESTA CESTA|LA CESTA INCLUYE|ESTA CESTA INCLUYE|CESTA GOURMET INCLUYE|CONTENIDO DE LA CESTA|SASKIAK DAKARRENA|PRODUCTS INCLUDED IN THE HAMPER|PRODUITS INCLUS DANS LE PANIER)\s*:?/i.test(l)) {
+      if (language === 'eu') return 'SASKIAK DAKARRENA:';
+      if (language === 'fr') return 'PRODUITS INCLUS DANS LE PANIER :';
+      if (language === 'en') return 'PRODUCTS INCLUDED IN THE HAMPER:';
+      return 'PRODUCTOS INCLUIDOS EN LA CESTA:';
+    }
+
+    // 2. Lote Gourmet - Header translations
     if (/^(LOTE GOURMET (INCLUYE)?|EL LOTE GOURMET INCLUYE|LOTE DE PRODUCTOS INCLUYE|ESTE LOTE INCLUYE|CONTENIDO DEL LOTE|CONTENIDO DEL LOTE GOURMET|PRODUCTOS INCLUIDOS EN ESTE LOTE|GOURMET LOTEAK DAKARRENA|LE COFFRET GOURMET COMPREND|GOURMET SET INCLUDES)\s*:?/i.test(l)) {
       if (language === 'eu') return 'GOURMET LOTEAK DAKARRENA:';
       if (language === 'fr') return 'LE COFFRET GOURMET COMPREND :';
@@ -163,7 +171,8 @@ export function formatProductDescription(
       return 'EL LOTE GOURMET INCLUYE:';
     }
 
-    if (/^(PACK DE CATA (EN CASA )?INCLUYE|EL PACK DE CATA INCLUYE|PACK DE CATA|EL PACK INCLUYE|ESTE PACK INCLUYE|DASTAKETA PACK-AK DAKARRENA|TASTING PACK INCLUDES|LE PACK DE DÉGUSTATION COMPREND|PRODUCTOS INCLUIDOS EN ESTA SELECCI[OÓ]N|PRODUCTOS INCLUIDOS|CONTENIDO DE LA CESTA|HAUTAKETA HONETAN SARTUTAKO PRODUKTUAK|PRODUCTS INCLUDED IN THIS SELECTION|PRODUITS INCLUS DANS CETTE SÉLECTION)\s*:?/i.test(l)) {
+    // 3. Pack de Cata & Selección General - Header translations
+    if (/^(PACK DE CATA (EN CASA )?INCLUYE|EL PACK DE CATA INCLUYE|PACK DE CATA|EL PACK INCLUYE|ESTE PACK INCLUYE|DASTAKETA PACK-AK DAKARRENA|TASTING PACK INCLUDES|LE PACK DE DÉGUSTATION COMPREND|PRODUCTOS INCLUIDOS EN ESTA SELECCI[OÓ]N|PRODUCTOS INCLUIDOS|HAUTAKETA HONETAN SARTUTAKO PRODUKTUAK|PRODUCTS INCLUDED IN THIS SELECTION|PRODUITS INCLUS DANS CETTE SÉLECTION)\s*:?/i.test(l)) {
       if (language === 'eu') return 'DASTAKETA PACK-AK DAKARRENA:';
       if (language === 'fr') return 'LE PACK DE DÉGUSTATION COMPREND :';
       if (language === 'en') return 'TASTING PACK INCLUDES:';
