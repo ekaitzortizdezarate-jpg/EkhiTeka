@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { deleteProduct } from '@/app/actions/products';
 import { getProductImage, getProductDiscount, getCleanDescription, formatEventDescription } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, Ticket, MapPin, Eye } from 'lucide-react';
+import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductWithSeller;
@@ -15,6 +17,8 @@ interface ProductCardProps {
 export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const { addToCart } = useCart();
   const { t } = useLanguage();
+  const [added, setAdded] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isSoldOut = !product.is_unlimited_stock && (product.stock ?? 0) <= 0;
   const isEvent =
@@ -39,12 +43,26 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
     e.stopPropagation();
     if (isSoldOut) return;
     addToCart(product, product.profiles?.full_name || 'EkhiTeka Selección');
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm(`¿Eliminar "${product.name}" del catálogo de EkhiTeka?`)) {
+      setIsDeleting(true);
+      await deleteProduct(product.id);
+      window.location.reload();
+    }
   };
 
   return (
-    <Link
-      href={`/producto/${product.id}`}
-      className="manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] p-4 flex flex-col justify-between shadow-xs transition-all font-serif overflow-hidden"
+    <article
+      aria-label={product.name}
+      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] p-4 flex flex-col justify-between shadow-xs transition-all font-serif overflow-hidden ${
+        isDeleting ? 'opacity-40 pointer-events-none' : ''
+      }`}
     >
       <div className="space-y-3">
         {/* Imagen del Producto */}
@@ -75,6 +93,13 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               {isEvent ? t.event_last_seats : t.prod_last_units}
             </span>
           ) : null}
+
+          {/* Badge de Formato y Peso */}
+          {(product.format || product.weight_g) && (
+            <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-tight shadow-xs border border-stone-200/80 dark:border-stone-700/80 font-sans">
+              {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
+            </span>
+          )}
         </div>
 
         {/* Datos del Producto */}
@@ -86,9 +111,11 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             </span>
           )}
 
-          <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-1 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
-            {product.name}
-          </h3>
+          <Link href={`/producto/${product.id}`} className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+            <h3 className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 line-clamp-1">
+              {product.name}
+            </h3>
+          </Link>
 
           {cleanDescription && (
             <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 font-sans font-medium">
@@ -98,7 +125,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Precio y Botón */}
+      {/* Precio y Botones de Acción */}
       <div className="pt-3 mt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between gap-2">
         <div>
           <div className="flex items-baseline gap-1.5">
@@ -116,26 +143,59 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           </span>
         </div>
 
-        {!isSeller ? (
-          <button
-            type="button"
-            disabled={isSoldOut}
-            onClick={handleAddToCart}
-            className={`p-2.5 rounded-xl font-bold transition-all flex items-center justify-center cursor-pointer ${
-              isSoldOut
-                ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
-                : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] shadow-xs hover:scale-105'
-            }`}
-            title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
-          >
-            {isEvent ? <Ticket className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-          </button>
+        {isSeller ? (
+          <div className="flex items-center gap-1.5">
+            <Link
+              href={`/vendedor/productos/${product.id}/editar`}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-102 font-serif uppercase tracking-wider cursor-pointer"
+              title="Editar Producto"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>Editar</span>
+            </Link>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="p-1.5 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer border border-red-200 dark:border-red-800"
+              title="Eliminar Producto"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         ) : (
-          <span className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-500">
-            <Eye className="w-4 h-4" />
-          </span>
+          <div className="flex items-center gap-1.5">
+            <Link
+              href={`/chat/${product.seller_id || ''}?product_id=${product.id}`}
+              className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 shrink-0"
+              title={t.prod_ask_artisan}
+            >
+              <MessageCircle className="w-3.5 h-3.5 text-stone-700 dark:text-stone-200" />
+            </Link>
+
+            <button
+              type="button"
+              disabled={isSoldOut}
+              onClick={handleAddToCart}
+              className={`p-2.5 rounded-xl font-bold transition-all flex items-center justify-center cursor-pointer ${
+                isSoldOut
+                  ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
+                  : added
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] shadow-xs hover:scale-105'
+              }`}
+              title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
+            >
+              {added ? (
+                <Check className="w-4 h-4" />
+              ) : isEvent ? (
+                <Ticket className="w-4 h-4" />
+              ) : (
+                <ShoppingBag className="w-4 h-4" />
+              )}
+            </button>
+          </div>
         )}
       </div>
-    </Link>
+    </article>
   );
 }
