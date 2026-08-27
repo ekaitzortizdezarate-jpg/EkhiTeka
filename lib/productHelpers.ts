@@ -195,12 +195,30 @@ export function formatProductDescription(
 
     // 3. Tarjeta Regalo - Header & Options
     if (/^(TARJETA REGALO VIRTUAL|Tarjeta Regalo Virtual|TARJETA REGALO|Tarjeta Regalo|OPARI TXARTEL BIRTUALA|Opari Txartel Birtuala|VIRTUAL GIFT CARD|Virtual Gift Card|CARTE CADEAU VIRTUELLE|Carte Cadeau Virtuelle)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(TARJETA REGALO VIRTUAL|Tarjeta Regalo Virtual|TARJETA REGALO|Tarjeta Regalo|OPARI TXARTEL BIRTUALA|Opari Txartel Birtuala|VIRTUAL GIFT CARD|Virtual Gift Card|CARTE CADEAU VIRTUELLE|Carte Cadeau Virtuelle)\s*:\s*/i, '');
+      const rest = l.replace(/^(TARJETA REGALO VIRTUAL|Tarjeta Regalo Virtual|TARJETA REGALO|Tarjeta Regalo|OPARI TXARTEL BIRTUALA|Opari Txartel Birtuala|VIRTUAL GIFT CARD|Virtual Gift Card|CARTE CADEAU VIRTUELLE|Carte Cadeau Virtuelle)\s*:\s*/i, '').trim();
       let header = 'TARJETA REGALO VIRTUAL:';
-      if (language === 'eu') header = 'OPARI TXARTEL BIRTUALA:';
-      if (language === 'fr') header = 'CARTE CADEAU VIRTUELLE :';
-      if (language === 'en') header = 'VIRTUAL GIFT CARD:';
-      l = rest ? `${header} ${rest}` : header;
+      let redeemable = 'Canjeable por productos';
+      if (language === 'eu') {
+        header = 'OPARI TXARTEL BIRTUALA:';
+        redeemable = 'Produktuekin trukagarria';
+      } else if (language === 'fr') {
+        header = 'CARTE CADEAU VIRTUELLE :';
+        redeemable = 'Échangeable contre des produits';
+      } else if (language === 'en') {
+        header = 'VIRTUAL GIFT CARD:';
+        redeemable = 'Redeemable for products';
+      }
+
+      // Clean rest if it contains duplicate redeemable text
+      const cleanRest = rest
+        .replace(/^(MODALIDAD\s*:\s*)?(Canjeable por productos(\s+EkhiTeka(\s+Gourmet)?)?|Produktuekin trukagarria|Échangeable contre des produits|Redeemable for products)(\.\.\.|\.)?\s*/i, '')
+        .trim();
+
+      if (cleanRest) {
+        l = `${header}\n${redeemable}\n${cleanRest}`;
+      } else {
+        l = `${header}\n${redeemable}`;
+      }
     }
 
     // Replace Tarjeta Regalo Options inline
@@ -326,14 +344,24 @@ export function formatProductDescription(
   return formattedLines.filter(Boolean).join('\n');
 }
 
+export function getGiftCardRedeemableText(language: string = 'es'): string {
+  if (language === 'eu') return 'Produktuekin trukagarria';
+  if (language === 'fr') return 'Échangeable contre des produits';
+  if (language === 'en') return 'Redeemable for products';
+  return 'Canjeable por productos';
+}
+
 export function getGiftCardDescription(
   description?: string | null,
   language: string = 'es'
 ): string {
   if (!description) return '';
   const formatted = formatProductDescription(description, language);
-  const cleaned = formatted
+  let cleaned = formatted
     .replace(/^(OPARI TXARTEL BIRTUALA:|TARJETA REGALO VIRTUAL:|CARTE CADEAU VIRTUELLE :|VIRTUAL GIFT CARD:)\s*/i, '')
+    .trim();
+  cleaned = cleaned
+    .replace(/^(Produktuekin trukagarria|Canjeable por productos|Échangeable contre des produits|Redeemable for products)\s*/i, '')
     .trim();
   return cleaned;
 }

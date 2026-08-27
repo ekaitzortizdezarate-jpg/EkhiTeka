@@ -206,6 +206,15 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                     : 'TARJETA REGALO VIRTUAL:'}
                 </span>
               </div>
+              <p className="text-xs sm:text-[13px] font-medium text-stone-800 dark:text-stone-200 leading-snug">
+                {language === 'eu'
+                  ? 'Produktuekin trukagarria'
+                  : language === 'fr'
+                  ? 'Échangeable contre des produits'
+                  : language === 'en'
+                  ? 'Redeemable for products'
+                  : 'Canjeable por productos'}
+              </p>
               {giftCardDescription && (
                 <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal whitespace-pre-line line-clamp-2">
                   {giftCardDescription}
