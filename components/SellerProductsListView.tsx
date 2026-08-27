@@ -549,13 +549,13 @@ export function SellerProductsListView({
   return (
     <div className="space-y-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 font-serif">
       {/* 1. Cabecera Principal */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-stone-200 dark:border-stone-800">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2.5">
+      <div className="pb-6 border-b border-stone-200 dark:border-stone-800">
+        <div className="space-y-1 text-center sm:text-left">
+          <div className="flex items-center justify-center sm:justify-start gap-2.5">
             <span className="p-2 rounded-2xl bg-[#FFE259] text-[#1D1D1B]">
               <Layers className="w-6 h-6" />
             </span>
-            <h1 className="text-3xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight">
               {language === 'eu'
                 ? 'Nire Denda eta Kudeaketa'
                 : language === 'fr'
@@ -571,75 +571,82 @@ export function SellerProductsListView({
               : 'Gestiona todos tus productos de la tienda, catas presenciales (eventos) y las imágenes de la web.'}
           </p>
         </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/vendedor/productos/nuevo"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-widest shadow-md hover:scale-102 transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{language === 'eu' ? 'Gehitu Produktua' : 'Añadir Producto'}</span>
-          </Link>
-
-          <Link
-            href="/vendedor/eventos"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-widest transition-all border border-stone-200 dark:border-stone-700"
-          >
-            <Building className="w-4 h-4" />
-            <span>{language === 'eu' ? 'Lokalak / Lekuak' : 'Locales y Espacios'}</span>
-          </Link>
-        </div>
       </div>
 
-      {/* 2. SELECTOR CENTRAL DESTACADO (Mis Productos / Mis Eventos / Mis Imágenes) */}
-      <div className="flex justify-center">
-        <div className="inline-flex p-1.5 rounded-3xl bg-white dark:bg-[#1C1B19] border-2 border-stone-200 dark:border-stone-800 shadow-sm gap-1.5 font-serif max-w-full overflow-x-auto">
+      {/* 2. SELECTOR CENTRAL DESTACADO (Mis Productos / Mis Eventos / Mis Imágenes en dos líneas centradas) */}
+      <div className="w-full max-w-2xl mx-auto px-1">
+        <div className="grid grid-cols-3 p-1.5 rounded-3xl bg-white dark:bg-[#1C1B19] border-2 border-stone-200 dark:border-stone-800 shadow-sm gap-1 sm:gap-2 font-serif w-full">
           {/* Botón 1: Mis Productos */}
           <button
             type="button"
             onClick={() => setActiveMainTab('productos')}
-            className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'productos'
-                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm'
-                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800'
+                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
             }`}
           >
-            <Package className="w-4 h-4 text-stone-800 dark:text-stone-200 stroke-[1.75]" />
-            <span>{language === 'eu' ? 'Nire Produktuak' : language === 'fr' ? 'Mes Produits' : language === 'en' ? 'My Products' : 'Mis Productos'}</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-stone-900/10 dark:bg-white/10 text-[10.5px]">
-              {products.length}
-            </span>
+            <div className="flex items-center gap-1 mb-0.5">
+              <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-stone-800 dark:text-stone-200 stroke-[1.75]" />
+              <span className="text-[10px] sm:text-xs uppercase tracking-wider block">
+                {language === 'eu' ? 'Nire' : language === 'fr' ? 'Mes' : language === 'en' ? 'My' : 'Mis'}
+              </span>
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-[11px] sm:text-xs uppercase tracking-wider block">
+                {language === 'eu' ? 'Produktuak' : language === 'fr' ? 'Produits' : language === 'en' ? 'Products' : 'Productos'}
+              </span>
+              <span className="px-1.5 py-0.2 rounded-full bg-stone-900/10 dark:bg-white/15 text-[9.5px] sm:text-[10.5px] font-mono">
+                {products.length}
+              </span>
+            </div>
           </button>
 
           {/* Botón 2: Mis Eventos */}
           <button
             type="button"
             onClick={() => setActiveMainTab('eventos')}
-            className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'eventos'
-                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm'
-                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800'
+                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
             }`}
           >
-            <Calendar className="w-4 h-4 text-stone-800 dark:text-stone-200 stroke-[1.75]" />
-            <span>{language === 'eu' ? 'Nire Ekitaldiak' : language === 'fr' ? 'Mes Événements' : language === 'en' ? 'My Events' : 'Mis Eventos'}</span>
-            <span className="ml-1 px-2 py-0.5 rounded-full bg-stone-900/10 dark:bg-white/10 text-[10.5px]">
-              {catasPresenciales.length}
-            </span>
+            <div className="flex items-center gap-1 mb-0.5">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-stone-800 dark:text-stone-200 stroke-[1.75]" />
+              <span className="text-[10px] sm:text-xs uppercase tracking-wider block">
+                {language === 'eu' ? 'Nire' : language === 'fr' ? 'Mes' : language === 'en' ? 'My' : 'Mis'}
+              </span>
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-[11px] sm:text-xs uppercase tracking-wider block">
+                {language === 'eu' ? 'Ekitaldiak' : language === 'fr' ? 'Événements' : language === 'en' ? 'Events' : 'Eventos'}
+              </span>
+              <span className="px-1.5 py-0.2 rounded-full bg-stone-900/10 dark:bg-white/15 text-[9.5px] sm:text-[10.5px] font-mono">
+                {catasPresenciales.length}
+              </span>
+            </div>
           </button>
 
           {/* Botón 3: Mis Imágenes */}
           <button
             type="button"
             onClick={() => setActiveMainTab('imagenes')}
-            className={`flex items-center gap-2 px-5 sm:px-7 py-3 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'imagenes'
-                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm'
-                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800'
+                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
             }`}
           >
-            <ImageIcon className="w-4 h-4 text-stone-800 dark:text-stone-200 stroke-[1.75]" />
-            <span>{language === 'eu' ? 'Nire Irudiak' : language === 'fr' ? 'Mes Images' : language === 'en' ? 'My Images' : 'Mis Imágenes'}</span>
+            <div className="flex items-center gap-1 mb-0.5">
+              <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-stone-800 dark:text-stone-200 stroke-[1.75]" />
+              <span className="text-[10px] sm:text-xs uppercase tracking-wider block">
+                {language === 'eu' ? 'Nire' : language === 'fr' ? 'Mes' : language === 'en' ? 'My' : 'Mis'}
+              </span>
+            </div>
+            <span className="text-[11px] sm:text-xs uppercase tracking-wider block">
+              {language === 'eu' ? 'Irudiak' : language === 'fr' ? 'Images' : language === 'en' ? 'Images' : 'Imágenes'}
+            </span>
           </button>
         </div>
       </div>
