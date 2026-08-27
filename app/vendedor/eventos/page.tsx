@@ -10,44 +10,48 @@ export default async function SellerEventsPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  const [profileRes, eventsRes] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('products')
+      .select(`
+        *,
+        order_items (
+          id,
+          quantity,
+          unit_price,
+          subtotal,
+          created_at,
+          orders (
+            id,
+            status,
+            created_at,
+            buyer_id,
+            profiles!orders_buyer_id_fkey (
+              id,
+              full_name,
+              phone,
+              email,
+              town
+            )
+          )
+        )
+      `)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false }),
+  ]);
+
+  const profile = profileRes.data;
 
   if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
     redirect('/');
   }
 
-  // Obtener todas las catas y eventos compartidos de la tienda
-  const { data: rawEvents } = await supabase
-    .from('products')
-    .select(`
-      *,
-      order_items (
-        id,
-        quantity,
-        unit_price,
-        subtotal,
-        created_at,
-        orders (
-          id,
-          status,
-          created_at,
-          buyer_id,
-          profiles!orders_buyer_id_fkey (
-            id,
-            full_name,
-            phone,
-            email,
-            town
-          )
-        )
-      )
-    `)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
+  const rawEvents = eventsRes.data;
 
   // Filtrar estrictamente solo las CATAS PRESENCIALES en tienda
   const events = (rawEvents || []).filter((p) => {
