@@ -94,8 +94,58 @@ export function SellerProductForm({
     return null;
   }, [initialProduct]);
 
-  const allCategories = useMemo(() => {
-    const list = [...categories];
+  const singleProductCategories = useMemo(() => {
+    const excludedIds = [
+      'cata_casa',
+      'cata_presencial',
+      'cata_tienda',
+      'cata_en_casa',
+      'cata_en_tienda',
+      'cesta_gourmet',
+      'cesta',
+      'cestas',
+      'lote',
+      'lote_gourmet',
+      'tarjeta_regalo',
+      'tarjeta',
+      'tarjetas',
+      'experiencia',
+      'experiencias',
+      'catas',
+    ];
+
+    const filtered = categories.filter((c) => {
+      const id = (c.id || '').toLowerCase();
+      const nameEs = (c.name_es || '').toLowerCase();
+      const nameEu = (c.name_eu || '').toLowerCase();
+      const nameEn = (c.name_en || '').toLowerCase();
+      const nameFr = (c.name_fr || '').toLowerCase();
+
+      if (excludedIds.includes(id)) return false;
+
+      if (
+        nameEs.includes('cata en casa') ||
+        nameEs.includes('cata en tienda') ||
+        nameEs.includes('cata presencial') ||
+        nameEs.includes('cesta') ||
+        nameEs.includes('tarjeta regalo') ||
+        nameEu.includes('dastaketa') ||
+        nameEu.includes('saski') ||
+        nameEu.includes('opari txartel') ||
+        nameEn.includes('tasting') ||
+        nameEn.includes('hamper') ||
+        nameEn.includes('gift card') ||
+        nameFr.includes('dégustation') ||
+        nameFr.includes('panier') ||
+        nameFr.includes('carte cadeau')
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const list = [...filtered];
     if (!list.some((c) => c.id === 'producto_unico')) {
       list.push({
         id: 'producto_unico',
@@ -110,7 +160,7 @@ export function SellerProductForm({
   }, [categories]);
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(() => {
-    return initialMeta?.category || initialProduct?.category_id || allCategories[0]?.id || 'queso';
+    return initialMeta?.category || initialProduct?.category_id || singleProductCategories[0]?.id || 'queso';
   });
 
   const isProductoUnico = selectedCategoryId === 'producto_unico';
@@ -118,7 +168,7 @@ export function SellerProductForm({
   const isBeverageCategory = useMemo(() => {
     if (isProductoUnico) return false;
     const catId = (selectedCategoryId || '').toLowerCase();
-    const catObj = allCategories.find((c) => c.id === selectedCategoryId);
+    const catObj = singleProductCategories.find((c) => c.id === selectedCategoryId);
     const catNameEs = (catObj?.name_es || '').toLowerCase();
     const catNameEu = (catObj?.name_eu || '').toLowerCase();
 
@@ -139,7 +189,7 @@ export function SellerProductForm({
       catNameEu.includes('sagardo') ||
       catNameEu.includes('txakoli')
     );
-  }, [selectedCategoryId, allCategories, isProductoUnico]);
+  }, [selectedCategoryId, singleProductCategories, isProductoUnico]);
 
   const [weightUnit, setWeightUnit] = useState<string>(() => {
     if (initialMeta?.unit) return initialMeta.unit;
@@ -951,6 +1001,122 @@ export function SellerProductForm({
             />
           </div>
 
+          {/* 2. Categoría (solo para producto suelto) */}
+          {publishingType === 'producto_suelto' && (
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                {t.seller_product_category} *
+              </label>
+              <select
+                name="category_id"
+                required
+                value={selectedCategoryId}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+              >
+                {singleProductCategories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c[`name_${language}` as keyof Category] || c.name_es || c.name_eu}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* 3. Formato / Presentación y 4. Peso / Volumen (solo para producto suelto) */}
+          {publishingType === 'producto_suelto' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.seller_product_format}
+                </label>
+                <select
+                  name="format"
+                  defaultValue={initialProduct?.format || 'unidad'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                >
+                  <option value="unidad">{t.seller_format_unit}</option>
+                  <option value="peso_kg">{t.seller_format_weight}</option>
+                  <option value="tarro">{t.seller_format_jar}</option>
+                  <option value="lata">{t.seller_format_can}</option>
+                  <option value="botella">{t.seller_format_bottle}</option>
+                  <option value="pack">{t.seller_format_pack}</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {isProductoUnico
+                    ? language === 'eu'
+                      ? 'Pisua edo Bolumena (g, kg, L, cl, ml)'
+                      : language === 'fr'
+                      ? 'Poids ou Volume (g, kg, L, cl, ml)'
+                      : language === 'en'
+                      ? 'Weight or Volume (g, kg, L, cl, ml)'
+                      : 'Peso o Volumen (g, kg, L, cl, ml)'
+                    : isBeverageCategory
+                    ? language === 'eu'
+                      ? 'Bolumena (L, cl, ml)'
+                      : language === 'fr'
+                      ? 'Volume (L, cl, ml)'
+                      : language === 'en'
+                      ? 'Volume (L, cl, ml)'
+                      : 'Volumen (L, cl, ml)'
+                    : language === 'eu'
+                    ? 'Pisua (g, kg)'
+                    : language === 'fr'
+                    ? 'Poids (g, kg)'
+                    : language === 'en'
+                    ? 'Weight (g, kg)'
+                    : 'Peso (g, kg)'}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    placeholder={
+                      isProductoUnico
+                        ? 'Ej: 250, 0.75, 1.5, 33'
+                        : isBeverageCategory
+                        ? 'Ej: 0.75, 33, 750'
+                        : 'Ej: 250, 1.5, 500'
+                    }
+                    value={weightAmount}
+                    onChange={(e) => setWeightAmount(e.target.value)}
+                    className="flex-1 px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  />
+                  <select
+                    value={weightUnit}
+                    onChange={(e) => setWeightUnit(e.target.value)}
+                    className="w-28 px-2.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  >
+                    {isProductoUnico ? (
+                      <>
+                        <option value="g">Gramos (g)</option>
+                        <option value="kg">Kilos (kg)</option>
+                        <option value="L">Litros (L)</option>
+                        <option value="cl">Centilitros (cl)</option>
+                        <option value="ml">Mililitros (ml)</option>
+                      </>
+                    ) : isBeverageCategory ? (
+                      <>
+                        <option value="L">Litros (L)</option>
+                        <option value="cl">Centilitros (cl)</option>
+                        <option value="ml">Mililitros (ml)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="g">Gramos (g)</option>
+                        <option value="kg">Kilos (kg)</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
           {isPackOrEvent && (
             <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-[#141312] border border-amber-200 dark:border-stone-800 space-y-3">
               <div>
@@ -1104,7 +1270,7 @@ export function SellerProductForm({
                         onChange={(e) => setCustomCategory(e.target.value)}
                         className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl"
                       >
-                        {categories.map((c) => (
+                        {singleProductCategories.map((c) => (
                           <option key={c.id} value={c.id}>
                             {c[`name_${language}` as keyof Category] || c.name_es || c.name_eu}
                           </option>
@@ -1311,6 +1477,7 @@ export function SellerProductForm({
             </div>
           )}
 
+          {/* 5. Precio de Venta y 6. Descuento */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
@@ -1372,150 +1539,36 @@ export function SellerProductForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="font-bold text-stone-700 dark:text-stone-300">
-                  {publishingType === 'cata_presencial' ? t.seller_seats_capacity_label : t.seller_stock_available_label}
+          {/* 7. Stock */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="font-bold text-stone-700 dark:text-stone-300">
+                {publishingType === 'cata_presencial' ? t.seller_seats_capacity_label : t.seller_stock_available_label}
+              </label>
+              {publishingType !== 'cata_presencial' && (
+                <label className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="is_unlimited_stock"
+                    value="true"
+                    checked={isUnlimited}
+                    onChange={(e) => setIsUnlimited(e.target.checked)}
+                  />
+                  <span>{t.seller_unlimited_checkbox}</span>
                 </label>
-                {publishingType !== 'cata_presencial' && (
-                  <label className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="is_unlimited_stock"
-                      value="true"
-                      checked={isUnlimited}
-                      onChange={(e) => setIsUnlimited(e.target.checked)}
-                    />
-                    <span>{t.seller_unlimited_checkbox}</span>
-                  </label>
-                )}
-              </div>
-              <input
-                type="number"
-                name="stock"
-                min="0"
-                disabled={isUnlimited}
-                defaultValue={initialProduct?.stock ?? 10}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
-              />
+              )}
             </div>
-
-            {publishingType === 'producto_suelto' && (
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.seller_product_category} *
-                </label>
-                <select
-                  name="category_id"
-                  required
-                  value={selectedCategoryId}
-                  onChange={(e) => setSelectedCategoryId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-                >
-                  {allCategories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c[`name_${language}` as keyof Category] || c.name_es || c.name_eu}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <input
+              type="number"
+              name="stock"
+              min="0"
+              disabled={isUnlimited}
+              defaultValue={initialProduct?.stock ?? 10}
+              className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
+            />
           </div>
 
-          {publishingType === 'producto_suelto' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.seller_product_format}
-                </label>
-                <select
-                  name="format"
-                  defaultValue={initialProduct?.format || 'unidad'}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-                >
-                  <option value="unidad">{t.seller_format_unit}</option>
-                  <option value="peso_kg">{t.seller_format_weight}</option>
-                  <option value="tarro">{t.seller_format_jar}</option>
-                  <option value="lata">{t.seller_format_can}</option>
-                  <option value="botella">{t.seller_format_bottle}</option>
-                  <option value="pack">{t.seller_format_pack}</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {isProductoUnico
-                    ? language === 'eu'
-                      ? 'Pisua edo Bolumena (g, kg, L, cl, ml)'
-                      : language === 'fr'
-                      ? 'Poids ou Volume (g, kg, L, cl, ml)'
-                      : language === 'en'
-                      ? 'Weight or Volume (g, kg, L, cl, ml)'
-                      : 'Peso o Volumen (g, kg, L, cl, ml)'
-                    : isBeverageCategory
-                    ? language === 'eu'
-                      ? 'Bolumena (L, cl, ml)'
-                      : language === 'fr'
-                      ? 'Volume (L, cl, ml)'
-                      : language === 'en'
-                      ? 'Volume (L, cl, ml)'
-                      : 'Volumen (L, cl, ml)'
-                    : language === 'eu'
-                    ? 'Pisua (g, kg)'
-                    : language === 'fr'
-                    ? 'Poids (g, kg)'
-                    : language === 'en'
-                    ? 'Weight (g, kg)'
-                    : 'Peso (g, kg)'}
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    step="any"
-                    min="0"
-                    placeholder={
-                      isProductoUnico
-                        ? 'Ej: 250, 0.75, 1.5, 33'
-                        : isBeverageCategory
-                        ? 'Ej: 0.75, 33, 750'
-                        : 'Ej: 250, 1.5, 500'
-                    }
-                    value={weightAmount}
-                    onChange={(e) => setWeightAmount(e.target.value)}
-                    className="flex-1 px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-                  />
-                  <select
-                    value={weightUnit}
-                    onChange={(e) => setWeightUnit(e.target.value)}
-                    className="w-28 px-2.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-                  >
-                    {isProductoUnico ? (
-                      <>
-                        <option value="g">Gramos (g)</option>
-                        <option value="kg">Kilos (kg)</option>
-                        <option value="L">Litros (L)</option>
-                        <option value="cl">Centilitros (cl)</option>
-                        <option value="ml">Mililitros (ml)</option>
-                      </>
-                    ) : isBeverageCategory ? (
-                      <>
-                        <option value="L">Litros (L)</option>
-                        <option value="cl">Centilitros (cl)</option>
-                        <option value="ml">Mililitros (ml)</option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="g">Gramos (g)</option>
-                        <option value="kg">Kilos (kg)</option>
-                      </>
-                    )}
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
-
+          {/* Si es cata en casa: Personas recomendadas */}
           {publishingType === 'cata_casa' && (
             <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 space-y-2">
               <label className="font-bold text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 block">
@@ -1552,6 +1605,7 @@ export function SellerProductForm({
             </div>
           )}
 
+          {/* 8. Localidad y 9. Provincia */}
           {publishingType !== 'cata_presencial' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -1583,6 +1637,7 @@ export function SellerProductForm({
             </div>
           )}
 
+          {/* 10. Descripción, notas de cata y presentación */}
           {publishingType !== 'cata_presencial' && (
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
