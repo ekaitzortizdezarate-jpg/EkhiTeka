@@ -40,6 +40,59 @@ export function getCleanDescription(description?: string | null): string {
   return description.replace(/<!-- META:{.*?} -->/g, '').trim();
 }
 
+export function formatEventDescription(
+  description?: string | null,
+  labels?: {
+    date?: string;
+    time?: string;
+    seats?: string;
+    itemsToTaste?: string;
+  }
+): string {
+  if (!description) return '';
+  const clean = description.replace(/<!-- META:{.*?} -->/g, '').trim();
+  if (!labels) return clean;
+
+  const lines = clean.split('\n');
+  const formattedLines = lines.map((line) => {
+    // Match date prefix
+    if (labels.date && /^\s*(Fecha|Data|Date)\s*:\s*/i.test(line)) {
+      return line.replace(/^\s*(Fecha|Data|Date)\s*:\s*/i, `${labels.date} `);
+    }
+    // Match time prefix
+    if (labels.time && /^\s*(Hora|Ordua|Time|Heure)\s*:\s*/i.test(line)) {
+      return line.replace(/^\s*(Hora|Ordua|Time|Heure)\s*:\s*/i, `${labels.time} `);
+    }
+    // Match seats prefix
+    if (
+      labels.seats &&
+      /^\s*(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i.test(
+        line
+      )
+    ) {
+      return line.replace(
+        /^\s*(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i,
+        `${labels.seats} `
+      );
+    }
+    // Match items to taste prefix
+    if (
+      labels.itemsToTaste &&
+      /^\s*(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i.test(
+        line
+      )
+    ) {
+      return line.replace(
+        /^\s*(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i,
+        `${labels.itemsToTaste} `
+      );
+    }
+    return line;
+  });
+
+  return formattedLines.join('\n');
+}
+
 export function getCategoryImage(category?: { id?: string; slug?: string; name_es?: string } | string): string {
   if (!category) return '/images/secciones/Quesos.JPG';
   const key = (typeof category === 'string' ? category : (category.slug || category.id || category.name_es || '')).toLowerCase();

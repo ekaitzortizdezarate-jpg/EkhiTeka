@@ -117,6 +117,11 @@ export interface TranslationDict {
   event_home_catalog_subtitle: string;
   event_store_catalog_title: string;
   event_store_catalog_subtitle: string;
+  event_details_title: string;
+  event_field_date: string;
+  event_field_time: string;
+  event_field_seats: string;
+  event_field_items_to_taste: string;
 
   // Home Pillars & Banners
   home_hero_badge: string;
@@ -615,7 +620,7 @@ export const translations: Record<Language, TranslationDict> = {
     brand_name: 'EkhiTeka',
     brand_tagline: 'Gourmet Denda & Artisau Produktuak',
     brand_subtitle: 'Gaztak, hegaluzea, gatzadurak, gildak, garagardo artisaua, txakolina eta sagardo hautatua.',
-    header_subtitle: 'Gaztandegia & Gourmet Hautaketa',
+    header_subtitle: 'Gaztandegia & Gourmet Selekzioa',
     top_refrigerated_shipping: 'Bidalpen hoztua 24/48h penintsulan',
     top_custom_orders: 'Eskari bereziak eta aholkularitza',
     top_store_pickup: 'Dendan jasotzeko aukera',
@@ -724,6 +729,11 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kit-ak eta pack-ak etxera eramateko',
     event_store_catalog_title: 'Dendako Dastaketak Eskuragarri',
     event_store_catalog_subtitle: 'Presentziala Lekeition',
+    event_details_title: 'Dastaketaren Xehetasunak & Datuak',
+    event_field_date: 'Data:',
+    event_field_time: 'Ordua:',
+    event_field_seats: 'Leku libreak:',
+    event_field_items_to_taste: 'Dastatzeko produktuak:',
 
     home_hero_badge: 'Gaztategi Gourmet & Gune Gastronomikoa',
     home_hero_title: 'Egile-gaztak & Esperientziak Lekeition',
@@ -1060,7 +1070,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_modal_stock_label: 'Leku Erabilgarriak *',
     seller_events_modal_location_label: 'Tokia / Kokapena *',
     seller_events_modal_desc_label: 'Deskribapena, Data/Ordua & Maridajea *',
-    seller_events_modal_desc_placeholder: 'Adib: Data: Irailak 20, Larunbata · 19:30\nDastatuko diren gaztak: 5 artisau gazta eta euskal maridajea...',
+    seller_events_modal_desc_placeholder: 'Adib: Data: Irailak 20, Larunbata · Ordua: 19:30\nLeku libreak: 12 plaza\nDastatzeko produktuak: 5 artzain gazta eta euskal maridajea...',
     seller_events_modal_save_notify: 'Gorde eta Jakinarazi',
     seller_events_modal_saving_notify: 'Gordetzen eta jakinarazten...',
     seller_events_remove_prompt: 'Nahi duzu parte-hartzaile honi baja eman dastaketa honetan? Erreserba bertan behera geratuko da, plazak berreskuratuko dira eta jakinarazpen automatiko bat bidaliko zaio txat bidez.\n\nArrazoia (aukerakoa):',
@@ -1122,7 +1132,7 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_event_details_label: 'Xehetasunak, Data, Ordua & Maridajea *',
     seller_product_desc_label: 'Deskribapena, dastatze oharrak eta aurkezpena',
-    seller_event_details_placeholder: 'Adib: Data: Irailak 20, Larunbata · 19:30\nIraupena: 90 minutu\n5 artzain gazta eta Bizkaiko 2 txakoli maridajearekin barne.',
+    seller_event_details_placeholder: 'Adib: Data: Irailak 20, Larunbata · Ordua: 19:30\nLeku libreak: 12 plaza\nDastatzeko produktuak: 5 artzain gazta eta Bizkaiko 2 txakoli maridajearekin barne.',
     seller_product_desc_placeholder: 'Deskribatu zaporea, ontzea, usainak eta ekoizlearen historia...',
 
     seller_step3_event_label: '3. Ekitaldi Puntua (Kokapen bakarra)',
@@ -1311,6 +1321,11 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kits & Packs para llevar',
     event_store_catalog_title: 'Catas en Tienda Disponibles',
     event_store_catalog_subtitle: 'Presencial en Lekeitio',
+    event_details_title: 'Detalles de la Cata & Datos',
+    event_field_date: 'Fecha:',
+    event_field_time: 'Hora:',
+    event_field_seats: 'Plazas disponibles:',
+    event_field_items_to_taste: 'Productos a degustar:',
 
     home_hero_badge: 'Quesería Gourmet & Espacio Gastronómico',
     home_hero_title: 'Quesos de autor & Experiencias en Lekeitio',
@@ -1647,7 +1662,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_modal_stock_label: 'Plazas Disponibles Restantes *',
     seller_events_modal_location_label: 'Lugar / Ubicación *',
     seller_events_modal_desc_label: 'Descripción, Fecha/Hora & Maridaje *',
-    seller_events_modal_desc_placeholder: 'Ej: Fecha: Sábado 20 de Septiembre · 19:30h\nQuesos a probar: 5 quesos de autor y maridaje vasco...',
+    seller_events_modal_desc_placeholder: 'Ej: Fecha: Sábado 20 de Septiembre · Hora: 19:30h\nPlazas disponibles: 12 plazas\nProductos a degustar: 5 quesos artesanos de autor y maridaje vasco...',
     seller_events_modal_save_notify: 'Guardar y Notificar',
     seller_events_modal_saving_notify: 'Guardando & Notificando...',
     seller_events_remove_prompt: '¿Deseas dar de baja a este participante de esta cata presencial? Se cancelará la reserva, se restablecerán las plazas y se le enviará un aviso automático por chat.\n\nMotivo (opcional):',
@@ -1709,7 +1724,7 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_event_details_label: 'Detalles, Fecha, Hora & Maridaje *',
     seller_product_desc_label: 'Descripción, notas de cata y presentación',
-    seller_event_details_placeholder: 'Ej: Fecha: Sábado 20 de Septiembre · 19:30h\nDuración: 90 minutos\nIncluye 5 quesos artesanos de pastor y maridaje con 2 txakolis de Bizkaia.',
+    seller_event_details_placeholder: 'Ej: Fecha: Sábado 20 de Septiembre · Hora: 19:30h\nPlazas disponibles: 12 plazas\nProductos a degustar: 5 quesos artesanos de pastor y maridaje con 2 txakolis de Bizkaia.',
     seller_product_desc_placeholder: 'Describe el perfil de sabor, curación, aromas e historia del productor...',
 
     seller_step3_event_label: '3. Punto de Evento (Ubicación única)',
@@ -1898,6 +1913,11 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kits & Tasting packs to take home',
     event_store_catalog_title: 'In-Store Tastings Available',
     event_store_catalog_subtitle: 'In-person in Lekeitio',
+    event_details_title: 'Tasting Details & Information',
+    event_field_date: 'Date:',
+    event_field_time: 'Time:',
+    event_field_seats: 'Available seats:',
+    event_field_items_to_taste: 'Products to taste:',
 
     home_hero_badge: 'Gourmet Cheesemonger & Gastro Space',
     home_hero_title: 'Author Cheeses & Experiences in Lekeitio',
@@ -2234,7 +2254,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_modal_stock_label: 'Remaining Available Seats *',
     seller_events_modal_location_label: 'Venue / Location *',
     seller_events_modal_desc_label: 'Description, Date/Time & Pairing *',
-    seller_events_modal_desc_placeholder: 'e.g. Date: Saturday 20 September · 19:30\nCheeses to taste: 5 artisan cheeses with Basque pairing...',
+    seller_events_modal_desc_placeholder: 'e.g. Date: Saturday 20 September · Time: 19:30\nAvailable seats: 12 seats\nProducts to taste: 5 artisan cheeses with Basque pairing...',
     seller_events_modal_save_notify: 'Save & Notify',
     seller_events_modal_saving_notify: 'Saving & Notifying...',
     seller_events_remove_prompt: 'Do you want to cancel this participant from this tasting? The reservation will be cancelled, seats will be restored, and an automatic chat notice will be sent.\n\nReason (optional):',
@@ -2296,7 +2316,7 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_event_details_label: 'Details, Date, Time & Pairing *',
     seller_product_desc_label: 'Description, tasting notes and presentation',
-    seller_event_details_placeholder: 'e.g. Date: Saturday 20 September · 19:30\nDuration: 90 minutes\nIncludes 5 artisan shepherd cheeses and pairing with 2 Bizkaia txakolis.',
+    seller_event_details_placeholder: 'e.g. Date: Saturday 20 September · Time: 19:30\nAvailable seats: 12 seats\nProducts to taste: 5 artisan shepherd cheeses paired with 2 Bizkaia txakolis.',
     seller_product_desc_placeholder: 'Describe flavour profile, ageing, aromas and producer story...',
 
     seller_step3_event_label: '3. Event Location (Single venue)',
@@ -2485,6 +2505,11 @@ export const translations: Record<Language, TranslationDict> = {
     event_home_catalog_subtitle: 'Kits & Packs de dégustation à emporter',
     event_store_catalog_title: 'Dégustations en Boutique Disponibles',
     event_store_catalog_subtitle: 'En présentiel à Lekeitio',
+    event_details_title: 'Détails de la Dégustation & Informations',
+    event_field_date: 'Date :',
+    event_field_time: 'Heure :',
+    event_field_seats: 'Places disponibles :',
+    event_field_items_to_taste: 'Produits à déguster :',
 
     home_hero_badge: 'Fromagerie Fine & Espace Gourmand',
     home_hero_title: 'Fromages d\'Auteur & Dégustations à Lekeitio',
@@ -2821,7 +2846,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_modal_stock_label: 'Places Disponibles Restantes *',
     seller_events_modal_location_label: 'Lieu / Emplacement *',
     seller_events_modal_desc_label: 'Description, Date/Heure & Accords *',
-    seller_events_modal_desc_placeholder: 'Ex : Date : Samedi 20 Septembre · 19h30\nFromages à déguster : 5 fromages fermiers et accords basques...',
+    seller_events_modal_desc_placeholder: 'Ex : Date : Samedi 20 Septembre · Heure : 19h30\nPlaces disponibles : 12 places\nProduits à déguster : 5 fromages fermiers et accords basques...',
     seller_events_modal_save_notify: 'Enregistrer et Notifier',
     seller_events_modal_saving_notify: 'Enregistrement et notification...',
     seller_events_remove_prompt: 'Souhaitez-vous annuler l\'inscription de ce participant à cette dégustation ? La réservation sera annulée, les places seront rétablies et une notification automatique lui sera envoyée par chat.\n\nMotif (facultatif) :',
@@ -2883,7 +2908,7 @@ export const translations: Record<Language, TranslationDict> = {
 
     seller_event_details_label: 'Détails, Date, Heure & Accords *',
     seller_product_desc_label: 'Description, notes de dégustation et présentation',
-    seller_event_details_placeholder: 'Ex : Date : Samedi 20 Septembre · 19h30\nDurée : 90 minutes\nComprend 5 fromages fermiers et accord avec 2 vins txakoli de Bizkaia.',
+    seller_event_details_placeholder: 'Ex : Date : Samedi 20 Septembre · Heure : 19h30\nPlaces disponibles : 12 places\nProduits à déguster : 5 fromages fermiers et accord avec 2 vins txakoli de Bizkaia.',
     seller_product_desc_placeholder: 'Décrivez le profil aromatique, l\'affinage et l\'histoire du producteur...',
 
     seller_step3_event_label: '3. Lieu de l\'Événement (Emplacement unique)',

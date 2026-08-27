@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
+import { getProductImage, getProductDiscount, getCleanDescription, formatEventDescription } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import { ShoppingBag, Ticket, MapPin, Eye } from 'lucide-react';
 
@@ -25,7 +25,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
   const imageUrl = getProductImage(product);
   const discountInfo = getProductDiscount(product);
-  const cleanDescription = getCleanDescription(product.description);
+  const cleanDescription = isEvent
+    ? formatEventDescription(product.description, {
+        date: t.event_field_date,
+        time: t.event_field_time,
+        seats: t.event_field_seats,
+        itemsToTaste: t.event_field_items_to_taste,
+      })
+    : getCleanDescription(product.description);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();

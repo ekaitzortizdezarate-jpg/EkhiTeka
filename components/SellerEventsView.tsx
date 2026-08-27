@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateEventDetails, removeEventParticipant } from '@/app/actions/events';
+import { formatEventDescription } from '@/lib/productHelpers';
 import {
   Users,
   MapPin,
@@ -174,7 +175,12 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
 
                     {event.description && (
                       <p className="text-xs text-stone-600 dark:text-stone-300 whitespace-pre-line leading-relaxed max-w-2xl font-medium font-sans">
-                        {event.description}
+                        {formatEventDescription(event.description, {
+                          date: t.event_field_date,
+                          time: t.event_field_time,
+                          seats: t.event_field_seats,
+                          itemsToTaste: t.event_field_items_to_taste,
+                        })}
                       </p>
                     )}
                   </div>

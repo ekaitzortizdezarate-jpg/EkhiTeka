@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
-import { getProductImage, getProductDiscount, getCleanDescription } from '@/lib/productHelpers';
+import { getProductImage, getProductDiscount, getCleanDescription, formatEventDescription } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import {
   ArrowLeft,
@@ -39,7 +39,14 @@ export function ProductDetailView({
 
   const imageUrl = getProductImage(product);
   const discountInfo = getProductDiscount(product);
-  const cleanDescription = getCleanDescription(product.description);
+  const cleanDescription = isEvent
+    ? formatEventDescription(product.description, {
+        date: t.event_field_date,
+        time: t.event_field_time,
+        seats: t.event_field_seats,
+        itemsToTaste: t.event_field_items_to_taste,
+      })
+    : getCleanDescription(product.description);
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -149,7 +156,7 @@ export function ProductDetailView({
           {cleanDescription && (
             <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
               <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-800 dark:text-stone-200">
-                {t.prod_details}
+                {isEvent ? t.event_details_title : t.prod_details}
               </h3>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans whitespace-pre-line">
                 {cleanDescription}
