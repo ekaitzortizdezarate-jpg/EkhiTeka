@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
 import Link from 'next/link';
 import { getProductImage, getPackItems, getOrderTypeBadge } from '@/lib/productHelpers';
+import { buyerCancelOrder } from '@/app/actions/orders';
 import type { Order } from '@/types/database';
 import {
   Package,
@@ -15,6 +16,9 @@ import {
   Sparkles,
   AlertTriangle,
   Truck,
+  Trash2,
+  X,
+  XCircle,
 } from 'lucide-react';
 
 const STATUS_STEPS = [
@@ -28,6 +32,20 @@ const STATUS_STEPS = [
 export function BuyerOrdersView({ orders }: { orders: Order[] }) {
   const { t, language } = useLanguage();
   const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  // Modal para cancelar pedido por parte del comprador
+  const [cancelModal, setCancelModal] = useState<{
+    open: boolean;
+    orderId: string;
+    reason: string;
+    loading: boolean;
+  }>({
+    open: false,
+    orderId: '',
+    reason: '',
+    loading: false,
+  });
 
   useEffect(() => {
     try {
@@ -45,6 +63,30 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
       localStorage.setItem('ekhiteka_seen_orders_buyer', JSON.stringify(updated));
       window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
     } catch {}
+  };
+
+  const handleOpenCancelModal = (orderId: string) => {
+    setCancelModal({
+      open: true,
+      orderId,
+      reason: '',
+      loading: false,
+    });
+  };
+
+  const handleConfirmBuyerCancel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCancelModal((prev) => ({ ...prev, loading: true }));
+    const res = await buyerCancelOrder(cancelModal.orderId, cancelModal.reason);
+    setCancelModal({
+      open: false,
+      orderId: '',
+      reason: '',
+      loading: false,
+    });
+    if (res?.error) {
+      alert(`Error: ${res.error}`);
+    }
   };
 
   const getStatusBadge = (status: string, hasUpdate: boolean) => {
@@ -119,6 +161,69 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-8">
+      {/* Modal de Cancelación para el Comprador */}
+      {cancelModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn font-sans">
+          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="w-5 h-5" />
+                <h3 className="font-serif font-black text-base text-stone-900 dark:text-stone-100">
+                  {language === 'eu' ? 'Ezeztatu Eskaera' : 'Cancelar Pedido'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCancelModal((prev) => ({ ...prev, open: false }))}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+              {language === 'eu'
+                ? 'Ziur zaude eskaera hau ezeztatu nahi duzula? Saltzaileari jakinaraziko zaio.'
+                : '¿Estás seguro de que deseas cancelar este pedido? Se notificará inmediatamente al vendedor.'}
+            </p>
+
+            <form onSubmit={handleConfirmBuyerCancel} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  {language === 'eu' ? 'Arrazoia (aukerakoa)' : 'Motivo de cancelación (opcional)'}
+                </label>
+                <textarea
+                  rows={2}
+                  value={cancelModal.reason}
+                  onChange={(e) => setCancelModal((prev) => ({ ...prev, reason: e.target.value }))}
+                  placeholder={language === 'eu' ? 'Idatzi arrazoia hemen...' : 'Indica el motivo de la cancelación...'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-900 dark:text-stone-100 outline-hidden focus:border-red-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  disabled={cancelModal.loading}
+                  onClick={() => setCancelModal((prev) => ({ ...prev, open: false }))}
+                  className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                >
+                  {language === 'eu' ? 'Atzera' : 'Volver'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={cancelModal.loading}
+                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider shadow-sm transition-colors cursor-pointer"
+                >
+                  {cancelModal.loading ? (language === 'eu' ? 'Izapidetzen...' : 'Procesando...') : (language === 'eu' ? 'Bai, Ezeztatu' : 'Confirmar Cancelación')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Cabecera de la página */}
       <div className="pb-4 border-b border-stone-200 dark:border-stone-800">
         <h1 className="text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
           {t.orders_title}
@@ -141,11 +246,12 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
             const hasUpdate = lastSeenStatus ? lastSeenStatus !== order.status : order.status !== 'pendiente';
             const currentStepIdx = getStepIndex(order.status);
             const isCancelled = order.status === 'cancelado';
+            const canCancel = !isCancelled && order.status !== 'entregado';
 
             return (
               <div
                 key={order.id}
-                className={`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-5 shadow-xs transition-all ${
+                className={`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-6 shadow-xs transition-all ${
                   hasUpdate
                     ? 'border-[#FFE259] ring-2 ring-[#FFE259]/40 shadow-lg'
                     : isCancelled
@@ -153,13 +259,21 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                     : 'border-stone-200 dark:border-stone-800'
                 }`}
               >
-                {/* Cabecera del pedido: ID + Fecha a la izquierda, Tipo de artículo y Estado a la derecha */}
+                {/* 1. Cabecera del pedido: Texto "Pedido #..." mejorado arriba a la izquierda */}
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
-                      {t.orders_order_number} #{order.id.slice(0, 8)}
-                    </span>
-                    <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif font-black text-sm sm:text-base text-stone-900 dark:text-stone-100 tracking-tight">
+                        {language === 'eu' ? 'Eskaera' : language === 'fr' ? 'Commande' : language === 'en' ? 'Order' : 'Pedido'}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100 font-mono font-black text-xs sm:text-[13px] tracking-wider border border-stone-300 dark:border-stone-700 shadow-2xs">
+                        #{order.id.slice(0, 8).toUpperCase()}
+                      </span>
+                      <span className="text-xs font-serif font-bold text-[#C68D07] dark:text-[#FFE259] ml-1">
+                        · {total.toFixed(2)} €
+                      </span>
+                    </div>
+                    <p className="text-[11.5px] font-sans font-medium text-stone-500 dark:text-stone-400">
                       {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
                         day: '2-digit',
                         month: 'short',
@@ -178,7 +292,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 </div>
 
-                {/* 1. Alerta (si la hay) */}
+                {/* 2. Alerta de nuevo estado o cancelado */}
                 {hasUpdate && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs font-sans animate-fadeIn">
                     <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
@@ -215,125 +329,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 )}
 
-                {/* 2. Productos del Pedido (con desglose si es cata, cesta o pack) */}
-                {order.order_items && order.order_items.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300">
-                      {t.orders_products_label}
-                    </h4>
-                    <div className="space-y-3">
-                      {order.order_items.map((item) => {
-                        const packItems = getPackItems(item.products);
-                        const isPack = packItems.length > 0;
-
-                        return (
-                          <div
-                            key={item.id}
-                            className="p-3.5 rounded-2xl bg-stone-50/80 dark:bg-[#141312]/80 border border-stone-200/80 dark:border-stone-800 font-sans space-y-3"
-                          >
-                            <div className="flex items-center justify-between text-xs gap-3">
-                              <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200/70 dark:border-stone-700 shrink-0 relative">
-                                  <img
-                                    src={getProductImage(item.products)}
-                                    alt={item.products?.name || 'Producto'}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                                    }}
-                                  />
-                                </div>
-                                <div className="min-w-0">
-                                  <span className="font-bold text-stone-900 dark:text-stone-100 block text-xs truncate">
-                                    {item.products?.name || 'Producto Gourmet'}
-                                  </span>
-                                  <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="px-2 py-0.5 rounded-md bg-[#FFE259] text-[#1D1D1B] font-black text-[10px]">
-                                      x{item.quantity}
-                                    </span>
-                                    <span className="text-[11px] text-stone-500 dark:text-stone-400">
-                                      {Number(item.unit_price).toFixed(2)} €/ud
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <span className="font-serif font-black text-stone-900 dark:text-stone-100 shrink-0 text-sm">
-                                {Number(item.subtotal || item.unit_price * item.quantity).toFixed(2)} €
-                              </span>
-                            </div>
-
-                            {/* Sub-items si es pack, cata o cesta */}
-                            {isPack && (
-                              <div className="pt-2.5 border-t border-stone-200 dark:border-stone-800 space-y-2">
-                                <div className="inline-flex items-center gap-1.5 text-[10.5px] font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider font-serif">
-                                  <Package className="w-3.5 h-3.5 text-stone-600 dark:text-stone-400 shrink-0" />
-                                  <span>
-                                    {language === 'eu'
-                                      ? 'PACK-AK DAKARRENA:'
-                                      : language === 'fr'
-                                      ? 'LE PACK COMPREND :'
-                                      : language === 'en'
-                                      ? 'THE PACK INCLUDES:'
-                                      : 'EL PACK INCLUYE:'}
-                                  </span>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-1">
-                                  {packItems.map((subItem, sIdx) => (
-                                    <div
-                                      key={sIdx}
-                                      className="p-2 rounded-xl bg-white dark:bg-[#1C1B19] border border-stone-200/70 dark:border-stone-700/70 text-xs space-y-1"
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200/50 dark:border-stone-700">
-                                          <img
-                                            src={subItem.imageUrl || '/images/secciones/Quesos.JPG'}
-                                            alt={subItem.name}
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                                            }}
-                                          />
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                          <span className="font-bold text-stone-900 dark:text-stone-100 block truncate text-[11.5px]">
-                                            {subItem.name}
-                                          </span>
-                                          <div className="flex flex-wrap items-center gap-1 text-[10px] text-stone-500 dark:text-stone-400">
-                                            {subItem.quantity && subItem.quantity > 1 && (
-                                              <span className="font-bold text-[#C68D07] dark:text-[#FFE259]">
-                                                x{subItem.quantity}
-                                              </span>
-                                            )}
-                                            {subItem.weight_display && (
-                                              <span className="font-bold text-stone-700 dark:text-stone-300">
-                                                · {subItem.weight_display}
-                                              </span>
-                                            )}
-                                            {subItem.price && (
-                                              <span>· {Number(subItem.price).toFixed(2)} €</span>
-                                            )}
-                                          </div>
-                                        </div>
-                                      </div>
-                                      {subItem.description && (
-                                        <p className="text-[10.5px] text-stone-600 dark:text-stone-400 italic line-clamp-2 pl-0.5">
-                                          {subItem.description}
-                                        </p>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. El resto como está: Estado, Tipo de envío, Footer */}
+                {/* 3. Progresión del Pedido */}
                 {!isCancelled ? (
                   <div className="p-4 bg-stone-50 dark:bg-[#141312] rounded-2xl border border-stone-200 dark:border-stone-800 space-y-3 font-sans">
                     <div className="flex items-center justify-between text-[11px] font-bold text-stone-400 uppercase tracking-wider">
@@ -376,7 +372,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 ) : null}
 
-                {/* Tipo de envio */}
+                {/* 4. Tipo de Envío */}
                 <div className="p-4 rounded-2xl bg-stone-50/70 dark:bg-[#141312]/70 border border-stone-200/80 dark:border-stone-800 font-sans text-xs space-y-1.5">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif block">
                     Tipo de Envío
@@ -416,24 +412,156 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 </div>
 
-                {/* Footer con Total y Botón de chat */}
-                <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs font-serif">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
-                      {t.orders_total_to_charge}
-                    </span>
-                    <p className="text-base font-black text-stone-900 dark:text-stone-100 font-serif">
-                      {total.toFixed(2)} €
-                    </p>
-                  </div>
+                {/* 5. PRODUCTOS DEL PEDIDO (Colocado debajo de Tipo de Envío, cada sub-item a todo el ancho) */}
+                {order.order_items && order.order_items.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-black uppercase tracking-wider font-serif text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
+                        <Package className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+                        <span>{t.orders_products_label}</span>
+                      </h4>
+                      <span className="text-xs text-stone-500 font-bold font-serif">
+                        {order.order_items.length} {order.order_items.length === 1 ? 'artículo' : 'artículos'}
+                      </span>
+                    </div>
 
+                    <div className="space-y-3">
+                      {order.order_items.map((item) => {
+                        const packItems = getPackItems(item.products);
+                        const isPack = packItems.length > 0;
+
+                        return (
+                          <div
+                            key={item.id}
+                            className="p-4 rounded-2xl bg-stone-50/90 dark:bg-[#141312] border border-stone-200/80 dark:border-stone-800 font-sans space-y-3 shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between text-xs gap-3">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-13 h-13 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200/70 dark:border-stone-700 shrink-0 relative">
+                                  <img
+                                    src={getProductImage(item.products)}
+                                    alt={item.products?.name || 'Producto'}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                                    }}
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <span className="font-bold text-stone-900 dark:text-stone-100 block text-xs sm:text-sm truncate">
+                                    {item.products?.name || 'Producto Gourmet'}
+                                  </span>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="px-2 py-0.5 rounded-md bg-[#FFE259] text-[#1D1D1B] font-black text-[10.5px]">
+                                      x{item.quantity}
+                                    </span>
+                                    <span className="text-[11px] text-stone-500 dark:text-stone-400">
+                                      {Number(item.unit_price).toFixed(2)} €/ud
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <span className="font-serif font-black text-stone-900 dark:text-stone-100 shrink-0 text-base">
+                                {Number(item.subtotal || item.unit_price * item.quantity).toFixed(2)} €
+                              </span>
+                            </div>
+
+                            {/* Desglose de sub-items si es pack, cata o cesta a todo el ancho */}
+                            {isPack && (
+                              <div className="pt-3 border-t border-stone-200 dark:border-stone-800 space-y-2.5">
+                                <div className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider font-serif">
+                                  <Package className="w-3.5 h-3.5 shrink-0" />
+                                  <span>
+                                    {language === 'eu'
+                                      ? 'PACK-AK DAKARRENA:'
+                                      : language === 'fr'
+                                      ? 'LE PACK COMPREND :'
+                                      : language === 'en'
+                                      ? 'THE PACK INCLUDES:'
+                                      : 'EL PACK INCLUYE:'}
+                                  </span>
+                                </div>
+
+                                <div className="space-y-2 w-full">
+                                  {packItems.map((subItem, sIdx) => (
+                                    <div
+                                      key={sIdx}
+                                      className="p-3 rounded-2xl bg-white dark:bg-[#1C1B19] border border-stone-200 dark:border-stone-700/70 text-xs w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                                    >
+                                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200/60 dark:border-stone-700">
+                                          <img
+                                            src={subItem.imageUrl || '/images/secciones/Quesos.JPG'}
+                                            alt={subItem.name}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                              (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                                            }}
+                                          />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                          <span className="font-bold text-stone-900 dark:text-stone-100 block text-xs sm:text-sm truncate">
+                                            {subItem.name}
+                                          </span>
+                                          {subItem.description && (
+                                            <p className="text-[10.5px] text-stone-500 dark:text-stone-400 italic truncate mt-0.5">
+                                              {subItem.description}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto font-serif text-[11px]">
+                                        {subItem.quantity && (
+                                          <span className="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-black text-stone-800 dark:text-stone-200">
+                                            x{subItem.quantity}
+                                          </span>
+                                        )}
+                                        {subItem.weight_display && (
+                                          <span className="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 font-bold text-stone-700 dark:text-stone-300">
+                                            {subItem.weight_display}
+                                          </span>
+                                        )}
+                                        {subItem.price && (
+                                          <span className="font-black text-stone-900 dark:text-stone-100">
+                                            {(Number(subItem.price) * (subItem.quantity || 1)).toFixed(2)} €
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 6. PARTE INFERIOR: Solo Chat y Cancelar Pedido */}
+                <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 font-sans">
+                  {/* Botón 1: Chat con el vendedor */}
                   <Link
                     href={`/chat/${order.seller_id || ''}?order_id=${order.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer whitespace-nowrap min-h-[40px]"
                   >
-                    <MessageCircle className="w-3.5 h-3.5" />
+                    <MessageCircle className="w-4 h-4 shrink-0" />
                     <span>{t.orders_chat_with_seller}</span>
                   </Link>
+
+                  {/* Botón 2: Cancelar Pedido (si el pedido sigue activo) */}
+                  {canCancel && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCancelModal(order.id)}
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/60 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer min-h-[40px] whitespace-nowrap"
+                    >
+                      <XCircle className="w-4 h-4 shrink-0" />
+                      <span>{t.orders_cancel_order || 'Cancelar Pedido'}</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
