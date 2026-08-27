@@ -107,7 +107,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             </span>
           ) : isUnlimited ? (
             <span className="px-2.5 py-1 bg-[#1D1D1B]/85 dark:bg-black/85 backdrop-blur-xs text-amber-300 border border-amber-400/30 text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
-              Stock: {t.prod_unlimited}
+              {t.prod_unlimited}
             </span>
           ) : isLowStock ? (
             <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
@@ -185,7 +185,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
             {isSeller ? (
               <span className="px-2.5 py-1.5 rounded-xl text-xs font-black bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 font-sans">
-                Stock: {isUnlimited ? t.prod_unlimited : `${product.stock ?? 0} uds`}
+                {isUnlimited ? t.prod_unlimited : `Stock: ${product.stock ?? 0} uds`}
               </span>
             ) : (
               <div className="flex items-center gap-1.5">

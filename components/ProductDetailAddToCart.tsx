@@ -53,7 +53,7 @@ export function ProductDetailAddToCart({
             Modo Vendedor: Estás previsualizando la ficha de este producto.
           </p>
           <span className="px-3 py-1 bg-white dark:bg-stone-900 border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-black text-amber-950 dark:text-amber-300 font-sans">
-            {t.prod_stock}: {isUnlimited ? t.prod_unlimited : `${product.stock ?? 0} ${isEvent ? t.event_seats : 'uds'}`}
+            {isUnlimited ? t.prod_unlimited : `${t.prod_stock}: ${product.stock ?? 0} ${isEvent ? t.event_seats : 'uds'}`}
           </span>
         </div>
         <Link
@@ -129,7 +129,7 @@ export function ProductDetailAddToCart({
         <p className="text-xs font-bold text-stone-600 dark:text-stone-300 font-sans">
           {isUnlimited ? (
             <span className="text-emerald-700 dark:text-emerald-400">
-              {t.prod_stock}: <strong className="uppercase">{t.prod_unlimited}</strong>
+              <strong className="uppercase">{t.prod_unlimited}</strong>
             </span>
           ) : product.stock !== null && product.stock <= 5 ? (
             <span className="text-amber-600 dark:text-amber-400">
