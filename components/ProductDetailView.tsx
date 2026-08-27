@@ -8,7 +8,7 @@ import {
   getProductImage,
   getProductDiscount,
   getCleanDescription,
-  formatEventDescription,
+  formatProductDescription,
   getTranslatedFormat,
   getTranslatedOrigin,
 } from '@/lib/productHelpers';
@@ -48,14 +48,7 @@ export function ProductDetailView({
   const discountInfo = getProductDiscount(product);
   const translatedOrigin = getTranslatedOrigin(product.origin_region, language);
   const translatedFormat = getTranslatedFormat(product.format, language);
-  const cleanDescription = isEvent
-    ? formatEventDescription(product.description, {
-        date: t.event_field_date,
-        time: t.event_field_time,
-        seats: t.event_field_seats,
-        itemsToTaste: t.event_field_items_to_taste,
-      })
-    : getCleanDescription(product.description);
+  const cleanDescription = formatProductDescription(product.description, language);
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -63,17 +56,18 @@ export function ProductDetailView({
       <div className="flex items-center justify-between">
         <Link
           href="/tienda"
-          className="inline-flex items-center gap-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white transition-colors p-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-[#1F1E1C] dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-700 shadow-2xs"
+          className="inline-flex items-center gap-2 text-xs font-bold font-serif uppercase tracking-[0.14em] text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white transition-colors p-2.5 rounded-2xl bg-[#FAF8F5] hover:bg-stone-100 dark:bg-[#1C1B19] dark:hover:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-2xs"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 stroke-[1.75]" />
           <span>{t.prod_back_to_selection}</span>
         </Link>
 
         {isSeller && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 text-xs font-bold font-sans">
-            <UserCheck className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] text-stone-700 dark:text-stone-300 text-xs font-bold font-serif uppercase tracking-[0.14em]">
+            <UserCheck className="w-4 h-4 stroke-[1.75]" />
             <span>
-              Última edición por: <strong className="font-black">{product.profiles?.full_name || 'Vendedor EkhiTeka'}</strong>
+              {t.seller_last_modified_by}{' '}
+              <strong className="font-bold">{product.profiles?.full_name || 'EkhiTeka'}</strong>
             </span>
           </div>
         )}
@@ -83,7 +77,7 @@ export function ProductDetailView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Imagen del Producto */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="relative aspect-square w-full rounded-3xl overflow-hidden border-2 border-stone-200 dark:border-stone-800 bg-[#FAF7F2] dark:bg-[#1C1B19] shadow-lg">
+          <div className="relative aspect-square w-full rounded-3xl overflow-hidden border border-[#E8E5DF] dark:border-[#2D2B27] bg-[#FAF7F2] dark:bg-[#1C1B19] shadow-sm">
             <img
               src={imageUrl}
               alt={product.name}
@@ -163,47 +157,49 @@ export function ProductDetailView({
 
           {/* Descripción & Notas de Cata */}
           {cleanDescription && (
-            <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
-              <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-800 dark:text-stone-200">
+            <div className="space-y-3 pt-3 border-t border-[#E8E5DF] dark:border-[#2D2B27]">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] font-serif text-stone-900 dark:text-stone-100">
                 {isEvent ? t.event_details_title : t.prod_details}
               </h3>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans whitespace-pre-line">
-                {cleanDescription}
-              </p>
+              <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27]">
+                <p className="text-xs sm:text-[13px] text-stone-700 dark:text-stone-300 leading-relaxed font-serif whitespace-pre-line">
+                  {cleanDescription}
+                </p>
+              </div>
             </div>
           )}
 
           {/* Caja de Consultas por Chat */}
-          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800 flex items-center justify-between gap-4">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-between gap-4 font-serif">
             <div className="space-y-0.5">
-              <p className="text-xs font-bold font-serif text-stone-900 dark:text-[#F5F5F0]">
+              <p className="text-xs font-bold text-stone-900 dark:text-[#F5F5F0]">
                 {t.prod_doubt_title}
               </p>
-              <p className="text-[11px] text-stone-500 dark:text-stone-400 font-sans">
+              <p className="text-[11px] text-stone-500 dark:text-stone-400">
                 {t.prod_doubt_desc}
               </p>
             </div>
             <Link
               href={`/chat/${product.seller_id || ''}?product_id=${product.id}`}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-black uppercase tracking-wider transition-all font-serif shrink-0 shadow-xs hover:scale-105"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-bold uppercase tracking-[0.14em] transition-all font-serif shrink-0 shadow-2xs hover:scale-[1.01]"
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4 stroke-[1.75]" />
               <span>{t.prod_ask_btn}</span>
             </Link>
           </div>
 
           {/* Garantías */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-600 dark:text-stone-400 font-sans">
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
-              <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-stone-700 dark:text-stone-300 font-serif">
+            <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27]">
+              <Truck className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0" />
               <span>{t.prod_guarantee_cold}</span>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
-              <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+            <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27]">
+              <Store className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0" />
               <span>{t.prod_guarantee_pickup}</span>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-800">
-              <ShieldCheck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+            <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27]">
+              <ShieldCheck className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0" />
               <span>{t.prod_guarantee_km0}</span>
             </div>
           </div>

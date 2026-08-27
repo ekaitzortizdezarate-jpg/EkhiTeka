@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateEventDetails, removeEventParticipant } from '@/app/actions/events';
-import { formatEventDescription, getProductImage } from '@/lib/productHelpers';
+import { formatProductDescription, getProductImage } from '@/lib/productHelpers';
 import {
   Users,
   MapPin,
@@ -49,18 +49,21 @@ export interface EventProduct {
   stock: number;
   origin_region?: string | null;
   image_url?: string | null;
-  category_id?: string;
+  created_at?: string;
   order_items?: AttendeeReservation[];
+  reservations?: AttendeeReservation[];
 }
 
-interface SellerEventsViewProps {
+export interface SellerEventsViewProps {
   events: EventProduct[];
 }
 
-export function SellerEventsView({ events }: SellerEventsViewProps) {
+export function SellerEventsView({ events: initialEvents }: SellerEventsViewProps) {
   const { t, language } = useLanguage();
+  const [events, setEvents] = useState<EventProduct[]>(initialEvents);
   const [editingEvent, setEditingEvent] = useState<EventProduct | null>(null);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'attendees' | 'reminders'>('attendees');
   const [msg, setMsg] = useState<{ text: string; isError: boolean } | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
@@ -138,17 +141,17 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
       <div className="space-y-6">
         {events.length > 0 ? (
           events.map((event) => {
-            const validReservations = (event.order_items || []).filter(
-              (it) => it.orders && it.orders.status !== 'cancelado'
+            const validReservations: AttendeeReservation[] = (event.order_items || event.reservations || []).filter(
+              (it: AttendeeReservation) => it.orders && it.orders.status !== 'cancelado'
             );
 
             const totalPlazasVendidas = validReservations.reduce(
-              (sum, it) => sum + it.quantity,
+              (sum: number, it: AttendeeReservation) => sum + it.quantity,
               0
             );
             const aforoActualRestante = event.stock ?? 0;
             const recaudacionTotal = validReservations.reduce(
-              (sum, it) => sum + Number(it.subtotal || 0),
+              (sum: number, it: AttendeeReservation) => sum + Number(it.subtotal || 0),
               0
             );
 
@@ -178,24 +181,19 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                           {t.seller_events_badge_store}
                         </span>
                         {event.origin_region && (
-                          <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 font-sans">
-                            <MapPin className="w-3 h-3 text-[#C68D07] dark:text-[#FFE259]" /> {event.origin_region}
+                          <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 font-serif">
+                            <MapPin className="w-3 h-3 text-stone-400 stroke-[1.75]" /> {event.origin_region}
                           </span>
                         )}
                       </div>
 
-                      <h2 className="text-xl sm:text-2xl font-black font-serif text-stone-900 dark:text-stone-100">
+                      <h2 className="text-xl sm:text-2xl font-bold font-serif text-stone-900 dark:text-stone-100">
                         {event.name}
                       </h2>
 
                       {event.description && (
-                        <p className="text-xs text-stone-600 dark:text-stone-300 whitespace-pre-line leading-relaxed max-w-2xl font-medium font-sans">
-                          {formatEventDescription(event.description, {
-                            date: t.event_field_date,
-                            time: t.event_field_time,
-                            seats: t.event_field_seats,
-                            itemsToTaste: t.event_field_items_to_taste,
-                          })}
+                        <p className="text-xs text-stone-600 dark:text-stone-300 whitespace-pre-line leading-relaxed max-w-2xl font-serif">
+                          {formatProductDescription(event.description, language)}
                         </p>
                       )}
                     </div>
@@ -206,36 +204,36 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                     <button
                       type="button"
                       onClick={() => setEditingEvent(event)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-black uppercase tracking-wider border border-stone-200 dark:border-stone-700 transition-all cursor-pointer shadow-2xs hover:scale-102"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FAF8F5] dark:bg-[#1C1B19] hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-bold uppercase tracking-[0.14em] border border-[#E8E5DF] dark:border-[#2D2B27] transition-all cursor-pointer shadow-2xs hover:scale-[1.01]"
                     >
-                      <Pencil className="w-3.5 h-3.5" />
+                      <Pencil className="w-3.5 h-3.5 stroke-[1.75]" />
                       <span>{t.seller_events_edit_btn}</span>
                     </button>
 
-                    <div className="grid grid-cols-3 gap-2 text-center font-sans">
-                      <div className="p-2.5 bg-stone-50 dark:bg-[#141312] rounded-xl border border-stone-200 dark:border-stone-800">
-                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block">
+                    <div className="grid grid-cols-3 gap-2 text-center font-serif">
+                      <div className="p-2.5 bg-[#FAF8F5] dark:bg-[#141312] rounded-xl border border-[#E8E5DF] dark:border-[#2D2B27]">
+                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block tracking-wider">
                           {t.seller_events_reserved}
                         </span>
-                        <span className="text-base font-black text-amber-600 dark:text-[#FFE259] font-serif">
+                        <span className="text-base font-bold text-stone-900 dark:text-stone-100 font-serif">
                           {totalPlazasVendidas}
                         </span>
                       </div>
 
-                      <div className="p-2.5 bg-stone-50 dark:bg-[#141312] rounded-xl border border-stone-200 dark:border-stone-800">
-                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block">
+                      <div className="p-2.5 bg-[#FAF8F5] dark:bg-[#141312] rounded-xl border border-[#E8E5DF] dark:border-[#2D2B27]">
+                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block tracking-wider">
                           {t.seller_events_available}
                         </span>
-                        <span className="text-base font-black text-emerald-600 dark:text-emerald-400 font-serif">
+                        <span className="text-base font-bold text-stone-900 dark:text-stone-100 font-serif">
                           {aforoActualRestante}
                         </span>
                       </div>
 
-                      <div className="p-2.5 bg-stone-50 dark:bg-[#141312] rounded-xl border border-stone-200 dark:border-stone-800">
-                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block">
+                      <div className="p-2.5 bg-[#FAF8F5] dark:bg-[#141312] rounded-xl border border-[#E8E5DF] dark:border-[#2D2B27]">
+                        <span className="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase block tracking-wider">
                           {t.seller_events_collected}
                         </span>
-                        <span className="text-base font-black text-stone-900 dark:text-stone-100 font-serif">
+                        <span className="text-base font-bold text-stone-900 dark:text-stone-100 font-serif">
                           {recaudacionTotal.toFixed(2)} €
                         </span>
                       </div>
@@ -244,10 +242,10 @@ export function SellerEventsView({ events }: SellerEventsViewProps) {
                 </div>
 
                 {/* Tabla de Asistentes */}
-                <div className="space-y-3 font-sans">
+                <div className="space-y-3 font-serif">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+                    <h3 className="text-xs font-bold uppercase tracking-[0.14em] font-serif text-stone-700 dark:text-stone-300 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
                       <span>{t.seller_events_attendees_title} ({validReservations.length})</span>
                     </h3>
                     <span className="text-[10px] text-stone-400 dark:text-stone-500 font-medium">

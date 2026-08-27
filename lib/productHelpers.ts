@@ -134,6 +134,122 @@ export function getSeatsSuffix(language: string = 'es', isPlural: boolean = true
   return isPlural ? 'plazas' : 'plaza';
 }
 
+export function formatProductDescription(
+  description?: string | null,
+  language: string = 'es'
+): string {
+  if (!description) return '';
+  const clean = description.replace(/<!-- META:{.*?} -->/g, '').trim();
+  if (!clean) return '';
+
+  const lines = clean.split('\n');
+  const formattedLines = lines.map((line) => {
+    let l = line.trim();
+
+    // Clean emojis for clean Maisons du Monde aesthetic
+    l = l.replace(/^[📦🧀📅🕒📍👥💳🏠✨🎉🍷⭐👉✔]\s*/u, '');
+
+    // 1. Cestas & Packs - Included items header
+    if (/^(Productos incluidos en esta selección|Productos incluidos|Contenido de la cesta|Contenido del lote|Hautaketa honetan sartutako produktuak|Products included in this selection|Produits inclus dans cette sélection)\s*:?/i.test(l)) {
+      if (language === 'eu') return 'Hautaketa honetan sartutako produktuak:';
+      if (language === 'fr') return 'Produits inclus dans cette sélection :';
+      if (language === 'en') return 'Products included in this selection:';
+      return 'Productos incluidos en esta selección:';
+    }
+
+    // 2. Catas en Casa
+    if (/^(Kit de cata en casa|Kit de cata para disfrutar en casa|Etxeko dastaketa kit-a|Home tasting kit|Kit de dégustation à domicile)\s*:?/i.test(l)) {
+      if (language === 'eu') return 'Etxeko dastaketa kit-a:';
+      if (language === 'fr') return 'Kit de dégustation à domicile :';
+      if (language === 'en') return 'Home tasting kit:';
+      return 'Kit de cata en casa:';
+    }
+    if (/^(Incluye guía de cata y maridaje|Guía de cata y maridaje|Dastaketa eta uztarketa gida barne|Includes tasting and pairing guide|Guide de dégustation et accords inclus)\s*:?/i.test(l)) {
+      if (language === 'eu') return 'Dastaketa eta uztarketa gida barne';
+      if (language === 'fr') return 'Guide de dégustation et accords inclus';
+      if (language === 'en') return 'Includes tasting and pairing guide';
+      return 'Incluye guía de cata y maridaje';
+    }
+    if (/^(Personas recomendadas|Comensales recomendados|Gomendatutako lagun kopurua|Recommended people|Nombre de personnes recommandé)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Personas recomendadas|Comensales recomendados|Gomendatutako lagun kopurua|Recommended people|Nombre de personnes recommandé)\s*:\s*/i, '');
+      if (language === 'eu') return `Gomendatutako pertsonak: ${rest}`;
+      if (language === 'fr') return `Nombre de personnes recommandé : ${rest}`;
+      if (language === 'en') return `Recommended people: ${rest}`;
+      return `Personas recomendadas: ${rest}`;
+    }
+
+    // 3. Catas Presenciales / en Tienda
+    if (/^(Fecha|Data|Date)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Fecha|Data|Date)\s*:\s*/i, '');
+      if (language === 'eu') return `Data: ${rest}`;
+      if (language === 'fr') return `Date : ${rest}`;
+      if (language === 'en') return `Date: ${rest}`;
+      return `Fecha: ${rest}`;
+    }
+    if (/^(Hora|Ordua|Time|Heure)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Hora|Ordua|Time|Heure)\s*:\s*/i, '');
+      if (language === 'eu') return `Ordua: ${rest}`;
+      if (language === 'fr') return `Heure : ${rest}`;
+      if (language === 'en') return `Time: ${rest}`;
+      return `Hora: ${rest}`;
+    }
+    if (/^(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i, '');
+      if (language === 'eu') return `Leku libreak: ${rest}`;
+      if (language === 'fr') return `Places disponibles : ${rest}`;
+      if (language === 'en') return `Available seats: ${rest}`;
+      return `Plazas disponibles: ${rest}`;
+    }
+    if (/^(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Dastatuko diren produktuak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Dastatuko diren produktuak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i, '');
+      if (language === 'eu') return `Dastatuko diren produktuak: ${rest}`;
+      if (language === 'fr') return `Produits à déguster : ${rest}`;
+      if (language === 'en') return `Products to taste: ${rest}`;
+      return `Productos a degustar: ${rest}`;
+    }
+    if (/^(Lugar|Ubicación|Tokia|Lekua|Lieu|Location)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Lugar|Ubicación|Tokia|Lekua|Lieu|Location)\s*:\s*/i, '');
+      if (language === 'eu') return `Lekua: ${rest}`;
+      if (language === 'fr') return `Lieu : ${rest}`;
+      if (language === 'en') return `Location: ${rest}`;
+      return `Lugar: ${rest}`;
+    }
+    if (/^(Duración|Iraupena|Duration|Durée)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Duración|Iraupena|Duration|Durée)\s*:\s*/i, '');
+      if (language === 'eu') return `Iraupena: ${rest}`;
+      if (language === 'fr') return `Durée : ${rest}`;
+      if (language === 'en') return `Duration: ${rest}`;
+      return `Duración: ${rest}`;
+    }
+
+    // 4. Tarjeta Regalo
+    if (/^(Saldo|Importe|Importe de la tarjeta|Saldo \/ Importe tarjeta|Txartelaren saldoa|Card balance|Gift card amount|Solde de la carte|Montant)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Saldo|Importe|Importe de la tarjeta|Saldo \/ Importe tarjeta|Txartelaren saldoa|Card balance|Gift card amount|Solde de la carte|Montant)\s*:\s*/i, '');
+      if (language === 'eu') return `Txartelaren saldoa: ${rest}`;
+      if (language === 'fr') return `Solde de la carte : ${rest}`;
+      if (language === 'en') return `Gift card amount: ${rest}`;
+      return `Saldo de la tarjeta: ${rest}`;
+    }
+    if (/^(Validez|Caducidad|Iraungipena|Validity|Validité)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(Validez|Caducidad|Iraungipena|Validity|Validité)\s*:\s*/i, '');
+      if (language === 'eu') return `Baliozkotasuna: ${rest}`;
+      if (language === 'fr') return `Validité : ${rest}`;
+      if (language === 'en') return `Validity: ${rest}`;
+      return `Validez: ${rest}`;
+    }
+    if (/^(Canjeable en tienda física y pedidos online|Canjeable en tienda y online|Dendan eta online erabilgarria|Redeemable in-store and online|Utilisable en boutique et en ligne)/i.test(l)) {
+      if (language === 'eu') return 'Dendan eta online erabilgarria';
+      if (language === 'fr') return 'Utilisable en boutique et en ligne';
+      if (language === 'en') return 'Redeemable in-store and online';
+      return 'Canjeable en tienda física y online';
+    }
+
+    return line;
+  });
+
+  return formattedLines.join('\n');
+}
+
 export function formatEventDescription(
   description?: string | null,
   labels?: {
@@ -144,47 +260,7 @@ export function formatEventDescription(
   }
 ): string {
   if (!description) return '';
-  const clean = description.replace(/<!-- META:{.*?} -->/g, '').trim();
-  if (!labels) return clean;
-
-  const lines = clean.split('\n');
-  const formattedLines = lines.map((line) => {
-    // Match date prefix
-    if (labels.date && /^\s*(Fecha|Data|Date)\s*:\s*/i.test(line)) {
-      return line.replace(/^\s*(Fecha|Data|Date)\s*:\s*/i, `${labels.date} `);
-    }
-    // Match time prefix
-    if (labels.time && /^\s*(Hora|Ordua|Time|Heure)\s*:\s*/i.test(line)) {
-      return line.replace(/^\s*(Hora|Ordua|Time|Heure)\s*:\s*/i, `${labels.time} `);
-    }
-    // Match seats prefix
-    if (
-      labels.seats &&
-      /^\s*(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i.test(
-        line
-      )
-    ) {
-      return line.replace(
-        /^\s*(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i,
-        `${labels.seats} `
-      );
-    }
-    // Match items to taste prefix
-    if (
-      labels.itemsToTaste &&
-      /^\s*(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i.test(
-        line
-      )
-    ) {
-      return line.replace(
-        /^\s*(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i,
-        `${labels.itemsToTaste} `
-      );
-    }
-    return line;
-  });
-
-  return formattedLines.join('\n');
+  return formatProductDescription(description, 'es');
 }
 
 export function getCategoryImage(category?: { id?: string; slug?: string; name_es?: string } | string): string {
