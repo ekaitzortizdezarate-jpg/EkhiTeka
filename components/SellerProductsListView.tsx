@@ -264,12 +264,6 @@ export function SellerProductsListView({
                     </span>
                   </span>
                 )}
-
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#141312] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-800 text-[11px] font-bold">
-                  {product.is_unlimited_stock
-                    ? 'Stock: Ilimitado'
-                    : `Stock: ${product.stock ?? 0} uds`}
-                </span>
               </div>
             </div>
 
@@ -320,12 +314,12 @@ export function SellerProductsListView({
         </div>
 
         {/* Lado Derecho: Precios y Acciones */}
-        <div className="flex flex-row lg:flex-col lg:items-end justify-between items-center gap-4 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-stone-100 dark:border-stone-800 font-serif">
-          <div className="text-left lg:text-right space-y-0.5">
-            <span className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest block">
+        <div className="flex flex-row lg:flex-col lg:items-center justify-between items-center gap-4 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-stone-100 dark:border-stone-800 font-serif">
+          <div className="text-center space-y-0.5">
+            <span className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest block text-center">
               {t.prod_price}
             </span>
-            <div className="flex items-baseline gap-2 lg:justify-end">
+            <div className="flex items-baseline gap-2 justify-center">
               <span className="text-2xl font-black text-stone-900 dark:text-stone-100">
                 {Number(product.price).toFixed(2)} €
               </span>
@@ -336,7 +330,7 @@ export function SellerProductsListView({
               )}
             </div>
             {discountInfo && discountInfo.discountPercent > 0 && (
-              <span className="inline-block text-xs font-black text-emerald-600 dark:text-emerald-400 font-sans">
+              <span className="inline-block text-xs font-black text-emerald-600 dark:text-emerald-400 font-sans text-center">
                 Ahorro del {discountInfo.discountPercent}%
               </span>
             )}
