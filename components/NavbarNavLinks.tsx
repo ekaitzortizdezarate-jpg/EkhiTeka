@@ -83,12 +83,13 @@ export function NavbarNavLinks({
           if (stored) seenMap = JSON.parse(stored);
         } catch {}
 
-        // Para el vendedor: SOLO pedidos en estado 'pendiente' asignados a este vendedor y que no estén en seenMap
+        // Para el vendedor: CUALQUIER pedido de la tienda que sea nuevo o cuyo estado haya cambiado
         const hasNewOrdersForSeller = activeOrders.some((order) => {
-          const isMySale = !order.seller_id || order.seller_id === user.id;
-          if (!isMySale) return false;
-          if (order.status !== 'pendiente') return false;
-          return !seenMap[order.id];
+          const lastSeen = seenMap[order.id];
+          if (!lastSeen) {
+            return true; // Nuevo pedido sin revisar
+          }
+          return lastSeen !== order.status; // Estado actualizado
         });
 
         setHasUnseenOrderUpdates(hasNewOrdersForSeller);

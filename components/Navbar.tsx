@@ -33,27 +33,92 @@ export default async function Navbar() {
     : 'Gamarra Kalea 4, Lekeitio · Bizkaia';
 
   if (user) {
-    const [profileRes, unreadRes, ordersRes] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', user.id).single(),
-      supabase
-        .from('chat_messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('receiver_id', user.id)
-        .eq('is_read', false),
-      supabase
-        .from('orders')
-        .select('id, status, seller_id, buyer_id')
-        .or(`seller_id.eq.${user.id},buyer_id.eq.${user.id}`)
-        .order('updated_at', { ascending: false })
-        .limit(50),
-    ]);
+    const { data: profileRaw } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-    profile = profileRes.data;
-    unreadMessagesCount = unreadRes.count || 0;
-    activeOrders = ordersRes.data || [];
-    ordersCount = activeOrders.filter((o) =>
-      ['pendiente', 'confirmado', 'preparando', 'listo_entrega'].includes(o.status)
-    ).length;
+    profile = profileRaw;
+    const parsedProfile = parseProfile(profileRaw);
+    const isSeller = parsedProfile.role === 'vendedor' || parsedProfile.role === 'admin';
+    const lastReadMap = parsedProfile.last_read_chats || {};
+
+    if (isSeller) {
+      // 1. Para vendedores: todos los pedidos y consultas de la tienda
+      const [ordersRes, allSellersRes, allMsgsRes] = await Promise.all([
+        supabase
+          .from('orders')
+          .select('id, status, seller_id, buyer_id, created_at, updated_at')
+          .order('updated_at', { ascending: false })
+          .limit(50),
+        supabase
+          .from('profiles')
+          .select('id')
+          .in('role', ['vendedor', 'admin']),
+        supabase
+          .from('chat_messages')
+          .select('id, sender_id, receiver_id, created_at')
+          .neq('sender_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(100),
+      ]);
+
+      activeOrders = (ordersRes.data || []) as any;
+      ordersCount = activeOrders.filter((o) =>
+        ['pendiente', 'confirmado', 'preparando', 'listo_entrega'].includes(o.status)
+      ).length;
+
+      const sellerIds = new Set((allSellersRes.data || []).map((s) => s.id));
+      const unreadConvs = new Set<string>();
+
+      (allMsgsRes.data || []).forEach((msg) => {
+        const isSenderSeller = sellerIds.has(msg.sender_id);
+        const buyerId = isSenderSeller ? msg.receiver_id : msg.sender_id;
+        if (!buyerId) return;
+
+        const myLastRead = lastReadMap[buyerId] ? new Date(lastReadMap[buyerId]).getTime() : 0;
+        const msgTime = new Date(msg.created_at).getTime();
+        if (msgTime > myLastRead) {
+          unreadConvs.add(buyerId);
+        }
+      });
+
+      unreadMessagesCount = unreadConvs.size;
+    } else {
+      // 2. Para compradores: solo sus pedidos y mensajes de la tienda
+      const [ordersRes, myMsgsRes] = await Promise.all([
+        supabase
+          .from('orders')
+          .select('id, status, seller_id, buyer_id, created_at, updated_at')
+          .eq('buyer_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(50),
+        supabase
+          .from('chat_messages')
+          .select('id, sender_id, receiver_id, created_at')
+          .eq('receiver_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50),
+      ]);
+
+      activeOrders = (ordersRes.data || []) as any;
+      ordersCount = activeOrders.filter((o) =>
+        ['pendiente', 'confirmado', 'preparando', 'listo_entrega'].includes(o.status)
+      ).length;
+
+      const myLastRead = Object.values(lastReadMap)[0];
+      const lastReadTime = myLastRead ? new Date(myLastRead).getTime() : 0;
+
+      let unreadCount = 0;
+      (myMsgsRes.data || []).forEach((msg) => {
+        if (new Date(msg.created_at).getTime() > lastReadTime) {
+          unreadCount += 1;
+        }
+      });
+
+      unreadMessagesCount = unreadCount;
+    }
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import type { ProfileDetails } from '@/types/database';
 
 export async function sendMessage(formData: FormData) {
   const supabase = await createClient();
@@ -22,6 +23,9 @@ export async function sendMessage(formData: FormData) {
     return { error: 'El mensaje no puede estar vacío' };
   }
 
+  const now = new Date().toISOString();
+
+  // 1. Insertar mensaje en chat_messages
   const { data, error } = await supabase
     .from('chat_messages')
     .insert({
@@ -32,19 +36,49 @@ export async function sendMessage(formData: FormData) {
       message: message.trim(),
       is_read: false,
     })
-    .select()
+    .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
     .single();
 
   if (error) {
     return { error: error.message };
   }
 
+  // 2. Actualizar marca de tiempo de lectura para el emisor (así no se le marca como no leído su propio mensaje)
+  const { data: profileRaw } = await supabase
+    .from('profiles')
+    .select('bio')
+    .eq('id', user.id)
+    .single();
+
+  let details: Partial<ProfileDetails> = {};
+  if (profileRaw?.bio) {
+    try {
+      const parsed = JSON.parse(profileRaw.bio);
+      if (typeof parsed === 'object' && parsed !== null) {
+        details = parsed;
+      }
+    } catch {}
+  }
+
+  const lastReadChats = { ...(details.last_read_chats || {}), [receiverId]: now };
+  await supabase
+    .from('profiles')
+    .update({
+      bio: JSON.stringify({
+        ...details,
+        last_read_chats: lastReadChats,
+      }),
+      updated_at: now,
+    })
+    .eq('id', user.id);
+
   revalidatePath(`/chat/${receiverId}`);
+  revalidatePath(`/chat/${user.id}`);
   revalidatePath('/chat');
   return { success: true, message: data };
 }
 
-export async function markChatAsRead(senderId: string) {
+export async function markChatAsRead(conversationUserId: string) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -52,13 +86,46 @@ export async function markChatAsRead(senderId: string) {
 
   if (!user) return { success: false };
 
+  const now = new Date().toISOString();
+
+  // 1. Actualizar last_read_chats del usuario actual en profiles.bio
+  const { data: profileRaw } = await supabase
+    .from('profiles')
+    .select('bio')
+    .eq('id', user.id)
+    .single();
+
+  let details: Partial<ProfileDetails> = {};
+  if (profileRaw?.bio) {
+    try {
+      const parsed = JSON.parse(profileRaw.bio);
+      if (typeof parsed === 'object' && parsed !== null) {
+        details = parsed;
+      }
+    } catch {}
+  }
+
+  const lastReadChats = { ...(details.last_read_chats || {}), [conversationUserId]: now };
+  await supabase
+    .from('profiles')
+    .update({
+      bio: JSON.stringify({
+        ...details,
+        last_read_chats: lastReadChats,
+      }),
+      updated_at: now,
+    })
+    .eq('id', user.id);
+
+  // 2. Marcar en la BD los mensajes dirigidos a este usuario como leídos
   await supabase
     .from('chat_messages')
     .update({ is_read: true })
-    .eq('sender_id', senderId)
+    .eq('sender_id', conversationUserId)
     .eq('receiver_id', user.id)
     .eq('is_read', false);
 
   revalidatePath('/chat');
+  revalidatePath(`/chat/${conversationUserId}`);
   return { success: true };
 }

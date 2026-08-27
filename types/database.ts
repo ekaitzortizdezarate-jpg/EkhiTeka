@@ -118,6 +118,8 @@ export interface ProfileDetails {
   cart_data?: any[];
   site_images?: Record<string, string>;
   site_images_meta?: Record<string, SiteImageMeta>;
+  last_read_chats?: Record<string, string>;
+  last_read_orders?: Record<string, string>;
 }
 
 export interface Profile extends ProfileDetails {
@@ -140,25 +142,31 @@ export function parseProfile(raw?: any): Profile {
       id: '',
       role: 'comprador',
       full_name: '',
+      email: '',
+      phone: '',
+      province: '',
+      town: '',
+      postal_code: '',
+      street: '',
+      number: '',
+      stair: '',
+      floor: '',
+      door: '',
       first_name: '',
       last_name_1: '',
       last_name_2: '',
       birth_date: '',
       dni: '',
-      phone: '',
-      province: 'Bizkaia',
-      town: 'Lekeitio',
-      postal_code: '48280',
-      street: 'Gamarra Kalea',
-      number: '4',
-      stair: '',
-      floor: '',
-      door: '',
-      whatsapp_phone: '34600000000',
+      whatsapp_phone: null,
       whatsapp_contacts: [],
       pickup_addresses: [],
       event_addresses: [],
       delivery_addresses: [],
+      cart_data: [],
+      site_images: {},
+      site_images_meta: {},
+      last_read_chats: {},
+      last_read_orders: {},
     };
   }
 
@@ -170,12 +178,19 @@ export function parseProfile(raw?: any): Profile {
         details = parsed;
       }
     } catch {
-      // bio text fallback
+      // Ignorar error al parsear JSON
     }
   }
 
   return {
-    ...raw,
+    id: raw.id || '',
+    role: raw.role || 'comprador',
+    full_name: raw.full_name || [raw.first_name || details.first_name, raw.last_name_1 || details.last_name_1, raw.last_name_2 || details.last_name_2].filter(Boolean).join(' ') || '',
+    email: raw.email || '',
+    avatar_url: raw.avatar_url || '',
+    bio: raw.bio || '',
+    created_at: raw.created_at || '',
+    updated_at: raw.updated_at || '',
     first_name: details.first_name || raw.first_name || raw.full_name?.split(' ')[0] || '',
     last_name_1: details.last_name_1 || raw.last_name_1 || raw.full_name?.split(' ')[1] || '',
     last_name_2: details.last_name_2 || raw.last_name_2 || raw.full_name?.split(' ').slice(2).join(' ') || '',
@@ -198,6 +213,8 @@ export function parseProfile(raw?: any): Profile {
     cart_data: details.cart_data || [],
     site_images: details.site_images || {},
     site_images_meta: details.site_images_meta || {},
+    last_read_chats: details.last_read_chats || {},
+    last_read_orders: details.last_read_orders || {},
   };
 }
 

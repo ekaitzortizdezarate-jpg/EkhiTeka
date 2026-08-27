@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import { ChatConversationView } from '@/components/ChatConversationView';
-import type { ChatMessage, Profile, Product, Order } from '@/types/database';
+import { markChatAsRead } from '@/app/actions/chat';
+import { type ChatMessage, type Profile, type Product, type Order, parseProfile } from '@/types/database';
 
 interface ChatRoomPageProps {
   params: Promise<{ receiverId: string }>;
@@ -19,33 +20,63 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
 
   if (!user) redirect('/login');
 
-  // Obtener perfil del destinatario
-  const { data: recipientProfile } = await supabase
+  // 1. Obtener mi perfil y todos los perfiles de vendedores
+  const [myProfileRes, allSellersRes] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase.from('profiles').select('*').in('role', ['vendedor', 'admin']),
+  ]);
+
+  const currentProfile = parseProfile(myProfileRes.data);
+  const isSeller = currentProfile.role === 'vendedor' || currentProfile.role === 'admin';
+  const allSellers = allSellersRes.data || [];
+  const sellerIds = new Set(allSellers.map((s) => s.id));
+
+  // Mapa de vendedores para mostrar nombres a otros vendedores
+  const sellerMap: Record<string, { full_name: string; avatar_url?: string }> = {};
+  allSellers.forEach((s) => {
+    sellerMap[s.id] = {
+      full_name: s.full_name || 'Vendedor EkhiTeka',
+      avatar_url: s.avatar_url,
+    };
+  });
+
+  // 2. Obtener perfil del destinatario
+  let recipientProfile: Profile | null = null;
+  const { data: recipientRaw } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', receiverId)
     .single();
 
-  if (!recipientProfile) {
-    notFound();
+  if (recipientRaw) {
+    recipientProfile = parseProfile(recipientRaw);
   }
 
-  // Marcar como leídos los mensajes de esta conversación
-  await supabase
-    .from('chat_messages')
-    .update({ is_read: true })
-    .eq('sender_id', receiverId)
-    .eq('receiver_id', user.id)
-    .eq('is_read', false);
+  // 3. Marcar como leído en la BD y en profile.bio
+  await markChatAsRead(receiverId);
 
-  // Obtener mensajes de la conversación
-  const { data: messagesData } = await supabase
-    .from('chat_messages')
-    .select('*')
-    .or(
-      `and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id})`
-    )
-    .order('created_at', { ascending: true });
+  // 4. Obtener mensajes según el rol
+  let messagesData: ChatMessage[] = [];
+
+  if (isSeller) {
+    // Si soy vendedor, ver todos los mensajes entre este cliente (receiverId) y CUALQUIER vendedor de la tienda
+    const { data: rawMsgs } = await supabase
+      .from('chat_messages')
+      .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
+      .or(`sender_id.eq.${receiverId},receiver_id.eq.${receiverId}`)
+      .order('created_at', { ascending: true });
+
+    messagesData = (rawMsgs || []) as ChatMessage[];
+  } else {
+    // Si soy comprador, ver todos los mensajes de mi conversación con la tienda
+    const { data: rawMsgs } = await supabase
+      .from('chat_messages')
+      .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .order('created_at', { ascending: true });
+
+    messagesData = (rawMsgs || []) as ChatMessage[];
+  }
 
   // Contexto opcional: Producto
   let contextProduct: Product | null = null;
@@ -65,8 +96,10 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
     <ChatConversationView
       currentUserId={user.id}
       receiverId={receiverId}
-      recipient={recipientProfile as Profile}
-      initialMessages={(messagesData || []) as ChatMessage[]}
+      recipient={recipientProfile}
+      isSellerViewer={isSeller}
+      sellerMap={sellerMap}
+      initialMessages={messagesData}
       contextProduct={contextProduct}
       contextOrder={contextOrder}
     />

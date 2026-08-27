@@ -11,10 +11,20 @@ export default async function SellerOrdersPage() {
 
   if (!user) redirect('/login');
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
+    redirect('/');
+  }
+
+  // Todos los vendedores ven todos los pedidos de la tienda
   const { data: orders } = await supabase
     .from('orders')
     .select('*, profiles!orders_buyer_id_fkey(id, full_name, phone, town, email), order_items(*, products(*))')
-    .eq('seller_id', user.id)
     .order('created_at', { ascending: false });
 
   return <SellerOrdersView orders={(orders || []) as unknown as Order[]} />;

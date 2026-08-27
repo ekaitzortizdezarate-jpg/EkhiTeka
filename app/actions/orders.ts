@@ -157,12 +157,29 @@ export async function createOrder(payload: CreateOrderPayload) {
     }
   }
 
+  // 5. Enviar mensaje de confirmación automático en el chat con la tienda
+  if (order.buyer_id) {
+    const shortId = order.id.slice(0, 8).toUpperCase();
+    const text = `🎉 ¡Gracias por tu pedido #${shortId}! Hemos recibido tu solicitud por un total de ${totalPrice.toFixed(2)} € y la estamos procesando.`;
+
+    try {
+      await supabase.from('chat_messages').insert({
+        sender_id: sellerId || user.id,
+        receiver_id: user.id,
+        order_id: order.id,
+        message: text,
+        is_read: false,
+      });
+    } catch {}
+  }
+
   revalidatePath('/');
   revalidatePath('/tienda');
   revalidatePath('/experiencias');
   revalidatePath('/regalos-gourmet');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
+  revalidatePath('/chat');
   return { success: true, orderId: order.id };
 }
 
@@ -202,6 +219,13 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     }
   }
 
+  // Obtener info del pedido para notificar al comprador
+  const { data: order } = await supabase
+    .from('orders')
+    .select('id, buyer_id, seller_id, status')
+    .eq('id', orderId)
+    .single();
+
   const { error } = await supabase
     .from('orders')
     .update({
@@ -214,8 +238,37 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     return { error: error.message };
   }
 
+  // Notificar al comprador mediante mensaje de chat del sistema
+  if (order?.buyer_id) {
+    const statusLabels: Record<string, string> = {
+      pendiente: 'Pendiente',
+      confirmado: 'Confirmado',
+      preparando: 'En preparación',
+      listo_entrega: 'Listo para entrega / recogida',
+      entregado: 'Entregado / Completado',
+      cancelado: 'Cancelado',
+    };
+    const statusName = statusLabels[status] || status;
+    const shortId = order.id.slice(0, 8).toUpperCase();
+    const text = `📦 Actualización de tu pedido #${shortId}: El estado ha cambiado a "${statusName}".`;
+
+    try {
+      await supabase.from('chat_messages').insert({
+        sender_id: user.id,
+        receiver_id: order.buyer_id,
+        order_id: order.id,
+        message: text,
+        is_read: false,
+      });
+    } catch {}
+  }
+
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
+  revalidatePath('/chat');
+  if (order?.buyer_id) {
+    revalidatePath(`/chat/${order.buyer_id}`);
+  }
   revalidatePath('/');
   revalidatePath('/tienda');
   return { success: true };
