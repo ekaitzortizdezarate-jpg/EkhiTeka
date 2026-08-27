@@ -23,9 +23,13 @@ export default async function Navbar() {
     .maybeSingle();
 
   const sellerProfile = parseProfile(sellerRaw);
-  const activeAddr = sellerProfile.pickup_addresses?.find((a) => a.is_active) || sellerProfile.pickup_addresses?.[0];
-  const storeAddress = activeAddr
-    ? `${activeAddr.street}${activeAddr.number ? ` ${activeAddr.number}` : ''}, ${activeAddr.town} · ${activeAddr.province}`
+  const mainStoreAddr =
+    sellerProfile.pickup_addresses?.find((a) => a.is_main) ||
+    sellerProfile.pickup_addresses?.find((a) => a.is_active) ||
+    sellerProfile.pickup_addresses?.[0];
+
+  const storeAddress = mainStoreAddr
+    ? `${mainStoreAddr.street}${mainStoreAddr.number ? ` ${mainStoreAddr.number}` : ''}, ${mainStoreAddr.town} · ${mainStoreAddr.province}`
     : 'Gamarra Kalea 4, Lekeitio · Bizkaia';
 
   if (user) {
@@ -62,6 +66,7 @@ export default async function Navbar() {
           unreadMessagesCount={unreadMessagesCount}
           ordersCount={ordersCount}
           activeOrders={activeOrders}
+          storeAddress={storeAddress}
         />
       </div>
 

@@ -24,6 +24,7 @@ interface NavbarNavLinksProps {
   unreadMessagesCount: number;
   ordersCount: number;
   activeOrders?: { id: string; status: string; seller_id?: string; buyer_id?: string }[];
+  storeAddress?: string;
 }
 
 export function NavbarNavLinks({
@@ -32,6 +33,7 @@ export function NavbarNavLinks({
   unreadMessagesCount,
   ordersCount,
   activeOrders = [],
+  storeAddress = 'Gamarra Kalea 4, Lekeitio · Bizkaia',
 }: NavbarNavLinksProps) {
   const pathname = usePathname();
   const { t, language } = useLanguage();
@@ -157,8 +159,8 @@ export function NavbarNavLinks({
             <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
               Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
             </span>
-            <span className="hidden xl:block text-[9.5px] font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 -mt-0.5 truncate">
-              {t.header_subtitle}
+            <span className="hidden xl:block text-[9.5px] font-sans font-medium text-stone-500 dark:text-stone-400 -mt-0.5 truncate max-w-[240px]" title={storeAddress}>
+              {storeAddress}
             </span>
           </div>
         </Link>
@@ -537,7 +539,7 @@ export function NavbarNavLinks({
               <p className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider text-[11px]">
                 {t.header_subtitle}
               </p>
-              <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
+              <p>{storeAddress}</p>
               <p className="font-semibold text-[#C68D07] dark:text-[#FFE259]">WhatsApp: +34 600 000 000</p>
             </div>
           </div>

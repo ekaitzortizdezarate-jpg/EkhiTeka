@@ -39,6 +39,7 @@ export interface StoreAddress {
   province: string;
   schedule?: string;
   is_active: boolean;
+  is_main?: boolean;
 }
 
 export interface EventAddress {

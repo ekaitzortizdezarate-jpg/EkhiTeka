@@ -25,6 +25,7 @@ import {
   X,
   ArrowLeft,
   Truck,
+  Star,
 } from 'lucide-react';
 
 interface SellerOption {
@@ -41,7 +42,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormProps) {
   const raw = profile || userProfile || ({} as Profile);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [currentProfile, setCurrentProfile] = useState<Profile>(parseProfile(raw));
   const isSeller = currentProfile.role === 'vendedor' || currentProfile.role === 'admin';
@@ -62,9 +63,33 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
   const [modalDeliveryAddr, setModalDeliveryAddr] = useState<{ open: boolean; addr: DeliveryAddress | null }>({ open: false, addr: null });
   const [loadingDeliveryAddr, setLoadingDeliveryAddr] = useState(false);
 
+  // Helper to ensure exactly one main store address if pickupAddresses is not empty
+  const ensureOneMainPickup = (list: StoreAddress[]): StoreAddress[] => {
+    if (list.length === 0) return list;
+    if (list.length === 1) {
+      return [{ ...list[0], is_main: true }];
+    }
+    const hasMain = list.some((a) => a.is_main);
+    if (!hasMain) {
+      const activeIdx = list.findIndex((a) => a.is_active);
+      const targetIdx = activeIdx >= 0 ? activeIdx : 0;
+      return list.map((a, idx) => ({ ...a, is_main: idx === targetIdx }));
+    }
+    let foundMain = false;
+    return list.map((a) => {
+      if (a.is_main && !foundMain) {
+        foundMain = true;
+        return a;
+      }
+      return { ...a, is_main: false };
+    });
+  };
+
   // Sección Tienda
   const [whatsappContacts, setWhatsappContacts] = useState<WhatsAppContact[]>(currentProfile.whatsapp_contacts || []);
-  const [pickupAddresses, setPickupAddresses] = useState<StoreAddress[]>(currentProfile.pickup_addresses || []);
+  const [pickupAddresses, setPickupAddresses] = useState<StoreAddress[]>(() =>
+    ensureOneMainPickup(currentProfile.pickup_addresses || [])
+  );
   const [eventAddresses, setEventAddresses] = useState<EventAddress[]>(currentProfile.event_addresses || []);
   const [loadingStore, setLoadingStore] = useState(false);
   const [storeMsg, setStoreMsg] = useState<{ text: string; isError: boolean } | null>(null);
@@ -174,11 +199,22 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     await syncStoreConfig(updated, pickupAddresses, eventAddresses);
   };
 
-  // --- Handlers Puntos de Entrega (Múltiples activos permitidos) ---
+  // --- Handlers Puntos de Entrega (Tienda Principal + Múltiples activos) ---
+  const handleSetMainPickup = async (addrId: string) => {
+    const updated = pickupAddresses.map((a) => ({
+      ...a,
+      is_main: a.id === addrId,
+      is_active: a.id === addrId ? true : a.is_active, // asegurarse de que la tienda principal esté activa
+    }));
+    setPickupAddresses(updated);
+    await syncStoreConfig(whatsappContacts, updated, eventAddresses);
+  };
+
   const handleToggleActivePickup = async (addrId: string) => {
-    const updated = pickupAddresses.map((a) =>
+    let updated = pickupAddresses.map((a) =>
       a.id === addrId ? { ...a, is_active: !a.is_active } : a
     );
+    updated = ensureOneMainPickup(updated);
     setPickupAddresses(updated);
     await syncStoreConfig(whatsappContacts, updated, eventAddresses);
   };
@@ -186,6 +222,8 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
   const handleSaveStoreAddr = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    const isMainChecked = fd.get('is_main') === 'on';
+
     const addrData: StoreAddress = {
       id: modalStoreAddr.addr?.id || 'pickup_' + Date.now(),
       title: fd.get('title') as string,
@@ -199,6 +237,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
       province: fd.get('province') as string,
       schedule: fd.get('schedule') as string,
       is_active: modalStoreAddr.addr ? modalStoreAddr.addr.is_active : true,
+      is_main: isMainChecked || (modalStoreAddr.addr ? !!modalStoreAddr.addr.is_main : pickupAddresses.length === 0),
     };
 
     let updated: StoreAddress[];
@@ -207,6 +246,15 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     } else {
       updated = [...pickupAddresses, addrData];
     }
+
+    if (isMainChecked) {
+      updated = updated.map((a) => ({
+        ...a,
+        is_main: a.id === addrData.id,
+      }));
+    }
+
+    updated = ensureOneMainPickup(updated);
     setPickupAddresses(updated);
     setModalStoreAddr({ open: false, addr: null });
     await syncStoreConfig(whatsappContacts, updated, eventAddresses);
@@ -214,7 +262,8 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
   const handleDeletePickup = async (addrId: string) => {
     if (!confirm(t.store_pickup_confirm_delete)) return;
-    const updated = pickupAddresses.filter((a) => a.id !== addrId);
+    let updated = pickupAddresses.filter((a) => a.id !== addrId);
+    updated = ensureOneMainPickup(updated);
     setPickupAddresses(updated);
     await syncStoreConfig(whatsappContacts, updated, eventAddresses);
   };
@@ -1153,16 +1202,37 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 <div
                   key={a.id}
                   className={`p-4 rounded-2xl border-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
-                    a.is_active
-                      ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700 shadow-xs'
-                      : 'bg-stone-50 dark:bg-[#1F1E1C] border-stone-200 dark:border-stone-800'
+                    a.is_main
+                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-400 dark:border-amber-600 shadow-sm ring-1 ring-amber-400/40'
+                      : a.is_active
+                      ? 'bg-stone-50/70 dark:bg-stone-850/60 border-stone-200 dark:border-stone-700 shadow-xs'
+                      : 'bg-stone-50/40 dark:bg-[#1F1E1C] border-stone-200 dark:border-stone-800 opacity-75'
                   }`}
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-black text-sm text-stone-900 dark:text-stone-100">{a.title}</span>
+
+                      {/* Badge Tienda Principal con Estrella */}
+                      {a.is_main ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[10px] uppercase tracking-wider font-serif border border-amber-400 dark:border-amber-300 shadow-2xs">
+                          <Star className="w-3 h-3 fill-[#1D1D1B] text-[#1D1D1B]" />
+                          <span>{language === 'eu' ? 'Denda Nagusia' : 'Tienda Principal'}</span>
+                        </span>
+                      ) : pickupAddresses.length > 1 ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSetMainPickup(a.id)}
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-600 hover:text-[#1D1D1B] dark:text-stone-300 dark:hover:text-[#1D1D1B] font-bold text-[9.5px] uppercase tracking-wider transition-all cursor-pointer border border-stone-200 dark:border-stone-700"
+                          title={language === 'eu' ? 'Ezarri denda nagusi gisa' : 'Marcar como tienda principal'}
+                        >
+                          <Star className="w-3 h-3" />
+                          <span>{language === 'eu' ? 'Nagusia Ezarri' : 'Hacer Principal'}</span>
+                        </button>
+                      ) : null}
+
                       {a.is_active ? (
-                        <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase tracking-wider">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-black text-[9px] uppercase tracking-wider border border-emerald-300 dark:border-emerald-700">
                           {t.store_wa_badge_active}
                         </span>
                       ) : (
@@ -1171,6 +1241,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                         </span>
                       )}
                     </div>
+
                     <p className="text-xs text-stone-600 dark:text-stone-300">
                       {a.street} {a.number ? `Nº ${a.number}` : ''} {a.stair ? `Esc ${a.stair}` : ''} {a.floor ? `Piso ${a.floor}` : ''} {a.door ? `Pta ${a.door}` : ''}, {a.postal_code || ''} {a.town} ({a.province})
                     </p>
@@ -1181,7 +1252,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 font-serif">
+                  <div className="flex items-center gap-2 shrink-0 font-serif self-end sm:self-auto">
                     <button
                       type="button"
                       onClick={() => handleToggleActivePickup(a.id)}
@@ -1603,6 +1674,20 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   placeholder="Ej: Lun-Vie: 10:00 - 14:30 | 17:00 - 20:30"
                   className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
                 />
+              </div>
+
+              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 font-serif">
+                <input
+                  type="checkbox"
+                  id="store_is_main"
+                  name="is_main"
+                  defaultChecked={modalStoreAddr.addr ? !!modalStoreAddr.addr.is_main : pickupAddresses.length === 0}
+                  className="w-4 h-4 rounded border-stone-300 accent-[#FFE259] cursor-pointer"
+                />
+                <label htmlFor="store_is_main" className="text-xs font-black text-stone-900 dark:text-stone-100 flex items-center gap-1.5 cursor-pointer">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                  <span>{language === 'eu' ? 'Denda Nagusi gisa ezarri' : 'Marcar como Tienda Principal'}</span>
+                </label>
               </div>
 
               <div className="pt-3 border-t border-stone-200 dark:border-stone-800 flex items-center justify-end gap-2 font-serif">
