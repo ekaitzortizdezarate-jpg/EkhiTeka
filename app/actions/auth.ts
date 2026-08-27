@@ -116,7 +116,18 @@ export async function updateProfile(formData: FormData) {
     .filter(Boolean)
     .join(', ');
 
+  let existingDetails: Partial<ProfileDetails> = {};
+  if (currentProfileRaw?.bio) {
+    try {
+      const parsed = JSON.parse(currentProfileRaw.bio);
+      if (typeof parsed === 'object' && parsed !== null) {
+        existingDetails = parsed;
+      }
+    } catch {}
+  }
+
   const profileData: ProfileDetails = {
+    ...existingDetails,
     first_name: firstName,
     last_name_1: lastName1,
     last_name_2: lastName2,
@@ -137,6 +148,8 @@ export async function updateProfile(formData: FormData) {
     event_addresses: currentParsed.event_addresses,
     delivery_addresses: currentParsed.delivery_addresses,
     cart_data: currentParsed.cart_data,
+    site_images: currentParsed.site_images || (existingDetails as any).site_images || {},
+    site_images_meta: currentParsed.site_images_meta || (existingDetails as any).site_images_meta || {},
   };
 
   const structuredBio = JSON.stringify(profileData);
@@ -208,8 +221,19 @@ export async function updateStoreConfig(formData: FormData) {
 
   if (allSellers) {
     for (const seller of allSellers) {
+      let existingBio: Partial<ProfileDetails> = {};
+      if (seller.bio) {
+        try {
+          const parsed = JSON.parse(seller.bio);
+          if (typeof parsed === 'object' && parsed !== null) {
+            existingBio = parsed;
+          }
+        } catch {}
+      }
+
       const sellerParsed = parseProfile(seller);
       const updatedDetails: ProfileDetails = {
+        ...existingBio,
         first_name: sellerParsed.first_name,
         last_name_1: sellerParsed.last_name_1,
         last_name_2: sellerParsed.last_name_2,
@@ -228,6 +252,10 @@ export async function updateStoreConfig(formData: FormData) {
         whatsapp_contacts: whatsappContacts,
         pickup_addresses: pickupAddresses,
         event_addresses: eventAddresses,
+        delivery_addresses: sellerParsed.delivery_addresses || existingBio.delivery_addresses || [],
+        cart_data: sellerParsed.cart_data || existingBio.cart_data || [],
+        site_images: sellerParsed.site_images || (existingBio as any).site_images || {},
+        site_images_meta: sellerParsed.site_images_meta || (existingBio as any).site_images_meta || {},
       };
 
       await supabase
@@ -309,7 +337,18 @@ export async function updateDeliveryAddresses(deliveryAddresses: DeliveryAddress
 
   const currentParsed = parseProfile(currentProfileRaw);
 
+  let existingDetails: Partial<ProfileDetails> = {};
+  if (currentProfileRaw?.bio) {
+    try {
+      const parsed = JSON.parse(currentProfileRaw.bio);
+      if (typeof parsed === 'object' && parsed !== null) {
+        existingDetails = parsed;
+      }
+    } catch {}
+  }
+
   const profileData: ProfileDetails = {
+    ...existingDetails,
     first_name: currentParsed.first_name,
     last_name_1: currentParsed.last_name_1,
     last_name_2: currentParsed.last_name_2,
@@ -329,6 +368,9 @@ export async function updateDeliveryAddresses(deliveryAddresses: DeliveryAddress
     pickup_addresses: currentParsed.pickup_addresses,
     event_addresses: currentParsed.event_addresses,
     delivery_addresses: deliveryAddresses,
+    cart_data: currentParsed.cart_data || (existingDetails as any).cart_data || [],
+    site_images: currentParsed.site_images || (existingDetails as any).site_images || {},
+    site_images_meta: currentParsed.site_images_meta || (existingDetails as any).site_images_meta || {},
   };
 
   const structuredBio = JSON.stringify(profileData);

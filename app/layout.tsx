@@ -56,7 +56,8 @@ export default async function RootLayout({
   const { data: sellerRaw } = await supabase
     .from('profiles')
     .select('*')
-    .eq('role', 'vendedor')
+    .in('role', ['vendedor', 'admin'])
+    .order('updated_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 

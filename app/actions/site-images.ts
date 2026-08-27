@@ -45,7 +45,10 @@ export async function updateSiteImage(formData: FormData) {
     try {
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(fileName, imageFile, { upsert: true });
+        .upload(fileName, imageFile, {
+          upsert: true,
+          contentType: imageFile.type || 'image/jpeg',
+        });
 
       if (!uploadError && uploadData) {
         const { data: publicUrlData } = supabase.storage
@@ -89,9 +92,18 @@ export async function updateSiteImage(formData: FormData) {
 
   if (allSellers && allSellers.length > 0) {
     for (const seller of allSellers) {
-      const parsed = parseProfile(seller);
-      const currentImages = (parsed as any).site_images || {};
-      const currentMeta = (parsed as any).site_images_meta || {};
+      let details: Partial<ProfileDetails> = {};
+      if (seller.bio) {
+        try {
+          const parsed = JSON.parse(seller.bio);
+          if (typeof parsed === 'object' && parsed !== null) {
+            details = parsed;
+          }
+        } catch {}
+      }
+
+      const currentImages = details.site_images || {};
+      const currentMeta = details.site_images_meta || {};
       const updatedImages = { ...currentImages };
       const updatedMeta = { ...currentMeta };
 
@@ -105,13 +117,6 @@ export async function updateSiteImage(formData: FormData) {
           author_id: user.id,
           updated_at: modifiedAt,
         };
-      }
-
-      let details: Partial<ProfileDetails> = {};
-      if (seller.bio) {
-        try {
-          details = JSON.parse(seller.bio);
-        } catch {}
       }
 
       const updatedBio = JSON.stringify({
