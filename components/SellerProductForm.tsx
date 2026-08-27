@@ -113,7 +113,10 @@ export function SellerProductForm({
     return initialMeta?.category || initialProduct?.category_id || allCategories[0]?.id || 'queso';
   });
 
+  const isProductoUnico = selectedCategoryId === 'producto_unico';
+
   const isBeverageCategory = useMemo(() => {
+    if (isProductoUnico) return false;
     const catId = (selectedCategoryId || '').toLowerCase();
     const catObj = allCategories.find((c) => c.id === selectedCategoryId);
     const catNameEs = (catObj?.name_es || '').toLowerCase();
@@ -136,7 +139,7 @@ export function SellerProductForm({
       catNameEu.includes('sagardo') ||
       catNameEu.includes('txakoli')
     );
-  }, [selectedCategoryId, allCategories]);
+  }, [selectedCategoryId, allCategories, isProductoUnico]);
 
   const [weightUnit, setWeightUnit] = useState<string>(() => {
     if (initialMeta?.unit) return initialMeta.unit;
@@ -145,6 +148,9 @@ export function SellerProductForm({
   });
 
   useEffect(() => {
+    if (isProductoUnico) {
+      return;
+    }
     if (isBeverageCategory) {
       if (weightUnit === 'g' || weightUnit === 'kg') {
         setWeightUnit('L');
@@ -154,7 +160,7 @@ export function SellerProductForm({
         setWeightUnit('g');
       }
     }
-  }, [isBeverageCategory]);
+  }, [isBeverageCategory, isProductoUnico]);
 
   const initialOriginParts = useMemo(() => {
     const raw = initialProduct?.origin_region || '';
@@ -815,18 +821,30 @@ export function SellerProductForm({
       )}
 
       <div className="space-y-2">
-        <label className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
-          {t.seller_step1_label}
-        </label>
+        <div className="flex flex-wrap items-center justify-between gap-1">
+          <label className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
+            {t.seller_step1_label}
+          </label>
+          {isEditing && (
+            <span className="text-[10.5px] font-medium text-amber-700 dark:text-amber-300 font-sans">
+              {language === 'eu'
+                ? 'Ezin da aldatu artikulu mota jada sortutako produktuetan'
+                : 'El tipo de artículo no se puede modificar una vez creado'}
+            </span>
+          )}
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 font-sans">
           {/* 1. Producto Suelto */}
           <button
             type="button"
-            onClick={() => setPublishingType('producto_suelto')}
-            className={`p-3.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+            disabled={isEditing && publishingType !== 'producto_suelto'}
+            onClick={() => !isEditing && setPublishingType('producto_suelto')}
+            className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
               publishingType === 'producto_suelto'
                 ? 'border-[#FFE259] bg-[#FFE259]/15 text-[#1D1D1B] dark:text-white font-bold shadow-xs'
-                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+                : isEditing
+                ? 'border-stone-200 dark:border-stone-800 bg-stone-100/60 dark:bg-[#141312] text-stone-400 dark:text-stone-600 opacity-40 cursor-not-allowed'
+                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400 cursor-pointer'
             }`}
           >
             <Package className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
@@ -836,11 +854,14 @@ export function SellerProductForm({
           {/* 2. Cesta / Lote */}
           <button
             type="button"
-            onClick={() => setPublishingType('cesta_gourmet')}
-            className={`p-3.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+            disabled={isEditing && publishingType !== 'cesta_gourmet'}
+            onClick={() => !isEditing && setPublishingType('cesta_gourmet')}
+            className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
               publishingType === 'cesta_gourmet'
                 ? 'border-[#FFE259] bg-[#FFE259]/15 text-[#1D1D1B] dark:text-white font-bold shadow-xs'
-                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+                : isEditing
+                ? 'border-stone-200 dark:border-stone-800 bg-stone-100/60 dark:bg-[#141312] text-stone-400 dark:text-stone-600 opacity-40 cursor-not-allowed'
+                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400 cursor-pointer'
             }`}
           >
             <Gift className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
@@ -852,11 +873,14 @@ export function SellerProductForm({
           {/* 3. Cata en Casa */}
           <button
             type="button"
-            onClick={() => setPublishingType('cata_casa')}
-            className={`p-3.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+            disabled={isEditing && publishingType !== 'cata_casa'}
+            onClick={() => !isEditing && setPublishingType('cata_casa')}
+            className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
               publishingType === 'cata_casa'
                 ? 'border-[#FFE259] bg-[#FFE259]/15 text-[#1D1D1B] dark:text-white font-bold shadow-xs'
-                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+                : isEditing
+                ? 'border-stone-200 dark:border-stone-800 bg-stone-100/60 dark:bg-[#141312] text-stone-400 dark:text-stone-600 opacity-40 cursor-not-allowed'
+                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400 cursor-pointer'
             }`}
           >
             <Home className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
@@ -866,11 +890,14 @@ export function SellerProductForm({
           {/* 4. Tarjeta Regalo */}
           <button
             type="button"
-            onClick={() => setPublishingType('tarjeta_regalo')}
-            className={`p-3.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+            disabled={isEditing && publishingType !== 'tarjeta_regalo'}
+            onClick={() => !isEditing && setPublishingType('tarjeta_regalo')}
+            className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
               publishingType === 'tarjeta_regalo'
                 ? 'border-[#FFE259] bg-[#FFE259]/15 text-[#1D1D1B] dark:text-white font-bold shadow-xs'
-                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+                : isEditing
+                ? 'border-stone-200 dark:border-stone-800 bg-stone-100/60 dark:bg-[#141312] text-stone-400 dark:text-stone-600 opacity-40 cursor-not-allowed'
+                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400 cursor-pointer'
             }`}
           >
             <CreditCard className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
@@ -880,11 +907,14 @@ export function SellerProductForm({
           {/* 5. Evento (Cata Presencial) */}
           <button
             type="button"
-            onClick={() => setPublishingType('cata_presencial')}
-            className={`p-3.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+            disabled={isEditing && publishingType !== 'cata_presencial'}
+            onClick={() => !isEditing && setPublishingType('cata_presencial')}
+            className={`p-3.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
               publishingType === 'cata_presencial'
                 ? 'border-[#FFE259] bg-[#FFE259]/15 text-[#1D1D1B] dark:text-white font-bold shadow-xs'
-                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+                : isEditing
+                ? 'border-stone-200 dark:border-stone-800 bg-stone-100/60 dark:bg-[#141312] text-stone-400 dark:text-stone-600 opacity-40 cursor-not-allowed'
+                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400 cursor-pointer'
             }`}
           >
             <Calendar className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
@@ -1415,7 +1445,15 @@ export function SellerProductForm({
 
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {isBeverageCategory
+                  {isProductoUnico
+                    ? language === 'eu'
+                      ? 'Pisua edo Bolumena (g, kg, L, cl, ml)'
+                      : language === 'fr'
+                      ? 'Poids ou Volume (g, kg, L, cl, ml)'
+                      : language === 'en'
+                      ? 'Weight or Volume (g, kg, L, cl, ml)'
+                      : 'Peso o Volumen (g, kg, L, cl, ml)'
+                    : isBeverageCategory
                     ? language === 'eu'
                       ? 'Bolumena (L, cl, ml)'
                       : language === 'fr'
@@ -1436,7 +1474,13 @@ export function SellerProductForm({
                     type="number"
                     step="any"
                     min="0"
-                    placeholder={isBeverageCategory ? 'Ej: 0.75, 33, 750' : 'Ej: 250, 1.5, 500'}
+                    placeholder={
+                      isProductoUnico
+                        ? 'Ej: 250, 0.75, 1.5, 33'
+                        : isBeverageCategory
+                        ? 'Ej: 0.75, 33, 750'
+                        : 'Ej: 250, 1.5, 500'
+                    }
                     value={weightAmount}
                     onChange={(e) => setWeightAmount(e.target.value)}
                     className="flex-1 px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
@@ -1446,7 +1490,15 @@ export function SellerProductForm({
                     onChange={(e) => setWeightUnit(e.target.value)}
                     className="w-28 px-2.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                   >
-                    {isBeverageCategory ? (
+                    {isProductoUnico ? (
+                      <>
+                        <option value="g">Gramos (g)</option>
+                        <option value="kg">Kilos (kg)</option>
+                        <option value="L">Litros (L)</option>
+                        <option value="cl">Centilitros (cl)</option>
+                        <option value="ml">Mililitros (ml)</option>
+                      </>
+                    ) : isBeverageCategory ? (
                       <>
                         <option value="L">Litros (L)</option>
                         <option value="cl">Centilitros (cl)</option>
