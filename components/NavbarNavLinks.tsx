@@ -294,15 +294,15 @@ export function NavbarNavLinks({
       {mounted && mobileMenuOpen && createPortal(
         <div className="fixed inset-0 z-[999999] lg:hidden" style={{ zIndex: 999999 }}>
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#1D1D1B] text-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-stone-800 animate-in slide-in-from-left duration-300">
+          <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-[#141312] text-stone-900 dark:text-stone-100 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-[#E8E5DF] dark:border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-stone-800">
+              <div className="flex items-center justify-between pb-4 border-b border-[#E8E5DF] dark:border-stone-800">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-[#FFE259] p-0.5 bg-[#FAF8F5]">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 p-0.5 bg-[#FAF7F2] dark:bg-stone-800 shrink-0">
                     <img
                       src="/Logo.jpg"
                       alt="EkhiTeka"
@@ -310,10 +310,10 @@ export function NavbarNavLinks({
                     />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-serif font-bold text-lg text-white tracking-wider">
-                      Ekhi<span className="text-[#FFE259]">Teka</span>
+                    <span className="font-serif font-bold text-lg text-[#1D1D1B] dark:text-stone-100 tracking-wider">
+                      Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
                     </span>
-                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-400">
+                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
                       Lekeitio · Bizkaia
                     </span>
                   </div>
@@ -321,7 +321,7 @@ export function NavbarNavLinks({
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-full text-stone-300 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
+                  className="p-2 rounded-full text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                   aria-label="Close"
                 >
                   <X className="w-6 h-6" />
@@ -329,16 +329,16 @@ export function NavbarNavLinks({
               </div>
 
               <div className="space-y-2 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
+                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#C68D07] dark:text-[#FFE259] text-center pb-1">
                   {t.nav_explore_selection}
                 </p>
                 <Link
                   href="/tienda"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
-                    pathname === '/tienda'
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
+                    pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
                   }`}
                 >
                   <span>{t.nav_shop}</span>
@@ -346,10 +346,10 @@ export function NavbarNavLinks({
                 <Link
                   href="/regalos-gourmet"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
                     pathname === '/regalos-gourmet'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
                   }`}
                 >
                   <span>{t.nav_gourmet_gifts}</span>
@@ -357,10 +357,10 @@ export function NavbarNavLinks({
                 <Link
                   href="/experiencias"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
                     pathname === '/experiencias'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
                   }`}
                 >
                   <span>{t.nav_tastings_experiences}</span>
@@ -368,10 +368,10 @@ export function NavbarNavLinks({
                 <Link
                   href="/regalos-empresa"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-md ${
+                  className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
                     pathname === '/regalos-empresa'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700 hover:border-[#FFE259]'
+                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
                   }`}
                 >
                   <span>{t.nav_corporate_gifts}</span>
@@ -379,8 +379,8 @@ export function NavbarNavLinks({
               </div>
 
               {/* SECCIÓN TU CUENTA */}
-              <div className="space-y-2.5 pt-4 border-t border-stone-800 font-serif">
-                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#FFE259] text-center pb-1">
+              <div className="space-y-2.5 pt-4 border-t border-[#E8E5DF] dark:border-stone-800 font-serif">
+                <p className="text-[11px] font-sans font-black uppercase tracking-[0.2em] text-[#C68D07] dark:text-[#FFE259] text-center pb-1">
                   {t.nav_your_account}
                 </p>
                 {user ? (
@@ -392,8 +392,8 @@ export function NavbarNavLinks({
                         pathname.includes('/pedidos')
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
                           : hasUnseenOrderUpdates
-                          ? 'bg-[#FFE259]/25 text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                          ? 'bg-[#FFE259]/30 text-stone-900 dark:text-[#FFE259] border border-[#FFE259] ring-2 ring-[#FFE259]/50 animate-pulse font-bold'
+                          : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
                       }`}
                     >
                       <span>{t.nav_orders}</span>
@@ -411,7 +411,7 @@ export function NavbarNavLinks({
                         className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                           pathname === '/vendedor/eventos'
                             ? 'bg-[#FFE259] text-[#1D1D1B]'
-                            : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                            : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
                         }`}
                       >
                         <span>{t.nav_events}</span>
@@ -422,13 +422,27 @@ export function NavbarNavLinks({
                       <Link
                         href="/vendedor/productos/nuevo"
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-lg hover:scale-102 transition-all ${
+                        className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-sm hover:scale-102 transition-all ${
                           pathname === '/vendedor/productos/nuevo'
                             ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
-                            : 'border-2 border-[#FFE259] bg-transparent text-white hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                            : 'border-2 border-[#FFE259] bg-[#FFE259]/10 dark:bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
                         }`}
                       >
                         <span>{t.nav_add_product}</span>
+                      </Link>
+                    )}
+
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-center p-3 rounded-full font-semibold text-xs tracking-[0.14em] uppercase transition-all ${
+                          pathname === '/admin'
+                            ? 'bg-purple-600 text-white shadow-xs'
+                            : 'bg-purple-50 dark:bg-purple-950/70 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/80'
+                        }`}
+                      >
+                        <span>{t.nav_admin}</span>
                       </Link>
                     )}
 
@@ -438,7 +452,7 @@ export function NavbarNavLinks({
                       className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname.startsWith('/chat')
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                          : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
                       }`}
                     >
                       <span>{t.nav_chats}</span>
@@ -455,7 +469,7 @@ export function NavbarNavLinks({
                       className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname === '/perfil'
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-stone-850 hover:bg-stone-800 text-white border border-stone-700'
+                          : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
                       }`}
                     >
                       <span>{t.nav_profile}</span>
@@ -464,7 +478,7 @@ export function NavbarNavLinks({
                     <form action={signout} className="pt-2">
                       <button
                         type="submit"
-                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-400 hover:text-red-400 hover:bg-stone-850 transition-colors cursor-pointer"
+                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-500 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                       >
                         <span>{t.nav_logout}</span>
                       </button>
@@ -475,14 +489,14 @@ export function NavbarNavLinks({
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-white hover:border-[#FFE259] hover:text-[#FFE259] transition-all bg-stone-850"
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-300 dark:border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-white hover:border-[#FFE259] hover:text-[#C68D07] dark:hover:text-[#FFE259] transition-all bg-white dark:bg-stone-900"
                     >
                       {t.nav_login}
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#FFE259] font-black text-xs tracking-[0.14em] uppercase text-[#1D1D1B] shadow-md hover:scale-102 transition-all"
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] dark:hover:bg-[#FFE259] dark:hover:text-[#1D1D1B] font-black text-xs tracking-[0.14em] uppercase text-white dark:text-stone-900 shadow-md hover:scale-102 transition-all"
                     >
                       {t.nav_register}
                     </Link>
@@ -491,13 +505,13 @@ export function NavbarNavLinks({
               </div>
             </div>
 
-            <div className="pt-6 border-t border-stone-800 text-[11px] text-stone-400 space-y-1 text-center font-sans">
-              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-200">
-                <Store className="w-3.5 h-3.5 text-[#FFE259]" />
+            <div className="pt-6 border-t border-[#E8E5DF] dark:border-stone-800 text-[11px] text-stone-500 dark:text-stone-400 space-y-1 text-center font-sans">
+              <div className="flex items-center justify-center gap-1.5 font-bold text-stone-800 dark:text-stone-200">
+                <Store className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
                 <span>Quesería & Tienda en Lekeitio</span>
               </div>
               <p>Gamarra Kalea 4, Lekeitio · Bizkaia</p>
-              <p className="font-semibold text-[#FFE259]">WhatsApp: +34 600 000 000</p>
+              <p className="font-semibold text-[#C68D07] dark:text-[#FFE259]">WhatsApp: +34 600 000 000</p>
             </div>
           </div>
         </div>,
