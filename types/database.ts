@@ -26,6 +26,22 @@ export interface WhatsAppContact {
   is_active: boolean;
 }
 
+export interface StoreScheduleDetails {
+  days: string[];
+  weekday_morning_enabled?: boolean;
+  weekday_morning_start?: string;
+  weekday_morning_end?: string;
+  weekday_afternoon_enabled?: boolean;
+  weekday_afternoon_start?: string;
+  weekday_afternoon_end?: string;
+  weekend_morning_enabled?: boolean;
+  weekend_morning_start?: string;
+  weekend_morning_end?: string;
+  weekend_afternoon_enabled?: boolean;
+  weekend_afternoon_start?: string;
+  weekend_afternoon_end?: string;
+}
+
 export interface StoreAddress {
   id: string;
   title: string;
@@ -38,6 +54,7 @@ export interface StoreAddress {
   town: string;
   province: string;
   schedule?: string;
+  schedule_details?: StoreScheduleDetails;
   is_active: boolean;
   is_main?: boolean;
 }

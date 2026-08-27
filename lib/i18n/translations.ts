@@ -425,6 +425,17 @@ export interface TranslationDict {
   store_modal_pickup_new: string;
   store_modal_pickup_title_field: string;
   store_modal_pickup_schedule_field: string;
+  store_schedule_days_title: string;
+  store_schedule_days_min_error: string;
+  store_schedule_weekday_morning: string;
+  store_schedule_weekday_afternoon: string;
+  store_schedule_weekend_morning: string;
+  store_schedule_weekend_afternoon: string;
+  store_schedule_time_start: string;
+  store_schedule_time_end: string;
+  store_schedule_closed_shift: string;
+  store_schedule_quick_weekdays: string;
+  store_schedule_quick_all: string;
   store_modal_pickup_save: string;
 
   store_modal_event_edit: string;
@@ -1059,6 +1070,17 @@ export const translations: Record<Language, TranslationDict> = {
     store_modal_pickup_new: 'Gehitu Jasotze Puntua / Denda',
     store_modal_pickup_title_field: 'Jasotze Puntuaren Titulua *',
     store_modal_pickup_schedule_field: 'Arreta / Jasotze Ordutegia',
+    store_schedule_days_title: 'Arreta eta Jasotze Egunak',
+    store_schedule_days_min_error: 'Gutxienez arreta egun bat hautatu behar duzu.',
+    store_schedule_weekday_morning: 'Astegun goizak (Al - Or)',
+    store_schedule_weekday_afternoon: 'Astegun arratsaldeak (Al - Or)',
+    store_schedule_weekend_morning: 'Asteburu goizak (Lr - Ig)',
+    store_schedule_weekend_afternoon: 'Asteburu arratsaldeak (Lr - Ig)',
+    store_schedule_time_start: 'Hasiera',
+    store_schedule_time_end: 'Amaiera',
+    store_schedule_closed_shift: 'Itxita',
+    store_schedule_quick_weekdays: 'Astelehenetik Ostiralera',
+    store_schedule_quick_all: 'Aste Osoa (Al - Ig)',
     store_modal_pickup_save: 'Gorde Helbidea',
 
     store_modal_event_edit: 'Editatu Ekitaldi Puntua',
@@ -1681,6 +1703,17 @@ export const translations: Record<Language, TranslationDict> = {
     store_modal_pickup_new: 'Añadir Punto de Entrega / Tienda',
     store_modal_pickup_title_field: 'Título del Punto de Entrega *',
     store_modal_pickup_schedule_field: 'Horario de Atención / Recogida',
+    store_schedule_days_title: 'Días de Atención / Recogida',
+    store_schedule_days_min_error: 'Debes seleccionar al menos un día de atención.',
+    store_schedule_weekday_morning: 'Mañanas entre semana (Lun - Vie)',
+    store_schedule_weekday_afternoon: 'Tardes entre semana (Lun - Vie)',
+    store_schedule_weekend_morning: 'Mañanas fin de semana (Sáb - Dom)',
+    store_schedule_weekend_afternoon: 'Tardes fin de semana (Sáb - Dom)',
+    store_schedule_time_start: 'Inicio',
+    store_schedule_time_end: 'Fin',
+    store_schedule_closed_shift: 'Cerrado',
+    store_schedule_quick_weekdays: 'Lunes a Viernes',
+    store_schedule_quick_all: 'Toda la semana (L - D)',
     store_modal_pickup_save: 'Guardar Dirección',
 
     store_modal_event_edit: 'Editar Punto de Evento',
@@ -2303,6 +2336,17 @@ export const translations: Record<Language, TranslationDict> = {
     store_modal_pickup_new: 'Add Pickup Point / Store',
     store_modal_pickup_title_field: 'Pickup Point Title *',
     store_modal_pickup_schedule_field: 'Opening / Pickup Hours',
+    store_schedule_days_title: 'Opening & Pickup Days',
+    store_schedule_days_min_error: 'You must select at least one day.',
+    store_schedule_weekday_morning: 'Weekday mornings (Mon - Fri)',
+    store_schedule_weekday_afternoon: 'Weekday afternoons (Mon - Fri)',
+    store_schedule_weekend_morning: 'Weekend mornings (Sat - Sun)',
+    store_schedule_weekend_afternoon: 'Weekend afternoons (Sat - Sun)',
+    store_schedule_time_start: 'Start',
+    store_schedule_time_end: 'End',
+    store_schedule_closed_shift: 'Closed',
+    store_schedule_quick_weekdays: 'Monday to Friday',
+    store_schedule_quick_all: 'All week (Mon - Sun)',
     store_modal_pickup_save: 'Save Address',
 
     store_modal_event_edit: 'Edit Event Location',
@@ -2925,6 +2969,17 @@ export const translations: Record<Language, TranslationDict> = {
     store_modal_pickup_new: 'Ajouter un Point de Retrait / Boutique',
     store_modal_pickup_title_field: 'Titre du Point de Retrait *',
     store_modal_pickup_schedule_field: 'Horaires d\'Ouverture / Retrait',
+    store_schedule_days_title: 'Jours d\'Ouverture et de Retrait',
+    store_schedule_days_min_error: 'Vous devez sélectionner au moins un jour.',
+    store_schedule_weekday_morning: 'Matinées en semaine (Lun - Ven)',
+    store_schedule_weekday_afternoon: 'Après-midis en semaine (Lun - Ven)',
+    store_schedule_weekend_morning: 'Matinées de week-end (Sam - Dim)',
+    store_schedule_weekend_afternoon: 'Après-midis de week-end (Sam - Dim)',
+    store_schedule_time_start: 'Début',
+    store_schedule_time_end: 'Fin',
+    store_schedule_closed_shift: 'Fermé',
+    store_schedule_quick_weekdays: 'Du Lundi au Vendredi',
+    store_schedule_quick_all: 'Toute la semaine (L - D)',
     store_modal_pickup_save: 'Enregistrer l\'Adresse',
 
     store_modal_event_edit: 'Modifier le Lieu d\'Événement',

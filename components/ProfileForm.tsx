@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { updateProfile, changeUserPassword, updateStoreConfig, updateDeliveryAddresses } from '@/app/actions/auth';
-import type { Profile, WhatsAppContact, StoreAddress, EventAddress, DeliveryAddress } from '@/types/database';
+import type { Profile, WhatsAppContact, StoreAddress, StoreScheduleDetails, EventAddress, DeliveryAddress } from '@/types/database';
 import { parseProfile, isProfileComplete } from '@/types/database';
 import {
   User,
@@ -26,6 +26,7 @@ import {
   ArrowLeft,
   Truck,
   Star,
+  Clock,
 } from 'lucide-react';
 
 interface SellerOption {
@@ -85,6 +86,94 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     });
   };
 
+  // Helper para construir la cadena legible de horario a partir de parámetros individuales
+  const buildScheduleString = (
+    days: string[],
+    wmEn: boolean,
+    wmStart: string,
+    wmEnd: string,
+    waEn: boolean,
+    waStart: string,
+    waEnd: string,
+    weMEn: boolean,
+    weMStart: string,
+    weMEnd: string,
+    weAEn: boolean,
+    weAStart: string,
+    weAEnd: string,
+    lang: string
+  ): string => {
+    const dayLabelsMap: Record<string, { es: string; eu: string; en: string; fr: string }> = {
+      lun: { es: 'Lun', eu: 'Al', en: 'Mon', fr: 'Lun' },
+      mar: { es: 'Mar', eu: 'Ar', en: 'Tue', fr: 'Mar' },
+      mie: { es: 'Mié', eu: 'Az', en: 'Wed', fr: 'Mer' },
+      jue: { es: 'Jue', eu: 'Og', en: 'Thu', fr: 'Jeu' },
+      vie: { es: 'Vie', eu: 'Or', en: 'Fri', fr: 'Ven' },
+      sab: { es: 'Sáb', eu: 'Lr', en: 'Sat', fr: 'Sam' },
+      dom: { es: 'Dom', eu: 'Ig', en: 'Sun', fr: 'Dim' },
+    };
+
+    const weekdaysList = ['lun', 'mar', 'mie', 'jue', 'vie'];
+    const weekendList = ['sab', 'dom'];
+
+    const selectedWeekdays = days.filter((d) => weekdaysList.includes(d));
+    const selectedWeekend = days.filter((d) => weekendList.includes(d));
+
+    const formatShifts = (mEn: boolean, mStart: string, mEnd: string, aEn: boolean, aStart: string, aEnd: string) => {
+      const parts: string[] = [];
+      if (mEn && mStart && mEnd) parts.push(`${mStart} - ${mEnd}`);
+      if (aEn && aStart && aEnd) parts.push(`${aStart} - ${aEnd}`);
+      return parts.join(' | ');
+    };
+
+    const weekdayShifts = formatShifts(wmEn, wmStart, wmEnd, waEn, waStart, waEnd);
+    const weekendShifts = formatShifts(weMEn, weMStart, weMEnd, weAEn, weAStart, weAEnd);
+
+    const getDaysLabel = (list: string[]) => {
+      if (list.length === 0) return '';
+      if (list.length === 5 && weekdaysList.every((d) => list.includes(d))) {
+        return lang === 'eu' ? 'Al-Or' : lang === 'en' ? 'Mon-Fri' : lang === 'fr' ? 'Lun-Ven' : 'Lun-Vie';
+      }
+      if (list.length === 7) {
+        return lang === 'eu' ? 'Al-Ig' : lang === 'en' ? 'Mon-Sun' : lang === 'fr' ? 'Lun-Dim' : 'Lun-Dom';
+      }
+      if (list.length === 2 && list.includes('sab') && list.includes('dom')) {
+        return lang === 'eu' ? 'Lr-Ig' : lang === 'en' ? 'Sat-Sun' : lang === 'fr' ? 'Sam-Dim' : 'Sáb-Dom';
+      }
+      return list.map((d) => dayLabelsMap[d]?.[lang as 'es'] || d).join(', ');
+    };
+
+    if (
+      selectedWeekdays.length > 0 &&
+      selectedWeekend.length > 0 &&
+      weekdayShifts === weekendShifts &&
+      weekdayShifts.length > 0
+    ) {
+      if (days.length === 6 && !days.includes('dom')) {
+        const daysStr = lang === 'eu' ? 'Al-Lr' : lang === 'en' ? 'Mon-Sat' : lang === 'fr' ? 'Lun-Sam' : 'Lun-Sáb';
+        return `${daysStr}: ${weekdayShifts}`;
+      }
+      if (days.length === 7) {
+        const daysStr = lang === 'eu' ? 'Al-Ig' : lang === 'en' ? 'Mon-Sun' : lang === 'fr' ? 'Lun-Dim' : 'Lun-Dom';
+        return `${daysStr}: ${weekdayShifts}`;
+      }
+    }
+
+    const sections: string[] = [];
+    if (selectedWeekdays.length > 0 && weekdayShifts) {
+      sections.push(`${getDaysLabel(selectedWeekdays)}: ${weekdayShifts}`);
+    }
+    if (selectedWeekend.length > 0 && weekendShifts) {
+      sections.push(`${getDaysLabel(selectedWeekend)}: ${weekendShifts}`);
+    }
+
+    if (sections.length === 0) {
+      return weekdayShifts || weekendShifts || (lang === 'eu' ? 'Itxita' : 'Cerrado');
+    }
+
+    return sections.join(' · ');
+  };
+
   // Sección Tienda
   const [whatsappContacts, setWhatsappContacts] = useState<WhatsAppContact[]>(currentProfile.whatsapp_contacts || []);
   const [pickupAddresses, setPickupAddresses] = useState<StoreAddress[]>(() =>
@@ -98,6 +187,62 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
   const [modalWA, setModalWA] = useState<{ open: boolean; contact: WhatsAppContact | null }>({ open: false, contact: null });
   const [modalStoreAddr, setModalStoreAddr] = useState<{ open: boolean; addr: StoreAddress | null }>({ open: false, addr: null });
   const [modalEventAddr, setModalEventAddr] = useState<{ open: boolean; addr: EventAddress | null }>({ open: false, addr: null });
+
+  // Estados para el Horario estructurado del Punto de Entrega
+  const [storeScheduleDays, setStoreScheduleDays] = useState<string[]>(['lun', 'mar', 'mie', 'jue', 'vie', 'sab']);
+  const [weekdayMorningEnabled, setWeekdayMorningEnabled] = useState(true);
+  const [weekdayMorningStart, setWeekdayMorningStart] = useState('10:00');
+  const [weekdayMorningEnd, setWeekdayMorningEnd] = useState('14:00');
+
+  const [weekdayAfternoonEnabled, setWeekdayAfternoonEnabled] = useState(true);
+  const [weekdayAfternoonStart, setWeekdayAfternoonStart] = useState('17:00');
+  const [weekdayAfternoonEnd, setWeekdayAfternoonEnd] = useState('20:30');
+
+  const [weekendMorningEnabled, setWeekendMorningEnabled] = useState(true);
+  const [weekendMorningStart, setWeekendMorningStart] = useState('10:30');
+  const [weekendMorningEnd, setWeekendMorningEnd] = useState('14:30');
+
+  const [weekendAfternoonEnabled, setWeekendAfternoonEnabled] = useState(false);
+  const [weekendAfternoonStart, setWeekendAfternoonStart] = useState('17:30');
+  const [weekendAfternoonEnd, setWeekendAfternoonEnd] = useState('21:00');
+
+  useEffect(() => {
+    if (!modalStoreAddr.open) return;
+    const addr = modalStoreAddr.addr;
+    if (addr?.schedule_details) {
+      const d = addr.schedule_details;
+      setStoreScheduleDays(d.days && d.days.length > 0 ? d.days : ['lun', 'mar', 'mie', 'jue', 'vie', 'sab']);
+      setWeekdayMorningEnabled(d.weekday_morning_enabled ?? true);
+      setWeekdayMorningStart(d.weekday_morning_start || '10:00');
+      setWeekdayMorningEnd(d.weekday_morning_end || '14:00');
+
+      setWeekdayAfternoonEnabled(d.weekday_afternoon_enabled ?? true);
+      setWeekdayAfternoonStart(d.weekday_afternoon_start || '17:00');
+      setWeekdayAfternoonEnd(d.weekday_afternoon_end || '20:30');
+
+      setWeekendMorningEnabled(d.weekend_morning_enabled ?? true);
+      setWeekendMorningStart(d.weekend_morning_start || '10:30');
+      setWeekendMorningEnd(d.weekend_morning_end || '14:30');
+
+      setWeekendAfternoonEnabled(d.weekend_afternoon_enabled ?? false);
+      setWeekendAfternoonStart(d.weekend_afternoon_start || '17:30');
+      setWeekendAfternoonEnd(d.weekend_afternoon_end || '21:00');
+    } else {
+      setStoreScheduleDays(['lun', 'mar', 'mie', 'jue', 'vie', 'sab']);
+      setWeekdayMorningEnabled(true);
+      setWeekdayMorningStart('10:00');
+      setWeekdayMorningEnd('14:00');
+      setWeekdayAfternoonEnabled(true);
+      setWeekdayAfternoonStart('17:00');
+      setWeekdayAfternoonEnd('20:30');
+      setWeekendMorningEnabled(true);
+      setWeekendMorningStart('10:30');
+      setWeekendMorningEnd('14:30');
+      setWeekendAfternoonEnabled(false);
+      setWeekendAfternoonStart('17:30');
+      setWeekendAfternoonEnd('21:00');
+    }
+  }, [modalStoreAddr]);
 
   // Formulario modal WhatsApp
   const [waSelectType, setWaSelectType] = useState<'seller' | 'manual'>('seller');
@@ -224,6 +369,44 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     const fd = new FormData(e.currentTarget);
     const isMainChecked = fd.get('is_main') === 'on';
 
+    if (storeScheduleDays.length === 0) {
+      alert(t.store_schedule_days_min_error);
+      return;
+    }
+
+    const scheduleDetails: StoreScheduleDetails = {
+      days: storeScheduleDays,
+      weekday_morning_enabled: weekdayMorningEnabled,
+      weekday_morning_start: weekdayMorningStart,
+      weekday_morning_end: weekdayMorningEnd,
+      weekday_afternoon_enabled: weekdayAfternoonEnabled,
+      weekday_afternoon_start: weekdayAfternoonStart,
+      weekday_afternoon_end: weekdayAfternoonEnd,
+      weekend_morning_enabled: weekendMorningEnabled,
+      weekend_morning_start: weekendMorningStart,
+      weekend_morning_end: weekendMorningEnd,
+      weekend_afternoon_enabled: weekendAfternoonEnabled,
+      weekend_afternoon_start: weekendAfternoonStart,
+      weekend_afternoon_end: weekendAfternoonEnd,
+    };
+
+    const formattedSchedule = buildScheduleString(
+      storeScheduleDays,
+      weekdayMorningEnabled,
+      weekdayMorningStart,
+      weekdayMorningEnd,
+      weekdayAfternoonEnabled,
+      weekdayAfternoonStart,
+      weekdayAfternoonEnd,
+      weekendMorningEnabled,
+      weekendMorningStart,
+      weekendMorningEnd,
+      weekendAfternoonEnabled,
+      weekendAfternoonStart,
+      weekendAfternoonEnd,
+      language
+    );
+
     const addrData: StoreAddress = {
       id: modalStoreAddr.addr?.id || 'pickup_' + Date.now(),
       title: fd.get('title') as string,
@@ -235,7 +418,8 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
       postal_code: fd.get('postal_code') as string,
       town: fd.get('town') as string,
       province: fd.get('province') as string,
-      schedule: fd.get('schedule') as string,
+      schedule: formattedSchedule,
+      schedule_details: scheduleDetails,
       is_active: modalStoreAddr.addr ? modalStoreAddr.addr.is_active : true,
       is_main: isMainChecked || (modalStoreAddr.addr ? !!modalStoreAddr.addr.is_main : pickupAddresses.length === 0),
     };
@@ -1664,17 +1848,267 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 </div>
               </div>
 
-              <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.store_modal_pickup_schedule_field}
-                </label>
-                <input
-                  type="text"
-                  name="schedule"
-                  defaultValue={modalStoreAddr.addr?.schedule || ''}
-                  placeholder="Ej: Lun-Vie: 10:00 - 14:30 | 17:00 - 20:30"
-                  className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
-                />
+              {/* Horario de Atención / Recogida Estructurado */}
+              <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 space-y-4 font-sans">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
+                  <label className="font-bold text-stone-800 dark:text-stone-200 block text-xs uppercase tracking-wider font-serif flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-amber-500" />
+                    <span>{t.store_modal_pickup_schedule_field}</span>
+                  </label>
+                  <div className="flex items-center gap-1 text-[10px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setStoreScheduleDays(['lun', 'mar', 'mie', 'jue', 'vie'])}
+                      className="px-2 py-0.5 rounded-lg bg-stone-200 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-700 dark:text-stone-300 transition-colors cursor-pointer"
+                    >
+                      {t.store_schedule_quick_weekdays}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setStoreScheduleDays(['lun', 'mar', 'mie', 'jue', 'vie', 'sab', 'dom'])}
+                      className="px-2 py-0.5 rounded-lg bg-stone-200 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-700 dark:text-stone-300 transition-colors cursor-pointer"
+                    >
+                      {t.store_schedule_quick_all}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 1. Selector de Días (Lunes a Domingo) */}
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-bold text-stone-600 dark:text-stone-400 block">
+                    {t.store_schedule_days_title} ({storeScheduleDays.length}/7):
+                  </span>
+                  <div className="grid grid-cols-7 gap-1.5 text-center">
+                    {[
+                      { id: 'lun', es: 'Lun', eu: 'Al', en: 'Mon', fr: 'Lun', full: 'Lunes' },
+                      { id: 'mar', es: 'Mar', eu: 'Ar', en: 'Tue', fr: 'Mar', full: 'Martes' },
+                      { id: 'mie', es: 'Mié', eu: 'Az', en: 'Wed', fr: 'Mer', full: 'Miércoles' },
+                      { id: 'jue', es: 'Jue', eu: 'Og', en: 'Thu', fr: 'Jeu', full: 'Jueves' },
+                      { id: 'vie', es: 'Vie', eu: 'Or', en: 'Fri', fr: 'Ven', full: 'Viernes' },
+                      { id: 'sab', es: 'Sáb', eu: 'Lr', en: 'Sat', fr: 'Sam', full: 'Sábado' },
+                      { id: 'dom', es: 'Dom', eu: 'Ig', en: 'Sun', fr: 'Dim', full: 'Domingo' },
+                    ].map((d) => {
+                      const isSelected = storeScheduleDays.includes(d.id);
+                      return (
+                        <button
+                          key={d.id}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              if (storeScheduleDays.length <= 1) {
+                                alert(t.store_schedule_days_min_error);
+                                return;
+                              }
+                              setStoreScheduleDays(storeScheduleDays.filter((item) => item !== d.id));
+                            } else {
+                              setStoreScheduleDays([...storeScheduleDays, d.id]);
+                            }
+                          }}
+                          className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border ${
+                            isSelected
+                              ? 'bg-[#FFE259] border-amber-400 text-[#1D1D1B] shadow-xs scale-102'
+                              : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 opacity-60 hover:opacity-100'
+                          }`}
+                          title={d.full}
+                        >
+                          {language === 'eu' ? d.eu : language === 'en' ? d.en : language === 'fr' ? d.fr : d.es}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Horarios individuales (4 turnos) */}
+                <div className="space-y-3 pt-1">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
+                    Horarios de Apertura & Cierre por Turno
+                  </span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* 1. Mañanas entre semana */}
+                    <div className={`p-3 rounded-xl border transition-all ${weekdayMorningEnabled ? 'bg-white dark:bg-stone-800/80 border-stone-200 dark:border-stone-700' : 'bg-stone-100/50 dark:bg-stone-850/50 border-stone-200 dark:border-stone-800 opacity-60'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[11px] font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={weekdayMorningEnabled}
+                            onChange={(e) => setWeekdayMorningEnabled(e.target.checked)}
+                            className="w-3.5 h-3.5 rounded border-stone-300 accent-[#FFE259] cursor-pointer"
+                          />
+                          <span>1. {t.store_schedule_weekday_morning}</span>
+                        </label>
+                        {!weekdayMorningEnabled && (
+                          <span className="text-[10px] text-stone-400 font-bold">{t.store_schedule_closed_shift}</span>
+                        )}
+                      </div>
+                      {weekdayMorningEnabled && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_start}</span>
+                            <input
+                              type="time"
+                              value={weekdayMorningStart}
+                              onChange={(e) => setWeekdayMorningStart(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_end}</span>
+                            <input
+                              type="time"
+                              value={weekdayMorningEnd}
+                              onChange={(e) => setWeekdayMorningEnd(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 2. Tardes entre semana */}
+                    <div className={`p-3 rounded-xl border transition-all ${weekdayAfternoonEnabled ? 'bg-white dark:bg-stone-800/80 border-stone-200 dark:border-stone-700' : 'bg-stone-100/50 dark:bg-stone-850/50 border-stone-200 dark:border-stone-800 opacity-60'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[11px] font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={weekdayAfternoonEnabled}
+                            onChange={(e) => setWeekdayAfternoonEnabled(e.target.checked)}
+                            className="w-3.5 h-3.5 rounded border-stone-300 accent-[#FFE259] cursor-pointer"
+                          />
+                          <span>2. {t.store_schedule_weekday_afternoon}</span>
+                        </label>
+                        {!weekdayAfternoonEnabled && (
+                          <span className="text-[10px] text-stone-400 font-bold">{t.store_schedule_closed_shift}</span>
+                        )}
+                      </div>
+                      {weekdayAfternoonEnabled && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_start}</span>
+                            <input
+                              type="time"
+                              value={weekdayAfternoonStart}
+                              onChange={(e) => setWeekdayAfternoonStart(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_end}</span>
+                            <input
+                              type="time"
+                              value={weekdayAfternoonEnd}
+                              onChange={(e) => setWeekdayAfternoonEnd(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 3. Mañanas fin de semana */}
+                    <div className={`p-3 rounded-xl border transition-all ${weekendMorningEnabled ? 'bg-white dark:bg-stone-800/80 border-stone-200 dark:border-stone-700' : 'bg-stone-100/50 dark:bg-stone-850/50 border-stone-200 dark:border-stone-800 opacity-60'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[11px] font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={weekendMorningEnabled}
+                            onChange={(e) => setWeekendMorningEnabled(e.target.checked)}
+                            className="w-3.5 h-3.5 rounded border-stone-300 accent-[#FFE259] cursor-pointer"
+                          />
+                          <span>3. {t.store_schedule_weekend_morning}</span>
+                        </label>
+                        {!weekendMorningEnabled && (
+                          <span className="text-[10px] text-stone-400 font-bold">{t.store_schedule_closed_shift}</span>
+                        )}
+                      </div>
+                      {weekendMorningEnabled && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_start}</span>
+                            <input
+                              type="time"
+                              value={weekendMorningStart}
+                              onChange={(e) => setWeekendMorningStart(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_end}</span>
+                            <input
+                              type="time"
+                              value={weekendMorningEnd}
+                              onChange={(e) => setWeekendMorningEnd(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 4. Tardes fin de semana */}
+                    <div className={`p-3 rounded-xl border transition-all ${weekendAfternoonEnabled ? 'bg-white dark:bg-stone-800/80 border-stone-200 dark:border-stone-700' : 'bg-stone-100/50 dark:bg-stone-850/50 border-stone-200 dark:border-stone-800 opacity-60'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[11px] font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={weekendAfternoonEnabled}
+                            onChange={(e) => setWeekendAfternoonEnabled(e.target.checked)}
+                            className="w-3.5 h-3.5 rounded border-stone-300 accent-[#FFE259] cursor-pointer"
+                          />
+                          <span>4. {t.store_schedule_weekend_afternoon}</span>
+                        </label>
+                        {!weekendAfternoonEnabled && (
+                          <span className="text-[10px] text-stone-400 font-bold">{t.store_schedule_closed_shift}</span>
+                        )}
+                      </div>
+                      {weekendAfternoonEnabled && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_start}</span>
+                            <input
+                              type="time"
+                              value={weekendAfternoonStart}
+                              onChange={(e) => setWeekendAfternoonStart(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-stone-500 block mb-0.5">{t.store_schedule_time_end}</span>
+                            <input
+                              type="time"
+                              value={weekendAfternoonEnd}
+                              onChange={(e) => setWeekendAfternoonEnd(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border bg-stone-50 dark:bg-stone-900 font-bold text-xs border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Previsualización del horario resultante */}
+                <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-[11px] flex items-center gap-2">
+                  <span className="font-bold text-amber-800 dark:text-amber-300 shrink-0">Vista previa:</span>
+                  <span className="font-medium text-stone-800 dark:text-stone-200 truncate">
+                    {buildScheduleString(
+                      storeScheduleDays,
+                      weekdayMorningEnabled,
+                      weekdayMorningStart,
+                      weekdayMorningEnd,
+                      weekdayAfternoonEnabled,
+                      weekdayAfternoonStart,
+                      weekdayAfternoonEnd,
+                      weekendMorningEnabled,
+                      weekendMorningStart,
+                      weekendMorningEnd,
+                      weekendAfternoonEnabled,
+                      weekendAfternoonStart,
+                      weekendAfternoonEnd,
+                      language
+                    )}
+                  </span>
+                </div>
               </div>
 
               <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 font-serif">
