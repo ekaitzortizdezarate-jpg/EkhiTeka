@@ -153,7 +153,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                     : 'border-stone-200 dark:border-stone-800'
                 }`}
               >
-                {/* Banner de novedad si el pedido cambió de estado */}
+                {/* 1. Alerta (si la hay) */}
                 {hasUpdate && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs font-sans animate-fadeIn">
                     <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
@@ -176,36 +176,28 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 )}
 
-                {/* Cabecera del pedido */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
-                      {t.orders_order_number} #{order.id.slice(0, 8)}
-                    </span>
-                    <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                      {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
+                {isCancelled && (
+                  <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900/60 flex items-center gap-3 text-xs font-sans">
+                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+                    <div>
+                      <span className="font-bold text-red-900 dark:text-red-200 block">
+                        Pedido cancelado
+                      </span>
+                      <span className="text-red-700 dark:text-red-300 text-[11px]">
+                        Revisa tu chat con el artesano para consultar el motivo de la cancelación.
+                      </span>
+                    </div>
                   </div>
+                )}
 
-                  <div className="flex items-center gap-3">
-                    {getStatusBadge(order.status, hasUpdate)}
-                    <span className="text-base font-black font-serif text-stone-900 dark:text-stone-100">
-                      {total.toFixed(2)} €
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stepper visual de progresión del pedido */}
+                {/* 2. Estado de tu pedido */}
                 {!isCancelled ? (
                   <div className="p-4 bg-stone-50 dark:bg-[#141312] rounded-2xl border border-stone-200 dark:border-stone-800 space-y-3 font-sans">
                     <div className="flex items-center justify-between text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                      <span>Estado de tu pedido</span>
+                      <div className="flex items-center gap-2">
+                        <span>Estado de tu pedido</span>
+                        {getStatusBadge(order.status, hasUpdate)}
+                      </div>
                       <span className="text-stone-600 dark:text-stone-300 font-semibold lowercase">
                         Paso {Math.max(1, currentStepIdx + 1)} de 5
                       </span>
@@ -243,20 +235,13 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900/60 flex items-center gap-3 text-xs font-sans">
-                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
-                    <div>
-                      <span className="font-bold text-red-900 dark:text-red-200 block">
-                        Pedido cancelado
-                      </span>
-                      <span className="text-red-700 dark:text-red-300 text-[11px]">
-                        Revisa tu chat con el artesano para consultar el motivo de la cancelación.
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-between pb-1 font-sans">
+                    <span className="text-xs font-bold text-stone-500">Estado del pedido:</span>
+                    {getStatusBadge(order.status, false)}
                   </div>
                 )}
 
-                {/* Productos del pedido con miniaturas con foto real */}
+                {/* 3. Productos del Pedido */}
                 {order.order_items && order.order_items.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300">
@@ -302,14 +287,17 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 )}
 
-                {/* Entrega y Contacto */}
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs font-serif">
-                  <div className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300 font-sans">
+                {/* 4. Tipo de envio */}
+                <div className="p-4 rounded-2xl bg-stone-50/70 dark:bg-[#141312]/70 border border-stone-200/80 dark:border-stone-800 font-sans text-xs space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif block">
+                    Tipo de Envío
+                  </span>
+                  <div className="flex items-start gap-2.5 text-stone-700 dark:text-stone-300">
                     {isStorePickup ? (
                       <>
-                        <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                        <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0 mt-0.5" />
                         <div>
-                          <span className="font-bold block">{t.deliv_store_pickup_tag}</span>
+                          <span className="font-bold block text-stone-900 dark:text-stone-100">{t.deliv_store_pickup_tag}</span>
                           <span className="text-[11px] text-stone-500 dark:text-stone-400">
                             {order.shipping_address || 'Punto de recogida en tienda'}
                           </span>
@@ -322,9 +310,9 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                       </>
                     ) : (
                       <>
-                        <Truck className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0" />
+                        <Truck className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0 mt-0.5" />
                         <div>
-                          <span className="font-bold block">{t.deliv_home_tag}</span>
+                          <span className="font-bold block text-stone-900 dark:text-stone-100">{t.deliv_home_tag}</span>
                           <span className="text-[11px] text-stone-600 dark:text-stone-300">
                             {order.shipping_address || t.deliv_home_tag}
                           </span>
@@ -337,10 +325,28 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                       </>
                     )}
                   </div>
+                </div>
+
+                {/* 5. Fecha y Numero de pedido y boton de chat */}
+                <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs font-serif">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
+                      {t.orders_order_number} #{order.id.slice(0, 8)} · <span className="font-black text-stone-900 dark:text-stone-100">{total.toFixed(2)} €</span>
+                    </span>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                      {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
 
                   <Link
                     href={`/chat/${order.seller_id || ''}?order_id=${order.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-2xs hover:scale-102"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
                     <span>{t.orders_chat_with_seller}</span>

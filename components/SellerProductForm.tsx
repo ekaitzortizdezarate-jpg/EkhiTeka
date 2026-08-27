@@ -70,6 +70,59 @@ export function SellerProductForm({
 
   const isEditing = Boolean(initialProduct);
 
+  const initialMeta = useMemo(() => {
+    if (!initialProduct?.description) return null;
+    const match = initialProduct.description.match(/<!-- META:({.*?}) -->/);
+    if (match && match[1]) {
+      try {
+        return JSON.parse(match[1]);
+      } catch {}
+    }
+    return null;
+  }, [initialProduct]);
+
+  const allCategories = useMemo(() => {
+    const list = [...categories];
+    if (!list.some((c) => c.id === 'producto_unico')) {
+      list.push({
+        id: 'producto_unico',
+        name_es: 'Producto único',
+        name_eu: 'Produktu bakarra',
+        name_en: 'Unique product',
+        name_fr: 'Produit unique',
+        icon: 'Sparkles',
+      });
+    }
+    return list;
+  }, [categories]);
+
+  const [weightUnit, setWeightUnit] = useState<string>(() => {
+    if (initialMeta?.unit) return initialMeta.unit;
+    if (initialProduct?.weight_g && initialProduct.weight_g >= 1000 && initialProduct.weight_g % 1000 === 0) return 'kg';
+    return 'g';
+  });
+
+  const [weightAmount, setWeightAmount] = useState<string>(() => {
+    if (initialMeta?.amount !== undefined) return String(initialMeta.amount);
+    if (initialProduct?.weight_g) {
+      if (initialProduct.weight_g >= 1000 && initialProduct.weight_g % 1000 === 0) {
+        return String(initialProduct.weight_g / 1000);
+      }
+      return String(initialProduct.weight_g);
+    }
+    return '';
+  });
+
+  const [minPeople, setMinPeople] = useState<number>(() => {
+    if (initialMeta?.min_people !== undefined) return Number(initialMeta.min_people);
+    return 2;
+  });
+
+  const [maxPeople, setMaxPeople] = useState<number>(() => {
+    if (initialMeta?.max_people !== undefined) return Number(initialMeta.max_people);
+    return 4;
+  });
+
   const inferInitialType = (): PublishingType => {
     if (!initialProduct) return 'producto_suelto';
     const cat = (initialProduct.category_id || '').toLowerCase();
@@ -390,8 +443,32 @@ export function SellerProductForm({
       formData.set('stock', '999');
     }
 
+    if (publishingType === 'producto_suelto') {
+      let computedWeightG: number | null = null;
+      const numAmt = parseFloat(weightAmount);
+      if (!isNaN(numAmt) && numAmt > 0) {
+        if (weightUnit === 'g') computedWeightG = numAmt;
+        else if (weightUnit === 'kg') computedWeightG = numAmt * 1000;
+        else if (weightUnit === 'L') computedWeightG = numAmt * 1000;
+        else if (weightUnit === 'cl') computedWeightG = numAmt * 10;
+        else if (weightUnit === 'ml') computedWeightG = numAmt;
+      }
+      if (computedWeightG !== null) {
+        formData.set('weight_g', String(Math.round(computedWeightG)));
+      } else {
+        formData.delete('weight_g');
+      }
+    }
+
     const rawDesc = (formData.get('description') as string) || '';
     let composedDesc = rawDesc.trim();
+
+    if (publishingType === 'cata_casa') {
+      const peopleNotice = `Personas recomendadas: ${minPeople} - ${maxPeople} personas`;
+      if (!composedDesc.includes('Personas recomendadas') && !composedDesc.includes('lagun')) {
+        composedDesc = `${peopleNotice}\n${composedDesc}`.trim();
+      }
+    }
 
     if (isPackOrEvent && selectedListItems.length > 0) {
       const itemsFormatted = selectedListItems.map(
@@ -399,12 +476,41 @@ export function SellerProductForm({
       );
 
       if (!composedDesc.includes('Productos incluidos')) {
-        composedDesc = `${composedDesc}\n\nProductos incluidos en esta selección:\n${itemsFormatted.join('\n')}`;
+        composedDesc = `${composedDesc}\n\nProductos incluidos en esta selección:\n${itemsFormatted.join('\n')}`.trim();
       }
     }
 
+    const metaObj: Record<string, any> = {};
+
     if (numericDiscount > 0 && sumOfLooseItems > 0) {
-      const metaTag = `\n\n<!-- META:{"discount_percent":${numericDiscount},"original_price":${sumOfLooseItems.toFixed(2)}} -->`;
+      metaObj.discount_percent = numericDiscount;
+      metaObj.original_price = sumOfLooseItems.toFixed(2);
+    }
+
+    if (publishingType === 'producto_suelto' && weightAmount && !isNaN(parseFloat(weightAmount))) {
+      metaObj.unit = weightUnit;
+      metaObj.amount = parseFloat(weightAmount);
+    }
+
+    if (publishingType === 'cata_casa') {
+      metaObj.min_people = minPeople;
+      metaObj.max_people = maxPeople;
+    }
+
+    if (isPackOrEvent && selectedListItems.length > 0) {
+      metaObj.pack_items = selectedListItems.map((it) => ({
+        id: it.id,
+        name: it.name,
+        quantity: it.quantity,
+        price: it.price,
+        imageUrl: it.imageUrl || null,
+        format: it.format || null,
+        origin: it.origin || null,
+      }));
+    }
+
+    if (Object.keys(metaObj).length > 0) {
+      const metaTag = `\n\n<!-- META:${JSON.stringify(metaObj)} -->`;
       composedDesc = `${composedDesc}${metaTag}`;
     }
 
@@ -1022,10 +1128,10 @@ export function SellerProductForm({
                 <select
                   name="category_id"
                   required
-                  defaultValue={initialProduct?.category_id || categories[0]?.id || 'queso'}
+                  defaultValue={initialProduct?.category_id || allCategories[0]?.id || 'queso'}
                   className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
-                  {categories.map((c) => (
+                  {allCategories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c[`name_${language}` as keyof Category] || c.name_es || c.name_eu}
                     </option>
@@ -1036,22 +1142,88 @@ export function SellerProductForm({
           </div>
 
           {publishingType === 'producto_suelto' && (
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.seller_product_format}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.seller_product_format}
+                </label>
+                <select
+                  name="format"
+                  defaultValue={initialProduct?.format || 'unidad'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                >
+                  <option value="unidad">{t.seller_format_unit}</option>
+                  <option value="peso_kg">{t.seller_format_weight}</option>
+                  <option value="tarro">{t.seller_format_jar}</option>
+                  <option value="lata">{t.seller_format_can}</option>
+                  <option value="botella">{t.seller_format_bottle}</option>
+                  <option value="pack">{t.seller_format_pack}</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {language === 'eu' ? 'Pisua / Bolumena' : language === 'fr' ? 'Poids / Volume' : language === 'en' ? 'Weight / Volume' : 'Peso o Volumen'}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    placeholder="Ej: 250, 1.5, 75"
+                    value={weightAmount}
+                    onChange={(e) => setWeightAmount(e.target.value)}
+                    className="flex-1 px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  />
+                  <select
+                    value={weightUnit}
+                    onChange={(e) => setWeightUnit(e.target.value)}
+                    className="w-28 px-2.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  >
+                    <option value="g">Gramos (g)</option>
+                    <option value="kg">Kilos (kg)</option>
+                    <option value="L">Litros (L)</option>
+                    <option value="cl">Centilitros (cl)</option>
+                    <option value="ml">Mililitros (ml)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {publishingType === 'cata_casa' && (
+            <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 space-y-2">
+              <label className="font-bold text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 block">
+                {language === 'eu' ? 'Gomendatutako lagun kopurua (Gutx. eta Geh.)' : language === 'fr' ? 'Nombre de personnes recommandé (Min. et Max.)' : language === 'en' ? 'Recommended people (Min. & Max.)' : 'Número de personas recomendado (Mín. y Máx.)'}
               </label>
-              <select
-                name="format"
-                defaultValue={initialProduct?.format || 'unidad'}
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-              >
-                <option value="unidad">{t.seller_format_unit}</option>
-                <option value="peso_kg">{t.seller_format_weight}</option>
-                <option value="tarro">{t.seller_format_jar}</option>
-                <option value="lata">{t.seller_format_can}</option>
-                <option value="botella">{t.seller_format_bottle}</option>
-                <option value="pack">{t.seller_format_pack}</option>
-              </select>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-[11px] font-bold text-stone-500 block mb-1">
+                    {language === 'eu' ? 'Gutxieneko pertsonak' : language === 'fr' ? 'Min. personnes' : language === 'en' ? 'Min. people' : 'Mín. personas'}
+                  </span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="99"
+                    value={minPeople}
+                    onChange={(e) => setMinPeople(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-full px-3 py-2 bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-stone-500 block mb-1">
+                    {language === 'eu' ? 'Gehienezko pertsonak' : language === 'fr' ? 'Max. personnes' : language === 'en' ? 'Max. people' : 'Máx. personas'}
+                  </span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="99"
+                    value={maxPeople}
+                    onChange={(e) => setMaxPeople(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-full px-3 py-2 bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  />
+                </div>
+              </div>
             </div>
           )}
 

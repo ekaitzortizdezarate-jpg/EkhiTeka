@@ -205,7 +205,7 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                     : 'border-stone-200 dark:border-stone-800'
                 }`}
               >
-                {/* Banner de Novedad / Nuevo Pedido con botón 'Visto' */}
+                {/* 1. Alerta (si la hay) */}
                 {isNew && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-sans animate-fadeIn">
                     <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
@@ -223,36 +223,28 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 )}
 
-                {/* Cabecera del pedido */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
-                      {t.orders_order_number} #{order.id.slice(0, 8)}
-                    </span>
-                    <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                      {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
+                {isCancelled && (
+                  <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900/60 flex items-center gap-3 text-xs font-sans">
+                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+                    <div>
+                      <span className="font-bold text-red-900 dark:text-red-200 block">
+                        Este pedido ha sido cancelado
+                      </span>
+                      <span className="text-red-700 dark:text-red-300 text-[11px]">
+                        El stock de los productos se ha restaurado y se ha notificado al comprador.
+                      </span>
+                    </div>
                   </div>
+                )}
 
-                  <div className="flex items-center gap-3">
-                    {getStatusBadge(order.status)}
-                    <span className="text-base font-black font-serif text-stone-900 dark:text-stone-100">
-                      {t.orders_total_to_charge} {total.toFixed(2)} €
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stepper visual de progresión del estado del pedido (si no está cancelado) */}
+                {/* 2. Estado de tu pedido */}
                 {!isCancelled ? (
                   <div className="p-4 bg-stone-50 dark:bg-[#141312] rounded-2xl border border-stone-200 dark:border-stone-800 space-y-3 font-sans">
                     <div className="flex items-center justify-between text-[11px] font-bold text-stone-400 uppercase tracking-wider">
-                      <span>Progresión del Pedido</span>
+                      <div className="flex items-center gap-2">
+                        <span>Progresión del Pedido</span>
+                        {getStatusBadge(order.status)}
+                      </div>
                       <span className="text-stone-600 dark:text-stone-300 font-semibold lowercase">
                         Paso {Math.max(1, currentStepIdx + 1)} de 5
                       </span>
@@ -290,77 +282,13 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900/60 flex items-center gap-3 text-xs font-sans">
-                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
-                    <div>
-                      <span className="font-bold text-red-900 dark:text-red-200 block">
-                        Este pedido ha sido cancelado
-                      </span>
-                      <span className="text-red-700 dark:text-red-300 text-[11px]">
-                        El stock de los productos se ha restaurado y se ha notificado al comprador.
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-between pb-1 font-sans">
+                    <span className="text-xs font-bold text-stone-500">Estado del pedido:</span>
+                    {getStatusBadge(order.status)}
                   </div>
                 )}
 
-                {/* Datos del Cliente y Modo de Entrega */}
-                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 text-xs space-y-2.5 font-sans">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-stone-200/80 dark:border-stone-800">
-                    <div className="flex items-center gap-2 font-bold text-stone-900 dark:text-stone-100">
-                      <User className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                      <span>{order.profiles?.full_name || t.orders_client_label}</span>
-                      {order.profiles?.phone && (
-                        <span className="inline-flex items-center gap-1 text-stone-500 dark:text-stone-400 font-normal">
-                          <Phone className="w-3 h-3" /> {order.profiles.phone}
-                        </span>
-                      )}
-                    </div>
-
-                    <Link
-                      href={`/chat/${order.buyer_id}?order_id=${order.id}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FFE259]/20 hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] rounded-xl text-[11px] font-bold transition-all border border-[#FFE259]/50"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>{t.orders_chat_with_buyer}</span>
-                    </Link>
-                  </div>
-
-                  <div className="flex items-start gap-2 text-stone-700 dark:text-stone-300">
-                    {isStorePickup ? (
-                      <>
-                        <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold block">{t.deliv_store_pickup_tag}</span>
-                          <span className="text-[11px] text-stone-500 dark:text-stone-400">
-                            {order.shipping_address || 'Punto de recogida en tienda'}
-                          </span>
-                          {order.pickup_schedule && (
-                            <span className="block text-[11px] text-[#C68D07] dark:text-[#FFE259] font-bold mt-0.5">
-                              Horario acordado: {order.pickup_schedule}
-                            </span>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <Truck className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold block">{t.deliv_home_tag}</span>
-                          <span className="text-[11px] text-stone-600 dark:text-stone-300">
-                            {order.shipping_address || t.profile_not_specified || 'Dirección de entrega a domicilio'}
-                          </span>
-                          {order.shipping_notes && (
-                            <span className="block text-[11px] italic text-stone-500 dark:text-stone-400 mt-0.5">
-                              Indicaciones: {order.shipping_notes}
-                            </span>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Productos a preparar con miniaturas con foto real */}
+                {/* 3. Productos del Pedido */}
                 {order.order_items && order.order_items.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300">
@@ -406,113 +334,182 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 )}
 
-                {/* Acciones de Gestión de Estado y Botón Rechazar / Cancelar */}
-                {!isCancelled && (
-                  <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 font-serif">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {/* Botón rápido del siguiente paso */}
-                      {order.status === 'pendiente' && (
-                        <button
-                          type="button"
-                          disabled={loadingId === order.id}
-                          onClick={() => handleStatusChange(order.id, 'confirmado')}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>{t.status_confirm}</span>
-                        </button>
+                {/* 4. Tipo de envio */}
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 text-xs space-y-2.5 font-sans">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-stone-200/80 dark:border-stone-800">
+                    <div className="flex items-center gap-2 font-bold text-stone-900 dark:text-stone-100">
+                      <User className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                      <span>{order.profiles?.full_name || t.orders_client_label}</span>
+                      {order.profiles?.phone && (
+                        <span className="inline-flex items-center gap-1 text-stone-500 dark:text-stone-400 font-normal">
+                          <Phone className="w-3 h-3" /> {order.profiles.phone}
+                        </span>
                       )}
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
+                      Tipo de Envío
+                    </span>
+                  </div>
 
-                      {order.status === 'confirmado' && (
-                        <button
-                          type="button"
-                          disabled={loadingId === order.id}
-                          onClick={() => handleStatusChange(order.id, 'preparando')}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
-                        >
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{t.status_preparing}</span>
-                        </button>
-                      )}
+                  <div className="flex items-start gap-2 text-stone-700 dark:text-stone-300">
+                    {isStorePickup ? (
+                      <>
+                        <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-bold block text-stone-900 dark:text-stone-100">{t.deliv_store_pickup_tag}</span>
+                          <span className="text-[11px] text-stone-500 dark:text-stone-400">
+                            {order.shipping_address || 'Punto de recogida en tienda'}
+                          </span>
+                          {order.pickup_schedule && (
+                            <span className="block text-[11px] text-[#C68D07] dark:text-[#FFE259] font-bold mt-0.5">
+                              Horario acordado: {order.pickup_schedule}
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Truck className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-bold block text-stone-900 dark:text-stone-100">{t.deliv_home_tag}</span>
+                          <span className="text-[11px] text-stone-600 dark:text-stone-300">
+                            {order.shipping_address || t.profile_not_specified || 'Dirección de entrega a domicilio'}
+                          </span>
+                          {order.shipping_notes && (
+                            <span className="block text-[11px] italic text-stone-500 dark:text-stone-400 mt-0.5">
+                              Indicaciones: {order.shipping_notes}
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
 
-                      {order.status === 'preparando' && (
-                        <button
-                          type="button"
-                          disabled={loadingId === order.id}
-                          onClick={() => handleStatusChange(order.id, 'listo_entrega')}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
-                        >
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          <span>{t.status_ready}</span>
-                        </button>
-                      )}
-
-                      {order.status === 'listo_entrega' && (
-                        <button
-                          type="button"
-                          disabled={loadingId === order.id}
-                          onClick={() => handleStatusChange(order.id, 'entregado')}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>{t.status_delivered}</span>
-                        </button>
-                      )}
-
-                      {/* Botones secundarios para saltar a otros estados */}
-                      <div className="flex items-center gap-1 text-xs">
-                        {order.status !== 'confirmado' && order.status !== 'pendiente' && (
-                          <button
-                            type="button"
-                            onClick={() => handleStatusChange(order.id, 'confirmado')}
-                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
-                          >
-                            {t.orders_step_confirmed}
-                          </button>
-                        )}
-                        {order.status !== 'preparando' && (
-                          <button
-                            type="button"
-                            onClick={() => handleStatusChange(order.id, 'preparando')}
-                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
-                          >
-                            {t.orders_step_preparing}
-                          </button>
-                        )}
-                        {order.status !== 'listo_entrega' && (
-                          <button
-                            type="button"
-                            onClick={() => handleStatusChange(order.id, 'listo_entrega')}
-                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
-                          >
-                            {t.orders_step_ready}
-                          </button>
-                        )}
-                        {order.status !== 'entregado' && (
-                          <button
-                            type="button"
-                            onClick={() => handleStatusChange(order.id, 'entregado')}
-                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
-                          >
-                            {t.orders_step_delivered}
-                          </button>
-                        )}
-                      </div>
+                {/* 5. Fecha y Numero de pedido y boton de chat */}
+                <div className="pt-3 border-t border-stone-100 dark:border-stone-800 space-y-3 font-serif">
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
+                        {t.orders_order_number} #{order.id.slice(0, 8)} · <span className="font-black text-stone-900 dark:text-stone-100">{t.orders_total_to_charge} {total.toFixed(2)} €</span>
+                      </span>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                        {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
                     </div>
 
-                    {/* Botón de Rechazo / Cancelación */}
-                    <button
-                      type="button"
-                      onClick={() => handleOpenCancelModal(order.id, order.status === 'pendiente')}
-                      className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-bold transition-colors cursor-pointer"
+                    <Link
+                      href={`/chat/${order.buyer_id}?order_id=${order.id}`}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer"
                     >
-                      <XCircle className="w-3.5 h-3.5" />
-                      <span>
-                        {order.status === 'pendiente' ? t.orders_reject : t.orders_cancel_order}
-                      </span>
-                    </button>
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>{t.orders_chat_with_buyer}</span>
+                    </Link>
                   </div>
-                )}
+
+                  {/* Acciones de Estado (si no está cancelado) */}
+                  {!isCancelled && (
+                    <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {order.status === 'pendiente' && (
+                          <button
+                            type="button"
+                            disabled={loadingId === order.id}
+                            onClick={() => handleStatusChange(order.id, 'confirmado')}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>{t.status_confirm}</span>
+                          </button>
+                        )}
+
+                        {order.status === 'confirmado' && (
+                          <button
+                            type="button"
+                            disabled={loadingId === order.id}
+                            onClick={() => handleStatusChange(order.id, 'preparando')}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                          >
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{t.status_preparing}</span>
+                          </button>
+                        )}
+
+                        {order.status === 'preparando' && (
+                          <button
+                            type="button"
+                            disabled={loadingId === order.id}
+                            onClick={() => handleStatusChange(order.id, 'listo_entrega')}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span>{t.status_ready}</span>
+                          </button>
+                        )}
+
+                        {order.status === 'listo_entrega' && (
+                          <button
+                            type="button"
+                            disabled={loadingId === order.id}
+                            onClick={() => handleStatusChange(order.id, 'entregado')}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>{t.status_delivered}</span>
+                          </button>
+                        )}
+
+                        {/* Botones secundarios */}
+                        <div className="flex items-center gap-1">
+                          {order.status !== 'confirmado' && order.status !== 'pendiente' && (
+                            <button
+                              type="button"
+                              onClick={() => handleStatusChange(order.id, 'confirmado')}
+                              className="px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
+                            >
+                              {t.orders_step_confirmed}
+                            </button>
+                          )}
+                          {order.status !== 'preparando' && (
+                            <button
+                              type="button"
+                              onClick={() => handleStatusChange(order.id, 'preparando')}
+                              className="px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
+                            >
+                              {t.orders_step_preparing}
+                            </button>
+                          )}
+                          {order.status !== 'listo_entrega' && (
+                            <button
+                              type="button"
+                              onClick={() => handleStatusChange(order.id, 'listo_entrega')}
+                              className="px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
+                            >
+                              {t.orders_step_ready}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {order.status !== 'entregado' && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenCancelModal(order.id, order.status === 'pendiente')}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg text-xs font-bold transition-colors cursor-pointer ml-auto"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>{order.status === 'pendiente' ? t.orders_reject : t.orders_cancel_order}</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}

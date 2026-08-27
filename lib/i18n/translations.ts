@@ -45,6 +45,7 @@ export interface TranslationDict {
   cat_cerveza: string;
   cat_txakoli: string;
   cat_sidra: string;
+  cat_producto_unico: string;
   cat_new_badge: string;
   cat_explore: string;
   cat_section_title: string;
@@ -686,6 +687,7 @@ export const translations: Record<Language, TranslationDict> = {
     cat_cerveza: 'Garagardo artisaua',
     cat_txakoli: 'Txakolina',
     cat_sidra: 'Sagardoa',
+    cat_producto_unico: 'Produktu bakarra',
     cat_new_badge: 'Berritasuna',
     cat_explore: 'Arakatu atala',
     cat_section_title: 'EkhiTeka Hautaketaren Kategoriak',
@@ -1099,7 +1101,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_deleted: 'Produktua ezabatu da',
     seller_events_title: 'Dastaketa Presentzialak Dendan',
     seller_events_subtitle: 'Aforoa, aldagaien edizioa eta bertaratuen kudeaketa Lekeitioko dastaketetan.',
-    seller_events_edit_btn: 'Editatu Dastaketa',
+    seller_events_edit_btn: 'Editatu Ekitaldia',
     seller_events_reserved: 'Erreserbatuta',
     seller_events_available: 'Libre',
     seller_events_collected: 'Bilketa',
@@ -1305,6 +1307,7 @@ export const translations: Record<Language, TranslationDict> = {
     cat_cerveza: 'Cerveza artesanal',
     cat_txakoli: 'Txakoli',
     cat_sidra: 'Sidra',
+    cat_producto_unico: 'Producto único',
     cat_new_badge: 'Novedad',
     cat_explore: 'Explorar sección',
     cat_section_title: 'Categorías Selección EkhiTeka',
@@ -1718,7 +1721,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_deleted: 'Producto eliminado correctamente',
     seller_events_title: 'Catas Presenciales en Tienda',
     seller_events_subtitle: 'Control de aforo, edición de variables y gestión de asistentes para catas en Lekeitio.',
-    seller_events_edit_btn: 'Editar Cata',
+    seller_events_edit_btn: 'Editar Evento',
     seller_events_reserved: 'Reservadas',
     seller_events_available: 'Disponibles',
     seller_events_collected: 'Recaudado',
@@ -1924,6 +1927,7 @@ export const translations: Record<Language, TranslationDict> = {
     cat_cerveza: 'Craft Beer',
     cat_txakoli: 'Txakoli Wine',
     cat_sidra: 'Natural Cider',
+    cat_producto_unico: 'Unique product',
     cat_new_badge: 'New',
     cat_explore: 'Explore category',
     cat_section_title: 'EkhiTeka Selection Categories',
@@ -2337,7 +2341,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_deleted: 'Product deleted successfully',
     seller_events_title: 'In-Store In-Person Tastings',
     seller_events_subtitle: 'Capacity control, variables edition and attendee management for tastings in Lekeitio.',
-    seller_events_edit_btn: 'Edit Tasting',
+    seller_events_edit_btn: 'Edit Event',
     seller_events_reserved: 'Booked',
     seller_events_available: 'Available',
     seller_events_collected: 'Collected',
@@ -2543,6 +2547,7 @@ export const translations: Record<Language, TranslationDict> = {
     cat_cerveza: 'Bière artisanale',
     cat_txakoli: 'Vin Txakoli',
     cat_sidra: 'Cidre naturel',
+    cat_producto_unico: 'Produit unique',
     cat_new_badge: 'Nouveau',
     cat_explore: 'Explorer la catégorie',
     cat_section_title: 'Catégories Sélection EkhiTeka',
@@ -2956,7 +2961,7 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_deleted: 'Produit supprimé avec succès',
     seller_events_title: 'Dégustations en Boutique',
     seller_events_subtitle: 'Contrôle de jauge, modification des variables et gestion des inscrits à Lekeitio.',
-    seller_events_edit_btn: 'Modifier la Dégustation',
+    seller_events_edit_btn: "Modifier l'Événement",
     seller_events_reserved: 'Réservées',
     seller_events_available: 'Disponibles',
     seller_events_collected: 'Encaissé',

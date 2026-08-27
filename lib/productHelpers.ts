@@ -16,6 +16,126 @@ export interface ExtraProductMeta {
   boxPresentation?: string;
 }
 
+export interface PackItem {
+  id?: string;
+  name: string;
+  quantity?: number;
+  price?: number;
+  imageUrl?: string | null;
+  format?: string | null;
+  origin?: string | null;
+}
+
+export function getPackItems(product?: { description?: string | null }): PackItem[] {
+  if (!product?.description) return [];
+  // 1. Check META
+  const match = product.description.match(/<!-- META:({.*?}) -->/);
+  if (match && match[1]) {
+    try {
+      const meta = JSON.parse(match[1]);
+      if (Array.isArray(meta.pack_items) && meta.pack_items.length > 0) {
+        return meta.pack_items;
+      }
+    } catch {}
+  }
+
+  // 2. Parse from bullet points in description e.g. "• Item Name (x2) — 15.00 €"
+  const clean = getCleanDescription(product.description);
+  const lines = clean.split('\n');
+  const items: PackItem[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+      const text = trimmed.replace(/^[•\-]\s*/, '').trim();
+      const qtyMatch = text.match(/\(x(\d+)\)/i);
+      const quantity = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+      const cleanName = text.replace(/\(x\d+\)/i, '').replace(/—\s*[\d,.]+\s*€/g, '').trim();
+      if (cleanName) {
+        items.push({
+          name: cleanName,
+          quantity,
+        });
+      }
+    }
+  }
+  return items;
+}
+
+export function getPeopleRange(product?: { description?: string | null }, language: string = 'es'): string | null {
+  if (!product?.description) return null;
+  
+  // 1. Check META
+  const match = product.description.match(/<!-- META:({.*?}) -->/);
+  let min = 2;
+  let max = 4;
+  let found = false;
+
+  if (match && match[1]) {
+    try {
+      const meta = JSON.parse(match[1]);
+      if (meta.min_people !== undefined && meta.max_people !== undefined) {
+        min = Number(meta.min_people);
+        max = Number(meta.max_people);
+        found = true;
+      }
+    } catch {}
+  }
+
+  if (!found) {
+    const textMatch = product.description.match(/(\d+)\s*(?:-|a|edo|ou|to)\s*(\d+)\s*(?:personas|pertsonak|lagun|personnes|people)/i);
+    if (textMatch) {
+      min = parseInt(textMatch[1], 10);
+      max = parseInt(textMatch[2], 10);
+      found = true;
+    }
+  }
+
+  if (!found) {
+    return null;
+  }
+
+  if (language === 'eu') return `${min}-${max} lagunentzat`;
+  if (language === 'fr') return `pour ${min}-${max} personnes`;
+  if (language === 'en') return `for ${min}-${max} people`;
+  return `para ${min}-${max} personas`;
+}
+
+export function getProductWeightOrVolume(
+  product?: { weight_g?: number | null; format?: string | null; description?: string | null },
+  language: string = 'es'
+): string | null {
+  if (!product) return null;
+
+  // Check META for exact unit (e.g. kg, L, cl, ml)
+  if (product.description) {
+    const match = product.description.match(/<!-- META:({.*?}) -->/);
+    if (match && match[1]) {
+      try {
+        const meta = JSON.parse(match[1]);
+        if (meta.unit && meta.amount !== undefined) {
+          const amt = Number(meta.amount);
+          const u = String(meta.unit).toLowerCase();
+          if (u === 'kg') return `${amt} kg`;
+          if (u === 'l' || u === 'litro' || u === 'litros') return `${amt} L`;
+          if (u === 'cl') return `${amt} cl`;
+          if (u === 'ml') return `${amt} ml`;
+          if (u === 'g') return `${amt}g`;
+        }
+      } catch {}
+    }
+  }
+
+  // Fallback to weight_g
+  if (product.weight_g && product.weight_g > 0) {
+    if (product.weight_g >= 1000 && product.weight_g % 100 === 0) {
+      return `${(product.weight_g / 1000).toFixed(product.weight_g % 1000 === 0 ? 0 : 1)} kg`;
+    }
+    return `${product.weight_g}g`;
+  }
+
+  return null;
+}
+
 export function getProductDiscount(product?: { description?: string | null }): { discountPercent: number; originalPrice?: number } | null {
   if (!product?.description) return null;
   const match = product.description.match(/<!-- META:({.*?}) -->/);

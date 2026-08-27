@@ -12,6 +12,7 @@ import {
   formatProductDescription,
   getTranslatedFormat,
   getTranslatedOrigin,
+  getProductWeightOrVolume,
 } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import {
@@ -49,6 +50,7 @@ export function ProductDetailView({
   const discountInfo = getProductDiscount(product);
   const translatedOrigin = getTranslatedOrigin(product.origin_region, language);
   const translatedFormat = getTranslatedFormat(product.format, language);
+  const weightOrVolume = getProductWeightOrVolume(product, language);
   const cleanDescription = formatProductDescription(product.description, language);
 
   return (
@@ -117,9 +119,9 @@ export function ProductDetailView({
                   {t.prod_format_label}: {translatedFormat}
                 </span>
               )}
-              {product.weight_g && (
+              {weightOrVolume && (
                 <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2D2B27] uppercase tracking-[0.12em]">
-                  {t.prod_weight_label}: {product.weight_g}g
+                  {t.prod_weight_label}: {weightOrVolume}
                 </span>
               )}
             </div>

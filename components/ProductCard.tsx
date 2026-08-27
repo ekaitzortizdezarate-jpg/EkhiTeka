@@ -16,9 +16,12 @@ import {
   getTranslatedOrigin,
   getUnitsSuffix,
   getSeatsSuffix,
+  getPackItems,
+  getPeopleRange,
+  getProductWeightOrVolume,
 } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
-import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle, CreditCard } from 'lucide-react';
+import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle, CreditCard, Package } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProductWithSeller;
@@ -42,11 +45,19 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const isSoldOut = !isUnlimited && (product.stock ?? 0) <= 0;
   const isLowStock = !isUnlimited && (product.stock ?? 0) <= 5 && (product.stock ?? 0) > 0;
   const maxStock = isUnlimited ? 99 : Math.max(1, product.stock ?? 1);
-  const isEvent =
-    product.category_id === 'catas' ||
+
+  const isCataCasa =
+    product.category_id === 'cata_casa' ||
+    (product.name && product.name.toLowerCase().includes('cata en casa'));
+
+  const isCataTienda =
     product.category_id === 'cata_presencial' ||
-    product.category_id === 'experiencia' ||
-    product.name.toLowerCase().includes('cata');
+    product.category_id === 'catas' ||
+    (product.name && (
+      product.name.toLowerCase().includes('cata presencial') ||
+      product.name.toLowerCase().includes('dastaketa presentziala') ||
+      (product.name.toLowerCase().includes('cata') && !isCataCasa)
+    ));
 
   const isGiftCard =
     product.category_id === 'tarjeta_regalo' ||
@@ -57,10 +68,28 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
       product.name.toLowerCase().includes('carte cadeau')
     ));
 
+  const isLoteGourmet =
+    product.category_id === 'lote' ||
+    product.category_id === 'lote_gourmet' ||
+    product.category_id === 'cesta' ||
+    product.category_id === 'cesta_gourmet' ||
+    product.format === 'pack' ||
+    (product.name && (
+      product.name.toLowerCase().includes('lote') ||
+      product.name.toLowerCase().includes('cesta') ||
+      product.name.toLowerCase().includes('pack')
+    ) && !isCataCasa && !isCataTienda && !isGiftCard);
+
+  const isPackType = isCataCasa || isCataTienda || isLoteGourmet;
+  const isEvent = isCataTienda;
+
   const imageUrl = getProductImage(product);
   const discountInfo = getProductDiscount(product);
   const cleanDescription = formatProductDescription(product.description, language);
   const giftCardDescription = getGiftCardDescription(product.description, language);
+  const packItems = getPackItems(product);
+  const peopleRange = getPeopleRange(product, language);
+  const weightOrVolume = getProductWeightOrVolume(product, language);
 
   const sellerName = product.profiles?.full_name || 'EkhiTeka Gourmet Lekeitio';
   const sellerId = product.seller_id;
@@ -161,10 +190,10 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           )}
         </div>
 
-        {/* Formato y Peso (Bottom Left) */}
-        {(translatedFormat || product.weight_g) && (
+        {/* Formato y Peso / Volumen (Bottom Left) */}
+        {(translatedFormat || weightOrVolume) && (
           <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-800 dark:text-stone-200 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs border border-[#E8E5DF] dark:border-[#2D2B27] font-serif">
-            {translatedFormat} {product.weight_g ? `· ${product.weight_g}g` : ''}
+            {translatedFormat ? translatedFormat : ''} {weightOrVolume ? `${translatedFormat ? '· ' : ''}${weightOrVolume}` : ''}
           </span>
         )}
 
@@ -221,6 +250,70 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                 </p>
               )}
             </div>
+          ) : isPackType ? (
+            <div className="space-y-2 pt-1 font-serif">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-stone-900 dark:text-stone-100 uppercase tracking-[0.14em]">
+                <Package className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0" />
+                <span>
+                  {language === 'eu'
+                    ? 'DASTAKETA PACK-AK DAKARRENA:'
+                    : language === 'fr'
+                    ? 'LE PACK DE DÉGUSTATION COMPREND :'
+                    : language === 'en'
+                    ? 'TASTING PACK INCLUDES:'
+                    : 'EL PACK DE CATA INCLUYE:'}
+                </span>
+              </div>
+
+              {packItems.length > 0 && (
+                <div className="grid grid-cols-1 gap-1.5">
+                  {packItems.slice(0, 4).map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 p-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27]"
+                    >
+                      <div className="w-7 h-7 rounded-lg overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200/60 dark:border-stone-700">
+                        <img
+                          src={item.imageUrl || '/images/secciones/Quesos.JPG'}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-bold text-stone-900 dark:text-stone-100 truncate leading-tight">
+                          {item.name}
+                        </p>
+                        <div className="flex items-center gap-1.5 text-[10px] text-stone-500 dark:text-stone-400">
+                          {item.quantity && item.quantity > 1 && (
+                            <span className="font-bold text-stone-700 dark:text-stone-300">
+                              x{item.quantity}
+                            </span>
+                          )}
+                          {item.format && <span>· {item.format}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {packItems.length > 4 && (
+                    <span className="text-[10px] font-bold text-stone-500 dark:text-stone-400 block text-right pr-1">
+                      +{packItems.length - 4} {language === 'eu' ? 'gehiago' : language === 'fr' ? 'de plus' : language === 'en' ? 'more' : 'más'}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {cleanDescription && (
+                <ProductDescription
+                  description={product.description}
+                  language={language}
+                  isCompact={true}
+                  className="pt-0.5"
+                />
+              )}
+            </div>
           ) : (
             cleanDescription && (
               <ProductDescription
@@ -239,7 +332,9 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           <div className="flex items-center justify-between gap-2.5">
             <div className="shrink-0">
               <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.16em] block font-serif">
-                {isEvent ? (t.prod_price_per_seat || '/ lekua') : t.prod_price}
+                {isCataCasa
+                  ? (peopleRange || (language === 'eu' ? '2-4 lagunentzat' : language === 'fr' ? 'pour 2-4 personnes' : language === 'en' ? 'for 2-4 people' : 'para 2-4 personas'))
+                  : t.prod_price}
               </span>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
