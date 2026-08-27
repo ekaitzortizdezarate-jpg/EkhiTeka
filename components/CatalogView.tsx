@@ -25,7 +25,7 @@ export function CatalogView({
   isSeller = false,
 }: CatalogViewProps) {
   const { t, language } = useLanguage();
-  const { getSiteImage } = useStoreConfig();
+  const { getSiteImage, getWhatsAppUrl, storeAddress } = useStoreConfig();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<'name_asc' | 'name_desc' | 'price_asc' | 'price_desc'>('name_asc');
@@ -164,12 +164,12 @@ export function CatalogView({
             onClick={() => setSelectedCat('all')}
             className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-bold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
               selectedCat === 'all'
-                ? 'bg-[#1D1D1B] text-white dark:bg-white dark:text-[#1D1D1B] scale-102 shadow-xs'
-                : 'bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black border border-[#FFE259] scale-102 shadow-xs'
+                : 'bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] text-stone-700 dark:text-stone-300 hover:border-stone-400 dark:hover:border-stone-600'
             }`}
           >
             <span>{t.cat_all}</span>
-            <span className="text-[10px] opacity-70">({products.length})</span>
+            <span className="text-[10px] opacity-80">({products.length})</span>
           </button>
 
           {categories.map((cat) => {
@@ -181,12 +181,12 @@ export function CatalogView({
                 onClick={() => setSelectedCat(cat.id)}
                 className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-bold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
                   selectedCat === cat.id
-                    ? 'bg-[#1D1D1B] text-white dark:bg-white dark:text-[#1D1D1B] scale-102 shadow-xs'
-                    : 'bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                    ? 'bg-[#FFE259] text-[#1D1D1B] font-black border border-[#FFE259] scale-102 shadow-xs'
+                    : 'bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] text-stone-700 dark:text-stone-300 hover:border-stone-400 dark:hover:border-stone-600'
                 }`}
               >
                 <span>{getCategoryName(cat)}</span>
-                <span className="text-[10px] opacity-70">({count})</span>
+                <span className="text-[10px] opacity-80">({count})</span>
               </button>
             );
           })}
@@ -258,10 +258,10 @@ export function CatalogView({
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
               {t.shop_visit_desc}
             </p>
-            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
+            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300 font-sans">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
-                <span>Gamarra Kalea 4, Lekeitio · Bizkaia</span>
+                <span>{storeAddress || 'Gamarra Kalea 4, Lekeitio · Bizkaia'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
@@ -270,13 +270,19 @@ export function CatalogView({
             </div>
             <div className="pt-2 flex flex-wrap gap-3">
               <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
+                href={
+                  getWhatsAppUrl(
+                    language === 'eu'
+                      ? 'Kaixo, Lekeitioko dendan produktuen eskuragarritasunari buruz galdetu nahi nuen.'
+                      : 'Hola, quisiera consultar disponibilidad de productos en la tienda de Lekeitio.'
+                  ) || 'https://wa.me/34600000000'
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105"
               >
-                <MessageCircle className="w-4 h-4 text-stone-300 dark:text-stone-700 stroke-[1.75]" />
-                <span>Kontaktatu Dendarekin</span>
+                <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#C68D07] stroke-[2]" />
+                <span>{t.shop_visit_contact}</span>
               </a>
               <button
                 type="button"
@@ -291,11 +297,11 @@ export function CatalogView({
           <div className="lg:col-span-6">
             <div className="relative rounded-3xl overflow-hidden shadow-md border border-[#E8E5DF] dark:border-[#2D2B27] h-64 sm:h-80 group">
               <img
-                src="/images/secciones/Tienda.JPG"
-                alt="Tienda EkhiTeka Lekeitio"
+                src={getSiteImage('tienda_hero', '/images/secciones/Tienda.JPG')}
+                alt={t.shop_visit_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-4 right-4 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60 backdrop-blur-xs">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60 backdrop-blur-xs font-sans">
                 Lekeitio Centro
               </div>
             </div>

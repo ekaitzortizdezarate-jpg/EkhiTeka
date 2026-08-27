@@ -251,13 +251,13 @@ export function SellerProductsListView({
 
               <div className="flex flex-wrap items-center gap-2 text-xs font-serif pt-0.5">
                 {(format || weightOrVolume) && (
-                  <span className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] dark:bg-stone-850 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700 font-bold uppercase tracking-wider text-[11px]">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] dark:bg-[#141312] text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 font-bold uppercase tracking-wider text-[11px]">
                     {format} {weightOrVolume ? `· ${weightOrVolume}` : ''}
                   </span>
                 )}
 
                 {minPeople && maxPeople && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700 text-[11px] font-bold">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#141312] text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 text-[11px] font-bold">
                     <Users className="w-3.5 h-3.5 text-stone-500" />
                     <span>
                       {language === 'eu' ? `${minPeople} - ${maxPeople} lagunentzat` : `Para ${minPeople} a ${maxPeople} personas`}
@@ -265,7 +265,7 @@ export function SellerProductsListView({
                   </span>
                 )}
 
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] font-bold">
+                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#141312] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-800 text-[11px] font-bold">
                   {product.is_unlimited_stock
                     ? 'Stock: Ilimitado'
                     : `Stock: ${product.stock ?? 0} uds`}
@@ -283,7 +283,7 @@ export function SellerProductsListView({
                   {packItems.map((sub, idx) => (
                     <div
                       key={sub.id || idx}
-                      className="flex items-center gap-2 p-2 rounded-xl bg-stone-50 dark:bg-stone-850 border border-stone-200/60 dark:border-stone-700/60 text-xs"
+                      className="flex items-center gap-2 p-2 rounded-xl bg-stone-50 dark:bg-[#141312] border border-stone-200/80 dark:border-stone-800 text-xs"
                     >
                       <div className="w-9 h-9 rounded-lg overflow-hidden bg-white dark:bg-stone-800 shrink-0 border border-stone-200 dark:border-stone-700">
                         <img
@@ -521,7 +521,7 @@ export function SellerProductsListView({
               {packItems.map((sub, idx) => (
                 <div
                   key={sub.id || idx}
-                  className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-850 border border-stone-200/70 dark:border-stone-700/70"
+                  className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200/80 dark:border-stone-800"
                 >
                   <div className="w-12 h-12 rounded-xl overflow-hidden bg-white dark:bg-stone-800 shrink-0 border border-stone-200 dark:border-stone-700">
                     <img
@@ -553,7 +553,7 @@ export function SellerProductsListView({
               ))}
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-stone-50 dark:bg-stone-850 text-xs text-stone-500 font-sans">
+            <div className="p-3 rounded-xl bg-stone-50 dark:bg-[#141312] border border-stone-200/80 dark:border-stone-800 text-xs text-stone-500 font-sans">
               No se han asignado productos específicos sueltos a este evento aún. Puedes editarlos en el formulario.
             </div>
           )}

@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const { t } = useLanguage();
-  const { getSiteImage } = useStoreConfig();
+  const { t, language } = useLanguage();
+  const { getSiteImage, getWhatsAppUrl, storeAddress } = useStoreConfig();
 
   const heroHomeImage = getSiteImage('home_hero', '/images/secciones/Tienda.JPG');
   const card1Image = getSiteImage('cat_quesos', '/images/secciones/Quesos.JPG');
@@ -252,18 +252,18 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-4">
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 block">
-              Bisitatu Lekeition · Km0
+              {t.shop_visit_subtitle}
             </span>
             <h2 className="text-2xl sm:text-4xl font-bold text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight">
-              Gure Gaztategia & Gourmet Gunea
+              {t.shop_visit_title}
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
-              En nuestra web ves una selección, en nuestra quesería de Lekeitio lo tienes todo: más de 80 referencias de quesos artesanos afinados, conservas selectas del Cantábrico y el asesoramiento personalizado de nuestros maestros queseros.
+              {t.shop_visit_desc}
             </p>
-            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
+            <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300 font-sans">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
-                <span>Gamarra Kalea 4, Lekeitio · Bizkaia</span>
+                <span>{storeAddress || 'Gamarra Kalea 4, Lekeitio · Bizkaia'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
@@ -272,31 +272,37 @@ export default function HomePage() {
             </div>
             <div className="pt-2 flex flex-wrap gap-3">
               <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
+                href={
+                  getWhatsAppUrl(
+                    language === 'eu'
+                      ? 'Kaixo, Lekeitioko dendan produktuen eskuragarritasunari buruz galdetu nahi nuen.'
+                      : 'Hola, quisiera consultar disponibilidad de productos en la tienda de Lekeitio.'
+                  ) || 'https://wa.me/34600000000'
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105"
               >
-                <MessageCircle className="w-4 h-4 text-stone-300 dark:text-stone-700 stroke-[1.75]" />
-                <span>Kontaktatu Dendarekin</span>
+                <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#C68D07] stroke-[2]" />
+                <span>{t.shop_visit_contact}</span>
               </a>
               <Link
                 href="/tienda"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105"
               >
                 <ShoppingBag className="w-4 h-4 stroke-[1.75]" />
-                <span>{t.nav_shop}</span>
+                <span>{t.shop_see_cheeses}</span>
               </Link>
             </div>
           </div>
           <div className="lg:col-span-6">
             <div className="relative rounded-3xl overflow-hidden shadow-md border border-[#E8E5DF] dark:border-[#2D2B27] h-64 sm:h-80 group">
               <img
-                src="/images/secciones/Tienda.JPG"
-                alt="Tienda EkhiTeka Lekeitio"
+                src={getSiteImage('tienda_hero', '/images/secciones/Tienda.JPG')}
+                alt={t.shop_visit_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-4 right-4 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60 backdrop-blur-xs">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60 backdrop-blur-xs font-sans">
                 Lekeitio Centro
               </div>
             </div>
