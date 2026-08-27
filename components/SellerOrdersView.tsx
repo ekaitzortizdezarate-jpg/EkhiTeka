@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
-import { updateOrderStatus, cancelOrder } from '@/app/actions/orders';
+import { updateOrderStatus, cancelOrder, deleteOrderPermanently } from '@/app/actions/orders';
 import { getProductImage, getPackItems, getOrderTypeBadge } from '@/lib/productHelpers';
 import Link from 'next/link';
 import type { Order, OrderStatus } from '@/types/database';
@@ -23,6 +23,7 @@ import {
   Truck,
   Trash2,
   X,
+  Layers,
 } from 'lucide-react';
 
 const STATUS_STEPS: { key: OrderStatus; labelKey: string }[] = [
@@ -35,10 +36,11 @@ const STATUS_STEPS: { key: OrderStatus; labelKey: string }[] = [
 
 export function SellerOrdersView({ orders }: { orders: Order[] }) {
   const { t, language } = useLanguage();
+  const [activeTab, setActiveTab] = useState<'actuales' | 'terminados'>('actuales');
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [seenMap, setSeenMap] = useState<Record<string, string>>({});
 
-  // Modal para rechazar / cancelar pedido
+  // Modal para cancelar pedido en curso (pasa a terminados)
   const [cancelModal, setCancelModal] = useState<{
     open: boolean;
     orderId: string;
@@ -50,6 +52,17 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
     orderId: '',
     isPending: false,
     reason: '',
+    loading: false,
+  });
+
+  // Modal para borrado permanente definitivo del sistema
+  const [permanentDeleteModal, setPermanentDeleteModal] = useState<{
+    open: boolean;
+    orderId: string;
+    loading: boolean;
+  }>({
+    open: false,
+    orderId: '',
     loading: false,
   });
 
@@ -118,6 +131,16 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
     });
   };
 
+  const handleConfirmPermanentDelete = async () => {
+    if (!permanentDeleteModal.orderId) return;
+    setPermanentDeleteModal((prev) => ({ ...prev, loading: true }));
+    const res = await deleteOrderPermanently(permanentDeleteModal.orderId);
+    setPermanentDeleteModal({ open: false, orderId: '', loading: false });
+    if (res?.error) {
+      alert(`Error: ${res.error}`);
+    }
+  };
+
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case 'pendiente':
@@ -165,9 +188,13 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
     return STATUS_STEPS.findIndex((s) => s.key === status);
   };
 
+  const actualOrders = orders.filter((o) => o.status !== 'entregado' && o.status !== 'cancelado');
+  const finishedOrders = orders.filter((o) => o.status === 'entregado' || o.status === 'cancelado');
+  const currentOrders = activeTab === 'actuales' ? actualOrders : finishedOrders;
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 space-y-8">
-      {/* Modal de Cancelación / Rechazo */}
+      {/* Modal de Cancelación / Rechazo (pasa a terminados) */}
       {cancelModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn font-sans">
           <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 max-w-md w-full p-6 space-y-4 shadow-2xl">
@@ -175,7 +202,11 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
               <div className="flex items-center gap-2 text-red-600">
                 <AlertTriangle className="w-5 h-5" />
                 <h3 className="font-serif font-black text-base text-stone-900 dark:text-stone-100">
-                  {cancelModal.isPending ? (language === 'eu' ? 'Baztertu Eskaera' : 'Rechazar Pedido') : (t.orders_cancel_modal_title || 'Cancelar Pedido')}
+                  {cancelModal.isPending
+                    ? language === 'eu'
+                      ? 'Baztertu Eskaera'
+                      : 'Rechazar Pedido'
+                    : t.orders_cancel_modal_title || 'Cancelar Pedido'}
                 </h3>
               </div>
               <button
@@ -189,8 +220,11 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
 
             <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
               {cancelModal.isPending
-                ? (language === 'eu' ? 'Eskaera hau baztertzean bezeroari jakinaraziko zaio.' : 'Al rechazar este pedido se notificará al cliente.')
-                : (t.orders_cancel_chat_notice || 'Al cancelar este pedido se notificará al cliente.')}
+                ? language === 'eu'
+                  ? 'Eskaera hau baztertzean amaituetara igaroko da eta bezeroari jakinaraziko zaio.'
+                  : 'Al rechazar este pedido pasará a terminados y se notificará al cliente.'
+                : t.orders_cancel_chat_notice ||
+                  'Al cancelar este pedido pasará a la sección de terminados y se notificará al cliente.'}
             </p>
 
             <form onSubmit={handleConfirmCancel} className="space-y-4">
@@ -205,8 +239,10 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   onChange={(e) => setCancelModal((prev) => ({ ...prev, reason: e.target.value }))}
                   placeholder={
                     cancelModal.isPending
-                      ? (language === 'eu' ? 'Adierazi eskaera baztertzeko arrazoia...' : 'Indica el motivo del rechazo del pedido...')
-                      : (t.orders_cancel_reason_placeholder || 'Indica el motivo de cancelación...')
+                      ? language === 'eu'
+                        ? 'Adierazi eskaera baztertzeko arrazoia...'
+                        : 'Indica el motivo del rechazo del pedido...'
+                      : t.orders_cancel_reason_placeholder || 'Indica el motivo de cancelación...'
                   }
                   className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-900 dark:text-stone-100 outline-hidden focus:border-red-500"
                 />
@@ -217,7 +253,7 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   type="button"
                   disabled={cancelModal.loading}
                   onClick={() => setCancelModal((prev) => ({ ...prev, open: false }))}
-                  className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                  className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                 >
                   {language === 'eu' ? 'Atzera' : 'Volver'}
                 </button>
@@ -227,10 +263,14 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider shadow-sm transition-colors cursor-pointer"
                 >
                   {cancelModal.loading
-                    ? (language === 'eu' ? 'Izapidetzen...' : 'Procesando...')
+                    ? language === 'eu'
+                      ? 'Izapidetzen...'
+                      : 'Procesando...'
                     : cancelModal.isPending
-                    ? (language === 'eu' ? 'Baztertu' : 'Rechazar')
-                    : (t.orders_confirm_cancel_btn || 'Confirmar Cancelación')}
+                    ? language === 'eu'
+                      ? 'Baztertu'
+                      : 'Rechazar'
+                    : t.orders_confirm_cancel_btn || 'Confirmar Cancelación'}
                 </button>
               </div>
             </form>
@@ -238,20 +278,112 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
         </div>
       )}
 
+      {/* Modal para Borrado Definitivo del Sistema */}
+      {permanentDeleteModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn font-sans">
+          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-red-300 dark:border-red-900/80 max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2 text-red-600">
+                <Trash2 className="w-5 h-5" />
+                <h3 className="font-serif font-black text-base text-stone-900 dark:text-stone-100">
+                  {language === 'eu' ? 'Eskaera Betirako Ezabatu' : 'Eliminar Pedido del Sistema'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPermanentDeleteModal({ open: false, orderId: '', loading: false })}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+              {language === 'eu'
+                ? 'Eskaera hau eta bere informazio guztia betirako ezabatuko da sistematik. Ekintza hau ezin da desegin. Ziur zaude?'
+                : 'Este pedido y toda su información se eliminarán por completo y de forma definitiva del sistema. Esta acción no se puede deshacer. ¿Deseas continuar?'}
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                disabled={permanentDeleteModal.loading}
+                onClick={() => setPermanentDeleteModal({ open: false, orderId: '', loading: false })}
+                className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
+              >
+                {language === 'eu' ? 'Utzi' : 'Cancelar'}
+              </button>
+              <button
+                type="button"
+                disabled={permanentDeleteModal.loading}
+                onClick={handleConfirmPermanentDelete}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider shadow-sm transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>
+                  {permanentDeleteModal.loading
+                    ? language === 'eu'
+                      ? 'Ezabatzen...'
+                      : 'Eliminando...'
+                    : language === 'eu'
+                    ? 'Bai, Betirako Ezabatu'
+                    : 'Sí, Eliminar Definitivamente'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Cabecera de la página */}
-      <div className="pb-4 border-b border-stone-200 dark:border-stone-800">
-        <h1 className="text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
-          {t.orders_title_seller}
-        </h1>
-        <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-          {t.orders_subtitle_seller}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
+        <div>
+          <h1 className="text-3xl font-black font-serif text-stone-900 dark:text-stone-100">
+            {t.orders_title_seller}
+          </h1>
+          <p className="text-xs text-stone-500 dark:text-stone-400 font-sans mt-0.5">
+            {t.orders_subtitle_seller}
+          </p>
+        </div>
+
+        {/* Pestañas: Actuales (por defecto) y Terminados */}
+        <div className="flex items-center p-1 bg-stone-100 dark:bg-[#141312] rounded-2xl border border-stone-200 dark:border-stone-800 shadow-2xs font-sans text-xs shrink-0 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setActiveTab('actuales')}
+            className={`py-2 px-4 rounded-xl font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'actuales'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
+            }`}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>{language === 'eu' ? 'Unekoak' : 'Actuales'}</span>
+            <span className="px-2 py-0.5 rounded-full bg-black/10 dark:bg-white/15 text-[10.5px]">
+              {actualOrders.length}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('terminados')}
+            className={`py-2 px-4 rounded-xl font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === 'terminados'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
+            }`}
+          >
+            <CheckCircle className="w-3.5 h-3.5" />
+            <span>{language === 'eu' ? 'Amaituak' : 'Terminados'}</span>
+            <span className="px-2 py-0.5 rounded-full bg-black/10 dark:bg-white/15 text-[10.5px]">
+              {finishedOrders.length}
+            </span>
+          </button>
+        </div>
       </div>
 
-      {orders.length > 0 ? (
+      {currentOrders.length > 0 ? (
         <div className="space-y-6">
-          {orders.map((order) => {
-            const total = Number(order.total_price ?? order.total_amount ?? 0);
+          {currentOrders.map((order) => {
             const isStorePickup =
               order.delivery_type === 'recogida_tienda' ||
               order.delivery_method === 'recogida_tienda' ||
@@ -261,19 +393,20 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
             const isNew = !lastSeenStatus || lastSeenStatus !== order.status;
             const currentStepIdx = getStepIndex(order.status);
             const isCancelled = order.status === 'cancelado';
+            const isDelivered = order.status === 'entregado';
 
             return (
               <div
                 key={order.id}
                 className={`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-6 shadow-xs transition-all ${
-                  isNew
+                  isNew && !isCancelled && !isDelivered
                     ? 'border-[#FFE259] ring-2 ring-[#FFE259]/50 shadow-lg bg-amber-50/20 dark:bg-amber-950/15'
                     : isCancelled
-                    ? 'border-red-200 dark:border-red-950/60 opacity-90'
+                    ? 'border-red-200 dark:border-red-950/60 opacity-95'
                     : 'border-stone-200 dark:border-stone-800'
                 }`}
               >
-                {/* 1. Cabecera del pedido: Texto "Pedido #..." mejorado arriba a la izquierda */}
+                {/* 1. Cabecera del pedido: Texto "Pedido #..." arriba a la izquierda */}
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -304,7 +437,7 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                 </div>
 
                 {/* 2. Alerta de nuevo pedido o cancelado */}
-                {isNew && (
+                {isNew && !isCancelled && !isDelivered && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-sans animate-fadeIn">
                     <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
                       <Sparkles className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
@@ -326,10 +459,12 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                     <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
                     <div>
                       <span className="font-bold text-red-900 dark:text-red-200 block">
-                        Este pedido ha sido cancelado
+                        {language === 'eu' ? 'Eskaera hau ezeztatuta dago' : 'Este pedido ha sido cancelado'}
                       </span>
                       <span className="text-red-700 dark:text-red-300 text-[11px]">
-                        El stock de los productos se ha restaurado y se ha notificado al comprador.
+                        {language === 'eu'
+                          ? 'Produktuen stock-a berrezarri da eta bezeroari jakinarazi zaio.'
+                          : 'El stock de los productos se ha restaurado y se ha notificado al comprador.'}
                       </span>
                     </div>
                   </div>
@@ -558,45 +693,68 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 )}
 
-                {/* 6. PARTE INFERIOR: En una sola línea armónica -> Chat, Borrar y Selector de Estado */}
-                <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 font-sans">
-                  {/* Botón 1: Chat con el comprador */}
-                  <Link
-                    href={`/chat/${order.buyer_id}?order_id=${order.id}`}
-                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer whitespace-nowrap min-h-[40px]"
-                  >
-                    <MessageCircle className="w-4 h-4 shrink-0" />
-                    <span>{t.orders_chat_with_buyer}</span>
-                  </Link>
-
-                  {/* Botón 2: Borrar Pedido (Cancel / Reject) */}
-                  <button
-                    type="button"
-                    onClick={() => handleOpenCancelModal(order.id, order.status === 'pendiente')}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/60 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer min-h-[40px] whitespace-nowrap"
-                    title="Cancelar o borrar pedido"
-                  >
-                    <Trash2 className="w-4 h-4 shrink-0" />
-                    <span>{language === 'eu' ? 'Ezabatu' : 'Borrar'}</span>
-                  </button>
-
-                  {/* Botón 3: Menú desplegable para cambiar a cualquier estado del pedido (incluidos anteriores) */}
-                  <div className="w-full sm:w-auto flex-1 min-w-[200px]">
-                    <select
-                      value={order.status}
-                      disabled={loadingId === order.id}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
-                      className="w-full px-3.5 py-2.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200/70 dark:hover:bg-stone-750 text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-stone-200 dark:border-stone-700 transition-all cursor-pointer outline-none min-h-[40px]"
+                {/* 6. PARTE INFERIOR: Según si está en Actuales o en Terminados */}
+                {activeTab === 'terminados' ? (
+                  <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 font-sans">
+                    {/* Botón Chat */}
+                    <Link
+                      href={`/chat/${order.buyer_id}?order_id=${order.id}`}
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer whitespace-nowrap min-h-[40px]"
                     >
-                      <option value="pendiente">🕒 {t.orders_pending || 'Pendiente'}</option>
-                      <option value="confirmado">✓ {t.orders_confirmed || 'Confirmado'}</option>
-                      <option value="preparando">⏳ {t.orders_preparing || 'Preparando'}</option>
-                      <option value="listo_entrega">📦 {t.orders_ready_delivery || 'Listo para entrega'}</option>
-                      <option value="entregado">✨ {t.orders_delivered || 'Entregado'}</option>
-                      <option value="cancelado">❌ {t.orders_cancelled || 'Cancelado'}</option>
-                    </select>
+                      <MessageCircle className="w-4 h-4 shrink-0" />
+                      <span>{t.orders_chat_with_buyer}</span>
+                    </Link>
+
+                    {/* Botón Borrar Definitivamente del Sistema */}
+                    <button
+                      type="button"
+                      onClick={() => setPermanentDeleteModal({ open: true, orderId: order.id, loading: false })}
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer min-h-[40px] whitespace-nowrap"
+                    >
+                      <Trash2 className="w-4 h-4 shrink-0" />
+                      <span>{language === 'eu' ? 'Betirako Ezabatu' : 'Borrar del Sistema'}</span>
+                    </button>
                   </div>
-                </div>
+                ) : (
+                  <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 font-sans">
+                    {/* Botón 1: Chat con el comprador */}
+                    <Link
+                      href={`/chat/${order.buyer_id}?order_id=${order.id}`}
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer whitespace-nowrap min-h-[40px]"
+                    >
+                      <MessageCircle className="w-4 h-4 shrink-0" />
+                      <span>{t.orders_chat_with_buyer}</span>
+                    </Link>
+
+                    {/* Botón 2: Borrar Pedido (Pasa a Terminados como Cancelado) */}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCancelModal(order.id, order.status === 'pendiente')}
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/60 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer min-h-[40px] whitespace-nowrap"
+                      title="Cancelar y pasar a terminados"
+                    >
+                      <Trash2 className="w-4 h-4 shrink-0" />
+                      <span>{language === 'eu' ? 'Ezabatu' : 'Borrar'}</span>
+                    </button>
+
+                    {/* Botón 3: Menú desplegable para cambiar a cualquier estado del pedido */}
+                    <div className="w-full sm:w-auto flex-1 min-w-[200px]">
+                      <select
+                        value={order.status}
+                        disabled={loadingId === order.id}
+                        onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
+                        className="w-full px-3.5 py-2.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200/70 dark:hover:bg-stone-750 text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-stone-200 dark:border-stone-700 transition-all cursor-pointer outline-none min-h-[40px]"
+                      >
+                        <option value="pendiente">🕒 {t.orders_pending || 'Pendiente'}</option>
+                        <option value="confirmado">✓ {t.orders_confirmed || 'Confirmado'}</option>
+                        <option value="preparando">⏳ {t.orders_preparing || 'Preparando'}</option>
+                        <option value="listo_entrega">📦 {t.orders_ready_delivery || 'Listo para entrega'}</option>
+                        <option value="entregado">✨ {t.orders_delivered || 'Entregado (Terminar)'}</option>
+                        <option value="cancelado">❌ {t.orders_cancelled || 'Cancelado (Terminar)'}</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -605,10 +763,20 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
         <div className="py-16 text-center space-y-4 bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-8">
           <Package className="w-12 h-12 text-stone-300 dark:text-stone-700 mx-auto" />
           <h3 className="text-lg font-black font-serif text-stone-800 dark:text-stone-200">
-            {t.orders_no_orders_seller}
+            {activeTab === 'actuales'
+              ? language === 'eu'
+                ? 'Ez dago uneko eskaerarik'
+                : 'No hay pedidos actuales'
+              : language === 'eu'
+              ? 'Ez dago amaitutako eskaerarik'
+              : 'No hay pedidos terminados'}
           </h3>
           <p className="text-xs text-stone-500 max-w-sm mx-auto font-sans">
-            {t.orders_no_orders_seller_sub || ''}
+            {activeTab === 'actuales'
+              ? t.orders_no_orders_seller_sub || 'Aquí aparecerán los pedidos en curso.'
+              : language === 'eu'
+              ? 'Amaitutako edo ezeztatutako eskaerak hemen ikusiko dituzu.'
+              : 'Aquí verás el historial de pedidos entregados o cancelados.'}
           </p>
         </div>
       )}

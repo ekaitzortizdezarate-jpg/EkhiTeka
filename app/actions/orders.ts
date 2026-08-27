@@ -389,3 +389,65 @@ export async function buyerCancelOrder(orderId: string, reason?: string) {
   }
   return { success: true };
 }
+
+export async function deleteOrderPermanently(orderId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'No autenticado' };
+  }
+
+  const { data: order } = await supabase
+    .from('orders')
+    .select('id, seller_id, buyer_id, status')
+    .eq('id', orderId)
+    .single();
+
+  if (!order) {
+    return { error: 'Pedido no encontrado' };
+  }
+
+  // Restaurar stock si estaba en curso
+  if (order.status !== 'cancelado' && order.status !== 'entregado') {
+    const { data: orderItems } = await supabase
+      .from('order_items')
+      .select('product_id, quantity')
+      .eq('order_id', orderId);
+
+    if (orderItems && orderItems.length > 0) {
+      for (const it of orderItems) {
+        if (!it.product_id) continue;
+        const { data: prod } = await supabase
+          .from('products')
+          .select('id, stock, is_unlimited_stock')
+          .eq('id', it.product_id)
+          .single();
+
+        if (prod && !prod.is_unlimited_stock) {
+          await supabase
+            .from('products')
+            .update({ stock: (prod.stock ?? 0) + it.quantity })
+            .eq('id', it.product_id);
+        }
+      }
+    }
+  }
+
+  // Borrar mensajes de chat vinculados a este pedido
+  await supabase.from('chat_messages').delete().eq('order_id', orderId);
+  // Borrar items del pedido
+  await supabase.from('order_items').delete().eq('order_id', orderId);
+  // Borrar el pedido
+  const { error } = await supabase.from('orders').delete().eq('id', orderId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath('/vendedor/pedidos');
+  revalidatePath('/comprador/pedidos');
+  return { success: true };
+}
