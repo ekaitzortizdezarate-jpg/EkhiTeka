@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
 import { updateOrderStatus, cancelOrder, deleteOrderPermanently } from '@/app/actions/orders';
@@ -36,9 +37,15 @@ const STATUS_STEPS: { key: OrderStatus; labelKey: string }[] = [
 
 export function SellerOrdersView({ orders }: { orders: Order[] }) {
   const { t, language } = useLanguage();
+  const router = useRouter();
+  const [localOrders, setLocalOrders] = useState<Order[]>(orders);
   const [activeTab, setActiveTab] = useState<'actuales' | 'terminados'>('actuales');
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setLocalOrders(orders);
+  }, [orders]);
 
   // Modal para cancelar pedido en curso (pasa a terminados)
   const [cancelModal, setCancelModal] = useState<{
@@ -92,9 +99,13 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
       window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
     } catch {}
 
+    setLocalOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+    );
     setLoadingId(orderId);
     await updateOrderStatus(orderId, newStatus);
     setLoadingId(null);
+    router.refresh();
   };
 
   const handleOpenCancelModal = (orderId: string, isPending: boolean) => {
@@ -121,6 +132,9 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
       window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
     } catch {}
 
+    setLocalOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: 'cancelado' } : o))
+    );
     await cancelOrder(orderId, cancelModal.reason);
     setCancelModal({
       open: false,
@@ -129,15 +143,24 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
       reason: '',
       loading: false,
     });
+    router.refresh();
   };
 
   const handleConfirmPermanentDelete = async () => {
     if (!permanentDeleteModal.orderId) return;
+    const orderIdToDelete = permanentDeleteModal.orderId;
     setPermanentDeleteModal((prev) => ({ ...prev, loading: true }));
-    const res = await deleteOrderPermanently(permanentDeleteModal.orderId);
+
+    // Optimistic removal from UI
+    setLocalOrders((prev) => prev.filter((o) => o.id !== orderIdToDelete));
+
+    const res = await deleteOrderPermanently(orderIdToDelete);
     setPermanentDeleteModal({ open: false, orderId: '', loading: false });
+
     if (res?.error) {
-      alert(`Error: ${res.error}`);
+      alert(`Error al eliminar: ${res.error}`);
+    } else {
+      router.refresh();
     }
   };
 
@@ -188,8 +211,8 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
     return STATUS_STEPS.findIndex((s) => s.key === status);
   };
 
-  const actualOrders = orders.filter((o) => o.status !== 'entregado' && o.status !== 'cancelado');
-  const finishedOrders = orders.filter((o) => o.status === 'entregado' || o.status === 'cancelado');
+  const actualOrders = localOrders.filter((o) => o.status !== 'entregado' && o.status !== 'cancelado');
+  const finishedOrders = localOrders.filter((o) => o.status === 'entregado' || o.status === 'cancelado');
   const currentOrders = activeTab === 'actuales' ? actualOrders : finishedOrders;
 
   return (
@@ -737,7 +760,7 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                       <span>{language === 'eu' ? 'Ezabatu' : 'Borrar'}</span>
                     </button>
 
-                    {/* Botón 3: Menú desplegable para cambiar a cualquier estado del pedido */}
+                    {/* Botón 3: Menú desplegable para cambiar a cualquier estado del pedido con iconos monocromáticos */}
                     <div className="w-full sm:w-auto flex-1 min-w-[200px]">
                       <select
                         value={order.status}
@@ -745,12 +768,12 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                         onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
                         className="w-full px-3.5 py-2.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200/70 dark:hover:bg-stone-750 text-stone-900 dark:text-stone-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-stone-200 dark:border-stone-700 transition-all cursor-pointer outline-none min-h-[40px]"
                       >
-                        <option value="pendiente">🕒 {t.orders_pending || 'Pendiente'}</option>
+                        <option value="pendiente">• {t.orders_pending || 'Pendiente'}</option>
                         <option value="confirmado">✓ {t.orders_confirmed || 'Confirmado'}</option>
-                        <option value="preparando">⏳ {t.orders_preparing || 'Preparando'}</option>
-                        <option value="listo_entrega">📦 {t.orders_ready_delivery || 'Listo para entrega'}</option>
-                        <option value="entregado">✨ {t.orders_delivered || 'Entregado (Terminar)'}</option>
-                        <option value="cancelado">❌ {t.orders_cancelled || 'Cancelado (Terminar)'}</option>
+                        <option value="preparando">⋯ {t.orders_preparing || 'Preparando'}</option>
+                        <option value="listo_entrega">▤ {t.orders_ready_delivery || 'Listo para entrega'}</option>
+                        <option value="entregado">● {t.orders_delivered || 'Entregado (Terminar)'}</option>
+                        <option value="cancelado">✕ {t.orders_cancelled || 'Cancelado (Terminar)'}</option>
                       </select>
                     </div>
                   </div>

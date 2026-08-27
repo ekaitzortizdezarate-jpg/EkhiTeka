@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
 import Link from 'next/link';
@@ -32,8 +33,14 @@ const STATUS_STEPS = [
 
 export function BuyerOrdersView({ orders }: { orders: Order[] }) {
   const { t, language } = useLanguage();
+  const router = useRouter();
+  const [localOrders, setLocalOrders] = useState<Order[]>(orders);
   const [activeTab, setActiveTab] = useState<'actuales' | 'terminados'>('actuales');
   const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setLocalOrders(orders);
+  }, [orders]);
 
   // Modal para cancelar pedido por parte del comprador
   const [cancelModal, setCancelModal] = useState<{
@@ -88,26 +95,43 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
 
   const handleConfirmBuyerCancel = async (e: React.FormEvent) => {
     e.preventDefault();
+    const orderIdToCancel = cancelModal.orderId;
     setCancelModal((prev) => ({ ...prev, loading: true }));
-    const res = await buyerCancelOrder(cancelModal.orderId, cancelModal.reason);
+
+    setLocalOrders((prev) =>
+      prev.map((o) => (o.id === orderIdToCancel ? { ...o, status: 'cancelado' } : o))
+    );
+
+    const res = await buyerCancelOrder(orderIdToCancel, cancelModal.reason);
     setCancelModal({
       open: false,
       orderId: '',
       reason: '',
       loading: false,
     });
+
     if (res?.error) {
       alert(`Error: ${res.error}`);
+    } else {
+      router.refresh();
     }
   };
 
   const handleConfirmPermanentDelete = async () => {
     if (!permanentDeleteModal.orderId) return;
+    const orderIdToDelete = permanentDeleteModal.orderId;
     setPermanentDeleteModal((prev) => ({ ...prev, loading: true }));
-    const res = await deleteOrderPermanently(permanentDeleteModal.orderId);
+
+    // Optimistic UI removal
+    setLocalOrders((prev) => prev.filter((o) => o.id !== orderIdToDelete));
+
+    const res = await deleteOrderPermanently(orderIdToDelete);
     setPermanentDeleteModal({ open: false, orderId: '', loading: false });
+
     if (res?.error) {
       alert(`Error: ${res.error}`);
+    } else {
+      router.refresh();
     }
   };
 
@@ -181,8 +205,8 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
     return STATUS_STEPS.findIndex((s) => s.key === status);
   };
 
-  const actualOrders = orders.filter((o) => o.status !== 'entregado' && o.status !== 'cancelado');
-  const finishedOrders = orders.filter((o) => o.status === 'entregado' || o.status === 'cancelado');
+  const actualOrders = localOrders.filter((o) => o.status !== 'entregado' && o.status !== 'cancelado');
+  const finishedOrders = localOrders.filter((o) => o.status === 'entregado' || o.status === 'cancelado');
   const currentOrders = activeTab === 'actuales' ? actualOrders : finishedOrders;
 
   return (

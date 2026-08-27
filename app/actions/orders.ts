@@ -436,18 +436,31 @@ export async function deleteOrderPermanently(orderId: string) {
     }
   }
 
-  // Borrar mensajes de chat vinculados a este pedido
-  await supabase.from('chat_messages').delete().eq('order_id', orderId);
-  // Borrar items del pedido
-  await supabase.from('order_items').delete().eq('order_id', orderId);
-  // Borrar el pedido
+  // 1. Desvincular o borrar mensajes de chat vinculados a este pedido
+  try {
+    await supabase.from('chat_messages').update({ order_id: null }).eq('order_id', orderId);
+    await supabase.from('chat_messages').delete().eq('order_id', orderId);
+  } catch (err) {
+    console.error('Chat messages cleanup error:', err);
+  }
+
+  // 2. Borrar items del pedido
+  try {
+    await supabase.from('order_items').delete().eq('order_id', orderId);
+  } catch (err) {
+    console.error('Order items deletion error:', err);
+  }
+
+  // 3. Borrar el pedido
   const { error } = await supabase.from('orders').delete().eq('id', orderId);
 
   if (error) {
+    console.error('Orders delete error:', error);
     return { error: error.message };
   }
 
   revalidatePath('/vendedor/pedidos');
   revalidatePath('/comprador/pedidos');
+  revalidatePath('/chat');
   return { success: true };
 }
