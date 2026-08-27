@@ -161,33 +161,33 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
         {/* Origen (Top Left) */}
         {translatedOrigin && (
-          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-white text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs max-w-[55%] truncate font-serif">
-            <MapPin className="w-3 h-3 text-stone-300 shrink-0 stroke-[1.75]" />
+          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-white text-[10.5px] sm:text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-xs max-w-[55%] truncate font-sans">
+            <MapPin className="w-3.5 h-3.5 text-stone-300 shrink-0 stroke-[1.75]" />
             <span className="truncate">{translatedOrigin}</span>
           </span>
         )}
 
         {/* Stock Badge (Top Right) */}
-        <div className="absolute top-2.5 right-2.5 flex items-center font-serif">
+        <div className="absolute top-2.5 right-2.5 flex items-center font-sans">
           {isSoldOut ? (
-            <span className="px-2.5 py-1 bg-[#1D1D1B]/90 text-stone-300 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60">
+            <span className="px-2.5 py-1 bg-[#1D1D1B]/90 text-stone-300 text-[10.5px] sm:text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-md border border-stone-700/60">
               {isEvent ? (t.event_capacity_full || t.prod_sold_out) : t.prod_sold_out}
             </span>
           ) : isUnlimited ? (
-            <span className="px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-stone-200 border border-stone-700/60 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md">
+            <span className="px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-stone-200 border border-stone-700/60 text-[10.5px] sm:text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-md">
               {t.prod_unlimited}
             </span>
           ) : isLowStock ? (
-            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-[0.14em] shadow-md">
+            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10.5px] sm:text-[11px] font-black rounded-xl uppercase tracking-wide shadow-md">
               {getLowStockBadgeText()}
             </span>
           ) : isEvent ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs backdrop-blur-xs">
-              <Ticket className="w-3 h-3 stroke-[1.75]" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10.5px] sm:text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-xs backdrop-blur-xs">
+              <Ticket className="w-3.5 h-3.5 stroke-[1.75]" />
               <span>{product.stock} {getSeatsSuffix(language, product.stock !== 1)}</span>
             </span>
           ) : (
-            <span className="px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs backdrop-blur-xs">
+            <span className="px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10.5px] sm:text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-xs backdrop-blur-xs">
               {product.stock} {getUnitsSuffix(language, product.stock !== 1)}
             </span>
           )}
@@ -195,14 +195,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
         {/* Formato y Peso / Volumen (Bottom Left) */}
         {(translatedFormat || weightOrVolume) && (
-          <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-800 dark:text-stone-200 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs border border-[#E8E5DF] dark:border-[#2D2B27] font-serif">
+          <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-800 dark:text-stone-200 text-[10.5px] sm:text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-xs border border-[#E8E5DF] dark:border-[#2D2B27] font-sans">
             {translatedFormat ? translatedFormat : ''} {weightOrVolume ? `${translatedFormat ? '· ' : ''}${weightOrVolume}` : ''}
           </span>
         )}
 
         {/* Badge de Descuento (Bottom Right) */}
         {discountInfo && discountInfo.discountPercent > 0 && !isSoldOut && (
-          <span className="absolute bottom-2.5 right-2.5 px-3 py-1.5 bg-emerald-600 dark:bg-emerald-500 text-white text-xs sm:text-sm font-black rounded-xl shadow-lg font-serif tracking-[0.12em] border border-emerald-700/80 dark:border-emerald-400/80">
+          <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-emerald-600 dark:bg-emerald-500 text-white text-xs sm:text-sm font-black rounded-xl shadow-lg font-sans tracking-tight border border-emerald-700/80 dark:border-emerald-400/80">
             -{discountInfo.discountPercent}%
           </span>
         )}

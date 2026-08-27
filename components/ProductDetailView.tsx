@@ -90,13 +90,13 @@ export function ProductDetailView({
               }}
             />
             {translatedOrigin && (
-              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-xl uppercase tracking-[0.14em] shadow-md font-serif">
+              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-xl uppercase tracking-wide shadow-md font-sans">
                 <MapPin className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" />
                 <span>{translatedOrigin}</span>
               </span>
             )}
             {isEvent && (
-              <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-bold rounded-xl uppercase tracking-[0.14em] shadow-md font-serif">
+              <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-bold rounded-xl uppercase tracking-wide shadow-md font-sans">
                 <Ticket className="w-3.5 h-3.5 stroke-[1.75]" />
                 <span>{product.stock} {t.event_seats_available}</span>
               </span>
