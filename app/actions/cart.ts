@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { parseProfile, type ProfileDetails } from '@/types/database';
 import type { CartItem } from '@/context/CartContext';
 
-export async function getUserCart(): Promise<{ items: CartItem[]; isAuthenticated: boolean }> {
+export async function getUserCart(): Promise<{ items: CartItem[]; isAuthenticated: boolean; userId?: string }> {
   try {
     const supabase = await createClient();
     const {
@@ -22,13 +22,13 @@ export async function getUserCart(): Promise<{ items: CartItem[]; isAuthenticate
       .maybeSingle();
 
     if (!profile) {
-      return { items: [], isAuthenticated: true };
+      return { items: [], isAuthenticated: true, userId: user.id };
     }
 
     const parsed = parseProfile(profile);
-    const cartItems = Array.isArray((parsed as any).cart_data) ? (parsed as any).cart_data : [];
+    const cartItems = Array.isArray(parsed.cart_data) ? parsed.cart_data : [];
 
-    return { items: cartItems, isAuthenticated: true };
+    return { items: cartItems, isAuthenticated: true, userId: user.id };
   } catch (err) {
     console.error('Error fetching user cart:', err);
     return { items: [], isAuthenticated: false };
