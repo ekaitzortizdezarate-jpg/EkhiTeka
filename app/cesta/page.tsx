@@ -302,8 +302,9 @@ export default function CartPage() {
                       </span>
                       <button
                         type="button"
+                        disabled={!item.product?.is_unlimited_stock && item.quantity >= (item.product?.stock ?? 99)}
                         onClick={() => updateQuantity(id, item.quantity + 1)}
-                        className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-lg cursor-pointer transition-colors"
+                        className="w-6 h-6 flex items-center justify-center font-bold text-xs hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-lg cursor-pointer transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         +
                       </button>

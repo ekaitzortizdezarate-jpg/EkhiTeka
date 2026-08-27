@@ -176,6 +176,32 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     return { error: 'No autenticado' };
   }
 
+  // Si pasa a cancelado, restaurar stock de los productos
+  if (status === 'cancelado') {
+    const { data: orderItems } = await supabase
+      .from('order_items')
+      .select('product_id, quantity')
+      .eq('order_id', orderId);
+
+    if (orderItems && orderItems.length > 0) {
+      for (const it of orderItems) {
+        if (!it.product_id) continue;
+        const { data: prod } = await supabase
+          .from('products')
+          .select('id, stock, is_unlimited_stock')
+          .eq('id', it.product_id)
+          .single();
+
+        if (prod && !prod.is_unlimited_stock) {
+          await supabase
+            .from('products')
+            .update({ stock: (prod.stock ?? 0) + it.quantity })
+            .eq('id', it.product_id);
+        }
+      }
+    }
+  }
+
   const { error } = await supabase
     .from('orders')
     .update({
@@ -190,6 +216,8 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
 
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
+  revalidatePath('/');
+  revalidatePath('/tienda');
   return { success: true };
 }
 

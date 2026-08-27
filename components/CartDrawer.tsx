@@ -78,8 +78,9 @@ export function CartDrawer() {
                         </span>
                         <button
                           type="button"
+                          disabled={!item.product?.is_unlimited_stock && item.quantity >= (item.product?.stock ?? 99)}
                           onClick={() => updateQuantity(id, item.quantity + 1)}
-                          className="w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer"
+                          className="w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-stone-200 dark:hover:bg-stone-700 rounded cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           +
                         </button>

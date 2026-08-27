@@ -81,12 +81,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addToCart = useCallback((product: Product, sellerName?: string, quantity = 1) => {
+    if (!product.is_unlimited_stock && (product.stock ?? 0) <= 0) return;
+    const maxStock = product.is_unlimited_stock ? 99 : Math.max(1, product.stock ?? 1);
+
     const existingIdx = items.findIndex((i) => (i.productId || i.product?.id) === product.id);
     if (existingIdx > -1) {
       const updated = [...items];
-      updated[existingIdx].quantity += quantity;
+      const newQty = Math.min(maxStock, updated[existingIdx].quantity + quantity);
+      updated[existingIdx].quantity = newQty;
       saveItems(updated);
     } else {
+      const initialQty = Math.min(maxStock, quantity);
       const newItem: CartItem = {
         productId: product.id,
         sellerId: product.seller_id,
@@ -97,7 +102,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         price: Number(product.price),
         imageUrl: getProductImage(product),
         originRegion: product.origin_region,
-        quantity,
+        quantity: initialQty,
         product,
       };
       saveItems([...items, newItem]);
@@ -114,8 +119,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart(productId);
       return;
     }
+    const item = items.find((i) => (i.productId || i.product?.id) === productId);
+    const maxStock = item?.product?.is_unlimited_stock ? 99 : Math.max(1, item?.product?.stock ?? 99);
+    const safeQty = Math.min(maxStock, quantity);
+
     const updated = items.map((i) =>
-      (i.productId || i.product?.id) === productId ? { ...i, quantity } : i
+      (i.productId || i.product?.id) === productId ? { ...i, quantity: safeQty } : i
     );
     saveItems(updated);
   }, [items, removeFromCart]);

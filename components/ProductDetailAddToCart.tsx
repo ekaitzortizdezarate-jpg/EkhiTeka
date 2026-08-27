@@ -113,9 +113,21 @@ export function ProductDetailAddToCart({
       </div>
 
       {/* Aviso de stock / plazas restantes */}
-      {!isSoldOut && product.stock !== null && product.stock <= 5 && !product.is_unlimited_stock && (
-        <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
-          {isEvent ? `¡Atención! Solo quedan ${product.stock} plazas disponibles.` : `¡Últimas ${product.stock} unidades en stock!`}
+      {!isSoldOut && (
+        <p className="text-xs font-bold text-stone-600 dark:text-stone-300 font-sans">
+          {product.is_unlimited_stock ? (
+            <span className="text-emerald-700 dark:text-emerald-400">
+              {t.prod_stock}: <strong className="uppercase">{t.prod_unlimited}</strong>
+            </span>
+          ) : product.stock !== null && product.stock <= 5 ? (
+            <span className="text-amber-600 dark:text-amber-400">
+              {isEvent ? `¡Atención! Solo quedan ${product.stock} plazas disponibles.` : `¡Últimas ${product.stock} unidades en stock!`}
+            </span>
+          ) : (
+            <span>
+              {t.prod_stock}: <strong>{product.stock}</strong> {isEvent ? t.event_seats : 'uds'}
+            </span>
+          )}
         </p>
       )}
     </div>

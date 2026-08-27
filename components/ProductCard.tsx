@@ -93,11 +93,19 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
               {isEvent ? t.event_capacity_full : t.prod_sold_out}
             </span>
-          ) : !product.is_unlimited_stock && (product.stock ?? 0) <= 5 ? (
-            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-amber-500 text-stone-900 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
-              {isEvent ? t.event_last_seats : t.prod_last_units}
+          ) : product.is_unlimited_stock ? (
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-stone-900/85 dark:bg-stone-800/90 text-amber-300 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans backdrop-blur-xs border border-amber-400/30">
+              Stock: {t.prod_unlimited}
             </span>
-          ) : null}
+          ) : (product.stock ?? 0) <= 5 ? (
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-amber-500 text-stone-900 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans">
+              {isEvent ? `${t.event_last_seats} (${product.stock})` : `¡${product.stock} uds!`}
+            </span>
+          ) : (
+            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 bg-stone-900/80 dark:bg-stone-800/90 text-stone-200 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md font-sans backdrop-blur-xs border border-stone-700/50">
+              {isEvent ? `${product.stock} ${t.event_seats}` : `${product.stock} uds`}
+            </span>
+          )}
 
           {/* Badge de Formato y Peso */}
           {(product.format || product.weight_g) && (
