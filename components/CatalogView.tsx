@@ -7,7 +7,7 @@ import { CategoryCircleGrid } from '@/components/CategoryCircleGrid';
 import { ExperienceBanners } from '@/components/ExperienceBanners';
 import { CustomerReviews } from '@/components/CustomerReviews';
 import type { Category, ProductWithSeller } from '@/types/database';
-import { Search, SlidersHorizontal, Sparkles, ArrowDown, MessageCircle } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, ArrowDown, MessageCircle, MapPin, Clock } from 'lucide-react';
 
 interface CatalogViewProps {
   products: ProductWithSeller[];
@@ -65,29 +65,29 @@ export function CatalogView({
   };
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
       {/* 1. Hero Editorial Gourmet */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[420px] flex items-center">
+      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[420px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/secciones/Tienda.JPG"
             alt="Tienda EkhiTeka Lekeitio"
             className="w-full h-full object-cover object-center scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/25 to-black/10 dark:from-black/85 dark:via-black/65 dark:to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20 dark:from-black/85 dark:via-black/65 dark:to-black/40" />
         </div>
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
           <div className="lg:col-span-8 space-y-5">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md">
-              <Sparkles className="w-3.5 h-3.5" /> {t.shop_specialty} · Lekeitio
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+              <Sparkles className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" /> {t.shop_specialty} · Lekeitio
             </span>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] font-serif sm:font-sans text-white drop-shadow-md">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
               {t.shop_hero_title}
             </h1>
 
-            <p className="text-sm sm:text-base text-white/95 leading-relaxed max-w-xl font-medium drop-shadow-md">
+            <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
               {t.shop_hero_desc}
             </p>
 
@@ -95,26 +95,26 @@ export function CatalogView({
               <button
                 type="button"
                 onClick={scrollToCatalog}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs sm:text-sm transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider font-serif"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs sm:text-sm transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-[0.14em]"
               >
                 <span>{t.shop_see_cheeses}</span>
-                <ArrowDown className="w-4 h-4" />
+                <ArrowDown className="w-4 h-4 stroke-[1.75]" />
               </button>
 
               <a
                 href="https://wa.me/34600000000?text=Hola,%20quisiera%20hacer%20un%20encargo%20a%20medida"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-black/60 hover:bg-black/80 text-white font-black text-xs sm:text-sm border-2 border-white/40 transition-all backdrop-blur-md shadow-lg hover:scale-105 font-serif"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B]/80 hover:bg-[#1D1D1B] text-white font-bold text-xs sm:text-sm border border-stone-600 transition-all backdrop-blur-md shadow-lg hover:scale-105 uppercase tracking-[0.14em]"
               >
-                <MessageCircle className="w-4 h-4 text-[#FFE259]" />
+                <MessageCircle className="w-4 h-4 text-stone-300 stroke-[1.75]" />
                 <span>{t.shop_whatsapp_orders}</span>
               </a>
             </div>
           </div>
 
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-[#FFE259] shadow-2xl p-1 bg-[#FAF7F2] hover:scale-105 transition-transform duration-500">
+            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
               <img
                 src="/Logo.jpg"
                 alt="EkhiTeka Lekeitio"
@@ -137,18 +137,18 @@ export function CatalogView({
 
       {/* 3. Catálogo Principal */}
       <section id="catalogo" className="space-y-6 pt-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-2 border-b border-stone-200 dark:border-stone-800">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-2 border-b border-[#E8E5DF] dark:border-[#2D2B27]">
           <div>
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 block">
               {t.shop_specialty}
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight uppercase font-serif">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight uppercase">
               {t.cat_queso} & {t.brand_tagline}
             </h2>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-stone-500 dark:text-stone-400">
+            <span className="text-xs font-bold text-stone-500 dark:text-stone-400 tracking-[0.14em] uppercase">
               {t.prod_showing ? `${filteredProducts.length} ${t.prod_showing}` : `${filteredProducts.length}`}
             </span>
           </div>
@@ -159,14 +159,14 @@ export function CatalogView({
           <button
             type="button"
             onClick={() => setSelectedCat('all')}
-            className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-semibold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
+            className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-bold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
               selectedCat === 'all'
-                ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 shadow-xs border border-stone-800 font-bold'
-                : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                ? 'bg-[#1D1D1B] text-white dark:bg-white dark:text-[#1D1D1B] scale-102 shadow-xs'
+                : 'bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] text-stone-700 dark:text-stone-300 hover:border-stone-400'
             }`}
           >
             <span>{t.cat_all}</span>
-            <span className="text-[10px] opacity-70 font-sans">({products.length})</span>
+            <span className="text-[10px] opacity-70">({products.length})</span>
           </button>
 
           {categories.map((cat) => {
@@ -176,38 +176,38 @@ export function CatalogView({
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCat(cat.id)}
-                className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-semibold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
+                className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-bold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
                   selectedCat === cat.id
-                    ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 shadow-xs border border-stone-800 font-bold'
-                    : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:border-stone-400'
+                    ? 'bg-[#1D1D1B] text-white dark:bg-white dark:text-[#1D1D1B] scale-102 shadow-xs'
+                    : 'bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] text-stone-700 dark:text-stone-300 hover:border-stone-400'
                 }`}
               >
                 <span>{getCategoryName(cat)}</span>
-                <span className="text-[10px] opacity-70 font-sans">({count})</span>
+                <span className="text-[10px] opacity-70">({count})</span>
               </button>
             );
           })}
         </div>
 
         {/* Buscador y Orden */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-2xs">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white dark:bg-[#1C1B19] rounded-2xl border border-[#E8E5DF] dark:border-[#2D2B27] shadow-2xs">
           <div className="relative w-full sm:max-w-md">
-            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 stroke-[1.75]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t.prod_search_placeholder}
-              className="w-full pl-9 pr-4 py-2 bg-[#FAF8F5] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#FFE259] text-stone-900 dark:text-stone-100 placeholder:text-stone-400"
+              className="w-full pl-9 pr-4 py-2 bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] rounded-xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-stone-400 text-stone-900 dark:text-stone-100 placeholder:text-stone-400 font-sans"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end font-serif">
-            <SlidersHorizontal className="w-4 h-4 text-stone-400 shrink-0" />
+            <SlidersHorizontal className="w-4 h-4 text-stone-400 shrink-0 stroke-[1.75]" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3.5 py-2 bg-[#FAF8F5] dark:bg-stone-850 border border-stone-200 dark:border-stone-700 rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#FFE259] cursor-pointer shadow-2xs"
+              className="px-3.5 py-2 bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none cursor-pointer shadow-2xs font-serif uppercase tracking-[0.12em]"
             >
               <option value="name_asc">{t.prod_sort_name_asc}</option>
               <option value="name_desc">{t.prod_sort_name_desc}</option>
@@ -225,14 +225,14 @@ export function CatalogView({
             ))}
           </div>
         ) : (
-          <div className="py-16 text-center bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-8 space-y-3">
+          <div className="py-16 text-center bg-white dark:bg-[#1C1B19] rounded-3xl border border-[#E8E5DF] dark:border-[#2D2B27] p-8 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 mx-auto">
-              <Search className="w-6 h-6 text-stone-400" />
+              <Search className="w-6 h-6 text-stone-400 stroke-[1.75]" />
             </div>
-            <h3 className="text-base font-black font-serif text-stone-800 dark:text-stone-200">
+            <h3 className="text-base font-bold font-serif text-stone-800 dark:text-stone-200 uppercase tracking-[0.14em]">
               {t.prod_no_results}
             </h3>
-            <p className="text-xs text-stone-500 dark:text-stone-400">
+            <p className="text-xs text-stone-500 dark:text-stone-400 font-normal">
               {t.prod_search_placeholder}
             </p>
           </div>
@@ -243,48 +243,56 @@ export function CatalogView({
       <ExperienceBanners />
 
       {/* 5. Tienda Física */}
-      <section className="relative rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 p-8 sm:p-12 overflow-hidden shadow-sm">
+      <section className="relative rounded-3xl bg-[#FAF7F2] dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] p-8 sm:p-12 overflow-hidden shadow-xs">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-4">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] block">
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 block">
               {t.shop_visit_subtitle}
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight font-serif sm:font-sans">
+            <h2 className="text-2xl sm:text-4xl font-bold text-[#1D1D1B] dark:text-stone-100 tracking-tight leading-tight">
               {t.shop_visit_title}
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
               {t.shop_visit_desc}
             </p>
             <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300">
               <div className="flex items-center gap-2">
-                <span className="text-base">📍</span>
+                <MapPin className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
                 <span>Gamarra Kalea 4, Lekeitio · Bizkaia</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-base">🕒</span>
+                <Clock className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
                 <span>{t.footer_schedule_weekdays}</span>
               </div>
             </div>
-            <div className="pt-2">
+            <div className="pt-2 flex flex-wrap gap-3">
               <a
                 href="https://wa.me/34600000000?text=Hola,%20quisiera%20consultar%20disponibilidad%20en%20tienda%20Lekeitio"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-105 font-serif"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105"
               >
-                <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#1D1D1B]" />
-                <span>{t.shop_visit_contact}</span>
+                <MessageCircle className="w-4 h-4 text-stone-300 dark:text-stone-700 stroke-[1.75]" />
+                <span>Kontaktatu Dendarekin</span>
               </a>
+              <button
+                type="button"
+                onClick={scrollToCatalog}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105 cursor-pointer"
+              >
+                <ArrowDown className="w-4 h-4 stroke-[1.75]" />
+                <span>{t.shop_see_cheeses}</span>
+              </button>
             </div>
           </div>
           <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 h-64 sm:h-80 group">
+            <div className="relative rounded-3xl overflow-hidden shadow-md border border-[#E8E5DF] dark:border-[#2D2B27] h-64 sm:h-80 group">
               <img
                 src="/images/secciones/Tienda.JPG"
                 alt="Tienda EkhiTeka Lekeitio"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-4 right-4 px-3 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] font-black rounded-full uppercase tracking-wider shadow-md">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60 backdrop-blur-xs">
                 Lekeitio Centro
               </div>
             </div>

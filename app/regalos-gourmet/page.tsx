@@ -71,9 +71,9 @@ export default function RegalosGourmetPage() {
   }, []);
 
   return (
-    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
       {/* 1. Hero Editorial */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border-2 border-stone-800 shadow-2xl min-h-[380px] flex items-center">
+      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[380px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/secciones/Cestas.JPG"
@@ -83,19 +83,19 @@ export default function RegalosGourmetPage() {
               (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
         </div>
 
         <div className="relative z-10 max-w-2xl space-y-4 text-white">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-full uppercase tracking-wider shadow-md font-serif">
-            <Sparkles className="w-3.5 h-3.5" /> {t.gifts_hero_badge}
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+            <Sparkles className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" /> {t.gifts_hero_badge}
           </span>
 
-          <h1 className="text-3xl sm:text-5xl font-black font-serif tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
             {t.gifts_hero_title} <span className="text-[#FFE259]">{t.gifts_hero_title_highlight}</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
+          <p className="text-sm sm:text-base text-white/90 leading-relaxed font-normal">
             {t.gifts_hero_desc}
           </p>
 
@@ -105,9 +105,9 @@ export default function RegalosGourmetPage() {
                 href="https://wa.me/34600000000?text=Hola,%20quisiera%20encargar%20un%20regalo%20gourmet%20personalizado"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-lg hover:scale-105 font-serif"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-lg hover:scale-105"
               >
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4 stroke-[1.75]" />
                 <span>{t.gifts_whatsapp_btn}</span>
               </a>
             </div>
@@ -117,17 +117,22 @@ export default function RegalosGourmetPage() {
 
       {/* 2. Catálogo de Packs y Regalos Disponibles */}
       {products.length > 0 && (
-        <section className="space-y-6 pt-2 font-serif">
-          <div className="pb-3 border-b border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259]">
-              {t.gifts_catalog_badge}
+        <section className="space-y-6 pt-2">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E8E5DF] dark:border-[#2D2B27]">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 block">
+                {t.gifts_catalog_badge}
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-bold text-[#1D1D1B] dark:text-stone-100 uppercase tracking-tight">
+                {t.gifts_catalog_title}
+              </h3>
+            </div>
+            <span className="text-xs font-bold text-stone-500 dark:text-stone-400 tracking-[0.14em] uppercase">
+              {products.length} {t.prod_showing}
             </span>
-            <h3 className="text-2xl font-black text-stone-900 dark:text-stone-100 uppercase">
-              {t.gifts_catalog_title}
-            </h3>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} isSeller={isSeller} />
             ))}
@@ -136,15 +141,15 @@ export default function RegalosGourmetPage() {
       )}
 
       {/* 3. Tres Bloques Editoriales con Imagen: Cestas, Packs y Tarjetas */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 font-serif">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Tarjeta 1: Cestas Gourmet a Medida */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-4">
-            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src="/images/secciones/Cestas.JPG"
                 alt={t.gifts_card1_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
                 }}
@@ -152,31 +157,31 @@ export default function RegalosGourmetPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Package className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <Package className="w-4 h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 leading-snug">
+              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.gifts_card1_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
                 {t.gifts_card1_desc}
               </p>
             </div>
           </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 font-sans">
-            <Truck className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 tracking-[0.12em] uppercase">
+            <Truck className="w-4 h-4 text-stone-600 dark:text-stone-400 stroke-[1.75]" />
             <span>{t.gifts_card1_feature}</span>
           </div>
         </div>
 
         {/* Tarjeta 2: Packs Degustación & Maridaje */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-4">
-            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src="/images/secciones/Quesos.JPG"
                 alt={t.gifts_card2_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Catas.JPG';
                 }}
@@ -184,31 +189,31 @@ export default function RegalosGourmetPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <Gift className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <Gift className="w-4 h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 leading-snug">
+              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.gifts_card2_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
                 {t.gifts_card2_desc}
               </p>
             </div>
           </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 font-sans">
-            <Sparkles className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 tracking-[0.12em] uppercase">
+            <Sparkles className="w-4 h-4 text-stone-600 dark:text-stone-400 stroke-[1.75]" />
             <span>{t.gifts_card2_feature}</span>
           </div>
         </div>
 
         {/* Tarjeta 3: Tarjetas & Catas de Regalo */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-4">
-            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700 relative">
+            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src="/images/secciones/Mesas.JPG"
                 alt={t.gifts_card3_title}
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Catas.JPG';
                 }}
@@ -216,19 +221,19 @@ export default function RegalosGourmetPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/70 flex items-center justify-center text-[#C68D07] dark:text-[#FFE259]">
-                <CreditCard className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <CreditCard className="w-4 h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 leading-snug">
+              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.gifts_card3_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-medium font-sans">
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
                 {t.gifts_card3_desc}
               </p>
             </div>
           </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 font-sans">
-            <HeartHandshake className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259]" />
+          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 tracking-[0.12em] uppercase">
+            <HeartHandshake className="w-4 h-4 text-stone-600 dark:text-stone-400 stroke-[1.75]" />
             <span>{t.gifts_card3_feature}</span>
           </div>
         </div>

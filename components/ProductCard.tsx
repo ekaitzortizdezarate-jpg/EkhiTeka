@@ -76,7 +76,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   return (
     <article
       aria-label={product.name}
-      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200/90 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259] shadow-xs flex flex-col justify-between overflow-hidden transition-all duration-300 font-serif ${
+      className={`manduca-card group relative bg-white dark:bg-[#1C1B19] rounded-3xl border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs flex flex-col justify-between overflow-hidden transition-all duration-300 font-serif ${
         isDeleting ? 'opacity-40 pointer-events-none' : ''
       }`}
     >
@@ -91,35 +91,35 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           }}
         />
 
-        {/* Origen (Top Left) */}
+        {/* Origen (Top Left) - Minimalist Chalk Pill */}
         {product.origin_region && (
-          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 px-2.5 py-1 bg-[#1D1D1B]/85 dark:bg-black/85 backdrop-blur-xs text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-xs max-w-[55%] truncate font-sans">
-            <MapPin className="w-3 h-3 text-[#FFE259] shrink-0" />
+          <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-white text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs max-w-[55%] truncate font-serif">
+            <MapPin className="w-3 h-3 text-stone-300 shrink-0 stroke-[1.75]" />
             <span className="truncate">{product.origin_region}</span>
           </span>
         )}
 
-        {/* Stock Badge (Top Right) */}
-        <div className="absolute top-2.5 right-2.5 flex items-center font-sans">
+        {/* Stock Badge (Top Right) - Monochrome & Refined */}
+        <div className="absolute top-2.5 right-2.5 flex items-center font-serif">
           {isSoldOut ? (
-            <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-wider shadow-md animate-pulse">
+            <span className="px-2.5 py-1 bg-[#1D1D1B]/90 text-stone-300 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60">
               {isEvent ? (t.event_capacity_full || 'Sin Plazas') : t.prod_sold_out}
             </span>
           ) : isUnlimited ? (
-            <span className="px-2.5 py-1 bg-[#1D1D1B]/85 dark:bg-black/85 backdrop-blur-xs text-amber-300 border border-amber-400/30 text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
+            <span className="px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-stone-200 border border-stone-700/60 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md">
               {t.prod_unlimited}
             </span>
           ) : isLowStock ? (
-            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
+            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-[0.14em] shadow-md">
               {isEvent ? `¡${product.stock} plazas!` : `¡${product.stock} uds!`}
             </span>
           ) : isEvent ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-md">
-              <Ticket className="w-3 h-3" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs backdrop-blur-xs">
+              <Ticket className="w-3 h-3 stroke-[1.75]" />
               <span>{product.stock} {t.event_seats}</span>
             </span>
           ) : (
-            <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-tight shadow-xs">
+            <span className="px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs backdrop-blur-xs">
               {product.stock} uds
             </span>
           )}
@@ -127,14 +127,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
         {/* Formato y Peso (Bottom Left) */}
         {(product.format || product.weight_g) && (
-          <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-900 dark:text-stone-100 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-tight shadow-xs border border-stone-200/80 dark:border-stone-700/80 font-sans">
+          <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-800 dark:text-stone-200 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs border border-[#E8E5DF] dark:border-[#2D2B27] font-serif">
             {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
           </span>
         )}
 
         {/* Badge de Descuento (Bottom Right) */}
         {discountInfo && discountInfo.discountPercent > 0 && !isSoldOut && (
-          <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-emerald-600 text-white text-[10.5px] font-black rounded-xl shadow-md font-sans">
+          <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-[#1D1D1B] text-white text-[10.5px] font-bold rounded-xl shadow-md font-serif tracking-[0.12em] border border-stone-700/60">
             -{discountInfo.discountPercent}%
           </span>
         )}
@@ -143,32 +143,32 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
       {/* 2. Cuerpo con Datos del Producto */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
         <div className="space-y-1.5">
-          <p className="text-[10px] sm:text-[11px] font-black text-[#C68D07] dark:text-[#FFE259] uppercase tracking-wider truncate font-sans">
+          <p className="text-[10px] sm:text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-[0.16em] truncate font-serif">
             {sellerName}
           </p>
 
           <Link
             href={`/producto/${product.id}`}
-            className="block group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors"
+            className="block group-hover:text-stone-600 dark:group-hover:text-[#FFE259] transition-colors"
           >
-            <h2 className="font-serif font-black text-stone-900 dark:text-stone-100 text-base sm:text-lg leading-snug break-words">
+            <h2 className="font-serif font-bold text-stone-900 dark:text-stone-100 text-base sm:text-lg leading-snug break-words">
               {product.name}
             </h2>
           </Link>
 
           {cleanDescription && (
-            <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed pt-0.5 font-medium whitespace-pre-line line-clamp-3 font-sans">
+            <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed pt-0.5 font-normal whitespace-pre-line line-clamp-3 font-serif">
               {cleanDescription}
             </p>
           )}
         </div>
 
         {/* 3. Footer con Precio, Selector y Botón Principal Abajo */}
-        <div className="pt-3 border-t border-stone-100 dark:border-stone-800/80 space-y-3">
+        <div className="pt-3 border-t border-[#E8E5DF] dark:border-[#2D2B27] space-y-3">
           {/* Fila 1: Precio y Selector de Cantidad / Chat */}
           <div className="flex items-center justify-between gap-2.5">
             <div className="shrink-0">
-              <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider block font-sans">
+              <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.16em] block font-serif">
                 {isEvent ? (t.prod_price_per_seat || 'Precio / Plaza') : t.prod_price}
               </span>
               <div className="flex items-baseline gap-1.5">
@@ -184,14 +184,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             </div>
 
             {isSeller ? (
-              <span className="px-2.5 py-1.5 rounded-xl text-xs font-black bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 font-sans">
+              <span className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-[#FAF8F5] dark:bg-[#1C1B19] text-stone-700 dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2D2B27] font-serif uppercase tracking-[0.14em]">
                 {isUnlimited ? t.prod_unlimited : `Stock: ${product.stock ?? 0} uds`}
               </span>
             ) : (
               <div className="flex items-center gap-1.5">
                 {/* Selector de Cantidad */}
                 {!isSoldOut && (
-                  <div className="flex items-center rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 p-0.5 shadow-2xs font-serif">
+                  <div className="flex items-center rounded-xl border border-[#E8E5DF] dark:border-[#2D2B27] bg-[#FAF8F5] dark:bg-[#1C1B19] p-0.5 shadow-2xs font-serif">
                     <button
                       type="button"
                       disabled={quantity <= 1}
@@ -224,10 +224,10 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
                 <Link
                   href={`/chat/${sellerId || ''}?product_id=${product.id}`}
-                  className="p-2 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259]/30 text-stone-700 dark:text-stone-300 transition-colors border border-stone-200 dark:border-stone-700 shrink-0"
+                  className="p-2 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1B19] hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors border border-[#E8E5DF] dark:border-[#2D2B27] shrink-0"
                   title={t.prod_ask_artisan}
                 >
-                  <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-200" />
+                  <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
                 </Link>
               </div>
             )}
@@ -238,19 +238,19 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             <div className="w-full flex items-center gap-2">
               <Link
                 href={`/vendedor/productos/${product.id}/editar`}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs transition-all shadow-2xs hover:scale-[1.01] font-serif uppercase tracking-wider cursor-pointer text-center"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs transition-all shadow-2xs hover:scale-[1.01] font-serif uppercase tracking-[0.14em] cursor-pointer text-center"
                 title="Editar Producto"
               >
-                <Pencil className="w-3.5 h-3.5" />
+                <Pencil className="w-3.5 h-3.5 stroke-[1.75]" />
                 <span>Editar variables</span>
               </Link>
               <button
                 type="button"
                 onClick={handleDelete}
-                className="p-2.5 rounded-2xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer border border-red-200 dark:border-red-800 shrink-0"
+                className="p-2.5 rounded-2xl bg-stone-100 hover:bg-red-50 dark:bg-stone-800 dark:hover:bg-red-950/40 text-stone-700 hover:text-red-700 dark:text-stone-300 dark:hover:text-red-400 transition-colors cursor-pointer border border-[#E8E5DF] dark:border-[#2D2B27] shrink-0"
                 title="Eliminar Producto"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 stroke-[1.75]" />
               </button>
             </div>
           ) : (
@@ -258,11 +258,11 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               type="button"
               disabled={isSoldOut}
               onClick={handleAddToCart}
-              className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xs active:scale-98 font-serif cursor-pointer ${
+              className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-bold text-xs uppercase tracking-[0.16em] transition-all shadow-xs active:scale-98 font-serif cursor-pointer ${
                 isSoldOut
                   ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed shadow-none'
                   : added
-                  ? 'bg-emerald-700 text-white'
+                  ? 'bg-[#1D1D1B] text-white dark:bg-white dark:text-[#1D1D1B]'
                   : 'bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] hover:shadow-md hover:scale-[1.01]'
               }`}
               title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
@@ -271,12 +271,12 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                 <span>{isEvent ? (t.event_capacity_full || 'Sin plazas') : t.prod_sold_out}</span>
               ) : added ? (
                 <>
-                  <Check className="w-4 h-4" />
+                  <Check className="w-4 h-4 stroke-[2]" />
                   <span>{t.prod_added}</span>
                 </>
               ) : (
                 <>
-                  {isEvent ? <Ticket className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                  {isEvent ? <Ticket className="w-4 h-4 stroke-[1.75]" /> : <ShoppingBag className="w-4 h-4 stroke-[1.75]" />}
                   <span>{isEvent ? t.event_reserve_seat : t.prod_add_to_cart}</span>
                 </>
               )}
