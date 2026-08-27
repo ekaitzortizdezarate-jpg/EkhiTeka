@@ -16,15 +16,42 @@ async function checkSellerPermission(supabase: any, userId: string) {
 }
 
 async function ensureCategoryExists(supabase: any, categoryId: string) {
+  if (!categoryId) return;
+
   const specialCategories: Record<string, { es: string; eu: string; en: string; fr: string; icon: string }> = {
+    producto_unico: { es: 'Producto único', eu: 'Produktu bakarra', en: 'Unique product', fr: 'Produit unique', icon: '✨' },
     cesta_gourmet: { es: 'Cesta Gourmet', eu: 'Gourmet Saskia', en: 'Gourmet Hamper', fr: 'Coffret Gourmet', icon: '🎁' },
     cata_casa: { es: 'Cata en Casa', eu: 'Etxeko Dastaketa', en: 'Home Tasting', fr: 'Dégustation à Domicile', icon: '🏠' },
     cata_presencial: { es: 'Cata Presencial', eu: 'Aurrez Aurreko Dastaketa', en: 'In-Person Tasting', fr: 'Dégustation Présentielle', icon: '🍷' },
     tarjeta_regalo: { es: 'Tarjeta Regalo', eu: 'Opari Txartela', en: 'Gift Card', fr: 'Carte Cadeau', icon: '💳' },
+    queso: { es: 'Quesos', eu: 'Gaztak', en: 'Cheeses', fr: 'Fromages', icon: '🧀' },
+    embutido: { es: 'Embutidos', eu: 'Embutituak', en: 'Charcuterie', fr: 'Charcuterie', icon: '🥩' },
+    conservas: { es: 'Conservas', eu: 'Kontserbak', en: 'Preserves', fr: 'Conserves', icon: '🥫' },
+    vino: { es: 'Vinos', eu: 'Ardoak', en: 'Wines', fr: 'Vins', icon: '🍷' },
+    sidra: { es: 'Sidras', eu: 'Sagardoak', en: 'Ciders', fr: 'Cidres', icon: '🍏' },
+    txakoli: { es: 'Txakoli', eu: 'Txakolina', en: 'Txakoli', fr: 'Txakoli', icon: '🍾' },
+    cerveza: { es: 'Cervezas', eu: 'Garagardoak', en: 'Beers', fr: 'Bières', icon: '🍺' },
+    dulces: { es: 'Dulces', eu: 'Goxokiak', en: 'Sweets', fr: 'Douceurs', icon: '🍯' },
+    aceite: { es: 'Aceites', eu: 'Olioak', en: 'Oils', fr: 'Huiles', icon: '🫒' },
+    miel: { es: 'Miel', eu: 'Eztia', en: 'Honey', fr: 'Miel', icon: '🍯' },
+    otros: { es: 'Otros', eu: 'Besteak', en: 'Others', fr: 'Autres', icon: '✨' },
   };
 
-  if (specialCategories[categoryId]) {
-    const spec = specialCategories[categoryId];
+  const { data: existing } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('id', categoryId)
+    .maybeSingle();
+
+  if (!existing) {
+    const spec = specialCategories[categoryId] || {
+      es: categoryId.replace(/_/g, ' '),
+      eu: categoryId.replace(/_/g, ' '),
+      en: categoryId.replace(/_/g, ' '),
+      fr: categoryId.replace(/_/g, ' '),
+      icon: '✨',
+    };
+
     await supabase.from('categories').upsert(
       {
         id: categoryId,
