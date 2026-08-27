@@ -31,6 +31,9 @@ import {
   ChevronUp,
   UserCheck,
   Tag,
+  Clock,
+  Ticket,
+  MapPin,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -130,6 +133,9 @@ export function SellerProductForm({
     if (initialMeta?.max_people !== undefined) return Number(initialMeta.max_people);
     return 4;
   });
+
+  const [eventDate, setEventDate] = useState<string>(() => initialMeta?.event_date || '');
+  const [eventTime, setEventTime] = useState<string>(() => initialMeta?.event_time || '');
 
   const inferInitialType = (): PublishingType => {
     if (!initialProduct) return 'producto_suelto';
@@ -588,6 +594,12 @@ export function SellerProductForm({
       metaObj.max_people = maxPeople;
     }
 
+    if (publishingType === 'cata_presencial') {
+      if (eventDate) metaObj.event_date = eventDate;
+      if (eventTime) metaObj.event_time = eventTime;
+      if (selectedEventId) metaObj.event_address_id = selectedEventId;
+    }
+
     if (isPackOrEvent && selectedListItems.length > 0) {
       metaObj.pack_items = selectedListItems.map((it) => ({
         id: it.id,
@@ -688,6 +700,7 @@ export function SellerProductForm({
           {t.seller_step1_label}
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 font-sans">
+          {/* 1. Producto Suelto */}
           <button
             type="button"
             onClick={() => setPublishingType('producto_suelto')}
@@ -697,10 +710,11 @@ export function SellerProductForm({
                 : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
             }`}
           >
-            <Package className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
+            <Package className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
             <span className="text-xs font-bold">{t.seller_type_single}</span>
           </button>
 
+          {/* 2. Cesta / Lote */}
           <button
             type="button"
             onClick={() => setPublishingType('cesta_gourmet')}
@@ -710,23 +724,13 @@ export function SellerProductForm({
                 : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
             }`}
           >
-            <Gift className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
-            <span className="text-xs font-bold">{t.seller_type_hamper}</span>
+            <Gift className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
+            <span className="text-xs font-bold">
+              {language === 'eu' ? 'Saskia / Lotea' : language === 'fr' ? 'Panier / Lot' : language === 'en' ? 'Hamper / Pack' : 'Cesta / Lote'}
+            </span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setPublishingType('cata_presencial')}
-            className={`p-3.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
-              publishingType === 'cata_presencial'
-                ? 'border-[#FFE259] bg-[#FFE259]/15 text-[#1D1D1B] dark:text-white font-bold shadow-xs'
-                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
-            }`}
-          >
-            <Wine className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            <span className="text-xs font-bold">{t.seller_type_store_tasting}</span>
-          </button>
-
+          {/* 3. Cata en Casa */}
           <button
             type="button"
             onClick={() => setPublishingType('cata_casa')}
@@ -736,10 +740,11 @@ export function SellerProductForm({
                 : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
             }`}
           >
-            <Sparkles className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
+            <Sparkles className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
             <span className="text-xs font-bold">{t.seller_type_home_tasting}</span>
           </button>
 
+          {/* 4. Tarjeta Regalo */}
           <button
             type="button"
             onClick={() => setPublishingType('tarjeta_regalo')}
@@ -749,8 +754,24 @@ export function SellerProductForm({
                 : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
             }`}
           >
-            <CreditCard className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
+            <CreditCard className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
             <span className="text-xs font-bold">{t.seller_type_gift_card}</span>
+          </button>
+
+          {/* 5. Evento (Cata Presencial) */}
+          <button
+            type="button"
+            onClick={() => setPublishingType('cata_presencial')}
+            className={`p-3.5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+              publishingType === 'cata_presencial'
+                ? 'border-[#FFE259] bg-[#FFE259]/15 text-[#1D1D1B] dark:text-white font-bold shadow-xs'
+                : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1C1B19] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+            }`}
+          >
+            <Calendar className="w-5 h-5 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
+            <span className="text-xs font-bold">
+              {language === 'eu' ? 'Ekitaldia' : language === 'fr' ? 'Événement' : language === 'en' ? 'Event' : 'Evento'}
+            </span>
           </button>
         </div>
       </div>
@@ -1358,22 +1379,55 @@ export function SellerProductForm({
         </div>
 
         {publishingType === 'cata_presencial' && (
-          <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 block font-serif flex items-center gap-1.5">
-              <Calendar className="w-4 h-4" />
-              <span>{t.seller_step3_event_label}</span>
+          <div className="space-y-4 pt-4 border-t border-stone-200 dark:border-stone-800">
+            <span className="text-[11px] font-black uppercase tracking-wider text-stone-700 dark:text-stone-300 block font-serif flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-stone-700 dark:text-stone-300" />
+              <span>{language === 'eu' ? 'Ekitaldiaren Datuak eta Lekua' : 'Datos del Evento y Ubicación'}</span>
             </span>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* 1. Fecha del Evento */}
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-stone-500" />
+                  <span>{language === 'eu' ? 'Ekitaldiaren Data' : 'Fecha del Evento'}</span>
+                </label>
+                <input
+                  type="date"
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                />
+              </div>
+
+              {/* 2. Horario del Evento */}
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-stone-500" />
+                  <span>{language === 'eu' ? 'Ordutegia' : 'Horario'}</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: 19:00 - 21:00"
+                  value={eventTime}
+                  onChange={(e) => setEventTime(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                />
+              </div>
+            </div>
+
+            {/* 3. Espacio / Local */}
             {activeEventList.length > 0 ? (
               <div>
-                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {t.seller_event_venue_label}
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-stone-500" />
+                  <span>{t.seller_event_venue_label}</span>
                 </label>
                 <select
                   name="event_address_id"
                   value={selectedEventId}
                   onChange={(e) => setSelectedEventId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-purple-50/50 dark:bg-[#141312] border border-purple-300 dark:border-purple-800 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
                   {activeEventList.map((addr) => (
                     <option key={addr.id} value={addr.id}>

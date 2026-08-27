@@ -40,6 +40,7 @@ export default async function SellerProductsPage() {
 
   const parsedProfile = parseProfile(profile);
   const pickupAddresses = parsedProfile.pickup_addresses || [];
+  const eventAddresses = parsedProfile.event_addresses || [];
 
   return (
     <main className="min-h-screen bg-[#FAF8F5] dark:bg-[#141312] py-4 sm:py-8">
@@ -47,6 +48,7 @@ export default async function SellerProductsPage() {
         products={productsData || []}
         categories={categoriesData || []}
         pickupAddresses={pickupAddresses}
+        eventAddresses={eventAddresses}
       />
     </main>
   );

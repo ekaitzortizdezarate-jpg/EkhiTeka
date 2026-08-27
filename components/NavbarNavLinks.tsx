@@ -34,7 +34,7 @@ export function NavbarNavLinks({
   activeOrders = [],
 }: NavbarNavLinksProps) {
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
@@ -229,19 +229,6 @@ export function NavbarNavLinks({
 
               {isSeller && (
                 <Link
-                  href="/vendedor/eventos"
-                  className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
-                    pathname === '/vendedor/eventos'
-                      ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
-                  }`}
-                >
-                  <span>{t.nav_events}</span>
-                </Link>
-              )}
-
-              {isSeller && (
-                <Link
                   href="/vendedor/productos/nuevo"
                   className={`flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 rounded-2xl transition-all font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px] ${
                     pathname === '/vendedor/productos/nuevo'
@@ -257,13 +244,18 @@ export function NavbarNavLinks({
               {isSeller && (
                 <Link
                   href="/vendedor/productos"
-                  className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
+                  className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
                     pathname === '/vendedor/productos'
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                       : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                 >
-                  <span>{t.nav_my_products || 'Productos'}</span>
+                  <span className="block text-center">
+                    {language === 'eu' ? 'Nire' : language === 'fr' ? 'Mes' : language === 'en' ? 'My' : 'Mis'}
+                  </span>
+                  <span className="block text-center">
+                    {language === 'eu' ? 'Produktuak' : language === 'fr' ? 'Produits' : language === 'en' ? 'Products' : 'Productos'}
+                  </span>
                 </Link>
               )}
 
@@ -437,20 +429,6 @@ export function NavbarNavLinks({
 
                     {isSeller && (
                       <Link
-                        href="/vendedor/eventos"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
-                          pathname === '/vendedor/eventos'
-                            ? 'bg-[#FFE259] text-[#1D1D1B]'
-                            : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
-                        }`}
-                      >
-                        <span>{t.nav_events}</span>
-                      </Link>
-                    )}
-
-                    {isSeller && (
-                      <Link
                         href="/vendedor/productos/nuevo"
                         onClick={() => setMobileMenuOpen(false)}
                         className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-sm hover:scale-102 transition-all ${
@@ -467,13 +445,18 @@ export function NavbarNavLinks({
                       <Link
                         href="/vendedor/productos"
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
+                        className={`flex flex-col items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all leading-tight ${
                           pathname === '/vendedor/productos'
                             ? 'bg-[#FFE259] text-[#1D1D1B]'
                             : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
                         }`}
                       >
-                        <span>{t.nav_my_products || 'Productos'}</span>
+                        <span className="block text-center">
+                          {language === 'eu' ? 'Nire' : language === 'fr' ? 'Mes' : language === 'en' ? 'My' : 'Mis'}
+                        </span>
+                        <span className="block text-center">
+                          {language === 'eu' ? 'Produktuak' : language === 'fr' ? 'Produits' : language === 'en' ? 'Products' : 'Productos'}
+                        </span>
                       </Link>
                     )}
 
