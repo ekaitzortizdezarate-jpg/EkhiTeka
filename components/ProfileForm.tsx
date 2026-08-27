@@ -845,97 +845,99 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
           </div>
 
           {/* Tarjeta de Gestión de Direcciones de Entrega (Comprador) */}
-          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-stone-200 dark:border-stone-800">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]">
-                  <Truck className="w-6 h-6" />
+          {!isSeller && (
+            <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-stone-200 dark:border-stone-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]">
+                    <Truck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 font-serif">
+                      {t.deliv_manage_addresses}
+                    </h2>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                      {t.deliv_manage_addresses_desc}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 font-serif">
-                    {t.deliv_manage_addresses}
-                  </h2>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                    {t.deliv_manage_addresses_desc}
-                  </p>
-                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setModalDeliveryAddr({ open: true, addr: null })}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs cursor-pointer hover:scale-105"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{t.deliv_add_new_address}</span>
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setModalDeliveryAddr({ open: true, addr: null })}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs cursor-pointer hover:scale-105"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{t.deliv_add_new_address}</span>
-              </button>
-            </div>
-
-            {/* Lista de direcciones guardadas */}
-            <div className="space-y-3 font-sans text-xs">
-              {deliveryAddresses.length > 0 ? (
-                deliveryAddresses.map((addr) => (
-                  <div
-                    key={addr.id}
-                    className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3"
-                  >
-                    <div className="space-y-1 min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
-                          {addr.title}
-                        </span>
-                        {addr.is_default && (
-                          <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-[#C68D07] dark:text-[#FFE259] font-black text-[10px] uppercase">
-                            {t.deliv_default_badge}
+              {/* Lista de direcciones guardadas */}
+              <div className="space-y-3 font-sans text-xs">
+                {deliveryAddresses.length > 0 ? (
+                  deliveryAddresses.map((addr) => (
+                    <div
+                      key={addr.id}
+                      className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3"
+                    >
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
+                            {addr.title}
                           </span>
+                          {addr.is_default && (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-[#C68D07] dark:text-[#FFE259] font-black text-[10px] uppercase">
+                              {t.deliv_default_badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-stone-600 dark:text-stone-300 font-medium">
+                          {addr.street} {addr.number ? `Nº ${addr.number}` : ''} {addr.stair ? `Esc ${addr.stair}` : ''} {addr.floor ? `Piso ${addr.floor}` : ''} {addr.door ? `Pta ${addr.door}` : ''}, {addr.postal_code || ''} {addr.town} ({addr.province})
+                        </p>
+                        {addr.notes && (
+                          <p className="text-[11px] text-stone-500 dark:text-stone-400 italic">
+                            Notas: {addr.notes}
+                          </p>
                         )}
                       </div>
-                      <p className="text-stone-600 dark:text-stone-300 font-medium">
-                        {addr.street} {addr.number ? `Nº ${addr.number}` : ''} {addr.stair ? `Esc ${addr.stair}` : ''} {addr.floor ? `Piso ${addr.floor}` : ''} {addr.door ? `Pta ${addr.door}` : ''}, {addr.postal_code || ''} {addr.town} ({addr.province})
-                      </p>
-                      {addr.notes && (
-                        <p className="text-[11px] text-stone-500 dark:text-stone-400 italic">
-                          Notas: {addr.notes}
-                        </p>
-                      )}
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      {!addr.is_default && (
+                      <div className="flex items-center gap-2">
+                        {!addr.is_default && (
+                          <button
+                            type="button"
+                            onClick={() => handleSetDefaultDeliveryAddr(addr.id)}
+                            className="px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-[11px] font-bold transition-colors cursor-pointer"
+                          >
+                            {t.deliv_set_as_default}
+                          </button>
+                        )}
                         <button
                           type="button"
-                          onClick={() => handleSetDefaultDeliveryAddr(addr.id)}
-                          className="px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-[11px] font-bold transition-colors cursor-pointer"
+                          onClick={() => setModalDeliveryAddr({ open: true, addr })}
+                          className="p-2 rounded-xl text-stone-500 hover:text-stone-900 dark:hover:text-white hover:bg-stone-200 dark:hover:bg-stone-800 transition-colors cursor-pointer"
+                          title={t.deliv_edit_address}
                         >
-                          {t.deliv_set_as_default}
+                          <Pencil className="w-4 h-4" />
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => setModalDeliveryAddr({ open: true, addr })}
-                        className="p-2 rounded-xl text-stone-500 hover:text-stone-900 dark:hover:text-white hover:bg-stone-200 dark:hover:bg-stone-800 transition-colors cursor-pointer"
-                        title={t.deliv_edit_address}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteDeliveryAddr(addr.id)}
-                        className="p-2 rounded-xl text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
-                        title={t.cart_remove}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteDeliveryAddr(addr.id)}
+                          className="p-2 rounded-xl text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                          title={t.cart_remove}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="py-6 text-center text-stone-400 dark:text-stone-500 italic">
+                    {t.deliv_no_saved_addresses}
                   </div>
-                ))
-              ) : (
-                <div className="py-6 text-center text-stone-400 dark:text-stone-500 italic">
-                  {t.deliv_no_saved_addresses}
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Tarjeta Cambio de Contraseña */}
           <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 shadow-xs">
@@ -1202,35 +1204,16 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 <div
                   key={a.id}
                   className={`p-4 rounded-2xl border-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
-                    a.is_main
-                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-400 dark:border-amber-600 shadow-sm ring-1 ring-amber-400/40'
-                      : a.is_active
-                      ? 'bg-stone-50/70 dark:bg-stone-850/60 border-stone-200 dark:border-stone-700 shadow-xs'
-                      : 'bg-stone-50/40 dark:bg-[#1F1E1C] border-stone-200 dark:border-stone-800 opacity-75'
+                    a.is_active
+                      ? 'bg-stone-50 dark:bg-[#141312] border-stone-200 dark:border-stone-800 shadow-xs'
+                      : 'bg-stone-50/50 dark:bg-[#1F1E1C]/50 border-stone-200 dark:border-stone-800 opacity-60'
                   }`}
                 >
                   <div className="space-y-1.5 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-black text-sm text-stone-900 dark:text-stone-100">{a.title}</span>
 
-                      {/* Badge Tienda Principal con Estrella */}
-                      {a.is_main ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[10px] uppercase tracking-wider font-serif border border-amber-400 dark:border-amber-300 shadow-2xs">
-                          <Star className="w-3 h-3 fill-[#1D1D1B] text-[#1D1D1B]" />
-                          <span>{language === 'eu' ? 'Denda Nagusia' : 'Tienda Principal'}</span>
-                        </span>
-                      ) : pickupAddresses.length > 1 ? (
-                        <button
-                          type="button"
-                          onClick={() => handleSetMainPickup(a.id)}
-                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-600 hover:text-[#1D1D1B] dark:text-stone-300 dark:hover:text-[#1D1D1B] font-bold text-[9.5px] uppercase tracking-wider transition-all cursor-pointer border border-stone-200 dark:border-stone-700"
-                          title={language === 'eu' ? 'Ezarri denda nagusi gisa' : 'Marcar como tienda principal'}
-                        >
-                          <Star className="w-3 h-3" />
-                          <span>{language === 'eu' ? 'Nagusia Ezarri' : 'Hacer Principal'}</span>
-                        </button>
-                      ) : null}
-
+                      {/* Badge Habilitado / Inactivo */}
                       {a.is_active ? (
                         <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 font-black text-[9px] uppercase tracking-wider border border-emerald-300 dark:border-emerald-700">
                           {t.store_wa_badge_active}
@@ -1239,6 +1222,24 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                         <span className="px-2 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 font-bold text-[9px] uppercase tracking-wider">
                           {t.store_wa_badge_inactive}
                         </span>
+                      )}
+
+                      {/* Botón / Indicador Tienda Principal a la derecha de Habilitado */}
+                      {a.is_main ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[10px] uppercase tracking-wider font-serif border border-amber-400 dark:border-amber-300 shadow-2xs">
+                          <Star className="w-3 h-3 fill-[#1D1D1B] text-[#1D1D1B]" />
+                          <span>{language === 'eu' ? 'Denda Nagusia' : 'Tienda Principal'}</span>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSetMainPickup(a.id)}
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-100 hover:bg-[#FFE259] dark:bg-stone-800 dark:hover:bg-[#FFE259] text-stone-600 hover:text-[#1D1D1B] dark:text-stone-300 dark:hover:text-[#1D1D1B] font-bold text-[9.5px] uppercase tracking-wider transition-all cursor-pointer border border-stone-200 dark:border-stone-700"
+                          title={language === 'eu' ? 'Ezarri denda nagusi gisa' : 'Marcar como tienda principal'}
+                        >
+                          <Star className="w-3 h-3" />
+                          <span>{language === 'eu' ? 'Denda Nagusia' : 'Tienda Principal'}</span>
+                        </button>
                       )}
                     </div>
 
