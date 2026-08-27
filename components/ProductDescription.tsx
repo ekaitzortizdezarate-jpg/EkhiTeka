@@ -35,22 +35,36 @@ export function ProductDescription({
   if (lines.length === 0) return null;
 
   const getLineIcon = (line: string) => {
-    const l = line.toLowerCase();
+    const l = line.toLowerCase().trim();
+
+    // 1. Pack / Cesta / Lote / Selección / Items included
     if (
-      l.includes('pack') ||
+      l.includes('incluidos en la cesta') ||
+      l.includes('saskiak dakarrena') ||
+      l.includes('lote gourmet') ||
+      l.includes('gourmet loteak') ||
+      l.includes('coffret gourmet') ||
+      l.includes('gourmet set') ||
+      l.includes('pack de cata') ||
+      l.includes('dastaketa pack') ||
+      l.includes('tasting pack') ||
+      l.includes('productos incluidos') ||
+      l.includes('sartutako produktuak') ||
+      l.includes('contenido de la cesta') ||
+      l.includes('contenido del lote') ||
       l.includes('cesta') ||
       l.includes('lote') ||
-      l.includes('sartutako') ||
-      l.includes('incluye') ||
-      l.includes('selection') ||
-      l.includes('comprend') ||
-      l.includes('coffret')
+      l.includes('pack')
     ) {
-      return <Package className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <Package className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 2. Fecha / Data / Date
     if (l.startsWith('data:') || l.startsWith('fecha:') || l.startsWith('date:')) {
-      return <Calendar className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <Calendar className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 3. Horario / Ordutegia / Schedule
     if (
       l.startsWith('ordutegia:') ||
       l.startsWith('horario:') ||
@@ -59,8 +73,10 @@ export function ProductDescription({
       l.startsWith('ordua:') ||
       l.startsWith('hora:')
     ) {
-      return <Clock className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <Clock className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 4. Plazas / Aforo / Seats
     if (
       l.startsWith('leku') ||
       l.startsWith('plaza') ||
@@ -68,16 +84,20 @@ export function ProductDescription({
       l.startsWith('place') ||
       l.startsWith('aforo')
     ) {
-      return <Users className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <Users className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 5. Tarjeta Regalo / Gift Card
     if (
       l.includes('tarjeta') ||
       l.includes('txartel') ||
       l.includes('carte cadeau') ||
       l.includes('gift card')
     ) {
-      return <CreditCard className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <CreditCard className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 6. Catas / Degustación
     if (
       l.includes('dastaketa') ||
       l.includes('cata') ||
@@ -86,11 +106,15 @@ export function ProductDescription({
       l.includes('degustar') ||
       l.includes('maridaje')
     ) {
-      return <Wine className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <Wine className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 7. Lugar / Ubicación
     if (l.startsWith('lekua:') || l.startsWith('lugar:') || l.startsWith('lieu:') || l.startsWith('location:')) {
-      return <MapPin className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <MapPin className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 8. Opciones / Canje
     if (
       l.startsWith('opciones') ||
       l.startsWith('aukera') ||
@@ -99,11 +123,14 @@ export function ProductDescription({
       l.includes('validez') ||
       l.includes('baliozkotasuna')
     ) {
-      return <Sparkles className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
+      return <Sparkles className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75] shrink-0 mt-0.5" />;
     }
+
+    // 9. Items
     if (line.startsWith('•') || line.startsWith('-')) {
-      return <Check className="w-3 h-3 text-stone-500 dark:text-stone-400 stroke-[2] shrink-0 mt-1" />;
+      return <Check className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 stroke-[1.75] shrink-0 mt-1" />;
     }
+
     return null;
   };
 
@@ -125,7 +152,7 @@ export function ProductDescription({
   }
 
   return (
-    <div className={`space-y-2 font-serif ${className}`}>
+    <div className={`space-y-2.5 font-serif ${className}`}>
       {lines.map((line, idx) => {
         const icon = getLineIcon(line);
         const isHeader =
@@ -141,7 +168,7 @@ export function ProductDescription({
         return (
           <div
             key={idx}
-            className={`flex items-start gap-2 text-xs sm:text-[13px] leading-relaxed ${
+            className={`flex items-start gap-2.5 text-xs sm:text-[13px] leading-relaxed ${
               isHeader
                 ? 'font-bold text-stone-900 dark:text-stone-100 pt-1 tracking-wide'
                 : 'text-stone-700 dark:text-stone-300 font-normal pl-0.5'
