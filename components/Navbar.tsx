@@ -38,10 +38,10 @@ export default async function Navbar() {
         .eq('is_read', false),
       supabase
         .from('orders')
-        .select('id, status')
+        .select('id, status, seller_id, buyer_id')
         .or(`seller_id.eq.${user.id},buyer_id.eq.${user.id}`)
         .order('updated_at', { ascending: false })
-        .limit(25),
+        .limit(50),
     ]);
 
     profile = profileRes.data;

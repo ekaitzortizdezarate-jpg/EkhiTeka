@@ -22,7 +22,7 @@ interface NavbarNavLinksProps {
   profile: Profile | null;
   unreadMessagesCount: number;
   ordersCount: number;
-  activeOrders?: { id: string; status: string }[];
+  activeOrders?: { id: string; status: string; seller_id?: string; buyer_id?: string }[];
 }
 
 export function NavbarNavLinks({
@@ -42,7 +42,7 @@ export function NavbarNavLinks({
     setMounted(true);
   }, []);
 
-  const isSeller = profile?.role === 'vendedor';
+  const isSeller = profile?.role === 'vendedor' || profile?.role === 'admin';
   const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
@@ -51,22 +51,43 @@ export function NavbarNavLinks({
         setHasUnseenOrderUpdates(false);
         return;
       }
-      const storageKey = isSeller ? 'ekhiteka_seen_orders_seller' : 'ekhiteka_seen_orders_buyer';
-      let seenMap: Record<string, string> = {};
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) seenMap = JSON.parse(stored);
-      } catch {}
 
-      const unseen = activeOrders.some((order) => {
-        const lastSeen = seenMap[order.id];
-        if (lastSeen) {
-          return lastSeen !== order.status;
-        }
-        return isSeller ? order.status === 'pendiente' : order.status !== 'pendiente';
-      });
+      if (isSeller) {
+        let seenMap: Record<string, string> = {};
+        try {
+          const stored = localStorage.getItem('ekhiteka_seen_orders_seller');
+          if (stored) seenMap = JSON.parse(stored);
+        } catch {}
 
-      setHasUnseenOrderUpdates(unseen);
+        // Para el vendedor: SOLO pedidos en estado 'pendiente' asignados a este vendedor y que no estén en seenMap
+        const hasNewOrdersForSeller = activeOrders.some((order) => {
+          const isMySale = !order.seller_id || order.seller_id === user.id;
+          if (!isMySale) return false;
+          if (order.status !== 'pendiente') return false;
+          return !seenMap[order.id];
+        });
+
+        setHasUnseenOrderUpdates(hasNewOrdersForSeller);
+      } else {
+        let seenMap: Record<string, string> = {};
+        try {
+          const stored = localStorage.getItem('ekhiteka_seen_orders_buyer');
+          if (stored) seenMap = JSON.parse(stored);
+        } catch {}
+
+        // Para el comprador: cambios de estado en sus pedidos
+        const hasUpdatesForBuyer = activeOrders.some((order) => {
+          const isMyPurchase = !order.buyer_id || order.buyer_id === user.id;
+          if (!isMyPurchase) return false;
+          const lastSeen = seenMap[order.id];
+          if (lastSeen) {
+            return lastSeen !== order.status;
+          }
+          return order.status !== 'pendiente';
+        });
+
+        setHasUnseenOrderUpdates(hasUpdatesForBuyer);
+      }
     }
 
     checkUnseenOrders();
