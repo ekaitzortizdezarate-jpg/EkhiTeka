@@ -355,12 +355,18 @@ export function SellerProductsListView({
     const imageUrl = getProductImage(eventProduct);
     const meta = getEventMeta(eventProduct);
     const eventDate = meta?.event_date || meta?.experienceDate || null;
-    const eventTime = meta?.event_time || meta?.experienceTime || null;
+    const eventTime =
+      meta?.event_start_time && meta?.event_end_time
+        ? `${meta.event_start_time} - ${meta.event_end_time}`
+        : meta?.event_time || meta?.event_start_time || '19:00 - 21:00';
     const eventAddrId = meta?.event_address_id || eventProduct.event_address_id;
-    const matchedVenue = eventAddresses.find((a) => a.id === eventAddrId) || null;
+    const matchedVenue =
+      pickupAddresses.find((a) => a.id === eventAddrId) ||
+      eventAddresses.find((a) => a.id === eventAddrId) ||
+      null;
     const venueText = matchedVenue
-      ? `${matchedVenue.title} — ${matchedVenue.street} ${matchedVenue.number || ''}, ${matchedVenue.town} (${matchedVenue.province})`
-      : eventProduct.origin_region || 'Local EkhiTeka Lekeitio';
+      ? `${matchedVenue.title ? matchedVenue.title + ' — ' : ''}${matchedVenue.street}${matchedVenue.number ? ' ' + matchedVenue.number : ''}, ${matchedVenue.town} (${matchedVenue.province})`
+      : eventProduct.origin_region || 'Tienda EkhiTeka Lekeitio';
 
     const packItems = getPackItems(eventProduct);
     const sellerDesc = getSellerDescription(eventProduct.description);

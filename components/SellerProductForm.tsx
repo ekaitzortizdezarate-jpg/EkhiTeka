@@ -34,6 +34,7 @@ import {
   Clock,
   Ticket,
   MapPin,
+  AlignLeft,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -135,7 +136,22 @@ export function SellerProductForm({
   });
 
   const [eventDate, setEventDate] = useState<string>(() => initialMeta?.event_date || '');
-  const [eventTime, setEventTime] = useState<string>(() => initialMeta?.event_time || '');
+  const [eventStartTime, setEventStartTime] = useState<string>(() => {
+    if (initialMeta?.event_start_time) return initialMeta.event_start_time;
+    if (initialMeta?.event_time) {
+      const parts = initialMeta.event_time.split('-');
+      if (parts[0]) return parts[0].trim();
+    }
+    return '19:00';
+  });
+  const [eventEndTime, setEventEndTime] = useState<string>(() => {
+    if (initialMeta?.event_end_time) return initialMeta.event_end_time;
+    if (initialMeta?.event_time) {
+      const parts = initialMeta.event_time.split('-');
+      if (parts[1]) return parts[1].trim();
+    }
+    return '21:00';
+  });
 
   const inferInitialType = (): PublishingType => {
     if (!initialProduct) return 'producto_suelto';
@@ -200,15 +216,51 @@ export function SellerProductForm({
   const activePickupList = pickupAddresses.filter((a) => a.is_active);
   const activeEventList = eventAddresses.filter((a) => a.is_active);
 
+  const availableVenues = useMemo(() => {
+    const list: { id: string; title: string; street: string; number?: string; town: string; province: string }[] = [];
+
+    // 1. Puntos de entrega / tiendas generados en la tienda
+    activePickupList.forEach((addr) => {
+      list.push({
+        id: addr.id,
+        title: addr.title
+          ? `${addr.title} — ${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`
+          : `${addr.street} ${addr.number || ''}, ${addr.town} (${addr.province})`,
+        street: addr.street,
+        number: addr.number,
+        town: addr.town,
+        province: addr.province,
+      });
+    });
+
+    // 2. Locales adicionales de eventos
+    activeEventList.forEach((ev) => {
+      if (!list.some((l) => l.id === ev.id)) {
+        list.push({
+          id: ev.id,
+          title: `${ev.title} — ${ev.street} ${ev.number || ''}, ${ev.town} (${ev.province})`,
+          street: ev.street,
+          number: ev.number,
+          town: ev.town,
+          province: ev.province,
+        });
+      }
+    });
+
+    return list;
+  }, [activePickupList, activeEventList]);
+
   const [selectedPickupIds, setSelectedPickupIds] = useState<string[]>(
     initialProduct?.pickup_address_ids && initialProduct.pickup_address_ids.length > 0
       ? initialProduct.pickup_address_ids
       : activePickupList.map((a) => a.id)
   );
 
-  const [selectedEventId, setSelectedEventId] = useState<string>(
-    initialProduct?.event_address_id || activeEventList[0]?.id || ''
-  );
+  const [selectedEventId, setSelectedEventId] = useState<string>(() => {
+    if (initialProduct?.event_address_id) return initialProduct.event_address_id;
+    if (initialMeta?.event_address_id) return initialMeta.event_address_id;
+    return activePickupList[0]?.id || activeEventList[0]?.id || '';
+  });
 
   const initialPackList = useMemo<AddedListItem[]>(() => {
     if (!initialProduct) return [];
@@ -529,9 +581,9 @@ export function SellerProductForm({
       formData.set('category_id', 'cata_presencial');
       formData.set('format', 'unidad');
       formData.set('event_address_id', selectedEventId);
-      const eventLoc = activeEventList.find((ev) => ev.id === selectedEventId);
-      if (eventLoc) {
-        formData.set('origin_region', `${eventLoc.title} · ${eventLoc.town} (${eventLoc.province})`);
+      const matchedVenue = availableVenues.find((ev) => ev.id === selectedEventId);
+      if (matchedVenue) {
+        formData.set('origin_region', `${matchedVenue.title || matchedVenue.street} · ${matchedVenue.town} (${matchedVenue.province})`);
       }
     } else if (publishingType === 'cesta_gourmet') {
       formData.set('category_id', 'cesta_gourmet');
@@ -596,7 +648,13 @@ export function SellerProductForm({
 
     if (publishingType === 'cata_presencial') {
       if (eventDate) metaObj.event_date = eventDate;
-      if (eventTime) metaObj.event_time = eventTime;
+      if (eventStartTime) metaObj.event_start_time = eventStartTime;
+      if (eventEndTime) metaObj.event_end_time = eventEndTime;
+      if (eventStartTime && eventEndTime) {
+        metaObj.event_time = `${eventStartTime} - ${eventEndTime}`;
+      } else if (eventStartTime) {
+        metaObj.event_time = eventStartTime;
+      }
       if (selectedEventId) metaObj.event_address_id = selectedEventId;
     }
 
@@ -1357,25 +1415,20 @@ export function SellerProductForm({
             </div>
           )}
 
-          <div>
-            <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-              {publishingType === 'cata_presencial'
-                ? t.seller_event_details_label
-                : t.seller_product_desc_label}
-            </label>
-            <textarea
-              name="description"
-              rows={4}
-              required={publishingType === 'cata_presencial'}
-              defaultValue={getSellerDescription(initialProduct?.description) || ''}
-              placeholder={
-                publishingType === 'cata_presencial'
-                  ? t.seller_event_details_placeholder
-                  : t.seller_product_desc_placeholder
-              }
-              className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100"
-            />
-          </div>
+          {publishingType !== 'cata_presencial' && (
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                {t.seller_product_desc_label}
+              </label>
+              <textarea
+                name="description"
+                rows={4}
+                defaultValue={getSellerDescription(initialProduct?.description) || ''}
+                placeholder={t.seller_product_desc_placeholder}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100"
+              />
+            </div>
+          )}
         </div>
 
         {publishingType === 'cata_presencial' && (
@@ -1385,7 +1438,7 @@ export function SellerProductForm({
               <span>{language === 'eu' ? 'Ekitaldiaren Datuak eta Lekua' : 'Datos del Evento y Ubicación'}</span>
             </span>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* 1. Fecha del Evento */}
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
@@ -1400,28 +1453,41 @@ export function SellerProductForm({
                 />
               </div>
 
-              {/* 2. Horario del Evento */}
+              {/* 2. Hora de Inicio */}
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-stone-500" />
-                  <span>{language === 'eu' ? 'Ordutegia' : 'Horario'}</span>
+                  <span>{language === 'eu' ? 'Hasiera Ordua' : 'Hora Inicio'}</span>
                 </label>
                 <input
-                  type="text"
-                  placeholder="Ej: 19:00 - 21:00"
-                  value={eventTime}
-                  onChange={(e) => setEventTime(e.target.value)}
+                  type="time"
+                  value={eventStartTime}
+                  onChange={(e) => setEventStartTime(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                />
+              </div>
+
+              {/* 3. Hora de Fin */}
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-stone-500" />
+                  <span>{language === 'eu' ? 'Amaiera Ordua' : 'Hora Fin'}</span>
+                </label>
+                <input
+                  type="time"
+                  value={eventEndTime}
+                  onChange={(e) => setEventEndTime(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 />
               </div>
             </div>
 
-            {/* 3. Espacio / Local */}
-            {activeEventList.length > 0 ? (
+            {/* 4. Espacio donde se celebrará la cata */}
+            {availableVenues.length > 0 ? (
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-stone-500" />
-                  <span>{t.seller_event_venue_label}</span>
+                  <span>{language === 'eu' ? 'Dastaketa egingo den lekua / denda' : 'Espacio donde se celebrará la cata'}</span>
                 </label>
                 <select
                   name="event_address_id"
@@ -1429,19 +1495,42 @@ export function SellerProductForm({
                   onChange={(e) => setSelectedEventId(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
-                  {activeEventList.map((addr) => (
+                  {availableVenues.map((addr) => (
                     <option key={addr.id} value={addr.id}>
-                      {addr.title} — {addr.street} {addr.number || ''}, {addr.town} ({addr.province})
+                      {addr.title}
                     </option>
                   ))}
                 </select>
               </div>
             ) : (
-              <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 rounded-xl flex items-center gap-2 text-red-900 dark:text-red-200">
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-xl flex items-center gap-2 text-amber-900 dark:text-amber-200 text-xs">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{t.seller_no_active_event_alert}</span>
+                <span>
+                  {language === 'eu'
+                    ? 'Ez dago puntu / dendarik konfiguratuta. Zure profilean gehi ditzakezu.'
+                    : 'No hay puntos de entrega o tiendas físicas activas. Puedes configurarlos en tu perfil o locales.'}
+                </span>
               </div>
             )}
+
+            {/* 5. Campo Descripción DESPUÉS del Espacio */}
+            <div>
+              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1 flex items-center gap-1.5">
+                <AlignLeft className="w-4 h-4 text-stone-500" />
+                <span>{language === 'eu' ? 'Deskribapena eta xehetasunak (aukerakoa)' : 'Descripción y detalles de la cata (opcional)'}</span>
+              </label>
+              <textarea
+                name="description"
+                rows={4}
+                defaultValue={getSellerDescription(initialProduct?.description) || ''}
+                placeholder={
+                  language === 'eu'
+                    ? 'Idatzi dastaketari buruzko xehetasun gehiago, maridaje oharrak edo informazio osagarria...'
+                    : 'Introduce más detalles sobre la cata, maridaje, recomendaciones o notas especiales para los participantes...'
+                }
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100"
+              />
+            </div>
           </div>
         )}
 
