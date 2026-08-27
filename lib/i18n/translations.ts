@@ -462,6 +462,8 @@ export interface TranslationDict {
   seller_product_category: string;
   seller_product_format: string;
   seller_product_origin: string;
+  seller_product_town: string;
+  seller_product_province: string;
   seller_product_stock: string;
   seller_product_image: string;
   seller_save_product: string;
@@ -1094,6 +1096,8 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_category: 'Kategoria',
     seller_product_format: 'Formatua / Aurkezpena',
     seller_product_origin: 'Jatorria (Herria/Eskualdea)',
+    seller_product_town: 'Herria',
+    seller_product_province: 'Probintzia',
     seller_product_stock: 'Stock erabilgarria',
     seller_product_image: 'Produktuaren Argazkia',
     seller_save_product: 'Gorde Produktua',
@@ -1714,6 +1718,8 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_category: 'Categoría',
     seller_product_format: 'Formato / Presentación',
     seller_product_origin: 'Origen (Localidad/Denominación)',
+    seller_product_town: 'Localidad',
+    seller_product_province: 'Provincia',
     seller_product_stock: 'Stock disponible',
     seller_product_image: 'Fotografía del Producto',
     seller_save_product: 'Guardar Producto',
@@ -2334,6 +2340,8 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_category: 'Category',
     seller_product_format: 'Format / Presentation',
     seller_product_origin: 'Origin / Region',
+    seller_product_town: 'Town / City',
+    seller_product_province: 'Province / Region',
     seller_product_stock: 'Available Stock',
     seller_product_image: 'Product Photo',
     seller_save_product: 'Save Product',
@@ -2954,6 +2962,8 @@ export const translations: Record<Language, TranslationDict> = {
     seller_product_category: 'Catégorie',
     seller_product_format: 'Format / Présentation',
     seller_product_origin: 'Origine / Terroir',
+    seller_product_town: 'Ville / Commune',
+    seller_product_province: 'Province / Région',
     seller_product_stock: 'Stock disponible',
     seller_product_image: 'Photo du Produit',
     seller_save_product: 'Enregistrer le Produit',

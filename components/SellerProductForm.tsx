@@ -109,11 +109,71 @@ export function SellerProductForm({
     return list;
   }, [categories]);
 
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(() => {
+    return initialMeta?.category || initialProduct?.category_id || allCategories[0]?.id || 'queso';
+  });
+
+  const isBeverageCategory = useMemo(() => {
+    const catId = (selectedCategoryId || '').toLowerCase();
+    const catObj = allCategories.find((c) => c.id === selectedCategoryId);
+    const catNameEs = (catObj?.name_es || '').toLowerCase();
+    const catNameEu = (catObj?.name_eu || '').toLowerCase();
+
+    return (
+      catId.includes('cerveza') ||
+      catId.includes('garagardo') ||
+      catId.includes('beer') ||
+      catId.includes('sidra') ||
+      catId.includes('sagardo') ||
+      catId.includes('cider') ||
+      catId.includes('txakoli') ||
+      catId.includes('vino') ||
+      catNameEs.includes('cerveza') ||
+      catNameEs.includes('sidra') ||
+      catNameEs.includes('txakoli') ||
+      catNameEs.includes('vino') ||
+      catNameEu.includes('garagardo') ||
+      catNameEu.includes('sagardo') ||
+      catNameEu.includes('txakoli')
+    );
+  }, [selectedCategoryId, allCategories]);
+
   const [weightUnit, setWeightUnit] = useState<string>(() => {
     if (initialMeta?.unit) return initialMeta.unit;
     if (initialProduct?.weight_g && initialProduct.weight_g >= 1000 && initialProduct.weight_g % 1000 === 0) return 'kg';
-    return 'g';
+    return isBeverageCategory ? 'L' : 'g';
   });
+
+  useEffect(() => {
+    if (isBeverageCategory) {
+      if (weightUnit === 'g' || weightUnit === 'kg') {
+        setWeightUnit('L');
+      }
+    } else {
+      if (weightUnit === 'L' || weightUnit === 'cl' || weightUnit === 'ml') {
+        setWeightUnit('g');
+      }
+    }
+  }, [isBeverageCategory]);
+
+  const initialOriginParts = useMemo(() => {
+    const raw = initialProduct?.origin_region || '';
+    const metaTown = initialMeta?.origin_town;
+    const metaProv = initialMeta?.origin_province;
+    if (metaTown || metaProv) {
+      return { town: metaTown || '', province: metaProv || '' };
+    }
+    if (!raw) return { town: 'Lekeitio', province: 'Bizkaia' };
+    const delimiter = raw.includes('·') ? '·' : raw.includes('/') ? '/' : raw.includes(',') ? ',' : null;
+    if (delimiter) {
+      const parts = raw.split(delimiter);
+      return { town: (parts[0] || '').trim(), province: (parts[1] || '').trim() };
+    }
+    return { town: raw.trim(), province: '' };
+  }, [initialProduct, initialMeta]);
+
+  const [originTown, setOriginTown] = useState<string>(initialOriginParts.town);
+  const [originProvince, setOriginProvince] = useState<string>(initialOriginParts.province);
 
   const [weightAmount, setWeightAmount] = useState<string>(() => {
     if (initialMeta?.amount !== undefined) return String(initialMeta.amount);
@@ -380,7 +440,8 @@ export function SellerProductForm({
   const [customCategory, setCustomCategory] = useState('queso');
   const [customFormat, setCustomFormat] = useState('unidad');
   const [customPrice, setCustomPrice] = useState('');
-  const [customOrigin, setCustomOrigin] = useState('Lekeitio / Bizkaia');
+  const [customTown, setCustomTown] = useState('Lekeitio');
+  const [customProvince, setCustomProvince] = useState('Bizkaia');
   const [customDesc, setCustomDesc] = useState('');
   const [customQuantityStr, setCustomQuantityStr] = useState<string>('1');
 
@@ -415,6 +476,10 @@ export function SellerProductForm({
       return;
     }
 
+    const combinedCustomOrigin = customTown.trim() && customProvince.trim()
+      ? `${customTown.trim()} · ${customProvince.trim()}`
+      : customTown.trim() || customProvince.trim();
+
     const newItem: AddedListItem = {
       id: 'custom_' + Date.now(),
       name: customName.trim(),
@@ -423,7 +488,7 @@ export function SellerProductForm({
       imageUrl: customImagePreview || customImageUrl.trim() || '/images/secciones/Quesos.JPG',
       category: customCategory,
       format: customFormat,
-      origin: customOrigin.trim() || undefined,
+      origin: combinedCustomOrigin || undefined,
       description: customDesc.trim() || undefined,
       isCustom: true,
     };
@@ -435,6 +500,8 @@ export function SellerProductForm({
     setCustomImagePreview('');
     setCustomImageFileName(null);
     setCustomPrice('');
+    setCustomTown('Lekeitio');
+    setCustomProvince('Bizkaia');
     setCustomDesc('');
     setCustomQuantityStr('1');
     setIsCustomAccordionOpen(false);
@@ -580,6 +647,17 @@ export function SellerProductForm({
       formData.set('stock', '999');
     }
 
+    if (publishingType !== 'cata_presencial') {
+      const town = originTown.trim();
+      const province = originProvince.trim();
+      const combined = town && province ? `${town} · ${province}` : town || province;
+      if (combined) {
+        formData.set('origin_region', combined);
+      } else {
+        formData.delete('origin_region');
+      }
+    }
+
     if (publishingType === 'producto_suelto') {
       let computedWeightG: number | null = null;
       const numAmt = parseFloat(weightAmount);
@@ -595,6 +673,8 @@ export function SellerProductForm({
       } else {
         formData.delete('weight_g');
       }
+    } else {
+      formData.delete('weight_g');
     }
 
     const rawDesc = (formData.get('description') as string) || '';
@@ -602,6 +682,9 @@ export function SellerProductForm({
     let composedDesc = cleanSellerDesc;
 
     const metaObj: Record<string, any> = {};
+
+    if (originTown.trim()) metaObj.origin_town = originTown.trim();
+    if (originProvince.trim()) metaObj.origin_province = originProvince.trim();
 
     if (numericDiscount > 0 && sumOfLooseItems > 0) {
       metaObj.discount_percent = numericDiscount;
@@ -1042,15 +1125,31 @@ export function SellerProductForm({
                     </div>
                   </div>
 
-                  <div>
-                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_product_origin}</label>
-                    <input
-                      type="text"
-                      value={customOrigin}
-                      onChange={(e) => setCustomOrigin(e.target.value)}
-                      placeholder="Ej: Lekeitio · Bizkaia / Idiazabal"
-                      className="w-full px-3 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl text-[11px]"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                        {t.seller_product_town}
+                      </label>
+                      <input
+                        type="text"
+                        value={customTown}
+                        onChange={(e) => setCustomTown(e.target.value)}
+                        placeholder={language === 'eu' ? 'Adib: Lekeitio' : 'Ej: Lekeitio'}
+                        className="w-full px-3 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl text-[11px] font-medium text-stone-900 dark:text-stone-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                        {t.seller_product_province}
+                      </label>
+                      <input
+                        type="text"
+                        value={customProvince}
+                        onChange={(e) => setCustomProvince(e.target.value)}
+                        placeholder={language === 'eu' ? 'Adib: Bizkaia' : 'Ej: Bizkaia'}
+                        className="w-full px-3 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl text-[11px] font-medium text-stone-900 dark:text-stone-100"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -1280,7 +1379,8 @@ export function SellerProductForm({
                 <select
                   name="category_id"
                   required
-                  defaultValue={initialMeta?.category || initialProduct?.category_id || allCategories[0]?.id || 'queso'}
+                  value={selectedCategoryId}
+                  onChange={(e) => setSelectedCategoryId(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                 >
                   {allCategories.map((c) => (
@@ -1315,14 +1415,28 @@ export function SellerProductForm({
 
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  {language === 'eu' ? 'Pisua / Bolumena' : language === 'fr' ? 'Poids / Volume' : language === 'en' ? 'Weight / Volume' : 'Peso o Volumen'}
+                  {isBeverageCategory
+                    ? language === 'eu'
+                      ? 'Bolumena (L, cl, ml)'
+                      : language === 'fr'
+                      ? 'Volume (L, cl, ml)'
+                      : language === 'en'
+                      ? 'Volume (L, cl, ml)'
+                      : 'Volumen (L, cl, ml)'
+                    : language === 'eu'
+                    ? 'Pisua (g, kg)'
+                    : language === 'fr'
+                    ? 'Poids (g, kg)'
+                    : language === 'en'
+                    ? 'Weight (g, kg)'
+                    : 'Peso (g, kg)'}
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="number"
                     step="any"
                     min="0"
-                    placeholder="Ej: 250, 1.5, 75"
+                    placeholder={isBeverageCategory ? 'Ej: 0.75, 33, 750' : 'Ej: 250, 1.5, 500'}
                     value={weightAmount}
                     onChange={(e) => setWeightAmount(e.target.value)}
                     className="flex-1 px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
@@ -1332,11 +1446,18 @@ export function SellerProductForm({
                     onChange={(e) => setWeightUnit(e.target.value)}
                     className="w-28 px-2.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
                   >
-                    <option value="g">Gramos (g)</option>
-                    <option value="kg">Kilos (kg)</option>
-                    <option value="L">Litros (L)</option>
-                    <option value="cl">Centilitros (cl)</option>
-                    <option value="ml">Mililitros (ml)</option>
+                    {isBeverageCategory ? (
+                      <>
+                        <option value="L">Litros (L)</option>
+                        <option value="cl">Centilitros (cl)</option>
+                        <option value="ml">Mililitros (ml)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="g">Gramos (g)</option>
+                        <option value="kg">Kilos (kg)</option>
+                      </>
+                    )}
                   </select>
                 </div>
               </div>
@@ -1380,17 +1501,33 @@ export function SellerProductForm({
           )}
 
           {publishingType !== 'cata_presencial' && (
-            <div>
-              <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {t.seller_product_origin}
-              </label>
-              <input
-                type="text"
-                name="origin_region"
-                defaultValue={initialProduct?.origin_region || 'Lekeitio / Bizkaia'}
-                placeholder="Ej: Lekeitio · Bizkaia / Idiazabal"
-                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.seller_product_town}
+                </label>
+                <input
+                  type="text"
+                  name="origin_town"
+                  value={originTown}
+                  onChange={(e) => setOriginTown(e.target.value)}
+                  placeholder={language === 'eu' ? 'Adib: Lekeitio' : language === 'fr' ? 'Ex: Lekeitio' : language === 'en' ? 'Ex: Lekeitio' : 'Ej: Lekeitio'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.seller_product_province}
+                </label>
+                <input
+                  type="text"
+                  name="origin_province"
+                  value={originProvince}
+                  onChange={(e) => setOriginProvince(e.target.value)}
+                  placeholder={language === 'eu' ? 'Adib: Bizkaia' : language === 'fr' ? 'Ex: Bizkaia' : language === 'en' ? 'Ex: Bizkaia' : 'Ej: Bizkaia'}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
+                />
+              </div>
             </div>
           )}
 
