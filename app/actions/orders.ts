@@ -203,11 +203,22 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: 'No autenticado' };
   }
 
+  // 1. Obtener detalles del pedido para saber el comprador
+  const { data: order } = await supabase
+    .from('orders')
+    .select('id, buyer_id, seller_id, status')
+    .eq('id', orderId)
+    .single();
+
+  if (!order) {
+    return { error: 'Pedido no encontrado' };
+  }
+
+  // 2. Actualizar estado del pedido a cancelado
   const { error } = await supabase
     .from('orders')
     .update({
       status: 'cancelado',
-      cancel_reason: reason,
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId);
@@ -216,7 +227,51 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: error.message };
   }
 
+  // 3. Enviar mensaje de chat automático al comprador con el motivo
+  if (order.buyer_id) {
+    const isPending = order.status === 'pendiente';
+    const actionLabel = isPending ? 'rechazado' : 'cancelado';
+    const shortId = order.id.slice(0, 8);
+    const text = `⚠️ Tu pedido #${shortId} ha sido ${actionLabel} por el artesano.\n\nMotivo:\n${reason.trim()}`;
+
+    await supabase.from('chat_messages').insert({
+      sender_id: user.id,
+      receiver_id: order.buyer_id,
+      order_id: order.id,
+      message: text,
+      is_read: false,
+    });
+  }
+
+  // 4. Restaurar el stock de los productos del pedido
+  const { data: orderItems } = await supabase
+    .from('order_items')
+    .select('product_id, quantity')
+    .eq('order_id', orderId);
+
+  if (orderItems && orderItems.length > 0) {
+    for (const it of orderItems) {
+      if (!it.product_id) continue;
+      const { data: prod } = await supabase
+        .from('products')
+        .select('id, stock, is_unlimited_stock')
+        .eq('id', it.product_id)
+        .single();
+
+      if (prod && !prod.is_unlimited_stock) {
+        await supabase
+          .from('products')
+          .update({ stock: (prod.stock ?? 0) + it.quantity })
+          .eq('id', it.product_id);
+      }
+    }
+  }
+
   revalidatePath('/comprador/pedidos');
   revalidatePath('/vendedor/pedidos');
+  revalidatePath('/chat');
+  if (order.buyer_id) {
+    revalidatePath(`/chat/${order.buyer_id}`);
+  }
   return { success: true };
 }

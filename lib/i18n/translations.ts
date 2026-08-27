@@ -309,6 +309,18 @@ export interface TranslationDict {
   orders_mark_seen: string;
   orders_client_label: string;
   orders_qty_label: string;
+  orders_reject: string;
+  orders_cancel_modal_title: string;
+  orders_cancel_reason_label: string;
+  orders_cancel_reason_placeholder: string;
+  orders_cancel_chat_notice: string;
+  orders_confirm_cancel_btn: string;
+  orders_step_pending: string;
+  orders_step_confirmed: string;
+  orders_step_preparing: string;
+  orders_step_ready: string;
+  orders_step_delivered: string;
+  orders_step_cancelled: string;
 
   status_confirm: string;
   status_preparing: string;
@@ -928,6 +940,18 @@ export const translations: Record<Language, TranslationDict> = {
     orders_mark_seen: 'Ikusia markatu',
     orders_client_label: 'Bezeroa',
     orders_qty_label: 'Kantitatea',
+    orders_reject: 'Ukatu Eskaera',
+    orders_cancel_modal_title: 'Eskaera Ezeztatu / Ukatu',
+    orders_cancel_reason_label: 'Ukatzeko edo ezeztatzeko arrazoia *',
+    orders_cancel_reason_placeholder: 'Azaldu laburki erosleari zergatik ezin den eskaera bideratu...',
+    orders_cancel_chat_notice: 'Arrazoi hau automatikoki bidaliko zaio erosleari txat mezuan.',
+    orders_confirm_cancel_btn: 'Berretsi eta Txat bidez Jakinarazi',
+    orders_step_pending: 'Zain',
+    orders_step_confirmed: 'Onartua',
+    orders_step_preparing: 'Prestatzen',
+    orders_step_ready: 'Prest',
+    orders_step_delivered: 'Entregatua',
+    orders_step_cancelled: 'Ezeztatua',
 
     status_confirm: 'Baieztatu',
     status_preparing: 'Prestatzen',
@@ -1535,6 +1559,18 @@ export const translations: Record<Language, TranslationDict> = {
     orders_mark_seen: 'Marcar como Visto',
     orders_client_label: 'Cliente',
     orders_qty_label: 'Cantidad',
+    orders_reject: 'Rechazar Pedido',
+    orders_cancel_modal_title: 'Cancelar / Rechazar Pedido',
+    orders_cancel_reason_label: 'Motivo del rechazo o cancelación *',
+    orders_cancel_reason_placeholder: 'Explica brevemente al comprador por qué no es posible atender el pedido...',
+    orders_cancel_chat_notice: 'Este motivo se enviará automáticamente como mensaje de chat al comprador.',
+    orders_confirm_cancel_btn: 'Confirmar y Notificar por Chat',
+    orders_step_pending: 'Pendiente',
+    orders_step_confirmed: 'Validado',
+    orders_step_preparing: 'En Preparación',
+    orders_step_ready: 'Listo',
+    orders_step_delivered: 'Entregado',
+    orders_step_cancelled: 'Cancelado',
 
     status_confirm: 'Confirmar',
     status_preparing: 'Preparando',
@@ -2142,6 +2178,18 @@ export const translations: Record<Language, TranslationDict> = {
     orders_mark_seen: 'Mark as Seen',
     orders_client_label: 'Customer',
     orders_qty_label: 'Quantity',
+    orders_reject: 'Reject Order',
+    orders_cancel_modal_title: 'Cancel / Reject Order',
+    orders_cancel_reason_label: 'Reason for rejection or cancellation *',
+    orders_cancel_reason_placeholder: 'Briefly explain to the buyer why the order cannot be fulfilled...',
+    orders_cancel_chat_notice: 'This reason will be automatically sent as a chat message to the buyer.',
+    orders_confirm_cancel_btn: 'Confirm & Notify via Chat',
+    orders_step_pending: 'Pending',
+    orders_step_confirmed: 'Confirmed',
+    orders_step_preparing: 'Preparing',
+    orders_step_ready: 'Ready',
+    orders_step_delivered: 'Delivered',
+    orders_step_cancelled: 'Cancelled',
 
     status_confirm: 'Confirm',
     status_preparing: 'Preparing',
@@ -2749,6 +2797,18 @@ export const translations: Record<Language, TranslationDict> = {
     orders_mark_seen: 'Marquer comme Vu',
     orders_client_label: 'Client',
     orders_qty_label: 'Quantité',
+    orders_reject: 'Refuser la Commande',
+    orders_cancel_modal_title: 'Annuler / Refuser la Commande',
+    orders_cancel_reason_label: 'Motif du refus ou de l\'annulation *',
+    orders_cancel_reason_placeholder: 'Expliquez brièvement à l\'acheteur pourquoi la commande ne peut pas être traitée...',
+    orders_cancel_chat_notice: 'Ce motif sera automatiquement envoyé sous forme de message de chat à l\'acheteur.',
+    orders_confirm_cancel_btn: 'Confirmer et Notifier par Chat',
+    orders_step_pending: 'En attente',
+    orders_step_confirmed: 'Validée',
+    orders_step_preparing: 'En Préparation',
+    orders_step_ready: 'Prête',
+    orders_step_delivered: 'Livrée',
+    orders_step_cancelled: 'Annulée',
 
     status_confirm: 'Confirmer',
     status_preparing: 'En préparation',

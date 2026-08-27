@@ -3,15 +3,55 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
-import { updateOrderStatus } from '@/app/actions/orders';
+import { updateOrderStatus, cancelOrder } from '@/app/actions/orders';
 import Link from 'next/link';
 import type { Order, OrderStatus } from '@/types/database';
-import { Package, MessageCircle, User, MapPin, Store, CheckCircle, Sparkles } from 'lucide-react';
+import {
+  Package,
+  MessageCircle,
+  User,
+  MapPin,
+  Store,
+  CheckCircle,
+  Sparkles,
+  XCircle,
+  AlertTriangle,
+  Clock,
+  Check,
+  ChevronRight,
+  X,
+  Phone,
+  Truck,
+  FileText,
+} from 'lucide-react';
+
+const STATUS_STEPS: { key: OrderStatus; labelKey: string }[] = [
+  { key: 'pendiente', labelKey: 'orders_step_pending' },
+  { key: 'confirmado', labelKey: 'orders_step_confirmed' },
+  { key: 'preparando', labelKey: 'orders_step_preparing' },
+  { key: 'listo_entrega', labelKey: 'orders_step_ready' },
+  { key: 'entregado', labelKey: 'orders_step_delivered' },
+];
 
 export function SellerOrdersView({ orders }: { orders: Order[] }) {
   const { t, language } = useLanguage();
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+
+  // Modal para rechazar / cancelar pedido
+  const [cancelModal, setCancelModal] = useState<{
+    open: boolean;
+    orderId: string;
+    isPending: boolean;
+    reason: string;
+    loading: boolean;
+  }>({
+    open: false,
+    orderId: '',
+    isPending: false,
+    reason: '',
+    loading: false,
+  });
 
   useEffect(() => {
     try {
@@ -32,7 +72,6 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
   };
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
-    // Al cambiar de estado, se marca automáticamente como visto
     const updated = { ...seenMap, [orderId]: newStatus };
     setSeenMap(updated);
     try {
@@ -45,16 +84,90 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
     setLoadingId(null);
   };
 
-  const getStatusText = (status: string) => {
+  const handleOpenCancelModal = (orderId: string, isPending: boolean) => {
+    setCancelModal({
+      open: true,
+      orderId,
+      isPending,
+      reason: '',
+      loading: false,
+    });
+  };
+
+  const handleConfirmCancel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cancelModal.reason.trim()) return;
+
+    setCancelModal((prev) => ({ ...prev, loading: true }));
+    const orderId = cancelModal.orderId;
+
+    // Actualizar seenMap
+    const updated = { ...seenMap, [orderId]: 'cancelado' };
+    setSeenMap(updated);
+    try {
+      localStorage.setItem('ekhiteka_seen_orders_seller', JSON.stringify(updated));
+      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+    } catch {}
+
+    await cancelOrder(orderId, cancelModal.reason);
+    setCancelModal({
+      open: false,
+      orderId: '',
+      isPending: false,
+      reason: '',
+      loading: false,
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pendiente': return t.orders_pending;
-      case 'confirmado': return t.orders_confirmed;
-      case 'preparando': return t.orders_preparing;
-      case 'listo_entrega': return t.orders_ready_delivery;
-      case 'entregado': return t.orders_delivered;
-      case 'cancelado': return t.orders_cancelled;
-      default: return status;
+      case 'pendiente':
+        return (
+          <span className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259] font-black text-xs uppercase tracking-wider font-serif border border-amber-300 dark:border-amber-700">
+            {t.orders_pending}
+          </span>
+        );
+      case 'confirmado':
+        return (
+          <span className="px-3 py-1 rounded-xl bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-200 font-black text-xs uppercase tracking-wider font-serif border border-blue-300 dark:border-blue-700">
+            {t.orders_confirmed}
+          </span>
+        );
+      case 'preparando':
+        return (
+          <span className="px-3 py-1 rounded-xl bg-orange-100 dark:bg-orange-950/70 text-orange-800 dark:text-orange-200 font-black text-xs uppercase tracking-wider font-serif border border-orange-300 dark:border-orange-700">
+            {t.orders_preparing}
+          </span>
+        );
+      case 'listo_entrega':
+        return (
+          <span className="px-3 py-1 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-200 font-black text-xs uppercase tracking-wider font-serif border border-purple-300 dark:border-purple-700">
+            {t.orders_ready_delivery}
+          </span>
+        );
+      case 'entregado':
+        return (
+          <span className="px-3 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200 font-black text-xs uppercase tracking-wider font-serif border border-emerald-300 dark:border-emerald-700">
+            {t.orders_delivered}
+          </span>
+        );
+      case 'cancelado':
+        return (
+          <span className="px-3 py-1 rounded-xl bg-red-100 dark:bg-red-950/70 text-red-800 dark:text-red-200 font-black text-xs uppercase tracking-wider font-serif border border-red-300 dark:border-red-700">
+            {t.orders_cancelled}
+          </span>
+        );
+      default:
+        return (
+          <span className="px-3 py-1 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 font-black text-xs uppercase tracking-wider font-serif">
+            {status}
+          </span>
+        );
     }
+  };
+
+  const getStepIndex = (status: string) => {
+    return STATUS_STEPS.findIndex((s) => s.key === status);
   };
 
   return (
@@ -72,8 +185,13 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
         <div className="space-y-6">
           {orders.map((order) => {
             const total = Number(order.total_price ?? order.total_amount ?? 0);
-            const isStorePickup = order.delivery_type === 'recogida_tienda' || order.delivery_method === 'recogida_tienda' || order.delivery_method === 'tienda';
+            const isStorePickup =
+              order.delivery_type === 'recogida_tienda' ||
+              order.delivery_method === 'recogida_tienda' ||
+              order.delivery_method === 'tienda';
             const isNew = !seenMap[order.id] && (order.status === 'pendiente' || !order.status);
+            const currentStepIdx = getStepIndex(order.status);
+            const isCancelled = order.status === 'cancelado';
 
             return (
               <div
@@ -81,6 +199,8 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                 className={`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-6 shadow-xs transition-all ${
                   isNew
                     ? 'border-[#FFE259] ring-2 ring-[#FFE259]/50 shadow-lg bg-amber-50/20 dark:bg-amber-950/15'
+                    : isCancelled
+                    ? 'border-red-200 dark:border-red-950/60 opacity-90'
                     : 'border-stone-200 dark:border-stone-800'
                 }`}
               >
@@ -101,6 +221,8 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                     </button>
                   </div>
                 )}
+
+                {/* Cabecera del pedido */}
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-stone-800">
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-serif">
@@ -118,34 +240,120 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259] font-black text-xs uppercase tracking-wider font-serif">
-                      {getStatusText(order.status)}
-                    </span>
+                    {getStatusBadge(order.status)}
                     <span className="text-base font-black font-serif text-stone-900 dark:text-stone-100">
                       {t.orders_total_to_charge} {total.toFixed(2)} €
                     </span>
                   </div>
                 </div>
 
-                {/* Datos del Cliente y Modo de Entrega (Modo oscuro 100% corregido) */}
-                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 text-xs space-y-2 font-sans">
-                  <div className="flex items-center gap-2 font-bold text-stone-900 dark:text-stone-100">
-                    <User className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                    <span>{order.profiles?.full_name || t.orders_client_label}</span>
-                    {order.profiles?.phone && (
-                      <span className="text-stone-500 dark:text-stone-400 font-normal">· {order.profiles.phone}</span>
-                    )}
+                {/* Stepper visual de progresión del estado del pedido (si no está cancelado) */}
+                {!isCancelled ? (
+                  <div className="p-4 bg-stone-50 dark:bg-[#141312] rounded-2xl border border-stone-200 dark:border-stone-800 space-y-3 font-sans">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                      <span>Progresión del Pedido</span>
+                      <span className="text-stone-600 dark:text-stone-300 font-semibold lowercase">
+                        Paso {Math.max(1, currentStepIdx + 1)} de 5
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-5 gap-1.5 items-center">
+                      {STATUS_STEPS.map((step, idx) => {
+                        const isPassed = currentStepIdx >= idx;
+                        const isCurrent = currentStepIdx === idx;
+                        return (
+                          <div key={step.key} className="space-y-1.5 text-center">
+                            <div
+                              className={`h-2 rounded-full transition-all ${
+                                isCurrent
+                                  ? 'bg-[#FFE259] shadow-xs'
+                                  : isPassed
+                                  ? 'bg-emerald-500'
+                                  : 'bg-stone-200 dark:bg-stone-800'
+                              }`}
+                            />
+                            <span
+                              className={`text-[9.5px] sm:text-[10.5px] block font-bold leading-tight truncate ${
+                                isCurrent
+                                  ? 'text-stone-950 dark:text-[#FFE259] font-black'
+                                  : isPassed
+                                  ? 'text-emerald-700 dark:text-emerald-400'
+                                  : 'text-stone-400 dark:text-stone-600'
+                              }`}
+                            >
+                              {(t as any)[step.labelKey] || step.key}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-stone-600 dark:text-stone-300">
+                ) : (
+                  <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-2xl border border-red-200 dark:border-red-900/60 flex items-center gap-3 text-xs font-sans">
+                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+                    <div>
+                      <span className="font-bold text-red-900 dark:text-red-200 block">
+                        Este pedido ha sido cancelado
+                      </span>
+                      <span className="text-red-700 dark:text-red-300 text-[11px]">
+                        El stock de los productos se ha restaurado y se ha notificado al comprador.
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Datos del Cliente y Modo de Entrega */}
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 text-xs space-y-2.5 font-sans">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-stone-200/80 dark:border-stone-800">
+                    <div className="flex items-center gap-2 font-bold text-stone-900 dark:text-stone-100">
+                      <User className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                      <span>{order.profiles?.full_name || t.orders_client_label}</span>
+                      {order.profiles?.phone && (
+                        <span className="inline-flex items-center gap-1 text-stone-500 dark:text-stone-400 font-normal">
+                          <Phone className="w-3 h-3" /> {order.profiles.phone}
+                        </span>
+                      )}
+                    </div>
+
+                    <Link
+                      href={`/chat/${order.buyer_id}?order_id=${order.id}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FFE259]/20 hover:bg-[#FFE259] text-stone-900 dark:text-stone-100 hover:text-[#1D1D1B] rounded-xl text-[11px] font-bold transition-all border border-[#FFE259]/50"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>{t.orders_chat_with_buyer}</span>
+                    </Link>
+                  </div>
+
+                  <div className="flex items-start gap-2 text-stone-700 dark:text-stone-300">
                     {isStorePickup ? (
                       <>
-                        <Store className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                        <span>{t.deliv_store_pickup_tag}</span>
+                        <Store className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-bold block">{t.deliv_store_pickup_tag}</span>
+                          <span className="text-[11px] text-stone-500 dark:text-stone-400">
+                            {order.shipping_address || 'Punto de recogida en tienda'}
+                          </span>
+                          {order.pickup_schedule && (
+                            <span className="block text-[11px] text-[#C68D07] dark:text-[#FFE259] font-bold mt-0.5">
+                              Horario acordado: {order.pickup_schedule}
+                            </span>
+                          )}
+                        </div>
                       </>
                     ) : (
                       <>
-                        <MapPin className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 shrink-0" />
-                        <span>{order.shipping_address || t.deliv_home_tag}</span>
+                        <Truck className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-bold block">{t.deliv_home_tag}</span>
+                          <span className="text-[11px] text-stone-600 dark:text-stone-300">
+                            {order.shipping_address || t.profile_not_specified || 'Dirección de entrega a domicilio'}
+                          </span>
+                          {order.shipping_notes && (
+                            <span className="block text-[11px] italic text-stone-500 dark:text-stone-400 mt-0.5">
+                              Indicaciones: {order.shipping_notes}
+                            </span>
+                          )}
+                        </div>
                       </>
                     )}
                   </div>
@@ -157,89 +365,137 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                     <h4 className="text-xs font-black uppercase tracking-wider font-serif text-stone-700 dark:text-stone-300">
                       {t.orders_products_to_prepare}
                     </h4>
-                    {order.order_items.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between text-xs py-1 border-b border-stone-100 dark:border-stone-800 last:border-0 font-sans">
-                        <div className="flex items-center gap-2">
-                          <Package className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
-                          <span className="font-bold text-stone-800 dark:text-stone-200">
-                            {item.products?.name || 'Producto'}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md bg-[#FFE259] text-[#1D1D1B] font-black text-[10px]">
-                            x{item.quantity}
+                    <div className="space-y-1.5">
+                      {order.order_items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between text-xs py-2 px-3 rounded-xl bg-stone-50/60 dark:bg-[#141312]/60 border border-stone-100 dark:border-stone-800 font-sans"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <Package className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+                            <span className="font-bold text-stone-800 dark:text-stone-200">
+                              {item.products?.name || 'Producto gourmet'}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-[#FFE259] text-[#1D1D1B] font-black text-[10px]">
+                              x{item.quantity}
+                            </span>
+                          </div>
+                          <span className="font-serif font-black text-stone-900 dark:text-stone-100">
+                            {Number(item.subtotal || item.unit_price * item.quantity).toFixed(2)} €
                           </span>
                         </div>
-                        <span className="font-serif font-black text-stone-900 dark:text-stone-100">
-                          {Number(item.subtotal || item.unit_price * item.quantity).toFixed(2)} €
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
 
-                {/* Botones de Cambio de Estado en 1 clic */}
-                <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 font-serif">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      disabled={loadingId === order.id || order.status === 'confirmado'}
-                      onClick={() => handleStatusChange(order.id, 'confirmado')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        order.status === 'confirmado'
-                          ? 'bg-blue-600 text-white shadow-xs'
-                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-blue-100 dark:hover:bg-blue-950 text-stone-700 dark:text-stone-300'
-                      }`}
-                    >
-                      {t.status_confirm}
-                    </button>
+                {/* Acciones de Gestión de Estado y Botón Rechazar / Cancelar */}
+                {!isCancelled && (
+                  <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 font-serif">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Botón rápido del siguiente paso */}
+                      {order.status === 'pendiente' && (
+                        <button
+                          type="button"
+                          disabled={loadingId === order.id}
+                          onClick={() => handleStatusChange(order.id, 'confirmado')}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>{t.status_confirm}</span>
+                        </button>
+                      )}
 
-                    <button
-                      type="button"
-                      disabled={loadingId === order.id || order.status === 'preparando'}
-                      onClick={() => handleStatusChange(order.id, 'preparando')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        order.status === 'preparando'
-                          ? 'bg-amber-500 text-white shadow-xs'
-                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-amber-100 dark:hover:bg-amber-950 text-stone-700 dark:text-stone-300'
-                      }`}
-                    >
-                      {t.status_preparing}
-                    </button>
+                      {order.status === 'confirmado' && (
+                        <button
+                          type="button"
+                          disabled={loadingId === order.id}
+                          onClick={() => handleStatusChange(order.id, 'preparando')}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                        >
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{t.status_preparing}</span>
+                        </button>
+                      )}
 
-                    <button
-                      type="button"
-                      disabled={loadingId === order.id || order.status === 'listo_entrega'}
-                      onClick={() => handleStatusChange(order.id, 'listo_entrega')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        order.status === 'listo_entrega'
-                          ? 'bg-purple-600 text-white shadow-xs'
-                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-purple-100 dark:hover:bg-purple-950 text-stone-700 dark:text-stone-300'
-                      }`}
-                    >
-                      {t.status_ready}
-                    </button>
+                      {order.status === 'preparando' && (
+                        <button
+                          type="button"
+                          disabled={loadingId === order.id}
+                          onClick={() => handleStatusChange(order.id, 'listo_entrega')}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                        >
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          <span>{t.status_ready}</span>
+                        </button>
+                      )}
 
+                      {order.status === 'listo_entrega' && (
+                        <button
+                          type="button"
+                          disabled={loadingId === order.id}
+                          onClick={() => handleStatusChange(order.id, 'entregado')}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer hover:scale-102"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>{t.status_delivered}</span>
+                        </button>
+                      )}
+
+                      {/* Botones secundarios para saltar a otros estados */}
+                      <div className="flex items-center gap-1 text-xs">
+                        {order.status !== 'confirmado' && order.status !== 'pendiente' && (
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(order.id, 'confirmado')}
+                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
+                          >
+                            {t.orders_step_confirmed}
+                          </button>
+                        )}
+                        {order.status !== 'preparando' && (
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(order.id, 'preparando')}
+                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
+                          >
+                            {t.orders_step_preparing}
+                          </button>
+                        )}
+                        {order.status !== 'listo_entrega' && (
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(order.id, 'listo_entrega')}
+                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
+                          >
+                            {t.orders_step_ready}
+                          </button>
+                        )}
+                        {order.status !== 'entregado' && (
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(order.id, 'entregado')}
+                            className="px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 text-[11px]"
+                          >
+                            {t.orders_step_delivered}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Botón de Rechazo / Cancelación */}
                     <button
                       type="button"
-                      disabled={loadingId === order.id || order.status === 'entregado'}
-                      onClick={() => handleStatusChange(order.id, 'entregado')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        order.status === 'entregado'
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-emerald-100 dark:hover:bg-emerald-950 text-stone-700 dark:text-stone-300'
-                      }`}
+                      onClick={() => handleOpenCancelModal(order.id, order.status === 'pendiente')}
+                      className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-bold transition-colors cursor-pointer"
                     >
-                      {t.status_delivered}
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>
+                        {order.status === 'pendiente' ? t.orders_reject : t.orders_cancel_order}
+                      </span>
                     </button>
                   </div>
-
-                  <Link
-                    href={`/chat/${order.buyer_id}?order_id=${order.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-100 dark:bg-stone-800 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-stone-800 dark:text-stone-200 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" />
-                    <span>{t.orders_chat_with_buyer}</span>
-                  </Link>
-                </div>
+                )}
               </div>
             );
           })}
@@ -253,6 +509,96 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
           <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
             {t.orders_no_orders_seller_sub}
           </p>
+        </div>
+      )}
+
+      {/* Modal de Cancelación / Rechazo con Motivo por Chat */}
+      {cancelModal.open && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn font-sans">
+          <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 font-serif">
+              <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <AlertTriangle className="w-5 h-5" />
+                <h3 className="font-black text-lg text-stone-900 dark:text-stone-100">
+                  {cancelModal.isPending ? t.orders_reject : t.orders_cancel_order}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCancelModal({ open: false, orderId: '', isPending: false, reason: '', loading: false })}
+                className="p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmCancel} className="space-y-4 text-xs">
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-2xl text-stone-800 dark:text-stone-200 space-y-1">
+                <span className="font-bold block flex items-center gap-1.5 text-[#C68D07] dark:text-[#FFE259]">
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>Notificación automática por chat</span>
+                </span>
+                <p className="text-[11px] text-stone-600 dark:text-stone-300">
+                  {t.orders_cancel_chat_notice}
+                </p>
+              </div>
+
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.orders_cancel_reason_label}
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={cancelModal.reason}
+                  onChange={(e) => setCancelModal((prev) => ({ ...prev, reason: e.target.value }))}
+                  placeholder={t.orders_cancel_reason_placeholder}
+                  className="w-full px-3.5 py-2.5 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-hidden focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+
+              {/* Sugerencias rápidas de motivo */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
+                  Motivos sugeridos (clic para rellenar):
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    'Falta de stock disponible para este producto',
+                    'Imposibilidad de entrega en la fecha u horario solicitado',
+                    'Dirección de entrega fuera de la zona de cobertura',
+                    'Cancelación acordada directamente con el cliente',
+                  ].map((sug) => (
+                    <button
+                      key={sug}
+                      type="button"
+                      onClick={() => setCancelModal((prev) => ({ ...prev, reason: sug }))}
+                      className="px-2.5 py-1 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 rounded-lg text-[10.5px] text-left transition-colors cursor-pointer"
+                    >
+                      {sug}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-stone-200 dark:border-stone-800 flex items-center justify-end gap-2 font-serif">
+                <button
+                  type="button"
+                  onClick={() => setCancelModal({ open: false, orderId: '', isPending: false, reason: '', loading: false })}
+                  className="px-4 py-2 rounded-xl text-stone-500 font-bold hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
+                >
+                  {t.common_cancel}
+                </button>
+                <button
+                  type="submit"
+                  disabled={cancelModal.loading || !cancelModal.reason.trim()}
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50 hover:scale-102"
+                >
+                  {cancelModal.loading ? t.common_loading : t.orders_confirm_cancel_btn}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
