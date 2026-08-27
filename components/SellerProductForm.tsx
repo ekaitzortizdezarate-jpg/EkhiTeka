@@ -64,7 +64,7 @@ export function SellerProductForm({
   eventAddresses = [],
 }: SellerProductFormProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,7 +85,6 @@ export function SellerProductForm({
   const [imagePreview, setImagePreview] = useState<string | null>(initialProduct?.image_url || null);
   const [isUnlimited, setIsUnlimited] = useState<boolean>(initialProduct?.is_unlimited_stock || false);
 
-  // Filtrar estrictamente solo productos sueltos reales (excluyendo cestas, catas y tarjetas de regalo)
   const cleanSingleProducts = useMemo(() => {
     return availableSingleProducts.filter((p) => {
       const cat = (p.category_id || '').toLowerCase();
@@ -115,7 +114,6 @@ export function SellerProductForm({
     });
   }, [availableSingleProducts]);
 
-  // Métodos de entrega
   const [deliveryMethods, setDeliveryMethods] = useState<string[]>(
     initialProduct?.delivery_methods || ['domicilio', 'recogida_tienda']
   );
@@ -131,7 +129,6 @@ export function SellerProductForm({
     }
   };
 
-  // Puntos de entrega y eventos
   const activePickupList = pickupAddresses.filter((a) => a.is_active);
   const activeEventList = eventAddresses.filter((a) => a.is_active);
 
@@ -145,12 +142,8 @@ export function SellerProductForm({
     initialProduct?.event_address_id || activeEventList[0]?.id || ''
   );
 
-  // ==========================================
-  // PRODUCTOS DE LA LISTA
-  // ==========================================
   const [selectedListItems, setSelectedListItems] = useState<AddedListItem[]>([]);
 
-  // 1. Selector de Catálogo
   const [catalogSelectId, setCatalogSelectId] = useState<string>(
     cleanSingleProducts[0]?.id || ''
   );
@@ -165,9 +158,6 @@ export function SellerProductForm({
   const selectedCatalogProduct = useMemo(() => {
     return cleanSingleProducts.find((p) => p.id === catalogSelectId) || cleanSingleProducts[0];
   }, [cleanSingleProducts, catalogSelectId]);
-
-  const parsedCatalogQty = parseInt(catalogQuantityStr, 10);
-  const isCatalogQtyValid = !isNaN(parsedCatalogQty) && parsedCatalogQty > 0;
 
   const handleAddCatalogProduct = () => {
     const qty = parseFloat(catalogQuantityStr);
@@ -201,7 +191,6 @@ export function SellerProductForm({
     setCatalogQuantityStr('1');
   };
 
-  // 2. Acordeón de Producto Específico / Manual
   const [isCustomAccordionOpen, setIsCustomAccordionOpen] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customImageUrl, setCustomImageUrl] = useState('');
@@ -283,9 +272,6 @@ export function SellerProductForm({
     return selectedListItems.reduce((acc, it) => acc + it.price * it.quantity, 0);
   }, [selectedListItems]);
 
-  // ==========================================
-  // PRECIO (€) Y DESCUENTO (%) BIDIRECCIONALES
-  // ==========================================
   const [finalPriceInput, setFinalPriceInput] = useState<string>(
     initialProduct?.price ? String(initialProduct.price) : ''
   );
@@ -343,12 +329,23 @@ export function SellerProductForm({
     }
   };
 
+  const isPackOrEvent =
+    publishingType === 'cesta_gourmet' ||
+    publishingType === 'cata_presencial' ||
+    publishingType === 'cata_casa';
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     const formData = new FormData(e.currentTarget);
+    formData.set('publishing_type', publishingType);
+    formData.set('items_count', String(selectedListItems.length));
+
+    if (isPackOrEvent) {
+      formData.set('pack_items', JSON.stringify(selectedListItems));
+    }
 
     formData.delete('delivery_methods');
     deliveryMethods.forEach((m) => formData.append('delivery_methods', m));
@@ -410,21 +407,15 @@ export function SellerProductForm({
   };
 
   const handleDelete = async () => {
-    if (!initialProduct || !confirm('¿Estás seguro de que deseas dar de baja este producto?')) return;
+    if (!initialProduct || !confirm(t.seller_confirm_delete_product)) return;
     setLoading(true);
     const res = await deleteProduct(initialProduct.id);
     setLoading(false);
     if (res?.error) alert(res.error);
   };
 
-  const isPackOrEvent =
-    publishingType === 'cesta_gourmet' ||
-    publishingType === 'cata_presencial' ||
-    publishingType === 'cata_casa';
-
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 space-y-8 font-serif">
-      {/* Cabecera */}
       <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-center gap-3">
           <Link
@@ -438,7 +429,7 @@ export function SellerProductForm({
               {isEditing ? t.seller_edit_product : t.seller_new_product}
             </h1>
             <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-              Catálogo compartido para todo el equipo de vendedores de EkhiTeka.
+              {t.seller_shared_catalog_subtitle}
             </p>
           </div>
         </div>
@@ -459,11 +450,11 @@ export function SellerProductForm({
         <div className="p-3.5 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/60 rounded-2xl flex items-center gap-2.5 text-xs text-amber-900 dark:text-amber-200 font-sans">
           <UserCheck className="w-4 h-4 shrink-0 text-[#C68D07] dark:text-[#FFE259]" />
           <span>
-            Última modificación realizada por:{' '}
+            {t.seller_last_modified_by}{' '}
             <strong className="font-bold">{initialProduct.profiles?.full_name || 'Vendedor EkhiTeka'}</strong>{' '}
             {initialProduct.updated_at && (
               <span className="text-[11px] opacity-80">
-                ({new Date(initialProduct.updated_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })})
+                ({new Date(initialProduct.updated_at).toLocaleDateString(language === 'eu' ? 'eu-ES' : language === 'en' ? 'en-GB' : language === 'fr' ? 'fr-FR' : 'es-ES', { day: '2-digit', month: 'short', year: 'numeric' })})
               </span>
             )}
           </span>
@@ -477,10 +468,9 @@ export function SellerProductForm({
         </div>
       )}
 
-      {/* 1. Selector de Tipología */}
       <div className="space-y-2">
         <label className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
-          1. ¿Qué tipo de artículo deseas publicar?
+          {t.seller_step1_label}
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 font-sans">
           <button
@@ -493,7 +483,7 @@ export function SellerProductForm({
             }`}
           >
             <Package className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
-            <span className="text-xs font-bold">Producto Suelto</span>
+            <span className="text-xs font-bold">{t.seller_type_single}</span>
           </button>
 
           <button
@@ -506,7 +496,7 @@ export function SellerProductForm({
             }`}
           >
             <Gift className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
-            <span className="text-xs font-bold">Cesta / Lote</span>
+            <span className="text-xs font-bold">{t.seller_type_hamper}</span>
           </button>
 
           <button
@@ -519,7 +509,7 @@ export function SellerProductForm({
             }`}
           >
             <Wine className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            <span className="text-xs font-bold">Cata Presencial</span>
+            <span className="text-xs font-bold">{t.seller_type_store_tasting}</span>
           </button>
 
           <button
@@ -532,7 +522,7 @@ export function SellerProductForm({
             }`}
           >
             <Sparkles className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
-            <span className="text-xs font-bold">Cata en Casa</span>
+            <span className="text-xs font-bold">{t.seller_type_home_tasting}</span>
           </button>
 
           <button
@@ -545,7 +535,7 @@ export function SellerProductForm({
             }`}
           >
             <CreditCard className="w-5 h-5 text-amber-600 dark:text-[#FFE259]" />
-            <span className="text-xs font-bold">Tarjeta Regalo</span>
+            <span className="text-xs font-bold">{t.seller_type_gift_card}</span>
           </button>
         </div>
       </div>
@@ -553,13 +543,12 @@ export function SellerProductForm({
       <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs font-sans text-xs">
         <div className="space-y-5">
           <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
-            2. Datos del Producto o Evento
+            {t.seller_step2_label}
           </span>
 
-          {/* 1. Nombre del Producto / Evento */}
           <div>
             <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-              {publishingType === 'cata_presencial' ? 'Nombre del Evento / Cata *' : 'Nombre del Producto *'}
+              {publishingType === 'cata_presencial' ? t.seller_name_event_label : t.seller_name_product_label}
             </label>
             <input
               type="text"
@@ -568,24 +557,23 @@ export function SellerProductForm({
               defaultValue={initialProduct?.name || ''}
               placeholder={
                 publishingType === 'cata_presencial'
-                  ? 'Ej: Cata Magistral de 6 Quesos Afinados & Txakoli'
+                  ? t.seller_name_placeholder_event
                   : publishingType === 'cesta_gourmet'
-                  ? 'Ej: Cesta Selección Degustación Lekeitio'
-                  : 'Ej: Queso Idiazabal Ahumado Pastor de Autor'
+                  ? t.seller_name_placeholder_hamper
+                  : t.seller_name_placeholder_single
               }
               className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
             />
           </div>
 
-          {/* 2. Añadir Productos Sueltos del Catálogo a esta Selección (Solo productos individuales) */}
           {isPackOrEvent && (
             <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-[#141312] border border-amber-200 dark:border-stone-800 space-y-3">
               <div>
                 <span className="text-[11px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] block font-serif">
-                  Añadir Productos Sueltos del Catálogo a esta Selección
+                  {t.seller_catalog_select_title}
                 </span>
                 <p className="text-[10.5px] text-stone-500 dark:text-stone-400">
-                  Selecciona en la lista desplegable un producto individual suelto para ver su ficha, indicar cantidad y añadirlo.
+                  {t.seller_catalog_select_desc}
                 </p>
               </div>
 
@@ -602,7 +590,7 @@ export function SellerProductForm({
                       </option>
                     ))
                   ) : (
-                    <option value="">No hay productos sueltos registrados en el catálogo</option>
+                    <option value="">{t.seller_catalog_no_singles}</option>
                   )}
                 </select>
 
@@ -619,14 +607,14 @@ export function SellerProductForm({
                           {selectedCatalogProduct.name}
                         </p>
                         <p className="text-[11px] text-stone-500 dark:text-stone-400">
-                          Precio: <strong className="text-amber-600 dark:text-[#FFE259]">{Number(selectedCatalogProduct.price).toFixed(2)} €</strong> · {selectedCatalogProduct.format || 'unidad'} · {selectedCatalogProduct.origin_region || 'Lekeitio'}
+                          {t.seller_product_price}: <strong className="text-amber-600 dark:text-[#FFE259]">{Number(selectedCatalogProduct.price).toFixed(2)} €</strong> · {selectedCatalogProduct.format || 'unidad'} · {selectedCatalogProduct.origin_region || 'Lekeitio'}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                       <div className="flex items-center gap-1.5">
-                        <label className="text-[11px] font-bold text-stone-500">Cantidad:</label>
+                        <label className="text-[11px] font-bold text-stone-500">{t.seller_qty_label}</label>
                         <input
                           type="number"
                           min="1"
@@ -644,7 +632,7 @@ export function SellerProductForm({
                         className="px-4 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer font-serif flex items-center gap-1"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>Añadir</span>
+                        <span>{t.seller_btn_add}</span>
                       </button>
                     </div>
                   </div>
@@ -653,7 +641,6 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 3. Meter productos sueltos específicos (uno a uno) - Acordeón Recogido */}
           {isPackOrEvent && (
             <div className="rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden bg-stone-50/50 dark:bg-[#141312]">
               <button
@@ -663,10 +650,10 @@ export function SellerProductForm({
               >
                 <div>
                   <span className="text-[11px] font-black uppercase tracking-wider text-stone-900 dark:text-stone-100 block font-serif">
-                    Meter productos sueltos específicos (uno a uno)
+                    {t.seller_custom_product_accordion_title}
                   </span>
                   <p className="text-[10.5px] text-stone-500 dark:text-stone-400 font-sans">
-                    Pulsa aquí para desplegar el formulario y crear un artículo nuevo exclusivo para esta selección.
+                    {t.seller_custom_product_accordion_desc}
                   </p>
                 </div>
                 <div className="p-1.5 rounded-xl bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
@@ -677,7 +664,7 @@ export function SellerProductForm({
               {isCustomAccordionOpen && (
                 <div className="p-4 border-t border-stone-200 dark:border-stone-800 space-y-3 bg-white dark:bg-[#1C1B19] animate-fadeIn font-sans">
                   <div>
-                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Nombre *</label>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_product_name} *</label>
                     <input
                       type="text"
                       value={customName}
@@ -688,7 +675,7 @@ export function SellerProductForm({
                   </div>
 
                   <div>
-                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Fotografía del Producto</label>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_custom_photo_label}</label>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl overflow-hidden bg-stone-100 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 shrink-0 flex items-center justify-center">
                         {customImagePreview || customImageUrl ? (
@@ -708,7 +695,7 @@ export function SellerProductForm({
                           type="text"
                           value={customImageUrl}
                           onChange={(e) => setCustomImageUrl(e.target.value)}
-                          placeholder="O escribe una URL directa de imagen (opcional)"
+                          placeholder={t.seller_custom_url_fallback}
                           className="w-full px-2.5 py-1 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-lg text-[10.5px]"
                         />
                       </div>
@@ -717,36 +704,38 @@ export function SellerProductForm({
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <div>
-                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Categoría</label>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_product_category}</label>
                       <select
                         value={customCategory}
                         onChange={(e) => setCustomCategory(e.target.value)}
                         className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl"
                       >
                         {categories.map((c) => (
-                          <option key={c.id} value={c.id}>{c.name_es}</option>
+                          <option key={c.id} value={c.id}>
+                            {c[`name_${language}` as keyof Category] || c.name_es || c.name_eu}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div>
-                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Formato</label>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_product_format}</label>
                       <select
                         value={customFormat}
                         onChange={(e) => setCustomFormat(e.target.value)}
                         className="w-full px-2.5 py-1.5 bg-stone-50 dark:bg-[#141312] border border-stone-300 dark:border-stone-700 rounded-xl"
                       >
-                        <option value="unidad">Unidad</option>
-                        <option value="peso_kg">Kg / Cuña</option>
-                        <option value="tarro">Tarro</option>
-                        <option value="lata">Lata</option>
-                        <option value="botella">Botella</option>
-                        <option value="pack">Pack</option>
+                        <option value="unidad">{t.seller_format_unit}</option>
+                        <option value="peso_kg">{t.seller_format_weight}</option>
+                        <option value="tarro">{t.seller_format_jar}</option>
+                        <option value="lata">{t.seller_format_can}</option>
+                        <option value="botella">{t.seller_format_bottle}</option>
+                        <option value="pack">{t.seller_format_pack}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Precio (€) *</label>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_product_price} *</label>
                       <input
                         type="number"
                         step="0.01"
@@ -759,7 +748,7 @@ export function SellerProductForm({
                     </div>
 
                     <div>
-                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Cantidad *</label>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.orders_qty_label} *</label>
                       <input
                         type="number"
                         min="1"
@@ -773,7 +762,7 @@ export function SellerProductForm({
                   </div>
 
                   <div>
-                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Denominación / Origen</label>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_product_origin}</label>
                     <input
                       type="text"
                       value={customOrigin}
@@ -784,7 +773,7 @@ export function SellerProductForm({
                   </div>
 
                   <div>
-                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Descripción</label>
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.seller_product_desc}</label>
                     <textarea
                       rows={2}
                       value={customDesc}
@@ -801,7 +790,7 @@ export function SellerProductForm({
                       className="px-5 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
                     >
                       <Plus className="w-3.5 h-3.5 text-[#FFE259] dark:text-[#1D1D1B]" />
-                      <span>Añadir a la lista</span>
+                      <span>{t.seller_btn_add_to_list}</span>
                     </button>
                   </div>
                 </div>
@@ -809,13 +798,12 @@ export function SellerProductForm({
             </div>
           )}
 
-          {/* 4. PRODUCTOS DE LA LISTA */}
           {isPackOrEvent && (
             <div className="p-4 rounded-3xl bg-stone-50 dark:bg-[#141312] border-2 border-stone-200 dark:border-stone-800 space-y-3 font-sans">
               <div className="flex items-center gap-2 pb-2 border-b border-stone-200 dark:border-stone-800">
                 <Tag className="w-4 h-4 text-amber-600 dark:text-[#FFE259]" />
                 <h3 className="font-black text-xs uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
-                  Productos de la lista ({selectedListItems.length})
+                  {t.seller_list_items_title} ({selectedListItems.length})
                 </h3>
               </div>
 
@@ -865,7 +853,7 @@ export function SellerProductForm({
                               type="button"
                               onClick={() => handleRemoveListItem(item.id)}
                               className="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
-                              title="Eliminar de la lista"
+                              title={t.cart_remove}
                             >
                               <Trash className="w-3.5 h-3.5" />
                             </button>
@@ -879,11 +867,11 @@ export function SellerProductForm({
                         </p>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-stone-500 dark:text-stone-400">
                           <span>{item.price.toFixed(2)} €/ud</span>
-                          {item.format && <span>· Formato: {item.format}</span>}
+                          {item.format && <span>· {t.seller_product_format}: {item.format}</span>}
                           {item.origin && <span>· {item.origin}</span>}
                           {item.isCustom && (
                             <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-[10px]">
-                              Específico
+                              {t.seller_badge_custom_item}
                             </span>
                           )}
                         </div>
@@ -898,7 +886,7 @@ export function SellerProductForm({
 
                   <div className="pt-3 mt-3 border-t-2 border-stone-200 dark:border-stone-800 flex items-center justify-between px-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 font-serif">
-                      Suma total de la lista:
+                      {t.seller_list_total_sum}
                     </span>
                     <span className="text-base font-black text-stone-900 dark:text-[#F5F5F0] font-serif">
                       {sumOfLooseItems.toFixed(2)} €
@@ -907,17 +895,16 @@ export function SellerProductForm({
                 </div>
               ) : (
                 <div className="p-4 rounded-2xl bg-white/60 dark:bg-[#1C1B19]/60 border border-dashed border-stone-300 dark:border-stone-700 text-center text-stone-400 text-xs">
-                  Aún no has añadido productos sueltos a esta lista.
+                  {t.seller_list_empty_desc}
                 </div>
               )}
             </div>
           )}
 
-          {/* 5. PRECIO (€) Y DESCUENTO (%) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                {publishingType === 'cata_presencial' ? 'Precio por Plaza (€) *' : 'Precio de Venta (€) *'}
+                {publishingType === 'cata_presencial' ? t.seller_price_per_seat_label : t.seller_sale_price_label}
               </label>
               <input
                 type="number"
@@ -932,14 +919,14 @@ export function SellerProductForm({
               />
               {sumOfLooseItems > 0 && (
                 <span className="text-[10.5px] text-stone-400 block mt-1">
-                  Suma suelta original: {sumOfLooseItems.toFixed(2)} €
+                  {t.seller_original_sum_helper} {sumOfLooseItems.toFixed(2)} €
                 </span>
               )}
             </div>
 
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                Descuento (%)
+                {t.seller_discount_label}
               </label>
               <div className="relative">
                 <input
@@ -963,13 +950,13 @@ export function SellerProductForm({
               </div>
               <span className="text-[10.5px] block mt-1">
                 {sumOfLooseItems === 0 ? (
-                  <span className="text-stone-400">Añade productos sueltos para calcular descuento</span>
+                  <span className="text-stone-400">{t.seller_discount_need_items_notice}</span>
                 ) : !isNaN(numericDiscount) && numericDiscount > 0 ? (
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Descuento aplicado: visible para los compradores</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">{t.seller_discount_applied_notice}</span>
                 ) : !isNaN(numericDiscount) && numericDiscount < 0 ? (
-                  <span className="text-red-600 dark:text-red-400 font-bold">Recargo sobre la suma suelta (no visible a compradores)</span>
+                  <span className="text-red-600 dark:text-red-400 font-bold">{t.seller_discount_surcharge_notice}</span>
                 ) : (
-                  <span className="text-stone-400">0% de descuento (precio igual a la suma suelta)</span>
+                  <span className="text-stone-400">{t.seller_discount_zero_notice}</span>
                 )}
               </span>
             </div>
@@ -979,7 +966,7 @@ export function SellerProductForm({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="font-bold text-stone-700 dark:text-stone-300">
-                  {publishingType === 'cata_presencial' ? 'Aforo / Plazas Disponibles *' : 'Stock Disponible'}
+                  {publishingType === 'cata_presencial' ? t.seller_seats_capacity_label : t.seller_stock_available_label}
                 </label>
                 {publishingType !== 'cata_presencial' && (
                   <label className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 cursor-pointer">
@@ -990,7 +977,7 @@ export function SellerProductForm({
                       checked={isUnlimited}
                       onChange={(e) => setIsUnlimited(e.target.checked)}
                     />
-                    <span>Ilimitado</span>
+                    <span>{t.seller_unlimited_checkbox}</span>
                   </label>
                 )}
               </div>
@@ -1007,7 +994,7 @@ export function SellerProductForm({
             {publishingType === 'producto_suelto' && (
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Categoría del Catálogo *
+                  {t.seller_product_category} *
                 </label>
                 <select
                   name="category_id"
@@ -1017,7 +1004,7 @@ export function SellerProductForm({
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name_es} / {c.name_eu}
+                      {c[`name_${language}` as keyof Category] || c.name_es || c.name_eu}
                     </option>
                   ))}
                 </select>
@@ -1028,19 +1015,19 @@ export function SellerProductForm({
           {publishingType === 'producto_suelto' && (
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                Formato / Unidad de Venta
+                {t.seller_product_format}
               </label>
               <select
                 name="format"
                 defaultValue={initialProduct?.format || 'unidad'}
                 className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100"
               >
-                <option value="unidad">Unidad / Pieza</option>
-                <option value="peso_kg">Peso (Kg / Cuña)</option>
-                <option value="tarro">Tarro / Bote</option>
-                <option value="lata">Lata Conserva</option>
-                <option value="botella">Botella</option>
-                <option value="pack">Pack Degustación</option>
+                <option value="unidad">{t.seller_format_unit}</option>
+                <option value="peso_kg">{t.seller_format_weight}</option>
+                <option value="tarro">{t.seller_format_jar}</option>
+                <option value="lata">{t.seller_format_can}</option>
+                <option value="botella">{t.seller_format_bottle}</option>
+                <option value="pack">{t.seller_format_pack}</option>
               </select>
             </div>
           )}
@@ -1048,7 +1035,7 @@ export function SellerProductForm({
           {publishingType !== 'cata_presencial' && (
             <div>
               <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                Denominación / Origen (Localidad / Valle)
+                {t.seller_product_origin}
               </label>
               <input
                 type="text"
@@ -1063,8 +1050,8 @@ export function SellerProductForm({
           <div>
             <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
               {publishingType === 'cata_presencial'
-                ? 'Detalles, Fecha, Hora & Maridaje *'
-                : 'Descripción, notas de cata y presentación'}
+                ? t.seller_event_details_label
+                : t.seller_product_desc_label}
             </label>
             <textarea
               name="description"
@@ -1073,26 +1060,25 @@ export function SellerProductForm({
               defaultValue={initialProduct?.description || ''}
               placeholder={
                 publishingType === 'cata_presencial'
-                  ? 'Ej: Fecha: Sábado 20 de Septiembre · 19:30h\nDuración: 90 minutos\nIncluye 5 quesos artesanos de pastor y maridaje con 2 txakolis de Bizkaia.'
-                  : 'Describe el perfil de sabor, curación, aromas e historia del productor...'
+                  ? t.seller_event_details_placeholder
+                  : t.seller_product_desc_placeholder
               }
               className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100"
             />
           </div>
         </div>
 
-        {/* 6. Ubicación de Evento (Catas Presenciales) */}
         {publishingType === 'cata_presencial' && (
           <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 block font-serif flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
-              <span>3. Punto de Evento (Ubicación única)</span>
+              <span>{t.seller_step3_event_label}</span>
             </span>
 
             {activeEventList.length > 0 ? (
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Espacio donde se celebrará la cata *
+                  {t.seller_event_venue_label}
                 </label>
                 <select
                   name="event_address_id"
@@ -1110,18 +1096,17 @@ export function SellerProductForm({
             ) : (
               <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 rounded-xl flex items-center gap-2 text-red-900 dark:text-red-200">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>No hay ningún punto de evento activo. Ve a Perfil &gt; Tienda para activar una ubicación de eventos.</span>
+                <span>{t.seller_no_active_event_alert}</span>
               </div>
             )}
           </div>
         )}
 
-        {/* 7. Métodos de Entrega & Puntos de Recogida */}
         {publishingType !== 'cata_presencial' && (
           <div className="space-y-4 pt-4 border-t border-stone-200 dark:border-stone-800">
             <span className="text-[11px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] block font-serif flex items-center gap-1.5">
               <Truck className="w-4 h-4" />
-              <span>3. Métodos de Entrega & Puntos de Recogida en Tienda</span>
+              <span>{t.seller_step3_delivery_label}</span>
             </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1139,7 +1124,7 @@ export function SellerProductForm({
                   onChange={() => {}}
                   className="w-4 h-4 accent-[#FFE259] rounded cursor-pointer"
                 />
-                <span className="font-bold text-xs">Envio a Domicilio</span>
+                <span className="font-bold text-xs">{t.seller_home_delivery_option}</span>
               </div>
 
               <div
@@ -1156,14 +1141,14 @@ export function SellerProductForm({
                   onChange={() => {}}
                   className="w-4 h-4 accent-[#FFE259] rounded cursor-pointer"
                 />
-                <span className="font-bold text-xs">Recogida en tienda</span>
+                <span className="font-bold text-xs">{t.seller_store_pickup_option}</span>
               </div>
             </div>
 
             {hasPickup && (
               <div className="space-y-2 pt-2 animate-fadeIn">
                 <label className="font-bold text-stone-700 dark:text-stone-300 block">
-                  Selecciona en qué puntos de entrega/tienda dar la opción de recogida:
+                  {t.seller_select_pickup_points_label}
                 </label>
                 {activePickupList.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1199,7 +1184,7 @@ export function SellerProductForm({
                   </div>
                 ) : (
                   <p className="text-[11px] text-amber-600 dark:text-amber-400">
-                    No hay puntos de entrega activos. Puedes activarlos en la pestaña Tienda de tu perfil.
+                    {t.seller_no_active_pickup_alert}
                   </p>
                 )}
               </div>
@@ -1207,11 +1192,10 @@ export function SellerProductForm({
           </div>
         )}
 
-        {/* 8. Fotografía del Producto */}
         <div className="space-y-3 pt-4 border-t border-stone-200 dark:border-stone-800">
           <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif flex items-center gap-1.5">
             <ImageIcon className="w-4 h-4" />
-            <span>4. Fotografía del Producto / Evento</span>
+            <span>{t.seller_step4_photo_label}</span>
           </span>
 
           <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -1235,14 +1219,13 @@ export function SellerProductForm({
                 type="text"
                 name="image_url_fallback"
                 defaultValue={initialProduct?.image_url || ''}
-                placeholder="O pega una URL de imagen directa (opcional)"
+                placeholder={t.seller_photo_url_placeholder}
                 className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-[11px] text-stone-900 dark:text-stone-100"
               />
             </div>
           </div>
         </div>
 
-        {/* Botones de acción */}
         <div className="pt-4 border-t border-stone-200 dark:border-stone-800 flex items-center justify-end gap-3 font-serif">
           <Link
             href="/tienda"
@@ -1257,7 +1240,7 @@ export function SellerProductForm({
             className="inline-flex items-center gap-2 px-7 py-3 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
           >
             <Check className="w-4 h-4" />
-            <span>{loading ? t.common_loading : isEditing ? 'Guardar Cambios' : 'Publicar en la Tienda'}</span>
+            <span>{loading ? t.common_loading : isEditing ? t.seller_save_changes_btn : t.seller_publish_btn}</span>
           </button>
         </div>
       </form>

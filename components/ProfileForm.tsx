@@ -97,7 +97,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     if (res?.error) {
       setStoreMsg({ text: res.error, isError: true });
     } else {
-      setStoreMsg({ text: 'Configuración de tienda actualizada correctamente.', isError: false });
+      setStoreMsg({ text: t.store_config_updated_success, isError: false });
       setTimeout(() => setStoreMsg(null), 3000);
     }
   };
@@ -160,7 +160,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
   };
 
   const handleDeleteWA = async (contactId: string) => {
-    if (!confirm('¿Eliminar este contacto de WhatsApp?')) return;
+    if (!confirm(t.store_wa_confirm_delete)) return;
     const updated = whatsappContacts.filter((c) => c.id !== contactId);
     setWhatsappContacts(updated);
     await syncStoreConfig(updated, pickupAddresses, eventAddresses);
@@ -205,7 +205,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
   };
 
   const handleDeletePickup = async (addrId: string) => {
-    if (!confirm('¿Eliminar esta dirección de entrega/tienda?')) return;
+    if (!confirm(t.store_pickup_confirm_delete)) return;
     const updated = pickupAddresses.filter((a) => a.id !== addrId);
     setPickupAddresses(updated);
     await syncStoreConfig(whatsappContacts, updated, eventAddresses);
@@ -250,7 +250,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
   };
 
   const handleDeleteEvent = async (addrId: string) => {
-    if (!confirm('¿Eliminar este punto de evento?')) return;
+    if (!confirm(t.store_event_confirm_delete)) return;
     const updated = eventAddresses.filter((a) => a.id !== addrId);
     setEventAddresses(updated);
     await syncStoreConfig(whatsappContacts, pickupAddresses, updated);
@@ -291,7 +291,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     if (res?.error) {
       setPasswordMsg({ text: res.error, isError: true });
     } else {
-      setPasswordMsg({ text: '¡Contraseña actualizada con éxito!', isError: false });
+      setPasswordMsg({ text: t.profile_password_success, isError: false });
       (e.target as HTMLFormElement).reset();
       setTimeout(() => {
         setPasswordMsg(null);
@@ -328,7 +328,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             }`}
           >
             <User className="w-4 h-4" />
-            <span>Usuario</span>
+            <span>{t.profile_tab_user}</span>
           </button>
 
           <button
@@ -341,7 +341,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             }`}
           >
             <Store className="w-4 h-4" />
-            <span>Tienda</span>
+            <span>{t.profile_tab_store}</span>
           </button>
         </div>
       )}
@@ -359,7 +359,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h2 className="text-lg sm:text-xl font-black text-stone-900 dark:text-stone-100">
-                      {isSeller ? 'Datos de Vendedor' : 'Datos del Usuario'}
+                      {isSeller ? t.profile_seller_data : t.profile_user_data}
                     </h2>
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider font-sans ${
@@ -381,7 +381,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   </div>
                   <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
                     {isSeller
-                      ? 'Tus datos de acceso y contacto personales (los campos de dirección no son obligatorios).'
+                      ? t.profile_seller_desc
                       : t.profile_subtitle}
                   </p>
                 </div>
@@ -416,7 +416,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
                     <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 block">
-                      Nombre y Apellidos
+                      {t.profile_full_name}
                     </span>
                     <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                       {[p.first_name, p.last_name_1, p.last_name_2].filter(Boolean).join(' ') || p.full_name || t.profile_not_specified}
@@ -461,7 +461,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
                   <div className="p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-1">
                     <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 block">
-                      Municipio / Provincia
+                      {t.profile_town_province}
                     </span>
                     <p className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
                       {p.town ? `${p.town} (${p.province || ''})` : t.profile_not_specified}
@@ -472,10 +472,10 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#1F1E1C] border border-stone-200/80 dark:border-stone-800 space-y-2">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#C68D07] dark:text-[#FFE259] flex items-center gap-1.5 font-serif">
                     <Home className="w-3.5 h-3.5" />
-                    <span>Dirección Personal del Usuario {isSeller && '(Opcional)'}</span>
+                    <span>{t.profile_user_address} {isSeller && t.profile_seller_addr_optional}</span>
                   </span>
                   <p className="text-sm font-bold text-stone-800 dark:text-[#F5F5F0]">
-                    {formattedUserAddress || (isSeller ? 'Sin dirección personal registrada (no obligatoria)' : t.profile_not_specified)}
+                    {formattedUserAddress || (isSeller ? t.profile_seller_no_address : t.profile_not_specified)}
                   </p>
                 </div>
               </div>
@@ -563,13 +563,13 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
                 <div className="space-y-3 pt-2">
                   <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 block font-serif">
-                    Dirección Personal {isSeller ? '(No obligatoria)' : '*'}
+                    {t.profile_user_address} {isSeller ? t.profile_seller_addr_optional : '*'}
                   </span>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Provincia {!isSeller && '*'}
+                        {t.profile_province} {!isSeller && '*'}
                       </label>
                       <input
                         type="text"
@@ -581,7 +581,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </div>
                     <div>
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Municipio {!isSeller && '*'}
+                        {t.profile_town} {!isSeller && '*'}
                       </label>
                       <input
                         type="text"
@@ -593,7 +593,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </div>
                     <div>
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Código Postal {!isSeller && '*'}
+                        {t.profile_postal_code} {!isSeller && '*'}
                       </label>
                       <input
                         type="text"
@@ -608,7 +608,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
                     <div className="col-span-2 sm:col-span-2">
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Calle / Vía {!isSeller && '*'}
+                        {t.profile_street} {!isSeller && '*'}
                       </label>
                       <input
                         type="text"
@@ -620,7 +620,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </div>
                     <div>
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Nº {!isSeller && '*'}
+                        {t.profile_number} {!isSeller && '*'}
                       </label>
                       <input
                         type="text"
@@ -632,7 +632,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </div>
                     <div>
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Escalera
+                        {t.profile_stair}
                       </label>
                       <input
                         type="text"
@@ -643,7 +643,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </div>
                     <div>
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Piso {!isSeller && '*'}
+                        {t.profile_floor} {!isSeller && '*'}
                       </label>
                       <input
                         type="text"
@@ -655,7 +655,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </div>
                     <div>
                       <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                        Puerta {!isSeller && '*'}
+                        {t.profile_door} {!isSeller && '*'}
                       </label>
                       <input
                         type="text"
@@ -705,7 +705,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     {t.profile_security}
                   </h2>
                   <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                    {isPasswordOpen ? 'Introduce tu contraseña actual y la nueva clave.' : 'Pulsa aquí para cambiar tu contraseña de acceso.'}
+                    {isPasswordOpen ? t.profile_password_open_desc : t.profile_password_closed_desc}
                   </p>
                 </div>
               </div>
@@ -808,10 +808,10 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-stone-900 dark:text-stone-100">
-                    Contacto whatsapp
+                    {t.store_wa_title}
                   </h3>
                   <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                    Canal oficial para las opciones de WhatsApp en toda la tienda web.
+                    {t.store_wa_desc}
                   </p>
                 </div>
               </div>
@@ -822,7 +822,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer hover:scale-105 shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Añadir contacto</span>
+                <span>{t.store_wa_add_btn}</span>
               </button>
             </div>
 
@@ -830,13 +830,13 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             {whatsappContacts.length === 0 ? (
               <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-2xl flex items-center gap-3 text-xs text-amber-900 dark:text-amber-200 font-sans">
                 <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
-                <span>No hay ningún contacto de WhatsApp registrado. Por favor, añade un contacto.</span>
+                <span>{t.store_wa_alert_empty}</span>
               </div>
             ) : !hasActiveWA ? (
               <div className="p-4 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 rounded-2xl flex items-center justify-between gap-3 text-xs text-red-900 dark:text-red-200 font-sans">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
-                  <span>Sin opciones whatsapp en la web. No hay ningún contacto habilitado. Por favor, activa uno.</span>
+                  <span>{t.store_wa_alert_no_active}</span>
                 </div>
               </div>
             ) : null}
@@ -857,11 +857,11 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       <span className="font-black text-sm text-stone-900 dark:text-stone-100">{c.name}</span>
                       {c.is_active ? (
                         <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white font-black text-[9px] uppercase tracking-wider">
-                          Habilitado (Activo en la web)
+                          {t.store_wa_badge_active}
                         </span>
                       ) : (
                         <span className="px-2 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 font-bold text-[9px] uppercase tracking-wider">
-                          Deshabilitado
+                          {t.store_wa_badge_inactive}
                         </span>
                       )}
                     </div>
@@ -882,14 +882,14 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       }`}
                     >
                       <Power className="w-3.5 h-3.5" />
-                      <span>{c.is_active ? 'Deshabilitar' : 'Habilitar'}</span>
+                      <span>{c.is_active ? t.store_btn_disable : t.store_btn_enable}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleOpenEditWA(c)}
                       className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition-colors cursor-pointer"
-                      title="Editar contacto"
+                      title={t.store_edit_contact}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
@@ -898,7 +898,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       type="button"
                       onClick={() => handleDeleteWA(c.id)}
                       className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer"
-                      title="Borrar contacto"
+                      title={t.store_delete_contact}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -917,10 +917,10 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-stone-900 dark:text-stone-100">
-                    Punto entrega / tienda
+                    {t.store_pickup_title}
                   </h3>
                   <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                    Direcciones para dar la opción de recogida a los compradores en sus pedidos.
+                    {t.store_pickup_desc}
                   </p>
                 </div>
               </div>
@@ -931,7 +931,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer hover:scale-105 shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Añadir Direccion</span>
+                <span>{t.store_pickup_add_btn}</span>
               </button>
             </div>
 
@@ -939,12 +939,12 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             {pickupAddresses.length === 0 ? (
               <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-2xl flex items-center gap-3 text-xs text-amber-900 dark:text-amber-200 font-sans">
                 <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
-                <span>No hay ningún punto de entrega metido. Por favor, mete una dirección.</span>
+                <span>{t.store_pickup_alert_empty}</span>
               </div>
             ) : !hasActivePickup ? (
               <div className="p-4 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 rounded-2xl flex items-center gap-3 text-xs text-red-900 dark:text-red-200 font-sans">
                 <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
-                <span>No hay ningún punto de entrega activo. Por favor, activa al menos una dirección.</span>
+                <span>{t.store_pickup_alert_no_active}</span>
               </div>
             ) : null}
 
@@ -964,11 +964,11 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       <span className="font-black text-sm text-stone-900 dark:text-stone-100">{a.title}</span>
                       {a.is_active ? (
                         <span className="px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] font-black text-[9px] uppercase tracking-wider">
-                          Habilitada
+                          {t.store_wa_badge_active}
                         </span>
                       ) : (
                         <span className="px-2 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 font-bold text-[9px] uppercase tracking-wider">
-                          Deshabilitada
+                          {t.store_wa_badge_inactive}
                         </span>
                       )}
                     </div>
@@ -977,7 +977,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </p>
                     {a.schedule && (
                       <p className="text-[11px] font-bold text-[#C68D07] dark:text-[#FFE259]">
-                        Horario: {a.schedule}
+                        {t.store_schedule_label} {a.schedule}
                       </p>
                     )}
                   </div>
@@ -993,14 +993,14 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       }`}
                     >
                       <Power className="w-3.5 h-3.5" />
-                      <span>{a.is_active ? 'Deshabilitar' : 'Habilitar'}</span>
+                      <span>{a.is_active ? t.store_btn_disable : t.store_btn_enable}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setModalStoreAddr({ open: true, addr: a })}
                       className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition-colors cursor-pointer"
-                      title="Editar dirección"
+                      title={t.profile_edit_btn}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
@@ -1009,7 +1009,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       type="button"
                       onClick={() => handleDeletePickup(a.id)}
                       className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer"
-                      title="Borrar dirección"
+                      title={t.store_delete_contact}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1028,10 +1028,10 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-stone-900 dark:text-stone-100">
-                    Punto evento
+                    {t.store_event_title}
                   </h3>
                   <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-                    Ubicaciones disponibles para la celebración de catas presenciales y eventos.
+                    {t.store_event_desc}
                   </p>
                 </div>
               </div>
@@ -1042,7 +1042,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer hover:scale-105 shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Añadir Direccion</span>
+                <span>{t.store_event_add_btn}</span>
               </button>
             </div>
 
@@ -1050,12 +1050,12 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             {eventAddresses.length === 0 ? (
               <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-2xl flex items-center gap-3 text-xs text-amber-900 dark:text-amber-200 font-sans">
                 <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
-                <span>No hay ningún punto de evento metido. Por favor, mete una dirección.</span>
+                <span>{t.store_event_alert_empty}</span>
               </div>
             ) : !hasActiveEvent ? (
               <div className="p-4 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-800 rounded-2xl flex items-center gap-3 text-xs text-red-900 dark:text-red-200 font-sans">
                 <AlertCircle className="w-5 h-5 shrink-0 text-red-600" />
-                <span>No hay ningún punto de evento activo. Por favor, activa al menos una ubicación.</span>
+                <span>{t.store_event_alert_no_active}</span>
               </div>
             ) : null}
 
@@ -1075,11 +1075,11 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       <span className="font-black text-sm text-stone-900 dark:text-stone-100">{a.title}</span>
                       {a.is_active ? (
                         <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white font-black text-[9px] uppercase tracking-wider">
-                          Habilitada
+                          {t.store_wa_badge_active}
                         </span>
                       ) : (
                         <span className="px-2 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 font-bold text-[9px] uppercase tracking-wider">
-                          Deshabilitada
+                          {t.store_wa_badge_inactive}
                         </span>
                       )}
                     </div>
@@ -1088,7 +1088,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                     </p>
                     {a.notes && (
                       <p className="text-[11px] font-medium text-stone-500 dark:text-stone-400">
-                        Notas: {a.notes}
+                        {t.store_notes_label} {a.notes}
                       </p>
                     )}
                   </div>
@@ -1104,14 +1104,14 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       }`}
                     >
                       <Power className="w-3.5 h-3.5" />
-                      <span>{a.is_active ? 'Deshabilitar' : 'Habilitar'}</span>
+                      <span>{a.is_active ? t.store_btn_disable : t.store_btn_enable}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setModalEventAddr({ open: true, addr: a })}
                       className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition-colors cursor-pointer"
-                      title="Editar dirección"
+                      title={t.profile_edit_btn}
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
@@ -1120,7 +1120,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                       type="button"
                       onClick={() => handleDeleteEvent(a.id)}
                       className="p-2 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/60 text-red-700 dark:text-red-300 transition-colors cursor-pointer"
-                      title="Borrar dirección"
+                      title={t.store_delete_contact}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1140,7 +1140,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
           <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 font-serif">
               <h3 className="font-black text-lg text-stone-900 dark:text-stone-100">
-                {modalWA.contact ? 'Editar Contacto WhatsApp' : 'Añadir Contacto WhatsApp'}
+                {modalWA.contact ? t.store_modal_wa_edit : t.store_modal_wa_new}
               </h3>
               <button
                 type="button"
@@ -1154,7 +1154,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             <form onSubmit={handleSaveWA} className="space-y-4 text-xs">
               <div className="space-y-2">
                 <label className="font-bold text-stone-700 dark:text-stone-300 block">
-                  Origen de los datos
+                  {t.store_modal_wa_source_label}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -1174,7 +1174,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                         : 'border-stone-200 dark:border-stone-700 text-stone-500'
                     }`}
                   >
-                    Elegir Vendedor
+                    {t.store_modal_wa_choose_seller}
                   </button>
 
                   <button
@@ -1189,7 +1189,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                         : 'border-stone-200 dark:border-stone-700 text-stone-500'
                     }`}
                   >
-                    Meter a mano
+                    {t.store_modal_wa_manual_input}
                   </button>
                 </div>
               </div>
@@ -1197,7 +1197,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
               {waSelectType === 'seller' && sellers.length > 0 && (
                 <div>
                   <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    Seleccionar Vendedor *
+                    {t.store_modal_wa_select_seller}
                   </label>
                   <select
                     value={selectedSellerId}
@@ -1214,7 +1214,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   >
                     {sellers.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.full_name} ({s.phone || 'Sin tlf'})
+                        {s.full_name} ({s.phone || t.profile_not_specified})
                       </option>
                     ))}
                   </select>
@@ -1223,7 +1223,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Nombre del Contacto *
+                  {t.store_modal_wa_name}
                 </label>
                 <input
                   type="text"
@@ -1237,7 +1237,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Número de Teléfono / WhatsApp *
+                  {t.store_modal_wa_phone}
                 </label>
                 <input
                   type="tel"
@@ -1255,14 +1255,14 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   onClick={() => setModalWA({ open: false, contact: null })}
                   className="px-4 py-2 rounded-xl text-stone-500 font-bold hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                 >
-                  Cancelar
+                  {t.common_cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={loadingStore}
                   className="px-5 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer"
                 >
-                  Guardar Contacto
+                  {t.store_modal_wa_save}
                 </button>
               </div>
             </form>
@@ -1276,7 +1276,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
           <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 font-serif">
               <h3 className="font-black text-lg text-stone-900 dark:text-stone-100">
-                {modalStoreAddr.addr ? 'Editar Punto de Entrega' : 'Añadir Punto de Entrega / Tienda'}
+                {modalStoreAddr.addr ? t.store_modal_pickup_edit : t.store_modal_pickup_new}
               </h3>
               <button
                 type="button"
@@ -1290,7 +1290,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             <form onSubmit={handleSaveStoreAddr} className="space-y-3 text-xs">
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Título del Punto de Entrega *
+                  {t.store_modal_pickup_title_field}
                 </label>
                 <input
                   type="text"
@@ -1304,7 +1304,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Calle *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_street} *</label>
                   <input
                     type="text"
                     name="street"
@@ -1315,7 +1315,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Nº *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_number} *</label>
                   <input
                     type="text"
                     name="number"
@@ -1329,7 +1329,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Escalera</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_stair}</label>
                   <input
                     type="text"
                     name="stair"
@@ -1339,7 +1339,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Piso</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_floor}</label>
                   <input
                     type="text"
                     name="floor"
@@ -1349,7 +1349,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Puerta</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_door}</label>
                   <input
                     type="text"
                     name="door"
@@ -1362,7 +1362,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">C.P. *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_postal_code} *</label>
                   <input
                     type="text"
                     name="postal_code"
@@ -1372,7 +1372,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Municipio *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_town} *</label>
                   <input
                     type="text"
                     name="town"
@@ -1382,7 +1382,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Provincia *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_province} *</label>
                   <input
                     type="text"
                     name="province"
@@ -1395,7 +1395,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Horario de Atención / Recogida
+                  {t.store_modal_pickup_schedule_field}
                 </label>
                 <input
                   type="text"
@@ -1412,14 +1412,14 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   onClick={() => setModalStoreAddr({ open: false, addr: null })}
                   className="px-4 py-2 rounded-xl text-stone-500 font-bold hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                 >
-                  Cancelar
+                  {t.common_cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={loadingStore}
                   className="px-5 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer"
                 >
-                  Guardar Dirección
+                  {t.store_modal_pickup_save}
                 </button>
               </div>
             </form>
@@ -1433,7 +1433,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
           <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 font-serif">
               <h3 className="font-black text-lg text-stone-900 dark:text-stone-100">
-                {modalEventAddr.addr ? 'Editar Punto de Evento' : 'Añadir Punto de Evento'}
+                {modalEventAddr.addr ? t.store_modal_event_edit : t.store_modal_event_new}
               </h3>
               <button
                 type="button"
@@ -1447,7 +1447,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
             <form onSubmit={handleSaveEventAddr} className="space-y-3 text-xs">
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Título de la Ubicación del Evento *
+                  {t.store_modal_event_title_field}
                 </label>
                 <input
                   type="text"
@@ -1461,7 +1461,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Calle *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_street} *</label>
                   <input
                     type="text"
                     name="street"
@@ -1472,7 +1472,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Nº *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_number} *</label>
                   <input
                     type="text"
                     name="number"
@@ -1486,7 +1486,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Escalera</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_stair}</label>
                   <input
                     type="text"
                     name="stair"
@@ -1496,7 +1496,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Piso</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_floor}</label>
                   <input
                     type="text"
                     name="floor"
@@ -1506,7 +1506,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Puerta</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_door}</label>
                   <input
                     type="text"
                     name="door"
@@ -1519,7 +1519,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">C.P. *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_postal_code} *</label>
                   <input
                     type="text"
                     name="postal_code"
@@ -1529,7 +1529,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Municipio *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_town} *</label>
                   <input
                     type="text"
                     name="town"
@@ -1539,7 +1539,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">Provincia *</label>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_province} *</label>
                   <input
                     type="text"
                     name="province"
@@ -1552,7 +1552,7 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
 
               <div>
                 <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                  Notas / Condiciones del Espacio
+                  {t.store_modal_event_notes_field}
                 </label>
                 <input
                   type="text"
@@ -1569,14 +1569,14 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   onClick={() => setModalEventAddr({ open: false, addr: null })}
                   className="px-4 py-2 rounded-xl text-stone-500 font-bold hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                 >
-                  Cancelar
+                  {t.common_cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={loadingStore}
                   className="px-5 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer"
                 >
-                  Guardar Ubicación
+                  {t.store_modal_event_save}
                 </button>
               </div>
             </form>

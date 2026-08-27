@@ -326,6 +326,77 @@ export interface TranslationDict {
   profile_status_complete: string;
   profile_status_incomplete: string;
 
+  // Profile (extended)
+  profile_tab_user: string;
+  profile_tab_store: string;
+  profile_seller_data: string;
+  profile_user_data: string;
+  profile_seller_desc: string;
+  profile_full_name: string;
+  profile_town_province: string;
+  profile_user_address: string;
+  profile_seller_addr_optional: string;
+  profile_seller_no_address: string;
+  profile_password_open_desc: string;
+  profile_password_closed_desc: string;
+  profile_password_success: string;
+  profile_required_mark: string;
+  profile_optional_mark: string;
+
+  // Store Management (Profile -> Tienda)
+  store_wa_title: string;
+  store_wa_desc: string;
+  store_wa_add_btn: string;
+  store_wa_alert_empty: string;
+  store_wa_alert_no_active: string;
+  store_wa_badge_active: string;
+  store_wa_badge_inactive: string;
+  store_btn_enable: string;
+  store_btn_disable: string;
+  store_edit_contact: string;
+  store_delete_contact: string;
+  store_wa_confirm_delete: string;
+  store_config_updated_success: string;
+
+  store_pickup_title: string;
+  store_pickup_desc: string;
+  store_pickup_add_btn: string;
+  store_pickup_alert_empty: string;
+  store_pickup_alert_no_active: string;
+  store_pickup_confirm_delete: string;
+  store_schedule_label: string;
+
+  store_event_title: string;
+  store_event_desc: string;
+  store_event_add_btn: string;
+  store_event_alert_empty: string;
+  store_event_alert_no_active: string;
+  store_event_confirm_delete: string;
+  store_notes_label: string;
+
+  // Store Modals
+  store_modal_wa_edit: string;
+  store_modal_wa_new: string;
+  store_modal_wa_source_label: string;
+  store_modal_wa_choose_seller: string;
+  store_modal_wa_manual_input: string;
+  store_modal_wa_select_seller: string;
+  store_modal_wa_name: string;
+  store_modal_wa_phone: string;
+  store_modal_wa_save: string;
+
+  store_modal_pickup_edit: string;
+  store_modal_pickup_new: string;
+  store_modal_pickup_title_field: string;
+  store_modal_pickup_schedule_field: string;
+  store_modal_pickup_save: string;
+
+  store_modal_event_edit: string;
+  store_modal_event_new: string;
+  store_modal_event_title_field: string;
+  store_modal_event_notes_field: string;
+  store_modal_event_save: string;
+
   // Shop Section (CatalogView & Hero)
   shop_specialty: string;
   shop_hero_title: string;
@@ -375,6 +446,82 @@ export interface TranslationDict {
   seller_events_col_date: string;
   seller_events_col_total: string;
   seller_events_col_actions: string;
+
+  // Seller Product Form (extended)
+  seller_shared_catalog_subtitle: string;
+  seller_last_modified_by: string;
+  seller_step1_label: string;
+  seller_type_single: string;
+  seller_type_hamper: string;
+  seller_type_store_tasting: string;
+  seller_type_home_tasting: string;
+  seller_type_gift_card: string;
+
+  seller_step2_label: string;
+  seller_name_product_label: string;
+  seller_name_event_label: string;
+  seller_name_placeholder_single: string;
+  seller_name_placeholder_hamper: string;
+  seller_name_placeholder_event: string;
+
+  seller_catalog_select_title: string;
+  seller_catalog_select_desc: string;
+  seller_catalog_no_singles: string;
+  seller_qty_label: string;
+  seller_btn_add: string;
+
+  seller_custom_product_accordion_title: string;
+  seller_custom_product_accordion_desc: string;
+  seller_custom_photo_label: string;
+  seller_custom_url_fallback: string;
+  seller_btn_add_to_list: string;
+
+  seller_list_items_title: string;
+  seller_badge_custom_item: string;
+  seller_list_total_sum: string;
+  seller_list_empty_desc: string;
+
+  seller_sale_price_label: string;
+  seller_price_per_seat_label: string;
+  seller_original_sum_helper: string;
+  seller_discount_label: string;
+  seller_discount_applied_notice: string;
+  seller_discount_surcharge_notice: string;
+  seller_discount_zero_notice: string;
+  seller_discount_need_items_notice: string;
+
+  seller_stock_available_label: string;
+  seller_seats_capacity_label: string;
+  seller_unlimited_checkbox: string;
+
+  seller_format_unit: string;
+  seller_format_weight: string;
+  seller_format_jar: string;
+  seller_format_can: string;
+  seller_format_bottle: string;
+  seller_format_pack: string;
+
+  seller_event_details_label: string;
+  seller_product_desc_label: string;
+  seller_event_details_placeholder: string;
+  seller_product_desc_placeholder: string;
+
+  seller_step3_event_label: string;
+  seller_event_venue_label: string;
+  seller_no_active_event_alert: string;
+
+  seller_step3_delivery_label: string;
+  seller_home_delivery_option: string;
+  seller_store_pickup_option: string;
+  seller_select_pickup_points_label: string;
+  seller_no_active_pickup_alert: string;
+
+  seller_step4_photo_label: string;
+  seller_photo_url_placeholder: string;
+
+  seller_publish_btn: string;
+  seller_save_changes_btn: string;
+  seller_confirm_delete_product: string;
 
   // Roles & Auth
   role_buyer: string;
@@ -756,6 +903,77 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Profila Osatua',
     profile_status_incomplete: 'Profila Osatu Gabea',
 
+    // Profile (extended)
+    profile_tab_user: 'Erabiltzailea',
+    profile_tab_store: 'Denda',
+    profile_seller_data: 'Saltzailearen Datuak',
+    profile_user_data: 'Erabiltzailearen Datuak',
+    profile_seller_desc: 'Sarbide eta kontaktu pertsonaleko datuak (helbide eremuak ez dira derrigorrezkoak).',
+    profile_full_name: 'Izen-abizenak',
+    profile_town_province: 'Herria / Probintzia',
+    profile_user_address: 'Erabiltzailearen Helbide Pertsonala',
+    profile_seller_addr_optional: '(Aukerakoa)',
+    profile_seller_no_address: 'Helbide pertsonalik gabe (ez da derrigorrezkoa)',
+    profile_password_open_desc: 'Sartu uneko pasahitza eta pasahitz berria.',
+    profile_password_closed_desc: 'Sakatu hemen sarbide-pasahitza aldatzeko.',
+    profile_password_success: 'Pasahitza behar bezala eguneratu da!',
+    profile_required_mark: '*',
+    profile_optional_mark: '(Aukerakoa)',
+
+    // Store Management (Profile -> Tienda)
+    store_wa_title: 'WhatsApp Kontaktua',
+    store_wa_desc: 'Webgune osoko WhatsApp aukeretarako kanal ofiziala.',
+    store_wa_add_btn: 'Gehitu kontaktua',
+    store_wa_alert_empty: 'Ez dago WhatsApp kontakturik erregistratuta. Mesedez, gehitu kontaktu bat.',
+    store_wa_alert_no_active: 'Ez dago WhatsApp aukerarik gaituta webgunean. Mesedez, aktibatu bat.',
+    store_wa_badge_active: 'Gaituta (Webgunean aktibo)',
+    store_wa_badge_inactive: 'Desgaituta',
+    store_btn_enable: 'Gaitu',
+    store_btn_disable: 'Desgaitu',
+    store_edit_contact: 'Editatu kontaktua',
+    store_delete_contact: 'Ezabatu kontaktua',
+    store_wa_confirm_delete: 'Ziur zaude WhatsApp kontaktu hau ezabatu nahi duzula?',
+    store_config_updated_success: 'Dendaren konfigurazioa behar bezala eguneratu da.',
+
+    store_pickup_title: 'Jasotze Puntua / Denda',
+    store_pickup_desc: 'Erosleei euren eskaerak dendan jasotzeko helbideak.',
+    store_pickup_add_btn: 'Gehitu Helbidea',
+    store_pickup_alert_empty: 'Ez dago jasotze-punturik sartuta. Mesedez, gehitu helbide bat.',
+    store_pickup_alert_no_active: 'Ez dago jasotze-puntu aktiborik. Mesedez, aktibatu gutxienez helbide bat.',
+    store_pickup_confirm_delete: 'Ziur zaude jasotze helbide hau ezabatu nahi duzula?',
+    store_schedule_label: 'Ordutegia:',
+
+    store_event_title: 'Ekitaldi Puntua',
+    store_event_desc: 'Dastaketa presentzialak eta ekitaldiak ospatzeko kokapenak.',
+    store_event_add_btn: 'Gehitu Kokapena',
+    store_event_alert_empty: 'Ez dago ekitaldi-punturik sartuta. Mesedez, gehitu kokapen bat.',
+    store_event_alert_no_active: 'Ez dago ekitaldi-puntu aktiborik. Mesedez, aktibatu gutxienez kokapen bat.',
+    store_event_confirm_delete: 'Ziur zaude ekitaldi-kokapen hau ezabatu nahi duzula?',
+    store_notes_label: 'Oharrak:',
+
+    // Store Modals
+    store_modal_wa_edit: 'Editatu WhatsApp Kontaktua',
+    store_modal_wa_new: 'Gehitu WhatsApp Kontaktua',
+    store_modal_wa_source_label: 'Datuen jatorria',
+    store_modal_wa_choose_seller: 'Aukeratu Saltzailea',
+    store_modal_wa_manual_input: 'Eskuz sartu',
+    store_modal_wa_select_seller: 'Hautatu Saltzailea *',
+    store_modal_wa_name: 'Kontaktuaren Izena *',
+    store_modal_wa_phone: 'Telefono Zenbakia / WhatsApp *',
+    store_modal_wa_save: 'Gorde Kontaktua',
+
+    store_modal_pickup_edit: 'Editatu Jasotze Puntua',
+    store_modal_pickup_new: 'Gehitu Jasotze Puntua / Denda',
+    store_modal_pickup_title_field: 'Jasotze Puntuaren Titulua *',
+    store_modal_pickup_schedule_field: 'Arreta / Jasotze Ordutegia',
+    store_modal_pickup_save: 'Gorde Helbidea',
+
+    store_modal_event_edit: 'Editatu Ekitaldi Puntua',
+    store_modal_event_new: 'Gehitu Ekitaldi Puntua',
+    store_modal_event_title_field: 'Ekitaldiaren Kokapenaren Titulua *',
+    store_modal_event_notes_field: 'Gunearen Oharrak / Baldintzak',
+    store_modal_event_save: 'Gorde Kokapena',
+
     // Shop Section
     shop_specialty: 'Gure Espezialitatea',
     shop_hero_title: 'Gaztak eta opari gastronomikoak Lekeition',
@@ -805,6 +1023,82 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Erosketa Data',
     seller_events_col_total: 'Guztira',
     seller_events_col_actions: 'Ekintzak',
+
+    // Seller Product Form (extended)
+    seller_shared_catalog_subtitle: 'EkhiTeka saltzaile talde osoarentzako katalogo partekatua.',
+    seller_last_modified_by: 'Azken aldaketa egin duena:',
+    seller_step1_label: '1. Zein motatako artikulua argitaratu nahi duzu?',
+    seller_type_single: 'Produktu Soltea',
+    seller_type_hamper: 'Saskia / Lotea',
+    seller_type_store_tasting: 'Dastaketa Presentziala',
+    seller_type_home_tasting: 'Dastaketa Etxean',
+    seller_type_gift_card: 'Opari Txartela',
+
+    seller_step2_label: '2. Produktu edo Ekitaldiaren Datuak',
+    seller_name_product_label: 'Produktuaren Izena *',
+    seller_name_event_label: 'Ekitaldiaren / Dastaketaren Izena *',
+    seller_name_placeholder_single: 'Adib: Idiazabal Gazta Ketua Artzain Egilea',
+    seller_name_placeholder_hamper: 'Adib: Lekeitio Dastatze Saskia',
+    seller_name_placeholder_event: 'Adib: 6 Gazta Afinatu & Txakoli Dastaketa Nagusia',
+
+    seller_catalog_select_title: 'Gehitu Katalogo Orokorreko Produktu Solteak Hautaketa Honetara',
+    seller_catalog_select_desc: 'Hautatu zerrendan produktu solte bat bere fitxa ikusteko, kantitatea zehazteko eta gehitzeko.',
+    seller_catalog_no_singles: 'Ez dago produktu solterik erregistratuta katalogoan',
+    seller_qty_label: 'Kantitatea:',
+    seller_btn_add: 'Gehitu',
+
+    seller_custom_product_accordion_title: 'Sartu produktu solte espezifikoak (banan-banan)',
+    seller_custom_product_accordion_desc: 'Sakatu hemen inprimakia zabaldu eta hautaketa honetarako artikulu berri bat sortzeko.',
+    seller_custom_photo_label: 'Produktuaren Argazkia',
+    seller_custom_url_fallback: 'Edo idatzi argazkiaren zuzeneko esteka (aukerakoa)',
+    seller_btn_add_to_list: 'Gehitu zerrendara',
+
+    seller_list_items_title: 'Zerrendako produktuak',
+    seller_badge_custom_item: 'Espezifikoa',
+    seller_list_total_sum: 'Zerrendaren guztizko batura:',
+    seller_list_empty_desc: 'Oraindik ez duzu produktu solterik gehitu zerrenda honetara.',
+
+    seller_sale_price_label: 'Salmenta Prezioa (€) *',
+    seller_price_per_seat_label: 'Prezioa Lekuko (€) *',
+    seller_original_sum_helper: 'Hasierako batura soltea:',
+    seller_discount_label: 'Deskontua (%)',
+    seller_discount_applied_notice: 'Aplikaturiko deskontua: erosleentzat ikusgai',
+    seller_discount_surcharge_notice: 'Batura soltearen gaineko errekargua (ez da erosleentzat ikusgai)',
+    seller_discount_zero_notice: '0% deskontua (prezioa batura soltearen berdina)',
+    seller_discount_need_items_notice: 'Gehitu produktu solteak deskontua kalkulatzeko',
+
+    seller_stock_available_label: 'Stock Erabilgarria',
+    seller_seats_capacity_label: 'Aforoa / Leku Erabilgarriak *',
+    seller_unlimited_checkbox: 'Mugagabea',
+
+    seller_format_unit: 'Unitatea / Pieza',
+    seller_format_weight: 'Pisua (Kg / Zatia)',
+    seller_format_jar: 'Potoa / Ontzia',
+    seller_format_can: 'Kontserba Lata',
+    seller_format_bottle: 'Botila',
+    seller_format_pack: 'Dastatze Pack-a',
+
+    seller_event_details_label: 'Xehetasunak, Data, Ordua & Maridajea *',
+    seller_product_desc_label: 'Deskribapena, dastatze oharrak eta aurkezpena',
+    seller_event_details_placeholder: 'Adib: Data: Irailak 20, Larunbata · 19:30\nIraupena: 90 minutu\n5 artzain gazta eta Bizkaiko 2 txakoli maridajearekin barne.',
+    seller_product_desc_placeholder: 'Deskribatu zaporea, ontzea, usainak eta ekoizlearen historia...',
+
+    seller_step3_event_label: '3. Ekitaldi Puntua (Kokapen bakarra)',
+    seller_event_venue_label: 'Dastaketa ospatuko den gunea *',
+    seller_no_active_event_alert: 'Ez dago ekitaldi-puntu aktiborik. Joan Profila > Denda atalera kokapen bat aktibatzeko.',
+
+    seller_step3_delivery_label: '3. Bidalketa Moduak & Jasotze Puntuak Dendan',
+    seller_home_delivery_option: 'Etxera Bidalketa',
+    seller_store_pickup_option: 'Dendan Jasotzea',
+    seller_select_pickup_points_label: 'Hautatu zein jasotze-puntutan eskaini jasotzeko aukera:',
+    seller_no_active_pickup_alert: 'Ez dago jasotze-puntu aktiborik. Zure profileko Denda fitxan aktiba ditzakezu.',
+
+    seller_step4_photo_label: '4. Produktuaren / Ekitaldiaren Argazkia',
+    seller_photo_url_placeholder: 'Edo itsatsi zuzeneko irudi esteka bat (aukerakoa)',
+
+    seller_publish_btn: 'Argitaratu Dendan',
+    seller_save_changes_btn: 'Gorde Aldaketak',
+    seller_confirm_delete_product: 'Ziur zaude produktu hau kendu nahi duzula?',
 
     role_buyer: 'Bezeroa / Eroslea',
     role_seller: 'Ekoizlea / Saltzailea',
@@ -1174,6 +1468,77 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Perfil Completo',
     profile_status_incomplete: 'Perfil Incompleto',
 
+    // Profile (extended)
+    profile_tab_user: 'Usuario',
+    profile_tab_store: 'Tienda',
+    profile_seller_data: 'Datos de Vendedor',
+    profile_user_data: 'Datos del Usuario',
+    profile_seller_desc: 'Tus datos de acceso y contacto personales (los campos de dirección no son obligatorios).',
+    profile_full_name: 'Nombre y Apellidos',
+    profile_town_province: 'Municipio / Provincia',
+    profile_user_address: 'Dirección Personal del Usuario',
+    profile_seller_addr_optional: '(Opcional)',
+    profile_seller_no_address: 'Sin dirección personal registrada (no obligatoria)',
+    profile_password_open_desc: 'Introduce tu contraseña actual y la nueva clave.',
+    profile_password_closed_desc: 'Pulsa aquí para cambiar tu contraseña de acceso.',
+    profile_password_success: '¡Contraseña actualizada con éxito!',
+    profile_required_mark: '*',
+    profile_optional_mark: '(Opcional)',
+
+    // Store Management (Profile -> Tienda)
+    store_wa_title: 'Contacto WhatsApp',
+    store_wa_desc: 'Canal oficial para las opciones de WhatsApp en toda la tienda web.',
+    store_wa_add_btn: 'Añadir contacto',
+    store_wa_alert_empty: 'No hay ningún contacto de WhatsApp registrado. Por favor, añade un contacto.',
+    store_wa_alert_no_active: 'Sin opciones WhatsApp en la web. No hay ningún contacto habilitado. Por favor, activa uno.',
+    store_wa_badge_active: 'Habilitado (Activo en la web)',
+    store_wa_badge_inactive: 'Deshabilitado',
+    store_btn_enable: 'Habilitar',
+    store_btn_disable: 'Deshabilitar',
+    store_edit_contact: 'Editar contacto',
+    store_delete_contact: 'Borrar contacto',
+    store_wa_confirm_delete: '¿Eliminar este contacto de WhatsApp?',
+    store_config_updated_success: 'Configuración de tienda actualizada correctamente.',
+
+    store_pickup_title: 'Punto entrega / tienda',
+    store_pickup_desc: 'Direcciones para dar la opción de recogida a los compradores en sus pedidos.',
+    store_pickup_add_btn: 'Añadir Dirección',
+    store_pickup_alert_empty: 'No hay ningún punto de entrega metido. Por favor, mete una dirección.',
+    store_pickup_alert_no_active: 'No hay ningún punto de entrega activo. Por favor, activa al menos una dirección.',
+    store_pickup_confirm_delete: '¿Eliminar esta dirección de entrega/tienda?',
+    store_schedule_label: 'Horario:',
+
+    store_event_title: 'Punto evento',
+    store_event_desc: 'Ubicaciones disponibles para la celebración de catas presenciales y eventos.',
+    store_event_add_btn: 'Añadir Ubicación',
+    store_event_alert_empty: 'No hay ningún punto de evento metido. Por favor, mete una dirección.',
+    store_event_alert_no_active: 'No hay ningún punto de evento activo. Por favor, activa al menos una ubicación.',
+    store_event_confirm_delete: '¿Eliminar este punto de evento?',
+    store_notes_label: 'Notas:',
+
+    // Store Modals
+    store_modal_wa_edit: 'Editar Contacto WhatsApp',
+    store_modal_wa_new: 'Añadir Contacto WhatsApp',
+    store_modal_wa_source_label: 'Origen de los datos',
+    store_modal_wa_choose_seller: 'Elegir Vendedor',
+    store_modal_wa_manual_input: 'Meter a mano',
+    store_modal_wa_select_seller: 'Seleccionar Vendedor *',
+    store_modal_wa_name: 'Nombre del Contacto *',
+    store_modal_wa_phone: 'Número de Teléfono / WhatsApp *',
+    store_modal_wa_save: 'Guardar Contacto',
+
+    store_modal_pickup_edit: 'Editar Punto de Entrega',
+    store_modal_pickup_new: 'Añadir Punto de Entrega / Tienda',
+    store_modal_pickup_title_field: 'Título del Punto de Entrega *',
+    store_modal_pickup_schedule_field: 'Horario de Atención / Recogida',
+    store_modal_pickup_save: 'Guardar Dirección',
+
+    store_modal_event_edit: 'Editar Punto de Evento',
+    store_modal_event_new: 'Añadir Punto de Evento',
+    store_modal_event_title_field: 'Título de la Ubicación del Evento *',
+    store_modal_event_notes_field: 'Notas / Condiciones del Espacio',
+    store_modal_event_save: 'Guardar Ubicación',
+
     // Shop Section
     shop_specialty: 'Nuestra Especialidad',
     shop_hero_title: 'Quesos y regalos gastronómicos en Lekeitio',
@@ -1223,6 +1588,82 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Fecha Compra',
     seller_events_col_total: 'Total',
     seller_events_col_actions: 'Acciones',
+
+    // Seller Product Form (extended)
+    seller_shared_catalog_subtitle: 'Catálogo compartido para todo el equipo de vendedores de EkhiTeka.',
+    seller_last_modified_by: 'Última modificación realizada por:',
+    seller_step1_label: '1. ¿Qué tipo de artículo deseas publicar?',
+    seller_type_single: 'Producto Suelto',
+    seller_type_hamper: 'Cesta / Lote',
+    seller_type_store_tasting: 'Cata Presencial',
+    seller_type_home_tasting: 'Cata en Casa',
+    seller_type_gift_card: 'Tarjeta Regalo',
+
+    seller_step2_label: '2. Datos del Producto o Evento' ,
+    seller_name_product_label: 'Nombre del Producto *',
+    seller_name_event_label: 'Nombre del Evento / Cata *',
+    seller_name_placeholder_single: 'Ej: Queso Idiazabal Ahumado Pastor de Autor',
+    seller_name_placeholder_hamper: 'Ej: Cesta Selección Degustación Lekeitio',
+    seller_name_placeholder_event: 'Ej: Cata Magistral de 6 Quesos Afinados & Txakoli',
+
+    seller_catalog_select_title: 'Añadir Productos Sueltos del Catálogo a esta Selección',
+    seller_catalog_select_desc: 'Selecciona en la lista desplegable un producto individual suelto para ver su ficha, indicar cantidad y añadirlo.',
+    seller_catalog_no_singles: 'No hay productos sueltos registrados en el catálogo',
+    seller_qty_label: 'Cantidad:',
+    seller_btn_add: 'Añadir',
+
+    seller_custom_product_accordion_title: 'Meter productos sueltos específicos (uno a uno)',
+    seller_custom_product_accordion_desc: 'Pulsa aquí para desplegar el formulario y crear un artículo nuevo exclusivo para esta selección.',
+    seller_custom_photo_label: 'Fotografía del Producto',
+    seller_custom_url_fallback: 'O escribe una URL directa de imagen (opcional)',
+    seller_btn_add_to_list: 'Añadir a la lista',
+
+    seller_list_items_title: 'Productos de la lista',
+    seller_badge_custom_item: 'Específico',
+    seller_list_total_sum: 'Suma total de la lista:',
+    seller_list_empty_desc: 'Aún no has añadido productos sueltos a esta lista.',
+
+    seller_sale_price_label: 'Precio de Venta (€) *',
+    seller_price_per_seat_label: 'Precio por Plaza (€) *',
+    seller_original_sum_helper: 'Suma suelta original:',
+    seller_discount_label: 'Descuento (%)',
+    seller_discount_applied_notice: 'Descuento aplicado: visible para los compradores',
+    seller_discount_surcharge_notice: 'Recargo sobre la suma suelta (no visible a compradores)',
+    seller_discount_zero_notice: '0% de descuento (precio igual a la suma suelta)',
+    seller_discount_need_items_notice: 'Añade productos sueltos para calcular descuento',
+
+    seller_stock_available_label: 'Stock Disponible',
+    seller_seats_capacity_label: 'Aforo / Plazas Disponibles *',
+    seller_unlimited_checkbox: 'Ilimitado',
+
+    seller_format_unit: 'Unidad / Pieza',
+    seller_format_weight: 'Peso (Kg / Cuña)',
+    seller_format_jar: 'Tarro / Bote',
+    seller_format_can: 'Lata Conserva',
+    seller_format_bottle: 'Botella',
+    seller_format_pack: 'Pack Degustación',
+
+    seller_event_details_label: 'Detalles, Fecha, Hora & Maridaje *',
+    seller_product_desc_label: 'Descripción, notas de cata y presentación',
+    seller_event_details_placeholder: 'Ej: Fecha: Sábado 20 de Septiembre · 19:30h\nDuración: 90 minutos\nIncluye 5 quesos artesanos de pastor y maridaje con 2 txakolis de Bizkaia.',
+    seller_product_desc_placeholder: 'Describe el perfil de sabor, curación, aromas e historia del productor...',
+
+    seller_step3_event_label: '3. Punto de Evento (Ubicación única)',
+    seller_event_venue_label: 'Espacio donde se celebrará la cata *',
+    seller_no_active_event_alert: 'No hay ningún punto de evento activo. Ve a Perfil > Tienda para activar una ubicación de eventos.',
+
+    seller_step3_delivery_label: '3. Métodos de Entrega & Puntos de Recogida en Tienda',
+    seller_home_delivery_option: 'Envío a Domicilio',
+    seller_store_pickup_option: 'Recogida en tienda',
+    seller_select_pickup_points_label: 'Selecciona en qué puntos de entrega/tienda dar la opción de recogida:',
+    seller_no_active_pickup_alert: 'No hay puntos de entrega activos. Puedes activarlos en la pestaña Tienda de tu perfil.',
+
+    seller_step4_photo_label: '4. Fotografía del Producto / Evento',
+    seller_photo_url_placeholder: 'O pega una URL de imagen directa (opcional)',
+
+    seller_publish_btn: 'Publicar en la Tienda',
+    seller_save_changes_btn: 'Guardar Cambios',
+    seller_confirm_delete_product: '¿Estás seguro de que deseas dar de baja este producto?',
 
     role_buyer: 'Comprador / Gourmet',
     role_seller: 'Productor / Vendedor',
@@ -1592,6 +2033,77 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Complete Profile',
     profile_status_incomplete: 'Incomplete Profile',
 
+    // Profile (extended)
+    profile_tab_user: 'User',
+    profile_tab_store: 'Store',
+    profile_seller_data: 'Seller Information',
+    profile_user_data: 'User Information',
+    profile_seller_desc: 'Your personal login and contact details (address fields are optional).',
+    profile_full_name: 'Full Name',
+    profile_town_province: 'Town / Province',
+    profile_user_address: 'Personal User Address',
+    profile_seller_addr_optional: '(Optional)',
+    profile_seller_no_address: 'No personal address registered (optional)',
+    profile_password_open_desc: 'Enter your current password and new password.',
+    profile_password_closed_desc: 'Click here to change your access password.',
+    profile_password_success: 'Password updated successfully!',
+    profile_required_mark: '*',
+    profile_optional_mark: '(Optional)',
+
+    // Store Management (Profile -> Tienda)
+    store_wa_title: 'WhatsApp Contact',
+    store_wa_desc: 'Official channel for WhatsApp options across the store.',
+    store_wa_add_btn: 'Add Contact',
+    store_wa_alert_empty: 'No WhatsApp contact registered. Please add a contact.',
+    store_wa_alert_no_active: 'No WhatsApp options on the web. No active contact. Please enable one.',
+    store_wa_badge_active: 'Enabled (Active on web)',
+    store_wa_badge_inactive: 'Disabled',
+    store_btn_enable: 'Enable',
+    store_btn_disable: 'Disable',
+    store_edit_contact: 'Edit contact',
+    store_delete_contact: 'Delete contact',
+    store_wa_confirm_delete: 'Are you sure you want to delete this WhatsApp contact?',
+    store_config_updated_success: 'Store configuration updated successfully.',
+
+    store_pickup_title: 'Pickup Point / Store',
+    store_pickup_desc: 'Addresses to offer buyers store pickup options for their orders.',
+    store_pickup_add_btn: 'Add Address',
+    store_pickup_alert_empty: 'No pickup points registered. Please add an address.',
+    store_pickup_alert_no_active: 'No active pickup points. Please enable at least one address.',
+    store_pickup_confirm_delete: 'Are you sure you want to delete this pickup address?',
+    store_schedule_label: 'Hours:',
+
+    store_event_title: 'Event Location',
+    store_event_desc: 'Locations available for in-person tastings and events.',
+    store_event_add_btn: 'Add Location',
+    store_event_alert_empty: 'No event locations registered. Please add a location.',
+    store_event_alert_no_active: 'No active event locations. Please enable at least one location.',
+    store_event_confirm_delete: 'Are you sure you want to delete this event location?',
+    store_notes_label: 'Notes:',
+
+    // Store Modals
+    store_modal_wa_edit: 'Edit WhatsApp Contact',
+    store_modal_wa_new: 'Add WhatsApp Contact',
+    store_modal_wa_source_label: 'Data source',
+    store_modal_wa_choose_seller: 'Choose Seller',
+    store_modal_wa_manual_input: 'Enter manually',
+    store_modal_wa_select_seller: 'Select Seller *',
+    store_modal_wa_name: 'Contact Name *',
+    store_modal_wa_phone: 'Phone Number / WhatsApp *',
+    store_modal_wa_save: 'Save Contact',
+
+    store_modal_pickup_edit: 'Edit Pickup Point',
+    store_modal_pickup_new: 'Add Pickup Point / Store',
+    store_modal_pickup_title_field: 'Pickup Point Title *',
+    store_modal_pickup_schedule_field: 'Opening / Pickup Hours',
+    store_modal_pickup_save: 'Save Address',
+
+    store_modal_event_edit: 'Edit Event Location',
+    store_modal_event_new: 'Add Event Location',
+    store_modal_event_title_field: 'Event Location Title *',
+    store_modal_event_notes_field: 'Venue Notes / Conditions',
+    store_modal_event_save: 'Save Location',
+
     // Shop Section
     shop_specialty: 'Our Speciality',
     shop_hero_title: 'Artisan cheeses & gourmet gifts in Lekeitio',
@@ -1641,6 +2153,82 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Purchase Date',
     seller_events_col_total: 'Total',
     seller_events_col_actions: 'Actions',
+
+    // Seller Product Form (extended)
+    seller_shared_catalog_subtitle: 'Shared catalogue for all EkhiTeka sellers.',
+    seller_last_modified_by: 'Last modified by:',
+    seller_step1_label: '1. What type of item do you want to publish?',
+    seller_type_single: 'Single Product',
+    seller_type_hamper: 'Hamper / Pack',
+    seller_type_store_tasting: 'In-Person Tasting',
+    seller_type_home_tasting: 'Home Tasting',
+    seller_type_gift_card: 'Gift Card',
+
+    seller_step2_label: '2. Product or Event Details',
+    seller_name_product_label: 'Product Name *',
+    seller_name_event_label: 'Event / Tasting Name *',
+    seller_name_placeholder_single: 'e.g. Smoked Idiazabal Artisan Shepherd Cheese',
+    seller_name_placeholder_hamper: 'e.g. Lekeitio Tasting Selection Hamper',
+    seller_name_placeholder_event: 'e.g. Master Tasting of 6 Aged Cheeses & Txakoli',
+
+    seller_catalog_select_title: 'Add Single Catalogue Products to this Selection',
+    seller_catalog_select_desc: 'Select a single product from the dropdown to see details, choose quantity and add it.',
+    seller_catalog_no_singles: 'No single products registered in the catalogue',
+    seller_qty_label: 'Quantity:',
+    seller_btn_add: 'Add',
+
+    seller_custom_product_accordion_title: 'Add specific custom single products (one by one)',
+    seller_custom_product_accordion_desc: 'Click here to expand the form and create a new custom item for this selection.',
+    seller_custom_photo_label: 'Product Photo',
+    seller_custom_url_fallback: 'Or enter direct image URL (optional)',
+    seller_btn_add_to_list: 'Add to list',
+
+    seller_list_items_title: 'Items in the list',
+    seller_badge_custom_item: 'Custom',
+    seller_list_total_sum: 'List total sum:',
+    seller_list_empty_desc: 'You have not added single items to this list yet.',
+
+    seller_sale_price_label: 'Sale Price (€) *',
+    seller_price_per_seat_label: 'Price per Seat (€) *',
+    seller_original_sum_helper: 'Original single sum:',
+    seller_discount_label: 'Discount (%)',
+    seller_discount_applied_notice: 'Discount applied: visible to buyers',
+    seller_discount_surcharge_notice: 'Surcharge over single sum (not visible to buyers)',
+    seller_discount_zero_notice: '0% discount (price equals single sum)',
+    seller_discount_need_items_notice: 'Add single items to calculate discount',
+
+    seller_stock_available_label: 'Available Stock',
+    seller_seats_capacity_label: 'Capacity / Available Seats *',
+    seller_unlimited_checkbox: 'Unlimited',
+
+    seller_format_unit: 'Unit / Piece',
+    seller_format_weight: 'Weight (Kg / Wedge)',
+    seller_format_jar: 'Jar',
+    seller_format_can: 'Tinned / Can',
+    seller_format_bottle: 'Bottle',
+    seller_format_pack: 'Tasting Pack',
+
+    seller_event_details_label: 'Details, Date, Time & Pairing *',
+    seller_product_desc_label: 'Description, tasting notes and presentation',
+    seller_event_details_placeholder: 'e.g. Date: Saturday 20 September · 19:30\nDuration: 90 minutes\nIncludes 5 artisan shepherd cheeses and pairing with 2 Bizkaia txakolis.',
+    seller_product_desc_placeholder: 'Describe flavour profile, ageing, aromas and producer story...',
+
+    seller_step3_event_label: '3. Event Location (Single venue)',
+    seller_event_venue_label: 'Venue where tasting takes place *',
+    seller_no_active_event_alert: 'No active event location. Go to Profile > Store to enable an event venue.',
+
+    seller_step3_delivery_label: '3. Delivery Methods & In-Store Pickup Points',
+    seller_home_delivery_option: 'Home Delivery',
+    seller_store_pickup_option: 'Store Pickup',
+    seller_select_pickup_points_label: 'Select which pickup locations will offer collection:',
+    seller_no_active_pickup_alert: 'No active pickup points. You can enable them in the Store tab of your profile.',
+
+    seller_step4_photo_label: '4. Product / Event Photo',
+    seller_photo_url_placeholder: 'Or paste direct image URL (optional)',
+
+    seller_publish_btn: 'Publish in Store',
+    seller_save_changes_btn: 'Save Changes',
+    seller_confirm_delete_product: 'Are you sure you want to remove this product?',
 
     role_buyer: 'Buyer / Gourmet',
     role_seller: 'Artisan / Seller',
@@ -2010,6 +2598,77 @@ export const translations: Record<Language, TranslationDict> = {
     profile_status_complete: 'Profil Complet',
     profile_status_incomplete: 'Profil Incomplet',
 
+    // Profile (extended)
+    profile_tab_user: 'Utilisateur',
+    profile_tab_store: 'Boutique',
+    profile_seller_data: 'Données du Vendeur',
+    profile_user_data: 'Données de l\'Utilisateur',
+    profile_seller_desc: 'Vos identifiants et coordonnées personnelles (l\'adresse n\'est pas obligatoire).',
+    profile_full_name: 'Nom et Prénom',
+    profile_town_province: 'Ville / Département',
+    profile_user_address: 'Adresse Personnelle de l\'Utilisateur',
+    profile_seller_addr_optional: '(Facultatif)',
+    profile_seller_no_address: 'Sans adresse personnelle enregistrée (facultatif)',
+    profile_password_open_desc: 'Saisissez votre mot de passe actuel et le nouveau mot de passe.',
+    profile_password_closed_desc: 'Cliquez ici pour changer votre mot de passe.',
+    profile_password_success: 'Mot de passe mis à jour avec succès !',
+    profile_required_mark: '*',
+    profile_optional_mark: '(Facultatif)',
+
+    // Store Management (Profile -> Tienda)
+    store_wa_title: 'Contact WhatsApp',
+    store_wa_desc: 'Canal officiel pour les options WhatsApp dans toute la boutique.',
+    store_wa_add_btn: 'Ajouter un contact',
+    store_wa_alert_empty: 'Aucun contact WhatsApp enregistré. Veuillez ajouter un contact.',
+    store_wa_alert_no_active: 'Pas d\'options WhatsApp sur le site. Aucun contact activé. Veuillez en activer un.',
+    store_wa_badge_active: 'Activé (Actif sur le web)',
+    store_wa_badge_inactive: 'Désactivé',
+    store_btn_enable: 'Activer',
+    store_btn_disable: 'Désactiver',
+    store_edit_contact: 'Modifier le contact',
+    store_delete_contact: 'Supprimer le contact',
+    store_wa_confirm_delete: 'Voulez-vous supprimer ce contact WhatsApp ?',
+    store_config_updated_success: 'Configuration de la boutique mise à jour avec succès.',
+
+    store_pickup_title: 'Point de Retrait / Boutique',
+    store_pickup_desc: 'Adresses pour offrir l\'option de retrait en boutique aux acheteurs.',
+    store_pickup_add_btn: 'Ajouter une Adresse',
+    store_pickup_alert_empty: 'Aucun point de retrait enregistré. Veuillez ajouter une adresse.',
+    store_pickup_alert_no_active: 'Aucun point de retrait actif. Veuillez activer au moins une adresse.',
+    store_pickup_confirm_delete: 'Voulez-vous supprimer cette adresse de retrait ?',
+    store_schedule_label: 'Horaires :',
+
+    store_event_title: 'Lieu d\'Événement',
+    store_event_desc: 'Emplacements disponibles pour les dégustations et événements.',
+    store_event_add_btn: 'Ajouter un Lieu',
+    store_event_alert_empty: 'Aucun lieu d\'événement enregistré. Veuillez ajouter une adresse.',
+    store_event_alert_no_active: 'Aucun lieu d\'événement actif. Veuillez activer au moins un lieu.',
+    store_event_confirm_delete: 'Voulez-vous supprimer ce lieu d\'événement ?',
+    store_notes_label: 'Remarques :',
+
+    // Store Modals
+    store_modal_wa_edit: 'Modifier le Contact WhatsApp',
+    store_modal_wa_new: 'Ajouter un Contact WhatsApp',
+    store_modal_wa_source_label: 'Origine des données',
+    store_modal_wa_choose_seller: 'Choisir le Vendeur',
+    store_modal_wa_manual_input: 'Saisir manuellement',
+    store_modal_wa_select_seller: 'Sélectionner le Vendeur *',
+    store_modal_wa_name: 'Nom du Contact *',
+    store_modal_wa_phone: 'Numéro de Téléphone / WhatsApp *',
+    store_modal_wa_save: 'Enregistrer le Contact',
+
+    store_modal_pickup_edit: 'Modifier le Point de Retrait',
+    store_modal_pickup_new: 'Ajouter un Point de Retrait / Boutique',
+    store_modal_pickup_title_field: 'Titre du Point de Retrait *',
+    store_modal_pickup_schedule_field: 'Horaires d\'Ouverture / Retrait',
+    store_modal_pickup_save: 'Enregistrer l\'Adresse',
+
+    store_modal_event_edit: 'Modifier le Lieu d\'Événement',
+    store_modal_event_new: 'Ajouter un Lieu d\'Événement',
+    store_modal_event_title_field: 'Titre du Lieu d\'Événement *',
+    store_modal_event_notes_field: 'Remarques / Conditions du Lieu',
+    store_modal_event_save: 'Enregistrer le Lieu',
+
     // Shop Section
     shop_specialty: 'Notre Spécialité',
     shop_hero_title: 'Fromages et cadeaux gastronomiques à Lekeitio',
@@ -2059,6 +2718,82 @@ export const translations: Record<Language, TranslationDict> = {
     seller_events_col_date: 'Date d\'Achat',
     seller_events_col_total: 'Total',
     seller_events_col_actions: 'Actions',
+
+    // Seller Product Form (extended)
+    seller_shared_catalog_subtitle: 'Catalogue partagé pour tous les vendeurs d\'EkhiTeka.',
+    seller_last_modified_by: 'Dernière modification par :',
+    seller_step1_label: '1. Quel type d\'article souhaitez-vous publier ?',
+    seller_type_single: 'Produit Unitaire',
+    seller_type_hamper: 'Panier / Coffret',
+    seller_type_store_tasting: 'Dégustation Présentielle',
+    seller_type_home_tasting: 'Dégustation à Domicile',
+    seller_type_gift_card: 'Carte Cadeau',
+
+    seller_step2_label: '2. Informations sur le Produit ou l\'Événement',
+    seller_name_product_label: 'Nom du Produit *',
+    seller_name_event_label: 'Nom de l\'Événement / Dégustation *',
+    seller_name_placeholder_single: 'Ex : Fromage Idiazabal Fumé Fermier d\'Auteur',
+    seller_name_placeholder_hamper: 'Ex : Coffret Dégustation Sélection Lekeitio',
+    seller_name_placeholder_event: 'Ex : Grande Dégustation de 6 Fromages Affinés & Txakoli',
+
+    seller_catalog_select_title: 'Ajouter des Produits Individuels du Catalogue à cette Sélection',
+    seller_catalog_select_desc: 'Sélectionnez un produit individuel dans la liste pour voir sa fiche, indiquer la quantité et l\'ajouter.',
+    seller_catalog_no_singles: 'Aucun produit individuel enregistré dans le catalogue',
+    seller_qty_label: 'Quantité :',
+    seller_btn_add: 'Ajouter',
+
+    seller_custom_product_accordion_title: 'Ajouter des produits spécifiques personnalisés (un par un)',
+    seller_custom_product_accordion_desc: 'Cliquez ici pour afficher le formulaire et créer un nouvel article exclusif à cette sélection.',
+    seller_custom_photo_label: 'Photo du Produit',
+    seller_custom_url_fallback: 'Ou saisissez une URL d\'image directe (facultatif)',
+    seller_btn_add_to_list: 'Ajouter à la liste',
+
+    seller_list_items_title: 'Produits de la liste',
+    seller_badge_custom_item: 'Spécifique',
+    seller_list_total_sum: 'Somme totale de la liste :',
+    seller_list_empty_desc: 'Vous n\'avez pas encore ajouté de produits unitaires à cette liste.',
+
+    seller_sale_price_label: 'Prix de Vente (€) *',
+    seller_price_per_seat_label: 'Prix par Place (€) *',
+    seller_original_sum_helper: 'Somme unitaire d\'origine :',
+    seller_discount_label: 'Remise (%)',
+    seller_discount_applied_notice: 'Remise appliquée : visible par les acheteurs',
+    seller_discount_surcharge_notice: 'Majoration sur la somme unitaire (non visible par les acheteurs)',
+    seller_discount_zero_notice: '0% de remise (prix égal à la somme unitaire)',
+    seller_discount_need_items_notice: 'Ajoutez des produits unitaires pour calculer la remise',
+
+    seller_stock_available_label: 'Stock Disponible',
+    seller_seats_capacity_label: 'Jauge / Places Disponibles *',
+    seller_unlimited_checkbox: 'Illimité',
+
+    seller_format_unit: 'Unité / Pièce',
+    seller_format_weight: 'Poids (Kg / Portion)',
+    seller_format_jar: 'Bocal / Pot',
+    seller_format_can: 'Boîte de conserve',
+    seller_format_bottle: 'Bouteille',
+    seller_format_pack: 'Pack Dégustation',
+
+    seller_event_details_label: 'Détails, Date, Heure & Accords *',
+    seller_product_desc_label: 'Description, notes de dégustation et présentation',
+    seller_event_details_placeholder: 'Ex : Date : Samedi 20 Septembre · 19h30\nDurée : 90 minutes\nComprend 5 fromages fermiers et accord avec 2 vins txakoli de Bizkaia.',
+    seller_product_desc_placeholder: 'Décrivez le profil aromatique, l\'affinage et l\'histoire du producteur...',
+
+    seller_step3_event_label: '3. Lieu de l\'Événement (Emplacement unique)',
+    seller_event_venue_label: 'Lieu où se déroulera la dégustation *',
+    seller_no_active_event_alert: 'Aucun lieu d\'événement actif. Allez dans Profil > Boutique pour activer un lieu.',
+
+    seller_step3_delivery_label: '3. Modes de Livraison & Points de Retrait en Boutique',
+    seller_home_delivery_option: 'Livraison à Domicile',
+    seller_store_pickup_option: 'Retrait en boutique',
+    seller_select_pickup_points_label: 'Sélectionnez les points de retrait proposant cette option :',
+    seller_no_active_pickup_alert: 'Aucun point de retrait actif. Vous pouvez les activer dans l\'onglet Boutique de votre profil.',
+
+    seller_step4_photo_label: '4. Photo du Produit / Événement',
+    seller_photo_url_placeholder: 'Ou collez une URL d\'image directe (facultatif)',
+
+    seller_publish_btn: 'Publier dans la Boutique',
+    seller_save_changes_btn: 'Enregistrer les Modifications',
+    seller_confirm_delete_product: 'Êtes-vous sûr de vouloir supprimer ce produit ?',
 
     role_buyer: 'Client / Gourmet',
     role_seller: 'Artisan / Vendeur',
