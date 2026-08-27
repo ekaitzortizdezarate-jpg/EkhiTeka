@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import type { ProfileDetails, WhatsAppContact, StoreAddress, EventAddress } from '@/types/database';
+import type { ProfileDetails, WhatsAppContact, StoreAddress, EventAddress, DeliveryAddress } from '@/types/database';
 import { parseProfile } from '@/types/database';
 
 export async function login(formData: FormData) {
@@ -135,6 +135,7 @@ export async function updateProfile(formData: FormData) {
     whatsapp_contacts: currentParsed.whatsapp_contacts,
     pickup_addresses: currentParsed.pickup_addresses,
     event_addresses: currentParsed.event_addresses,
+    delivery_addresses: currentParsed.delivery_addresses,
   };
 
   const structuredBio = JSON.stringify(profileData);
@@ -289,6 +290,83 @@ export async function changeUserPassword(formData: FormData) {
   }
 
   return { success: true };
+}
+
+export async function updateDeliveryAddresses(deliveryAddresses: DeliveryAddress[]) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: currentProfileRaw } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  const currentParsed = parseProfile(currentProfileRaw);
+
+  const profileData: ProfileDetails = {
+    first_name: currentParsed.first_name,
+    last_name_1: currentParsed.last_name_1,
+    last_name_2: currentParsed.last_name_2,
+    birth_date: currentParsed.birth_date,
+    dni: currentParsed.dni,
+    phone: currentParsed.phone,
+    province: currentParsed.province,
+    town: currentParsed.town,
+    postal_code: currentParsed.postal_code,
+    street: currentParsed.street,
+    number: currentParsed.number,
+    stair: currentParsed.stair,
+    floor: currentParsed.floor,
+    door: currentParsed.door,
+    whatsapp_phone: currentParsed.whatsapp_phone,
+    whatsapp_contacts: currentParsed.whatsapp_contacts,
+    pickup_addresses: currentParsed.pickup_addresses,
+    event_addresses: currentParsed.event_addresses,
+    delivery_addresses: deliveryAddresses,
+  };
+
+  const structuredBio = JSON.stringify(profileData);
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      bio: structuredBio,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', user.id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath('/perfil');
+  revalidatePath('/cesta');
+  return { success: true, delivery_addresses: deliveryAddresses };
+}
+
+export async function getUserDeliveryAddresses() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { user: null, profile: null, addresses: [] };
+
+  const { data: currentProfileRaw } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  const profile = parseProfile(currentProfileRaw);
+  return {
+    user,
+    profile,
+    addresses: profile.delivery_addresses || [],
+  };
 }
 
 export async function signout() {

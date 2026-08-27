@@ -7,7 +7,9 @@ import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useStoreConfig } from '@/context/StoreConfigContext';
 import { createOrder } from '@/app/actions/orders';
-import { ShoppingBag, ArrowLeft, Trash2, Truck, Store, AlertCircle, Clock, MapPin } from 'lucide-react';
+import { getUserDeliveryAddresses, updateDeliveryAddresses } from '@/app/actions/auth';
+import type { DeliveryAddress, Profile } from '@/types/database';
+import { ShoppingBag, ArrowLeft, Trash2, Truck, Store, AlertCircle, Clock, MapPin, Check, Plus, Home } from 'lucide-react';
 
 export default function CartPage() {
   const router = useRouter();
@@ -16,12 +18,56 @@ export default function CartPage() {
   const { activePickupAddresses, storeAddress } = useStoreConfig();
 
   const [deliveryType, setDeliveryType] = useState<'domicilio' | 'recogida_tienda'>('domicilio');
-  const [shippingAddress, setShippingAddress] = useState('');
-  const [shippingNotes, setShippingNotes] = useState('');
+  const [addressMode, setAddressMode] = useState<'saved' | 'manual'>('saved');
+
+  // Direcciones guardadas del perfil
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<DeliveryAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('main');
+
+  // Campos manuales de uno en uno
+  const [manualStreet, setManualStreet] = useState('');
+  const [manualNumber, setManualNumber] = useState('');
+  const [manualStair, setManualStair] = useState('');
+  const [manualFloor, setManualFloor] = useState('');
+  const [manualDoor, setManualDoor] = useState('');
+  const [manualPostalCode, setManualPostalCode] = useState('');
+  const [manualTown, setManualTown] = useState('');
+  const [manualProvince, setManualProvince] = useState('');
+  const [manualNotes, setManualNotes] = useState('');
+  const [saveManualToProfile, setSaveManualToProfile] = useState(false);
+  const [manualAlias, setManualAlias] = useState('');
+
+  // Notas de entrega para dirección guardada
+  const [savedAddressNotes, setSavedAddressNotes] = useState('');
+
   const [pickupSchedule, setPickupSchedule] = useState('');
   const [selectedPickupAddressId, setSelectedPickupAddressId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Cargar direcciones del perfil del usuario
+  useEffect(() => {
+    getUserDeliveryAddresses().then((res) => {
+      if (res.profile) {
+        setUserProfile(res.profile);
+        const addrs = res.addresses || [];
+        setSavedAddresses(addrs);
+
+        const hasMain = Boolean(res.profile.street && res.profile.town);
+        if (hasMain) {
+          setSelectedAddressId('main');
+          setAddressMode('saved');
+        } else if (addrs.length > 0) {
+          const def = addrs.find((a) => a.is_default) || addrs[0];
+          setSelectedAddressId(def.id);
+          setAddressMode('saved');
+        } else {
+          setAddressMode('manual');
+        }
+      }
+    });
+  }, []);
 
   // Inicializar con la primera dirección de recogida activa disponible
   useEffect(() => {
@@ -29,6 +75,21 @@ export default function CartPage() {
       setSelectedPickupAddressId(activePickupAddresses[0].id);
     }
   }, [activePickupAddresses, selectedPickupAddressId]);
+
+  const getFormattedMainAddress = (p: Profile) => {
+    return [
+      p.street,
+      p.number ? `Nº ${p.number}` : '',
+      p.stair ? `Esc ${p.stair}` : '',
+      p.floor ? `Piso ${p.floor}` : '',
+      p.door ? `Pta ${p.door}` : '',
+      p.postal_code,
+      p.town,
+      p.province ? `(${p.province})` : '',
+    ]
+      .filter(Boolean)
+      .join(', ');
+  };
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +100,72 @@ export default function CartPage() {
 
     const firstItem = items[0];
     const sellerId = firstItem.sellerId || firstItem.product?.seller_id || '';
+
+    // Resolver dirección de envío a domicilio
+    let resolvedShippingAddress = '';
+    let resolvedShippingNotes = '';
+
+    if (deliveryType === 'domicilio') {
+      if (addressMode === 'manual') {
+        resolvedShippingAddress = [
+          manualStreet,
+          manualNumber ? `Nº ${manualNumber}` : '',
+          manualStair ? `Esc ${manualStair}` : '',
+          manualFloor ? `Piso ${manualFloor}` : '',
+          manualDoor ? `Pta ${manualDoor}` : '',
+          manualPostalCode,
+          manualTown,
+          manualProvince ? `(${manualProvince})` : '',
+        ]
+          .filter(Boolean)
+          .join(', ');
+
+        resolvedShippingNotes = manualNotes;
+
+        // Si marcó guardar en perfil, guardarlo en background
+        if (saveManualToProfile && manualStreet && manualTown) {
+          const newAddr: DeliveryAddress = {
+            id: 'addr_' + Date.now(),
+            title: manualAlias.trim() || 'Dirección de Entrega',
+            street: manualStreet.trim(),
+            number: manualNumber.trim(),
+            stair: manualStair.trim(),
+            floor: manualFloor.trim(),
+            door: manualDoor.trim(),
+            postal_code: manualPostalCode.trim(),
+            town: manualTown.trim(),
+            province: manualProvince.trim(),
+            notes: manualNotes.trim(),
+            is_default: savedAddresses.length === 0,
+          };
+          updateDeliveryAddresses([...savedAddresses, newAddr]);
+        }
+      } else {
+        // Modo guardado
+        if (selectedAddressId === 'main' && userProfile) {
+          resolvedShippingAddress = getFormattedMainAddress(userProfile);
+          resolvedShippingNotes = savedAddressNotes;
+        } else {
+          const chosenAddr = savedAddresses.find((a) => a.id === selectedAddressId);
+          if (chosenAddr) {
+            resolvedShippingAddress = [
+              chosenAddr.street,
+              chosenAddr.number ? `Nº ${chosenAddr.number}` : '',
+              chosenAddr.stair ? `Esc ${chosenAddr.stair}` : '',
+              chosenAddr.floor ? `Piso ${chosenAddr.floor}` : '',
+              chosenAddr.door ? `Pta ${chosenAddr.door}` : '',
+              chosenAddr.postal_code,
+              chosenAddr.town,
+              chosenAddr.province ? `(${chosenAddr.province})` : '',
+            ]
+              .filter(Boolean)
+              .join(', ');
+
+            resolvedShippingNotes = chosenAddr.notes || savedAddressNotes;
+          }
+        }
+      }
+    }
 
     // Obtener la dirección física de la tienda seleccionada
     const chosenPickupAddress = activePickupAddresses.find((a) => a.id === selectedPickupAddressId) || activePickupAddresses[0];
@@ -51,10 +178,10 @@ export default function CartPage() {
       seller_id: sellerId,
       deliveryType,
       delivery_method: deliveryType,
-      shippingAddress: deliveryType === 'domicilio' ? shippingAddress : resolvedPickupAddressText,
-      shipping_address: deliveryType === 'domicilio' ? shippingAddress : resolvedPickupAddressText,
-      shippingNotes: deliveryType === 'domicilio' ? shippingNotes : undefined,
-      shipping_notes: deliveryType === 'domicilio' ? shippingNotes : undefined,
+      shippingAddress: deliveryType === 'domicilio' ? resolvedShippingAddress : resolvedPickupAddressText,
+      shipping_address: deliveryType === 'domicilio' ? resolvedShippingAddress : resolvedPickupAddressText,
+      shippingNotes: deliveryType === 'domicilio' ? resolvedShippingNotes : undefined,
+      shipping_notes: deliveryType === 'domicilio' ? resolvedShippingNotes : undefined,
       pickupSchedule: deliveryType === 'recogida_tienda' ? pickupSchedule : undefined,
       pickup_schedule: deliveryType === 'recogida_tienda' ? pickupSchedule : undefined,
       totalPrice,
@@ -234,32 +361,292 @@ export default function CartPage() {
 
             {/* Formulario Envio a Domicilio */}
             {deliveryType === 'domicilio' ? (
-              <div className="space-y-3 font-sans text-xs animate-fadeIn">
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.deliv_shipping_address} *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={shippingAddress}
-                    onChange={(e) => setShippingAddress(e.target.value)}
-                    placeholder="Calle, número, piso, código postal y localidad"
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0] placeholder:text-stone-400"
-                  />
+              <div className="space-y-4 font-sans text-xs animate-fadeIn">
+                {/* Selector de modo de dirección guardada vs manual */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAddressMode('saved')}
+                    className={`py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                      addressMode === 'saved'
+                        ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0] shadow-xs'
+                        : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-500 hover:border-stone-400'
+                    }`}
+                  >
+                    {t.deliv_use_saved_address}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddressMode('manual')}
+                    className={`py-2 px-3 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                      addressMode === 'manual'
+                        ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0] shadow-xs'
+                        : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-500 hover:border-stone-400'
+                    }`}
+                  >
+                    {t.deliv_enter_manual_address}
+                  </button>
                 </div>
-                <div>
-                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
-                    {t.deliv_shipping_notes}
-                  </label>
-                  <input
-                    type="text"
-                    value={shippingNotes}
-                    onChange={(e) => setShippingNotes(e.target.value)}
-                    placeholder="Ej: Horario preferente de mañana, portería..."
-                    className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0] placeholder:text-stone-400"
-                  />
-                </div>
+
+                {addressMode === 'saved' ? (
+                  <div className="space-y-3">
+                    <label className="font-bold text-stone-700 dark:text-stone-300 block">
+                      Selecciona la dirección de entrega:
+                    </label>
+
+                    {/* Dirección principal del perfil */}
+                    {userProfile && userProfile.street && (
+                      <div
+                        onClick={() => setSelectedAddressId('main')}
+                        className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3 ${
+                          selectedAddressId === 'main'
+                            ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0] shadow-xs'
+                            : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="saved_address_choice"
+                          value="main"
+                          checked={selectedAddressId === 'main'}
+                          onChange={() => setSelectedAddressId('main')}
+                          className="w-4 h-4 accent-[#FFE259] mt-0.5 cursor-pointer"
+                        />
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-xs block text-stone-900 dark:text-[#F5F5F0]">
+                              {t.deliv_main_profile_address}
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-[9px] font-bold uppercase text-stone-700 dark:text-stone-300">
+                              Perfil
+                            </span>
+                          </div>
+                          <p className="text-[11px] opacity-85 text-stone-600 dark:text-stone-300 leading-relaxed">
+                            {getFormattedMainAddress(userProfile)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Direcciones guardadas adicionales */}
+                    {savedAddresses.map((addr) => {
+                      const isSelected = selectedAddressId === addr.id;
+                      return (
+                        <div
+                          key={addr.id}
+                          onClick={() => setSelectedAddressId(addr.id)}
+                          className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-3 ${
+                            isSelected
+                              ? 'border-[#FFE259] bg-[#FFE259]/15 text-stone-900 dark:text-[#F5F5F0] shadow-xs'
+                              : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#141312] text-stone-600 dark:text-stone-400 hover:border-stone-400'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="saved_address_choice"
+                            value={addr.id}
+                            checked={isSelected}
+                            onChange={() => setSelectedAddressId(addr.id)}
+                            className="w-4 h-4 accent-[#FFE259] mt-0.5 cursor-pointer"
+                          />
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-xs block text-stone-900 dark:text-[#F5F5F0]">
+                                {addr.title}
+                              </span>
+                              {addr.is_default && (
+                                <span className="px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-[#C68D07] dark:text-[#FFE259] text-[9px] font-black uppercase">
+                                  {t.deliv_default_badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] opacity-85 text-stone-600 dark:text-stone-300 leading-relaxed">
+                              {addr.street} {addr.number ? `Nº ${addr.number}` : ''} {addr.stair ? `Esc ${addr.stair}` : ''} {addr.floor ? `Piso ${addr.floor}` : ''} {addr.door ? `Pta ${addr.door}` : ''}, {addr.postal_code || ''} {addr.town} ({addr.province})
+                            </p>
+                            {addr.notes && (
+                              <p className="text-[10.5px] italic text-stone-500 dark:text-stone-400">
+                                Notas: {addr.notes}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {(!userProfile || !userProfile.street) && savedAddresses.length === 0 && (
+                      <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-[#FFE259] rounded-2xl text-stone-800 dark:text-stone-200 text-xs">
+                        No tienes una dirección guardada en tu perfil todavía. Puedes introducirla abajo campo a campo.
+                      </div>
+                    )}
+
+                    {/* Notas de entrega adicionales */}
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                        {t.deliv_shipping_notes}
+                      </label>
+                      <input
+                        type="text"
+                        value={savedAddressNotes}
+                        onChange={(e) => setSavedAddressNotes(e.target.value)}
+                        placeholder="Ej: Horario preferente de mañana, portería..."
+                        className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0] placeholder:text-stone-400"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  /* Modo Manual Campo a Campo */
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="col-span-2">
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_street} *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={manualStreet}
+                          onChange={(e) => setManualStreet(e.target.value)}
+                          placeholder="Calle, avenida o plaza"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_number} *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={manualNumber}
+                          onChange={(e) => setManualNumber(e.target.value)}
+                          placeholder="Nº"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_stair}
+                        </label>
+                        <input
+                          type="text"
+                          value={manualStair}
+                          onChange={(e) => setManualStair(e.target.value)}
+                          placeholder="A"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_floor}
+                        </label>
+                        <input
+                          type="text"
+                          value={manualFloor}
+                          onChange={(e) => setManualFloor(e.target.value)}
+                          placeholder="2º"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_door}
+                        </label>
+                        <input
+                          type="text"
+                          value={manualDoor}
+                          onChange={(e) => setManualDoor(e.target.value)}
+                          placeholder="B"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_postal_code} *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={manualPostalCode}
+                          onChange={(e) => setManualPostalCode(e.target.value)}
+                          placeholder="48280"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_town} *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={manualTown}
+                          onChange={(e) => setManualTown(e.target.value)}
+                          placeholder="Lekeitio"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                          {t.profile_province} *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={manualProvince}
+                          onChange={(e) => setManualProvince(e.target.value)}
+                          placeholder="Bizkaia"
+                          className="w-full px-3 py-2 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                        {t.deliv_shipping_notes}
+                      </label>
+                      <input
+                        type="text"
+                        value={manualNotes}
+                        onChange={(e) => setManualNotes(e.target.value)}
+                        placeholder="Ej: Dejar en portería si no estoy..."
+                        className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-[#F5F5F0] placeholder:text-stone-400"
+                      />
+                    </div>
+
+                    {/* Checkbox para guardar en perfil */}
+                    <div className="pt-2 p-3 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 rounded-2xl space-y-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="save_manual_to_profile"
+                          checked={saveManualToProfile}
+                          onChange={(e) => setSaveManualToProfile(e.target.checked)}
+                          className="w-4 h-4 accent-[#FFE259] rounded cursor-pointer"
+                        />
+                        <label htmlFor="save_manual_to_profile" className="font-bold text-stone-700 dark:text-stone-300 cursor-pointer">
+                          {t.deliv_save_to_profile}
+                        </label>
+                      </div>
+                      {saveManualToProfile && (
+                        <div>
+                          <input
+                            type="text"
+                            value={manualAlias}
+                            onChange={(e) => setManualAlias(e.target.value)}
+                            placeholder={t.deliv_address_alias_placeholder}
+                            className="w-full px-3 py-1.5 bg-white dark:bg-[#1F1E1C] border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-900 dark:text-[#F5F5F0]"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               /* Formulario Recogida en Tienda con Selector de Puntos de Entrega Disponibles y Modo Oscuro Nítido */

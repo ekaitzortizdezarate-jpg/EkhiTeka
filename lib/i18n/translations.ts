@@ -263,6 +263,20 @@ export interface TranslationDict {
   deliv_order_success_desc: string;
   deliv_store_pickup_tag: string;
   deliv_home_tag: string;
+  deliv_manage_addresses: string;
+  deliv_manage_addresses_desc: string;
+  deliv_add_new_address: string;
+  deliv_edit_address: string;
+  deliv_address_alias: string;
+  deliv_address_alias_placeholder: string;
+  deliv_set_as_default: string;
+  deliv_default_badge: string;
+  deliv_delete_confirm: string;
+  deliv_use_saved_address: string;
+  deliv_enter_manual_address: string;
+  deliv_save_to_profile: string;
+  deliv_main_profile_address: string;
+  deliv_no_saved_addresses: string;
 
   // Orders & Statuses
   orders_title: string;
@@ -869,6 +883,20 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_order_success_desc: 'Saltzaileak zure eskaera jaso du eta prestatzen hasiko da.',
     deliv_store_pickup_tag: 'Lekeitioko dendan jasotzea',
     deliv_home_tag: 'Etxera bidaltzea',
+    deliv_manage_addresses: 'Bidalketa Helbideen Kudeaketa',
+    deliv_manage_addresses_desc: 'Kudeatu zure helbideak bidalketak eta eskaerak azkartzeko.',
+    deliv_add_new_address: 'Gehitu Bidalketa Helbidea',
+    deliv_edit_address: 'Editatu Bidalketa Helbidea',
+    deliv_address_alias: 'Helbidearen Izena / Ezizena *',
+    deliv_address_alias_placeholder: 'Adib: Etxea, Bulegoa, Udako Etxea...',
+    deliv_set_as_default: 'Ezarri bidalketa helbide lehenetsi gisa',
+    deliv_default_badge: 'Lehenetsia',
+    deliv_delete_confirm: 'Ziur zaude bidalketa helbide hau ezabatu nahi duzula?',
+    deliv_use_saved_address: 'Bidali nire profileko helbide batera',
+    deliv_enter_manual_address: 'Sartu helbidea eskuz (eremuz eremu)',
+    deliv_save_to_profile: 'Gorde helbide hau nire profilean etorkizuneko eskaeretarako',
+    deliv_main_profile_address: 'Profileko Helbide Nagusia',
+    deliv_no_saved_addresses: 'Ez duzu helbide gehigarririk gordeta',
 
     orders_title: 'Nire Eskaerak',
     orders_title_seller: 'Eskaerak Kudeatu',
@@ -1462,6 +1490,20 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_order_success_desc: 'El artesano ha recibido tu pedido y comenzará a prepararlo.',
     deliv_store_pickup_tag: 'Recogida en Tienda Lekeitio',
     deliv_home_tag: 'Envío a domicilio',
+    deliv_manage_addresses: 'Gestión de Direcciones de Entrega',
+    deliv_manage_addresses_desc: 'Gestiona tus direcciones para agilizar tus envíos y pedidos.',
+    deliv_add_new_address: 'Añadir Dirección de Entrega',
+    deliv_edit_address: 'Editar Dirección de Entrega',
+    deliv_address_alias: 'Nombre / Alias de la Dirección *',
+    deliv_address_alias_placeholder: 'Ej: Casa, Oficina, Residencia de Verano...',
+    deliv_set_as_default: 'Establecer como dirección predeterminada',
+    deliv_default_badge: 'Predeterminada',
+    deliv_delete_confirm: '¿Seguro que deseas eliminar esta dirección de entrega?',
+    deliv_use_saved_address: 'Enviar a una dirección de mi perfil',
+    deliv_enter_manual_address: 'Añadir dirección manualmente (campo a campo)',
+    deliv_save_to_profile: 'Guardar esta dirección en mi perfil para futuros pedidos',
+    deliv_main_profile_address: 'Dirección Principal del Perfil',
+    deliv_no_saved_addresses: 'No tienes direcciones guardadas adicionales',
 
     orders_title: 'Mis Pedidos',
     orders_title_seller: 'Gestión de Pedidos',
@@ -2055,6 +2097,20 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_order_success_desc: 'The artisan has received your order and is preparing it.',
     deliv_store_pickup_tag: 'Store Pickup in Lekeitio',
     deliv_home_tag: 'Home Delivery',
+    deliv_manage_addresses: 'Delivery Address Management',
+    deliv_manage_addresses_desc: 'Manage your addresses to speed up shipments and orders.',
+    deliv_add_new_address: 'Add Delivery Address',
+    deliv_edit_address: 'Edit Delivery Address',
+    deliv_address_alias: 'Address Name / Alias *',
+    deliv_address_alias_placeholder: 'e.g. Home, Office, Holiday Home...',
+    deliv_set_as_default: 'Set as default delivery address',
+    deliv_default_badge: 'Default',
+    deliv_delete_confirm: 'Are you sure you want to delete this delivery address?',
+    deliv_use_saved_address: 'Ship to an address from my profile',
+    deliv_enter_manual_address: 'Add address manually (field by field)',
+    deliv_save_to_profile: 'Save this address to my profile for future orders',
+    deliv_main_profile_address: 'Main Profile Address',
+    deliv_no_saved_addresses: 'No additional saved addresses',
 
     orders_title: 'My Orders',
     orders_title_seller: 'Order Management',
@@ -2648,6 +2704,20 @@ export const translations: Record<Language, TranslationDict> = {
     deliv_order_success_desc: 'L\'artisan a reçu votre commande et prépare vos productos.',
     deliv_store_pickup_tag: 'Retrait en boutique à Lekeitio',
     deliv_home_tag: 'Livraison à domicile',
+    deliv_manage_addresses: 'Gestion des Adresses de Livraison',
+    deliv_manage_addresses_desc: 'Gérez vos adresses pour accélérer vos livraisons et commandes.',
+    deliv_add_new_address: 'Ajouter une Adresse de Livraison',
+    deliv_edit_address: 'Modifier l\'Adresse de Livraison',
+    deliv_address_alias: 'Nom / Alias de l\'Adresse *',
+    deliv_address_alias_placeholder: 'Ex : Domicile, Bureau, Résidence secondaire...',
+    deliv_set_as_default: 'Définir comme adresse de livraison par défaut',
+    deliv_default_badge: 'Par défaut',
+    deliv_delete_confirm: 'Êtes-vous sûr de vouloir supprimer cette adresse de livraison ?',
+    deliv_use_saved_address: 'Expédier à une adresse de mon profil',
+    deliv_enter_manual_address: 'Saisir l\'adresse manuellement (champ par champ)',
+    deliv_save_to_profile: 'Enregistrer cette adresse dans mon profil pour de futures commandes',
+    deliv_main_profile_address: 'Adresse Principale du Profil',
+    deliv_no_saved_addresses: 'Aucune adresse supplémentaire enregistrée',
 
     orders_title: 'Mes Commandes',
     orders_title_seller: 'Gestion des Commandes',

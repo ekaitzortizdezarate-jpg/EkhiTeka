@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import { sendMessage } from '@/app/actions/chat';
+import { sendMessage, markChatAsRead } from '@/app/actions/chat';
 import type { ChatMessage, Profile, Product, Order } from '@/types/database';
 import { Send, ArrowLeft, Store, Package, MapPin } from 'lucide-react';
 
@@ -37,6 +37,12 @@ export function ChatConversationView({
   useEffect(() => {
     scrollToBottom();
   }, [messages.length]);
+
+  useEffect(() => {
+    markChatAsRead(receiverId).then(() => {
+      window.dispatchEvent(new CustomEvent('ekhiteka_chat_read', { detail: { receiverId } }));
+    });
+  }, [receiverId]);
 
   const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

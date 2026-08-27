@@ -56,6 +56,21 @@ export interface EventAddress {
   is_active: boolean;
 }
 
+export interface DeliveryAddress {
+  id: string;
+  title: string;
+  street: string;
+  number?: string;
+  stair?: string;
+  floor?: string;
+  door?: string;
+  postal_code?: string;
+  town: string;
+  province: string;
+  notes?: string;
+  is_default?: boolean;
+}
+
 export interface ProfileDetails {
   first_name?: string | null;
   last_name_1?: string | null;
@@ -75,6 +90,7 @@ export interface ProfileDetails {
   whatsapp_contacts?: WhatsAppContact[];
   pickup_addresses?: StoreAddress[];
   event_addresses?: EventAddress[];
+  delivery_addresses?: DeliveryAddress[];
 }
 
 export interface Profile extends ProfileDetails {
@@ -115,6 +131,7 @@ export function parseProfile(raw?: any): Profile {
       whatsapp_contacts: [],
       pickup_addresses: [],
       event_addresses: [],
+      delivery_addresses: [],
     };
   }
 
@@ -150,6 +167,7 @@ export function parseProfile(raw?: any): Profile {
     whatsapp_contacts: details.whatsapp_contacts || [],
     pickup_addresses: details.pickup_addresses || [],
     event_addresses: details.event_addresses || [],
+    delivery_addresses: details.delivery_addresses || [],
   };
 }
 

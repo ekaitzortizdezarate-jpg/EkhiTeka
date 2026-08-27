@@ -37,10 +37,31 @@ export function NavbarNavLinks({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hasUnseenOrderUpdates, setHasUnseenOrderUpdates] = useState(false);
+  const [liveUnreadMessages, setLiveUnreadMessages] = useState(unreadMessagesCount);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    setLiveUnreadMessages(unreadMessagesCount);
+  }, [unreadMessagesCount]);
+
+  useEffect(() => {
+    const handleChatRead = () => {
+      setLiveUnreadMessages(0);
+    };
+    window.addEventListener('ekhiteka_chat_read', handleChatRead);
+    return () => {
+      window.removeEventListener('ekhiteka_chat_read', handleChatRead);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (pathname.startsWith('/chat/')) {
+      setLiveUnreadMessages(0);
+    }
+  }, [pathname]);
 
   const isSeller = profile?.role === 'vendedor' || profile?.role === 'admin';
   const isAdmin = profile?.role === 'admin';
@@ -245,9 +266,9 @@ export function NavbarNavLinks({
         </nav>
       </div>
 
-      {/* 2. LADO DERECHO (Botón de cesta siempre visible para visitantes y compradores) */}
+      {/* 2. LADO DERECHO (Botón de cesta visible únicamente con sesión iniciada para compradores) */}
       <div className="flex items-center gap-2 shrink-0">
-        {(!profile || profile.role === 'comprador') && <CartNavButton />}
+        {user && (!profile || profile.role === 'comprador') && <CartNavButton />}
 
         {user ? (
           <div className="flex items-center gap-2">
@@ -261,9 +282,9 @@ export function NavbarNavLinks({
               title={t.nav_chats}
             >
               <MessageCircle className="w-4 h-4" />
-              {unreadMessagesCount > 0 && (
+              {liveUnreadMessages > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
-                  {unreadMessagesCount}
+                  {liveUnreadMessages}
                 </span>
               )}
             </Link>
@@ -469,9 +490,9 @@ export function NavbarNavLinks({
                       }`}
                     >
                       <span>{t.nav_chats}</span>
-                      {unreadMessagesCount > 0 && (
+                      {liveUnreadMessages > 0 && (
                         <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">
-                          {unreadMessagesCount}
+                          {liveUnreadMessages}
                         </span>
                       )}
                     </Link>

@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import { updateProfile, changeUserPassword, updateStoreConfig } from '@/app/actions/auth';
-import type { Profile, WhatsAppContact, StoreAddress, EventAddress } from '@/types/database';
+import { updateProfile, changeUserPassword, updateStoreConfig, updateDeliveryAddresses } from '@/app/actions/auth';
+import type { Profile, WhatsAppContact, StoreAddress, EventAddress, DeliveryAddress } from '@/types/database';
 import { parseProfile, isProfileComplete } from '@/types/database';
 import {
   User,
@@ -24,6 +24,7 @@ import {
   Power,
   X,
   ArrowLeft,
+  Truck,
 } from 'lucide-react';
 
 interface SellerOption {
@@ -55,6 +56,11 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
   const [userMsg, setUserMsg] = useState<{ text: string; isError: boolean } | null>(null);
   const [loadingPassword, setLoadingPassword] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState<{ text: string; isError: boolean } | null>(null);
+
+  // Direcciones de Entrega Comprador
+  const [deliveryAddresses, setDeliveryAddresses] = useState<DeliveryAddress[]>(currentProfile.delivery_addresses || []);
+  const [modalDeliveryAddr, setModalDeliveryAddr] = useState<{ open: boolean; addr: DeliveryAddress | null }>({ open: false, addr: null });
+  const [loadingDeliveryAddr, setLoadingDeliveryAddr] = useState(false);
 
   // Sección Tienda
   const [whatsappContacts, setWhatsappContacts] = useState<WhatsAppContact[]>(currentProfile.whatsapp_contacts || []);
@@ -256,6 +262,86 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     const updated = eventAddresses.filter((a) => a.id !== addrId);
     setEventAddresses(updated);
     await syncStoreConfig(whatsappContacts, pickupAddresses, updated);
+  };
+
+  // --- Handlers Direcciones de Entrega (Comprador) ---
+  const handleSaveDeliveryAddr = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const title = (fd.get('title') as string)?.trim() || 'Dirección de Entrega';
+    const street = (fd.get('street') as string)?.trim() || '';
+    const number = (fd.get('number') as string)?.trim() || '';
+    const stair = (fd.get('stair') as string)?.trim() || '';
+    const floor = (fd.get('floor') as string)?.trim() || '';
+    const door = (fd.get('door') as string)?.trim() || '';
+    const postal_code = (fd.get('postal_code') as string)?.trim() || '';
+    const town = (fd.get('town') as string)?.trim() || '';
+    const province = (fd.get('province') as string)?.trim() || '';
+    const notes = (fd.get('notes') as string)?.trim() || '';
+    const is_default = fd.get('is_default') === 'on' || deliveryAddresses.length === 0;
+
+    let nextList: DeliveryAddress[];
+    if (modalDeliveryAddr.addr) {
+      nextList = deliveryAddresses.map((a) => {
+        if (a.id === modalDeliveryAddr.addr!.id) {
+          return {
+            ...a,
+            title,
+            street,
+            number,
+            stair,
+            floor,
+            door,
+            postal_code,
+            town,
+            province,
+            notes,
+            is_default: is_default ? true : a.is_default,
+          };
+        }
+        return is_default ? { ...a, is_default: false } : a;
+      });
+    } else {
+      const newAddr: DeliveryAddress = {
+        id: 'addr_' + Date.now(),
+        title,
+        street,
+        number,
+        stair,
+        floor,
+        door,
+        postal_code,
+        town,
+        province,
+        notes,
+        is_default,
+      };
+      nextList = is_default
+        ? [...deliveryAddresses.map((a) => ({ ...a, is_default: false })), newAddr]
+        : [...deliveryAddresses, newAddr];
+    }
+
+    setDeliveryAddresses(nextList);
+    setModalDeliveryAddr({ open: false, addr: null });
+    setLoadingDeliveryAddr(true);
+    await updateDeliveryAddresses(nextList);
+    setLoadingDeliveryAddr(false);
+  };
+
+  const handleDeleteDeliveryAddr = async (id: string) => {
+    if (!confirm(t.deliv_delete_confirm)) return;
+    const nextList = deliveryAddresses.filter((a) => a.id !== id);
+    setDeliveryAddresses(nextList);
+    await updateDeliveryAddresses(nextList);
+  };
+
+  const handleSetDefaultDeliveryAddr = async (id: string) => {
+    const nextList = deliveryAddresses.map((a) => ({
+      ...a,
+      is_default: a.id === id,
+    }));
+    setDeliveryAddresses(nextList);
+    await updateDeliveryAddresses(nextList);
   };
 
   // Submit Usuario
@@ -707,6 +793,99 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                 </div>
               </form>
             )}
+          </div>
+
+          {/* Tarjeta de Gestión de Direcciones de Entrega (Comprador) */}
+          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-stone-200 dark:border-stone-800">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-[#C68D07] dark:text-[#FFE259]">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 font-serif">
+                    {t.deliv_manage_addresses}
+                  </h2>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                    {t.deliv_manage_addresses_desc}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setModalDeliveryAddr({ open: true, addr: null })}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs cursor-pointer hover:scale-105"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{t.deliv_add_new_address}</span>
+              </button>
+            </div>
+
+            {/* Lista de direcciones guardadas */}
+            <div className="space-y-3 font-sans text-xs">
+              {deliveryAddresses.length > 0 ? (
+                deliveryAddresses.map((addr) => (
+                  <div
+                    key={addr.id}
+                    className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-stone-900 dark:text-[#F5F5F0] text-sm">
+                          {addr.title}
+                        </span>
+                        {addr.is_default && (
+                          <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-[#C68D07] dark:text-[#FFE259] font-black text-[10px] uppercase">
+                            {t.deliv_default_badge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-stone-600 dark:text-stone-300 font-medium">
+                        {addr.street} {addr.number ? `Nº ${addr.number}` : ''} {addr.stair ? `Esc ${addr.stair}` : ''} {addr.floor ? `Piso ${addr.floor}` : ''} {addr.door ? `Pta ${addr.door}` : ''}, {addr.postal_code || ''} {addr.town} ({addr.province})
+                      </p>
+                      {addr.notes && (
+                        <p className="text-[11px] text-stone-500 dark:text-stone-400 italic">
+                          Notas: {addr.notes}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {!addr.is_default && (
+                        <button
+                          type="button"
+                          onClick={() => handleSetDefaultDeliveryAddr(addr.id)}
+                          className="px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-[11px] font-bold transition-colors cursor-pointer"
+                        >
+                          {t.deliv_set_as_default}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setModalDeliveryAddr({ open: true, addr })}
+                        className="p-2 rounded-xl text-stone-500 hover:text-stone-900 dark:hover:text-white hover:bg-stone-200 dark:hover:bg-stone-800 transition-colors cursor-pointer"
+                        title={t.deliv_edit_address}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteDeliveryAddr(addr.id)}
+                        className="p-2 rounded-xl text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                        title={t.cart_remove}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-6 text-center text-stone-400 dark:text-stone-500 italic">
+                  {t.deliv_no_saved_addresses}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Tarjeta Cambio de Contraseña */}
@@ -1597,6 +1776,179 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
                   className="px-5 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer"
                 >
                   {t.store_modal_event_save}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Dirección de Entrega para Comprador */}
+      {modalDeliveryAddr.open && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn font-sans">
+          <div className="bg-white dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-800 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 font-serif">
+              <h3 className="font-black text-lg text-stone-900 dark:text-stone-100">
+                {modalDeliveryAddr.addr ? t.deliv_edit_address : t.deliv_add_new_address}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setModalDeliveryAddr({ open: false, addr: null })}
+                className="p-1.5 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDeliveryAddr} className="space-y-3 text-xs">
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.deliv_address_alias}
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  required
+                  defaultValue={modalDeliveryAddr.addr?.title || ''}
+                  placeholder={t.deliv_address_alias_placeholder}
+                  className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 font-bold border-stone-200 dark:border-stone-700"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="col-span-2">
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_street} *</label>
+                  <input
+                    type="text"
+                    name="street"
+                    required
+                    defaultValue={modalDeliveryAddr.addr?.street || ''}
+                    placeholder="Calle / Vía"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_number} *</label>
+                  <input
+                    type="text"
+                    name="number"
+                    required
+                    defaultValue={modalDeliveryAddr.addr?.number || ''}
+                    placeholder="4"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_stair}</label>
+                  <input
+                    type="text"
+                    name="stair"
+                    defaultValue={modalDeliveryAddr.addr?.stair || ''}
+                    placeholder="A"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_floor}</label>
+                  <input
+                    type="text"
+                    name="floor"
+                    defaultValue={modalDeliveryAddr.addr?.floor || ''}
+                    placeholder="2º"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_door}</label>
+                  <input
+                    type="text"
+                    name="door"
+                    defaultValue={modalDeliveryAddr.addr?.door || ''}
+                    placeholder="B"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_postal_code} *</label>
+                  <input
+                    type="text"
+                    name="postal_code"
+                    required
+                    defaultValue={modalDeliveryAddr.addr?.postal_code || ''}
+                    placeholder="48280"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_town} *</label>
+                  <input
+                    type="text"
+                    name="town"
+                    required
+                    defaultValue={modalDeliveryAddr.addr?.town || ''}
+                    placeholder="Lekeitio"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">{t.profile_province} *</label>
+                  <input
+                    type="text"
+                    name="province"
+                    required
+                    defaultValue={modalDeliveryAddr.addr?.province || ''}
+                    placeholder="Bizkaia"
+                    className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-stone-700 dark:text-stone-300 block mb-1">
+                  {t.deliv_shipping_notes}
+                </label>
+                <input
+                  type="text"
+                  name="notes"
+                  defaultValue={modalDeliveryAddr.addr?.notes || ''}
+                  placeholder="Ej: Dejar en portería si no estoy..."
+                  className="w-full px-3 py-2 rounded-xl border bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="is_default_delivery_addr"
+                  name="is_default"
+                  defaultChecked={modalDeliveryAddr.addr?.is_default ?? deliveryAddresses.length === 0}
+                  className="w-4 h-4 accent-[#FFE259] rounded cursor-pointer"
+                />
+                <label htmlFor="is_default_delivery_addr" className="font-bold text-stone-700 dark:text-stone-300 cursor-pointer">
+                  {t.deliv_set_as_default}
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-stone-200 dark:border-stone-800 flex items-center justify-end gap-2 font-serif">
+                <button
+                  type="button"
+                  onClick={() => setModalDeliveryAddr({ open: false, addr: null })}
+                  className="px-4 py-2 rounded-xl text-stone-500 font-bold hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
+                >
+                  {t.common_cancel}
+                </button>
+                <button
+                  type="submit"
+                  disabled={loadingDeliveryAddr}
+                  className="px-5 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black uppercase text-xs rounded-xl shadow-xs cursor-pointer"
+                >
+                  {loadingDeliveryAddr ? t.common_loading : t.profile_save_changes_btn}
                 </button>
               </div>
             </form>
