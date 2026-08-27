@@ -380,14 +380,14 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         {/* 3. Footer con Precio, Selector y Botón Principal Abajo */}
         <div className="pt-3 border-t border-[#E8E5DF] dark:border-[#2D2B27] space-y-3">
           {/* Fila 1: Precio y Selector de Cantidad / Chat */}
-          <div className="flex items-center justify-between gap-2.5">
-            <div className="shrink-0">
-              <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.16em] block font-serif">
+          {isSeller ? (
+            <div className="w-full text-center flex flex-col items-center justify-center space-y-0.5">
+              <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.16em] block font-serif text-center">
                 {isCataCasa
                   ? (peopleRange || (language === 'eu' ? '2-4 lagunentzat' : language === 'fr' ? 'pour 2-4 personnes' : language === 'en' ? 'for 2-4 people' : 'para 2-4 personas'))
                   : t.prod_price}
               </span>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline justify-center gap-1.5">
                 <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
                   {Number(product.price).toFixed(2)} €
                 </span>
@@ -403,12 +403,31 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                 )}
               </div>
             </div>
+          ) : (
+            <div className="flex items-center justify-between gap-2.5">
+              <div className="shrink-0">
+                <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.16em] block font-serif">
+                  {isCataCasa
+                    ? (peopleRange || (language === 'eu' ? '2-4 lagunentzat' : language === 'fr' ? 'pour 2-4 personnes' : language === 'en' ? 'for 2-4 people' : 'para 2-4 personas'))
+                    : t.prod_price}
+                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
+                    {Number(product.price).toFixed(2)} €
+                  </span>
+                  {discountInfo && discountInfo.originalPrice && discountInfo.originalPrice > Number(product.price) && (
+                    <div className="flex items-center gap-1">
+                      <span className="text-[11px] text-stone-400 line-through font-serif font-semibold">
+                        {discountInfo.originalPrice.toFixed(2)} €
+                      </span>
+                      <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 font-serif">
+                        (-{discountInfo.discountPercent}%)
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-            {isSeller ? (
-              <span className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-[#FAF8F5] dark:bg-[#1C1B19] text-stone-700 dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2D2B27] font-serif uppercase tracking-[0.14em]">
-                {isUnlimited ? t.prod_unlimited : `${t.prod_stock}: ${product.stock ?? 0} ${isEvent ? getSeatsSuffix(language, (product.stock ?? 0) !== 1) : getUnitsSuffix(language, (product.stock ?? 0) !== 1)}`}
-              </span>
-            ) : (
               <div className="flex items-center gap-1.5">
                 {/* Selector de Cantidad */}
                 {!isSoldOut && (
@@ -451,8 +470,8 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                   <MessageCircle className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
                 </Link>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Fila 2: Botón Principal Abajo a Ancho Completo */}
           {isSeller ? (
