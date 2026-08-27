@@ -4,7 +4,14 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailAddToCart } from '@/components/ProductDetailAddToCart';
-import { getProductImage, getProductDiscount, getCleanDescription, formatEventDescription } from '@/lib/productHelpers';
+import {
+  getProductImage,
+  getProductDiscount,
+  getCleanDescription,
+  formatEventDescription,
+  getTranslatedFormat,
+  getTranslatedOrigin,
+} from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import {
   ArrowLeft,
@@ -29,7 +36,7 @@ export function ProductDetailView({
   relatedProducts,
   isSeller,
 }: ProductDetailViewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const isEvent =
     product.category_id === 'catas' ||
@@ -39,6 +46,8 @@ export function ProductDetailView({
 
   const imageUrl = getProductImage(product);
   const discountInfo = getProductDiscount(product);
+  const translatedOrigin = getTranslatedOrigin(product.origin_region, language);
+  const translatedFormat = getTranslatedFormat(product.format, language);
   const cleanDescription = isEvent
     ? formatEventDescription(product.description, {
         date: t.event_field_date,
@@ -83,15 +92,15 @@ export function ProductDetailView({
                 (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
               }}
             />
-            {product.origin_region && (
-              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-xs text-white text-xs font-black rounded-xl uppercase tracking-wider shadow-md font-sans">
-                <MapPin className="w-3.5 h-3.5 text-[#FFE259]" />
-                <span>{product.origin_region}</span>
+            {translatedOrigin && (
+              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-xl uppercase tracking-[0.14em] shadow-md font-serif">
+                <MapPin className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" />
+                <span>{translatedOrigin}</span>
               </span>
             )}
             {isEvent && (
-              <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-black rounded-xl uppercase tracking-wider shadow-md font-sans">
-                <Ticket className="w-3.5 h-3.5" />
+              <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-3 py-1.5 bg-[#FFE259] text-[#1D1D1B] text-xs font-bold rounded-xl uppercase tracking-[0.14em] shadow-md font-serif">
+                <Ticket className="w-3.5 h-3.5 stroke-[1.75]" />
                 <span>{product.stock} {t.event_seats_available}</span>
               </span>
             )}
@@ -100,21 +109,21 @@ export function ProductDetailView({
 
         {/* Información & Checkout */}
         <div className="lg:col-span-6 space-y-6">
-          <div className="space-y-2 border-b border-stone-200 dark:border-stone-800 pb-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[#C68D07] dark:text-[#FFE259] font-serif">
+          <div className="space-y-2 border-b border-[#E8E5DF] dark:border-[#2D2B27] pb-4">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 font-serif">
               EkhiTeka Gourmet · Lekeitio
             </span>
-            <h1 className="text-2xl sm:text-4xl font-black font-serif text-stone-900 dark:text-stone-100 leading-tight">
+            <h1 className="text-2xl sm:text-4xl font-bold font-serif text-stone-900 dark:text-stone-100 leading-tight">
               {product.name}
             </h1>
-            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-bold text-stone-500 dark:text-stone-400 font-sans">
-              {product.format && (
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
-                  {t.prod_format_label}: {product.format}
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-bold text-stone-500 dark:text-stone-400 font-serif">
+              {translatedFormat && (
+                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2D2B27] uppercase tracking-[0.12em]">
+                  {t.prod_format_label}: {translatedFormat}
                 </span>
               )}
               {product.weight_g && (
-                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
+                <span className="px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#1F1E1C] text-stone-700 dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2D2B27] uppercase tracking-[0.12em]">
                   {t.prod_weight_label}: {product.weight_g}g
                 </span>
               )}
@@ -135,13 +144,13 @@ export function ProductDetailView({
               )}
 
               {discountInfo && discountInfo.discountPercent > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-black text-xs uppercase tracking-wider font-sans">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#1D1D1B] text-white font-bold text-xs uppercase tracking-[0.14em] font-serif border border-stone-700">
                   <Percent className="w-3.5 h-3.5" />
-                  <span>{discountInfo.discountPercent}% Descuento</span>
+                  <span>-{discountInfo.discountPercent}% {language === 'eu' ? 'Deskontua' : language === 'fr' ? 'Remise' : language === 'en' ? 'Discount' : 'Descuento'}</span>
                 </span>
               )}
 
-              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider font-sans ml-auto">
+              <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.14em] font-serif ml-auto">
                 {isEvent ? t.prod_price_per_seat : t.prod_vat_included}
               </span>
             </div>

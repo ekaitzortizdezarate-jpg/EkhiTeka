@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { getUnitsSuffix, getSeatsSuffix } from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import { ShoppingBag, Check, Pencil, Ticket } from 'lucide-react';
 
@@ -17,7 +18,7 @@ export function ProductDetailAddToCart({
   isSeller = false,
 }: ProductDetailAddToCartProps) {
   const { addToCart } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -45,23 +46,42 @@ export function ProductDetailAddToCart({
     setTimeout(() => setAdded(false), 2000);
   };
 
+  const getLowStockNotice = () => {
+    if (isEvent) {
+      if (language === 'eu') return `Kontuz! ${product.stock} leku libre bakarrik geratzen dira.`;
+      if (language === 'fr') return `Attention ! Plus que ${product.stock} places disponibles.`;
+      if (language === 'en') return `Warning! Only ${product.stock} seats remaining.`;
+      return `¡Atención! Solo quedan ${product.stock} plazas disponibles.`;
+    }
+    if (language === 'eu') return `Kontuz! Azken ${product.stock} unitate stockean!`;
+    if (language === 'fr') return `Attention ! Plus que ${product.stock} unités en stock !`;
+    if (language === 'en') return `Warning! Only ${product.stock} units left in stock!`;
+    return `¡Últimas ${product.stock} unidades en stock!`;
+  };
+
   if (isSeller) {
     return (
       <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-3 font-serif">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
-            Modo Vendedor: Estás previsualizando la ficha de este producto.
+            {language === 'eu'
+              ? 'Saltzaile modua: Produktu honen fitxa aurreikusten ari zara.'
+              : language === 'fr'
+              ? 'Mode Vendeur : Vous prévisualisez la fiche de ce produit.'
+              : language === 'en'
+              ? 'Seller Mode: You are previewing this product page.'
+              : 'Modo Vendedor: Estás previsualizando la ficha de este producto.'}
           </p>
-          <span className="px-3 py-1 bg-white dark:bg-stone-900 border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-black text-amber-950 dark:text-amber-300 font-sans">
-            {isUnlimited ? t.prod_unlimited : `${t.prod_stock}: ${product.stock ?? 0} ${isEvent ? t.event_seats : 'uds'}`}
+          <span className="px-3 py-1 bg-white dark:bg-stone-900 border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-black text-amber-950 dark:text-amber-300 font-serif">
+            {isUnlimited ? t.prod_unlimited : `${t.prod_stock}: ${product.stock ?? 0} ${isEvent ? getSeatsSuffix(language, (product.stock ?? 0) !== 1) : getUnitsSuffix(language, (product.stock ?? 0) !== 1)}`}
           </span>
         </div>
         <Link
           href={`/vendedor/productos/${product.id}/editar`}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-xs font-serif cursor-pointer hover:scale-102"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-xs font-serif cursor-pointer hover:scale-102"
         >
-          <Pencil className="w-4 h-4" />
-          <span>Editar variables del producto</span>
+          <Pencil className="w-4 h-4 stroke-[1.75]" />
+          <span>{t.seller_edit_product || t.common_edit}</span>
         </Link>
       </div>
     );
@@ -72,7 +92,7 @@ export function ProductDetailAddToCart({
       <div className="flex items-center gap-3">
         {/* Selector de cantidad con modo oscuro nítido */}
         {!isSoldOut && (
-          <div className="flex items-center rounded-2xl border-2 border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-[#1F1E1C] p-1 shadow-inner">
+          <div className="flex items-center rounded-2xl border border-[#E8E5DF] dark:border-[#2D2B27] bg-stone-50 dark:bg-[#1F1E1C] p-1 shadow-inner">
             <button
               type="button"
               disabled={quantity <= 1}
@@ -100,7 +120,7 @@ export function ProductDetailAddToCart({
           type="button"
           disabled={isSoldOut}
           onClick={handleAdd}
-          className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-[0.14em] transition-all shadow-md active:scale-98 cursor-pointer ${
             isSoldOut
               ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed shadow-none'
               : added
@@ -109,7 +129,7 @@ export function ProductDetailAddToCart({
           }`}
         >
           {isSoldOut ? (
-            <span>{isEvent ? t.event_capacity_full : t.prod_sold_out}</span>
+            <span>{isEvent ? (t.event_capacity_full || t.prod_sold_out) : t.prod_sold_out}</span>
           ) : added ? (
             <>
               <Check className="w-5 h-5" />
@@ -117,7 +137,7 @@ export function ProductDetailAddToCart({
             </>
           ) : (
             <>
-              {isEvent ? <Ticket className="w-5 h-5" /> : <ShoppingBag className="w-5 h-5" />}
+              {isEvent ? <Ticket className="w-5 h-5 stroke-[1.75]" /> : <ShoppingBag className="w-5 h-5 stroke-[1.75]" />}
               <span>{isEvent ? t.event_reserve_seat : t.prod_add_to_cart}</span>
             </>
           )}
@@ -126,18 +146,18 @@ export function ProductDetailAddToCart({
 
       {/* Aviso de stock / plazas restantes */}
       {!isSoldOut && (
-        <p className="text-xs font-bold text-stone-600 dark:text-stone-300 font-sans">
+        <p className="text-xs font-bold text-stone-600 dark:text-stone-300 font-serif">
           {isUnlimited ? (
             <span className="text-emerald-700 dark:text-emerald-400">
               <strong className="uppercase">{t.prod_unlimited}</strong>
             </span>
           ) : product.stock !== null && product.stock <= 5 ? (
             <span className="text-amber-600 dark:text-amber-400">
-              {isEvent ? `¡Atención! Solo quedan ${product.stock} plazas disponibles.` : `¡Últimas ${product.stock} unidades en stock!`}
+              {getLowStockNotice()}
             </span>
           ) : (
             <span>
-              {t.prod_stock}: <strong>{product.stock}</strong> {isEvent ? t.event_seats : 'uds'}
+              {t.prod_stock}: <strong>{product.stock}</strong> {isEvent ? getSeatsSuffix(language, product.stock !== 1) : getUnitsSuffix(language, product.stock !== 1)}
             </span>
           )}
         </p>

@@ -40,6 +40,100 @@ export function getCleanDescription(description?: string | null): string {
   return description.replace(/<!-- META:{.*?} -->/g, '').trim();
 }
 
+export function getTranslatedFormat(format?: string | null, language: string = 'es'): string {
+  if (!format) return '';
+  const f = format.toLowerCase().trim();
+
+  if (f === 'unidad' || f === 'unit' || f === 'pieza' || f === 'unitatea' || f === 'piece' || f === 'ud') {
+    if (language === 'eu') return 'Unitatea';
+    if (language === 'fr') return 'Unité';
+    if (language === 'en') return 'Unit';
+    return 'Unidad';
+  }
+  if (f === 'peso_kg' || f === 'peso' || f === 'kg' || f === 'cuña' || f === 'por peso' || f === 'al corte') {
+    if (language === 'eu') return 'Pisuan (kg)';
+    if (language === 'fr') return 'Au poids (kg)';
+    if (language === 'en') return 'By weight (kg)';
+    return 'Al corte (kg)';
+  }
+  if (f === 'pack' || f === 'lote' || f === 'cesta' || f === 'saski' || f === 'pack / cesta' || f === 'pack / saskia') {
+    if (language === 'eu') return 'Pack';
+    if (language === 'fr') return 'Pack';
+    if (language === 'en') return 'Pack';
+    return 'Pack';
+  }
+  if (f === 'botella' || f === 'bottle' || f === 'bouteille' || f === 'botila') {
+    if (language === 'eu') return 'Botila';
+    if (language === 'fr') return 'Bouteille';
+    if (language === 'en') return 'Bottle';
+    return 'Botella';
+  }
+  if (f === 'lata' || f === 'can' || f === 'boîte' || f === 'boite') {
+    if (language === 'eu') return 'Lata';
+    if (language === 'fr') return 'Boîte';
+    if (language === 'en') return 'Can';
+    return 'Lata';
+  }
+  if (f === 'tarro' || f === 'jar' || f === 'bocal' || f === 'potoa' || f === 'frasco' || f === 'bote') {
+    if (language === 'eu') return 'Potoa';
+    if (language === 'fr') return 'Bocal';
+    if (language === 'en') return 'Jar';
+    return 'Tarro';
+  }
+
+  return format;
+}
+
+export function getTranslatedOrigin(origin?: string | null, language: string = 'es'): string {
+  if (!origin) return '';
+  const o = origin.toLowerCase().trim();
+
+  if (o.includes('país vasco') || o.includes('pais vasco') || o.includes('euskal herria') || o.includes('basque country') || o.includes('pays basque')) {
+    if (language === 'eu') return 'Euskal Herria';
+    if (language === 'fr') return 'Pays Basque';
+    if (language === 'en') return 'Basque Country';
+    return 'País Vasco';
+  }
+  if (o.includes('navarra') || o.includes('nafarroa') || o.includes('navarre')) {
+    if (language === 'eu') return 'Nafarroa';
+    if (language === 'fr' || language === 'en') return 'Navarre';
+    return 'Navarra';
+  }
+  if (o.includes('bizkaia') || o.includes('vizcaya') || o.includes('biscay')) {
+    if (language === 'eu' || language === 'es') return 'Bizkaia';
+    if (language === 'fr') return 'Biscaye';
+    if (language === 'en') return 'Biscay';
+    return 'Bizkaia';
+  }
+  if (o.includes('gipuzkoa') || o.includes('guipúzcoa') || o.includes('guipuzcoa')) {
+    if (language === 'eu' || language === 'es') return 'Gipuzkoa';
+    if (language === 'fr') return 'Guipuscoa';
+    if (language === 'en') return 'Gipuzkoa';
+    return 'Gipuzkoa';
+  }
+  if (o.includes('araba') || o.includes('álava') || o.includes('alava')) {
+    if (language === 'eu') return 'Araba';
+    if (language === 'es') return 'Álava';
+    return 'Alava';
+  }
+
+  return origin;
+}
+
+export function getUnitsSuffix(language: string = 'es', isPlural: boolean = true): string {
+  if (language === 'eu') return isPlural ? 'unitate' : 'unitate';
+  if (language === 'fr') return isPlural ? 'unités' : 'unité';
+  if (language === 'en') return isPlural ? 'units' : 'unit';
+  return isPlural ? 'uds' : 'ud';
+}
+
+export function getSeatsSuffix(language: string = 'es', isPlural: boolean = true): string {
+  if (language === 'eu') return 'leku';
+  if (language === 'fr') return isPlural ? 'places' : 'place';
+  if (language === 'en') return isPlural ? 'seats' : 'seat';
+  return isPlural ? 'plazas' : 'plaza';
+}
+
 export function formatEventDescription(
   description?: string | null,
   labels?: {

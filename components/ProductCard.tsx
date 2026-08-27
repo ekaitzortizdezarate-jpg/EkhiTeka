@@ -5,7 +5,16 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
-import { getProductImage, getProductDiscount, getCleanDescription, formatEventDescription } from '@/lib/productHelpers';
+import {
+  getProductImage,
+  getProductDiscount,
+  getCleanDescription,
+  formatEventDescription,
+  getTranslatedFormat,
+  getTranslatedOrigin,
+  getUnitsSuffix,
+  getSeatsSuffix,
+} from '@/lib/productHelpers';
 import type { ProductWithSeller } from '@/types/database';
 import { ShoppingBag, Ticket, MapPin, Pencil, Trash2, Check, MessageCircle } from 'lucide-react';
 
@@ -16,7 +25,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const { addToCart } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -50,6 +59,28 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
   const sellerName = product.profiles?.full_name || 'EkhiTeka Gourmet Lekeitio';
   const sellerId = product.seller_id;
+  const translatedOrigin = getTranslatedOrigin(product.origin_region, language);
+  const translatedFormat = getTranslatedFormat(product.format, language);
+
+  const getLowStockBadgeText = () => {
+    if (isEvent) {
+      if (language === 'eu') return `¡${product.stock} leku libre!`;
+      if (language === 'fr') return `Plus que ${product.stock} places !`;
+      if (language === 'en') return `Only ${product.stock} seats left!`;
+      return `¡Últimas ${product.stock} plazas!`;
+    }
+    if (language === 'eu') return `¡Azken ${product.stock} unitate!`;
+    if (language === 'fr') return `Plus que ${product.stock} unités !`;
+    if (language === 'en') return `Only ${product.stock} left!`;
+    return `¡Últimas ${product.stock} uds!`;
+  };
+
+  const getDeleteConfirmMessage = () => {
+    if (language === 'eu') return `Ziur zaude "${product.name}" produktua EkhiTekako katalogotik ezabatu nahi duzula?`;
+    if (language === 'fr') return `Voulez-vous supprimer « ${product.name} » du catalogue d’EkhiTeka ?`;
+    if (language === 'en') return `Are you sure you want to remove "${product.name}" from the EkhiTeka catalog?`;
+    return `¿Eliminar "${product.name}" del catálogo de EkhiTeka?`;
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -66,7 +97,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (confirm(`¿Eliminar "${product.name}" del catálogo de EkhiTeka?`)) {
+    if (confirm(getDeleteConfirmMessage())) {
       setIsDeleting(true);
       await deleteProduct(product.id);
       window.location.reload();
@@ -91,19 +122,19 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           }}
         />
 
-        {/* Origen (Top Left) - Minimalist Chalk Pill */}
-        {product.origin_region && (
+        {/* Origen (Top Left) */}
+        {translatedOrigin && (
           <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-white text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs max-w-[55%] truncate font-serif">
             <MapPin className="w-3 h-3 text-stone-300 shrink-0 stroke-[1.75]" />
-            <span className="truncate">{product.origin_region}</span>
+            <span className="truncate">{translatedOrigin}</span>
           </span>
         )}
 
-        {/* Stock Badge (Top Right) - Monochrome & Refined */}
+        {/* Stock Badge (Top Right) */}
         <div className="absolute top-2.5 right-2.5 flex items-center font-serif">
           {isSoldOut ? (
             <span className="px-2.5 py-1 bg-[#1D1D1B]/90 text-stone-300 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60">
-              {isEvent ? (t.event_capacity_full || 'Sin Plazas') : t.prod_sold_out}
+              {isEvent ? (t.event_capacity_full || t.prod_sold_out) : t.prod_sold_out}
             </span>
           ) : isUnlimited ? (
             <span className="px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-stone-200 border border-stone-700/60 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md">
@@ -111,24 +142,24 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
             </span>
           ) : isLowStock ? (
             <span className="px-2.5 py-1 bg-[#FFE259] text-[#1D1D1B] text-[10px] sm:text-[11px] font-black rounded-xl uppercase tracking-[0.14em] shadow-md">
-              {isEvent ? `¡${product.stock} plazas!` : `¡${product.stock} uds!`}
+              {getLowStockBadgeText()}
             </span>
           ) : isEvent ? (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs backdrop-blur-xs">
               <Ticket className="w-3 h-3 stroke-[1.75]" />
-              <span>{product.stock} {t.event_seats}</span>
+              <span>{product.stock} {getSeatsSuffix(language, product.stock !== 1)}</span>
             </span>
           ) : (
             <span className="px-2.5 py-1 bg-[#FAF8F5]/95 dark:bg-[#1C1B19]/95 text-[#1D1D1B] dark:text-[#F5F5F0] border border-[#E8E5DF] dark:border-[#2D2B27] text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs backdrop-blur-xs">
-              {product.stock} uds
+              {product.stock} {getUnitsSuffix(language, product.stock !== 1)}
             </span>
           )}
         </div>
 
         {/* Formato y Peso (Bottom Left) */}
-        {(product.format || product.weight_g) && (
+        {(translatedFormat || product.weight_g) && (
           <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-white/95 dark:bg-stone-900/95 backdrop-blur-xs text-stone-800 dark:text-stone-200 text-[10px] sm:text-[11px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-xs border border-[#E8E5DF] dark:border-[#2D2B27] font-serif">
-            {product.format} {product.weight_g ? `· ${product.weight_g}g` : ''}
+            {translatedFormat} {product.weight_g ? `· ${product.weight_g}g` : ''}
           </span>
         )}
 
@@ -169,7 +200,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           <div className="flex items-center justify-between gap-2.5">
             <div className="shrink-0">
               <span className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.16em] block font-serif">
-                {isEvent ? (t.prod_price_per_seat || 'Precio / Plaza') : t.prod_price}
+                {isEvent ? (t.prod_price_per_seat || '/ lekua') : t.prod_price}
               </span>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-base sm:text-xl font-black text-[#1D1D1B] dark:text-stone-100 font-serif">
@@ -185,7 +216,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
 
             {isSeller ? (
               <span className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-[#FAF8F5] dark:bg-[#1C1B19] text-stone-700 dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2D2B27] font-serif uppercase tracking-[0.14em]">
-                {isUnlimited ? t.prod_unlimited : `Stock: ${product.stock ?? 0} uds`}
+                {isUnlimited ? t.prod_unlimited : `${t.prod_stock}: ${product.stock ?? 0} ${isEvent ? getSeatsSuffix(language, (product.stock ?? 0) !== 1) : getUnitsSuffix(language, (product.stock ?? 0) !== 1)}`}
               </span>
             ) : (
               <div className="flex items-center gap-1.5">
@@ -239,16 +270,16 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               <Link
                 href={`/vendedor/productos/${product.id}/editar`}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs transition-all shadow-2xs hover:scale-[1.01] font-serif uppercase tracking-[0.14em] cursor-pointer text-center"
-                title="Editar Producto"
+                title={t.seller_edit_product || t.common_edit}
               >
                 <Pencil className="w-3.5 h-3.5 stroke-[1.75]" />
-                <span>Editar variables</span>
+                <span>{t.seller_edit_product || t.common_edit}</span>
               </Link>
               <button
                 type="button"
                 onClick={handleDelete}
                 className="p-2.5 rounded-2xl bg-stone-100 hover:bg-red-50 dark:bg-stone-800 dark:hover:bg-red-950/40 text-stone-700 hover:text-red-700 dark:text-stone-300 dark:hover:text-red-400 transition-colors cursor-pointer border border-[#E8E5DF] dark:border-[#2D2B27] shrink-0"
-                title="Eliminar Producto"
+                title={t.seller_delete_product || t.common_delete}
               >
                 <Trash2 className="w-4 h-4 stroke-[1.75]" />
               </button>
@@ -268,7 +299,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
               title={isEvent ? t.event_reserve_seat : t.prod_add_to_cart}
             >
               {isSoldOut ? (
-                <span>{isEvent ? (t.event_capacity_full || 'Sin plazas') : t.prod_sold_out}</span>
+                <span>{isEvent ? (t.event_capacity_full || t.prod_sold_out) : t.prod_sold_out}</span>
               ) : added ? (
                 <>
                   <Check className="w-4 h-4 stroke-[2]" />
