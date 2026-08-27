@@ -146,18 +146,18 @@ export function formatProductDescription(
   const formattedLines = lines.map((line) => {
     let l = line.trim();
 
-    // Clean emojis for clean Maisons du Monde aesthetic
-    l = l.replace(/^[📦🧀📅🕒📍👥💳🏠✨🎉🍷⭐👉✔]\s*/u, '');
+    // Clean emojis anywhere in the line for clean Maisons du Monde aesthetic
+    l = l.replace(/[📦🧀📅🕒⏰📍👥💳🏠✨🎉🍷⭐👉✔]/gu, '').trim();
 
-    // 1. Cestas & Packs - Included items header
-    if (/^(Productos incluidos en esta selección|Productos incluidos|Contenido de la cesta|Contenido del lote|Hautaketa honetan sartutako produktuak|Products included in this selection|Produits inclus dans cette sélection)\s*:?/i.test(l)) {
-      if (language === 'eu') return 'Hautaketa honetan sartutako produktuak:';
-      if (language === 'fr') return 'Produits inclus dans cette sélection :';
-      if (language === 'en') return 'Products included in this selection:';
-      return 'Productos incluidos en esta selección:';
+    // 1. Pack de Cata & Cestas Gourmet - Header translations
+    if (/^(PACK DE CATA (EN CASA )?INCLUYE|EL PACK DE CATA INCLUYE|PACK DE CATA|EL PACK INCLUYE|ESTE PACK INCLUYE|DASTAKETA PACK-AK DAKARRENA|TASTING PACK INCLUDES|LE PACK DE DÉGUSTATION COMPREND|PRODUCTOS INCLUIDOS EN ESTA SELECCI[OÓ]N|PRODUCTOS INCLUIDOS|CONTENIDO DE LA CESTA|CONTENIDO DEL LOTE|HAUTAKETA HONETAN SARTUTAKO PRODUKTUAK|PRODUCTS INCLUDED IN THIS SELECTION|PRODUITS INCLUS DANS CETTE SÉLECTION)\s*:?/i.test(l)) {
+      if (language === 'eu') return 'DASTAKETA PACK-AK DAKARRENA:';
+      if (language === 'fr') return 'LE PACK DE DÉGUSTATION COMPREND :';
+      if (language === 'en') return 'TASTING PACK INCLUDES:';
+      return 'EL PACK DE CATA INCLUYE:';
     }
 
-    // 2. Catas en Casa
+    // 2. Catas en Casa - Sections
     if (/^(Kit de cata en casa|Kit de cata para disfrutar en casa|Etxeko dastaketa kit-a|Home tasting kit|Kit de dégustation à domicile)\s*:?/i.test(l)) {
       if (language === 'eu') return 'Etxeko dastaketa kit-a:';
       if (language === 'fr') return 'Kit de dégustation à domicile :';
@@ -170,81 +170,113 @@ export function formatProductDescription(
       if (language === 'en') return 'Includes tasting and pairing guide';
       return 'Incluye guía de cata y maridaje';
     }
-    if (/^(Personas recomendadas|Comensales recomendados|Gomendatutako lagun kopurua|Recommended people|Nombre de personnes recommandé)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Personas recomendadas|Comensales recomendados|Gomendatutako lagun kopurua|Recommended people|Nombre de personnes recommandé)\s*:\s*/i, '');
-      if (language === 'eu') return `Gomendatutako pertsonak: ${rest}`;
-      if (language === 'fr') return `Nombre de personnes recommandé : ${rest}`;
-      if (language === 'en') return `Recommended people: ${rest}`;
-      return `Personas recomendadas: ${rest}`;
+
+    // 3. Tarjeta Regalo - Header & Options
+    if (/^(TARJETA REGALO VIRTUAL|Tarjeta Regalo Virtual|TARJETA REGALO|Tarjeta Regalo|OPARI TXARTEL BIRTUALA|Opari Txartel Birtuala|VIRTUAL GIFT CARD|Virtual Gift Card|CARTE CADEAU VIRTUELLE|Carte Cadeau Virtuelle)\s*:\s*/i.test(l)) {
+      const rest = l.replace(/^(TARJETA REGALO VIRTUAL|Tarjeta Regalo Virtual|TARJETA REGALO|Tarjeta Regalo|OPARI TXARTEL BIRTUALA|Opari Txartel Birtuala|VIRTUAL GIFT CARD|Virtual Gift Card|CARTE CADEAU VIRTUELLE|Carte Cadeau Virtuelle)\s*:\s*/i, '');
+      let header = 'TARJETA REGALO VIRTUAL:';
+      if (language === 'eu') header = 'OPARI TXARTEL BIRTUALA:';
+      if (language === 'fr') header = 'CARTE CADEAU VIRTUELLE :';
+      if (language === 'en') header = 'VIRTUAL GIFT CARD:';
+      l = rest ? `${header} ${rest}` : header;
     }
 
-    // 3. Catas Presenciales / en Tienda
-    if (/^(Fecha|Data|Date)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Fecha|Data|Date)\s*:\s*/i, '');
-      if (language === 'eu') return `Data: ${rest}`;
-      if (language === 'fr') return `Date : ${rest}`;
-      if (language === 'en') return `Date: ${rest}`;
-      return `Fecha: ${rest}`;
-    }
-    if (/^(Hora|Ordua|Time|Heure)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Hora|Ordua|Time|Heure)\s*:\s*/i, '');
-      if (language === 'eu') return `Ordua: ${rest}`;
-      if (language === 'fr') return `Heure : ${rest}`;
-      if (language === 'en') return `Time: ${rest}`;
-      return `Hora: ${rest}`;
-    }
-    if (/^(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Plazas disponibles|Plazas|Aforo|Leku libreak|Lekuak|Available seats|Seats|Places disponibles|Places)\s*:\s*/i, '');
-      if (language === 'eu') return `Leku libreak: ${rest}`;
-      if (language === 'fr') return `Places disponibles : ${rest}`;
-      if (language === 'en') return `Available seats: ${rest}`;
-      return `Plazas disponibles: ${rest}`;
-    }
-    if (/^(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Dastatuko diren produktuak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Productos a degustar|Productos a probar|Quesos a probar|Dastatzeko produktuak|Dastatuko diren gaztak|Dastatuko diren produktuak|Products to taste|Cheeses to taste|Produits à déguster|Fromages à déguster)\s*:\s*/i, '');
-      if (language === 'eu') return `Dastatuko diren produktuak: ${rest}`;
-      if (language === 'fr') return `Produits à déguster : ${rest}`;
-      if (language === 'en') return `Products to taste: ${rest}`;
-      return `Productos a degustar: ${rest}`;
-    }
-    if (/^(Lugar|Ubicación|Tokia|Lekua|Lieu|Location)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Lugar|Ubicación|Tokia|Lekua|Lieu|Location)\s*:\s*/i, '');
-      if (language === 'eu') return `Lekua: ${rest}`;
-      if (language === 'fr') return `Lieu : ${rest}`;
-      if (language === 'en') return `Location: ${rest}`;
-      return `Lugar: ${rest}`;
-    }
-    if (/^(Duración|Iraupena|Duration|Durée)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Duración|Iraupena|Duration|Durée)\s*:\s*/i, '');
-      if (language === 'eu') return `Iraupena: ${rest}`;
-      if (language === 'fr') return `Durée : ${rest}`;
-      if (language === 'en') return `Duration: ${rest}`;
-      return `Duración: ${rest}`;
-    }
+    // Replace Tarjeta Regalo Options inline
+    l = l.replace(/(Opciones canjeables|Aukera erabilgarriak|Options échangeables|Redeemable options)\s*:\s*/gi, () => {
+      if (language === 'eu') return 'Aukera erabilgarriak: ';
+      if (language === 'fr') return 'Options échangeables : ';
+      if (language === 'en') return 'Redeemable options: ';
+      return 'Opciones canjeables: ';
+    });
 
-    // 4. Tarjeta Regalo
-    if (/^(Saldo|Importe|Importe de la tarjeta|Saldo \/ Importe tarjeta|Txartelaren saldoa|Card balance|Gift card amount|Solde de la carte|Montant)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Saldo|Importe|Importe de la tarjeta|Saldo \/ Importe tarjeta|Txartelaren saldoa|Card balance|Gift card amount|Solde de la carte|Montant)\s*:\s*/i, '');
-      if (language === 'eu') return `Txartelaren saldoa: ${rest}`;
-      if (language === 'fr') return `Solde de la carte : ${rest}`;
-      if (language === 'en') return `Gift card amount: ${rest}`;
-      return `Saldo de la tarjeta: ${rest}`;
-    }
-    if (/^(Validez|Caducidad|Iraungipena|Validity|Validité)\s*:\s*/i.test(l)) {
-      const rest = l.replace(/^(Validez|Caducidad|Iraungipena|Validity|Validité)\s*:\s*/i, '');
-      if (language === 'eu') return `Baliozkotasuna: ${rest}`;
-      if (language === 'fr') return `Validité : ${rest}`;
-      if (language === 'en') return `Validity: ${rest}`;
-      return `Validez: ${rest}`;
-    }
-    if (/^(Canjeable en tienda física y pedidos online|Canjeable en tienda y online|Dendan eta online erabilgarria|Redeemable in-store and online|Utilisable en boutique et en ligne)/i.test(l)) {
+    l = l.replace(/(o Canjeable por Cata Presencial|edo Dastaketa Presentzialagatik trukagarria|edo Dastaketa Presentzialarengatik trukatu daiteke|ou Échangeable contre une Dégustation en Boutique|ou Échangeable contre une Dégustation Présentielle|or Redeemable for In-Person Tasting)/gi, () => {
+      if (language === 'eu') return 'edo Dastaketa Presentzialagatik trukagarria';
+      if (language === 'fr') return 'ou Échangeable contre une Dégustation en Boutique';
+      if (language === 'en') return 'or Redeemable for In-Person Tasting';
+      return 'o Canjeable por Cata Presencial';
+    });
+
+    l = l.replace(/(o Canjeable por Cata en Casa|edo Etxeko Dastaketagatik trukagarria|ou Échangeable contre une Dégustation à Domicile|or Redeemable for Home Tasting)/gi, () => {
+      if (language === 'eu') return 'edo Etxeko Dastaketagatik trukagarria';
+      if (language === 'fr') return 'ou Échangeable contre une Dégustation à Domicile';
+      if (language === 'en') return 'or Redeemable for Home Tasting';
+      return 'o Canjeable por Cata en Casa';
+    });
+
+    l = l.replace(/(Canjeable en tienda física y pedidos online|Canjeable en tienda y online|Dendan eta online erabilgarria|Redeemable in-store and online|Utilisable en boutique et en ligne)/gi, () => {
       if (language === 'eu') return 'Dendan eta online erabilgarria';
       if (language === 'fr') return 'Utilisable en boutique et en ligne';
       if (language === 'en') return 'Redeemable in-store and online';
       return 'Canjeable en tienda física y online';
-    }
+    });
 
-    return line;
+    // 4. Catas Presenciales / Events - Inline Tokens (even when concatenated on one line)
+    l = l.replace(/\b(FECHA|Fecha|DATA|Data|DATE|Date)\s*:\s*/g, () => {
+      if (language === 'eu') return 'Data: ';
+      if (language === 'fr') return 'Date : ';
+      if (language === 'en') return 'Date: ';
+      return 'Fecha: ';
+    });
+
+    l = l.replace(/\b(HORARIO|Horario|HORA|Hora|ORDUTEGIA|Ordutegia|ORDUA|Ordua|TIME|Time|HEURE|Heure|SCHEDULE|Schedule)\s*:\s*/g, () => {
+      if (language === 'eu') return 'Ordutegia: ';
+      if (language === 'fr') return 'Horaires : ';
+      if (language === 'en') return 'Schedule: ';
+      return 'Horario: ';
+    });
+
+    l = l.replace(/\b(PLAZAS DISPONIBLES|Plazas disponibles|PLAZAS|Plazas|AFORO|Aforo|LEKU LIBREAK|Leku libreak|LEKUAK|Lekuak|AVAILABLE SEATS|Available seats|SEATS|Seats|PLACES DISPONIBLES|Places disponibles)\s*:\s*/g, () => {
+      if (language === 'eu') return 'Leku libreak: ';
+      if (language === 'fr') return 'Places disponibles : ';
+      if (language === 'en') return 'Available seats: ';
+      return 'Plazas disponibles: ';
+    });
+
+    l = l.replace(/\b(PRODUCTOS A DEGUSTAR|Productos a degustar|PRODUCTOS A PROBAR|Productos a probar|QUESOS A PROBAR|Quesos a probar|DASTATUKO DIREN PRODUKTUAK|Dastatuko diren produktuak|DASTATZEKO PRODUKTUAK|Dastatzeko produktuak|PRODUCTS TO TASTE|Products to taste|PRODUITS À DÉGUSTER|Produits à déguster)\s*:\s*/g, () => {
+      if (language === 'eu') return 'Dastatuko diren produktuak: ';
+      if (language === 'fr') return 'Produits à déguster : ';
+      if (language === 'en') return 'Products to taste: ';
+      return 'Productos a degustar: ';
+    });
+
+    l = l.replace(/\b(LUGAR|Lugar|UBICACIÓN|Ubicación|TOKIA|Tokia|LEKUA|Lekua|LIEU|Lieu|LOCATION|Location)\s*:\s*/g, () => {
+      if (language === 'eu') return 'Lekua: ';
+      if (language === 'fr') return 'Lieu : ';
+      if (language === 'en') return 'Location: ';
+      return 'Lugar: ';
+    });
+
+    l = l.replace(/\b(DURACIÓN|Duración|IRAUPENA|Iraupena|DURATION|Duration|DURÉE|Durée)\s*:\s*/g, () => {
+      if (language === 'eu') return 'Iraupena: ';
+      if (language === 'fr') return 'Durée : ';
+      if (language === 'en') return 'Duration: ';
+      return 'Duración: ';
+    });
+
+    // 5. Item list modifier tags (e.g., (Tienda), (Casa), (Online), etc.)
+    l = l.replace(/\((Tienda|Denda|Dendan|Boutique|En boutique|Store|In store)\)/gi, () => {
+      if (language === 'eu') return '(Dendan)';
+      if (language === 'fr') return '(En boutique)';
+      if (language === 'en') return '(In store)';
+      return '(Tienda)';
+    });
+
+    l = l.replace(/\((Para casa|En casa|Casa|Etxerako|À domicile|Domicile|For home|Home)\)/gi, () => {
+      if (language === 'eu') return '(Etxerako)';
+      if (language === 'fr') return '(À domicile)';
+      if (language === 'en') return '(For home)';
+      return '(Para casa)';
+    });
+
+    // Item name translations
+    l = l.replace(/Cesta Degustaci[oó]n Gourmet Lekeitio/gi, () => {
+      if (language === 'eu') return 'Lekeitioko Gourmet Dastaketa Saskia';
+      if (language === 'fr') return 'Panier Dégustation Gourmet Lekeitio';
+      if (language === 'en') return 'Lekeitio Gourmet Tasting Hamper';
+      return 'Cesta Degustación Gourmet Lekeitio';
+    });
+
+    return l;
   });
 
   return formattedLines.join('\n');
