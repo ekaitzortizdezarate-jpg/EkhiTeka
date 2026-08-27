@@ -283,9 +283,6 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                       <span className="px-2.5 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100 font-mono font-black text-xs sm:text-[13px] tracking-wider border border-stone-300 dark:border-stone-700 shadow-2xs">
                         #{order.id.slice(0, 8).toUpperCase()}
                       </span>
-                      <span className="text-xs font-serif font-bold text-[#C68D07] dark:text-[#FFE259] ml-1">
-                        · {total.toFixed(2)} €
-                      </span>
                     </div>
                     <p className="text-[11.5px] font-sans font-medium text-stone-500 dark:text-stone-400">
                       {new Date(order.created_at).toLocaleDateString(LOCALE_MAP[language] || 'eu', {
