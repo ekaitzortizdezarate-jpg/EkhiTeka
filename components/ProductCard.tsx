@@ -154,6 +154,8 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
         <img
           src={imageUrl}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           onError={(e) => {
             (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';

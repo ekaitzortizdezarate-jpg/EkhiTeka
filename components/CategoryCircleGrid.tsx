@@ -91,6 +91,8 @@ export function CategoryCircleGrid({
               <img
                 src={imageSrc}
                 alt={getCategoryName(cat)}
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';

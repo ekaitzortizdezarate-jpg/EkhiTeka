@@ -155,6 +155,8 @@ export default function RegalosGourmetPage() {
               <img
                 src={getSiteImage('gifts_card1', '/images/secciones/Cestas.JPG')}
                 alt={t.gifts_card1_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
@@ -187,6 +189,8 @@ export default function RegalosGourmetPage() {
               <img
                 src={getSiteImage('gifts_card2', '/images/secciones/Quesos.JPG')}
                 alt={t.gifts_card2_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Catas.JPG';
@@ -219,6 +223,8 @@ export default function RegalosGourmetPage() {
               <img
                 src={getSiteImage('gifts_card3', '/images/secciones/Mesas.JPG')}
                 alt={t.gifts_card3_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Catas.JPG';

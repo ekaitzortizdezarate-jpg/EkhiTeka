@@ -97,6 +97,8 @@ export default function HomePage() {
               <img
                 src={card1Image}
                 alt={t.home_card1_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -132,6 +134,8 @@ export default function HomePage() {
               <img
                 src={card2Image}
                 alt={t.home_card2_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -167,6 +171,8 @@ export default function HomePage() {
               <img
                 src={card3Image}
                 alt={t.home_card3_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -202,6 +208,8 @@ export default function HomePage() {
               <img
                 src={card4Image}
                 alt={t.home_card4_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';

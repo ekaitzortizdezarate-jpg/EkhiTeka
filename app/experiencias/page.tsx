@@ -167,6 +167,8 @@ export default function ExperienciasPage() {
               <img
                 src="/images/secciones/Quesos.JPG"
                 alt={t.exp_home_tasting_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Catas.JPG';
@@ -206,6 +208,8 @@ export default function ExperienciasPage() {
               <img
                 src="/images/secciones/Catas.JPG"
                 alt={t.exp_store_tasting_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
@@ -246,6 +250,8 @@ export default function ExperienciasPage() {
               <img
                 src="/images/secciones/Mesas.JPG"
                 alt={t.exp_wedding_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
@@ -285,6 +291,8 @@ export default function ExperienciasPage() {
               <img
                 src="/images/secciones/Quesos.JPG"
                 alt={t.exp_raclette_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';

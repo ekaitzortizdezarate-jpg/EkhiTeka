@@ -62,7 +62,7 @@ export function CatalogView({
   }, [products, selectedCat, search, sortBy]);
 
   const productsByCategory = useMemo(() => {
-    const groups: { category: Category; items: ProductWithSeller[] }[] = [];
+    const categoryMap = new Map<string, ProductWithSeller[]>();
     const seenIds = new Set<string>();
 
     const targetCategories =
@@ -70,14 +70,22 @@ export function CatalogView({
         ? categories
         : categories.filter((c) => c.id === selectedCat);
 
+    targetCategories.forEach((c) => categoryMap.set(c.id, []));
+
+    filteredProducts.forEach((p) => {
+      const catId = getProductCategoryId(p);
+      const list = categoryMap.get(catId);
+      if (list) {
+        list.push(p);
+        seenIds.add(p.id);
+      }
+    });
+
+    const groups: { category: Category; items: ProductWithSeller[] }[] = [];
     targetCategories.forEach((cat) => {
-      const items = filteredProducts.filter((p) => getProductCategoryId(p) === cat.id);
-      if (items.length > 0) {
-        items.forEach((p) => seenIds.add(p.id));
-        groups.push({
-          category: cat,
-          items,
-        });
+      const items = categoryMap.get(cat.id);
+      if (items && items.length > 0) {
+        groups.push({ category: cat, items });
       }
     });
 
