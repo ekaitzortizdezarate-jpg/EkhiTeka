@@ -144,7 +144,7 @@ export default async function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-[#FAF8F5]/95 dark:bg-[#141312]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-stone-800 shadow-xs transition-colors">
+    <header className="sticky top-0 z-50 bg-[#FAF8F5]/65 dark:bg-[#141312]/65 backdrop-blur-md border-b border-[#E8E5DF]/50 dark:border-stone-800/50 shadow-xs transition-colors">
       {/* Barra Principal de Navegación */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
         <NavbarNavLinks
@@ -158,7 +158,7 @@ export default async function Navbar() {
       </div>
 
       {/* Sub-barra de Utilidades */}
-      <div className="border-t border-[#E8E5DF]/70 dark:border-stone-800/80 bg-[#FAF8F5]/80 dark:bg-[#141312]/80 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
+      <div className="border-t border-[#E8E5DF]/40 dark:border-stone-800/40 bg-[#FAF8F5]/45 dark:bg-[#141312]/45 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
           <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
             {storeAddress}

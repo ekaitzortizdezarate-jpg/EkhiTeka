@@ -170,7 +170,7 @@ export function NavbarNavLinks({
         <button
           type="button"
           onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden relative p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
+          className="lg:hidden relative p-2 -ml-1 text-stone-800 dark:text-stone-200 bg-stone-100/90 dark:bg-stone-800/90 hover:bg-stone-200 dark:hover:bg-stone-700 border border-stone-200/80 dark:border-stone-700/80 rounded-2xl transition-colors cursor-pointer shadow-2xs"
           aria-label="Menu"
         >
           <Menu className="w-6 h-6" />
