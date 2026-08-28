@@ -201,7 +201,7 @@ export function NavbarNavLinks({
         </button>
 
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-11 h-11 sm:w-13 sm:h-13 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
+          <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
             <img
               src="/Logo.jpg"
               alt="EkhiTeka Logo"
@@ -209,11 +209,8 @@ export function NavbarNavLinks({
             />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight">
+            <span className="inline-flex items-center px-3 py-1.5 rounded-2xl bg-stone-100 group-hover:bg-stone-200 dark:bg-stone-800 dark:group-hover:bg-stone-700 border border-stone-200 dark:border-stone-700 font-serif font-black text-lg sm:text-xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight shadow-2xs transition-colors">
               Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
-            </span>
-            <span className="hidden xl:block text-[9.5px] font-sans font-medium text-stone-500 dark:text-stone-400 -mt-0.5 truncate max-w-[240px]" title={storeAddress}>
-              {storeAddress}
             </span>
           </div>
         </Link>
@@ -428,11 +425,11 @@ export function NavbarNavLinks({
                       className="w-full h-full object-cover rounded-full"
                     />
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-serif font-bold text-lg text-[#1D1D1B] dark:text-stone-100 tracking-wider">
+                  <div className="flex flex-col gap-1">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-serif font-bold text-base text-[#1D1D1B] dark:text-stone-100 tracking-wider shadow-2xs">
                       Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
                     </span>
-                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
+                    <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 pl-1">
                       Lekeitio · Bizkaia
                     </span>
                   </div>

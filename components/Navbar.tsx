@@ -160,7 +160,7 @@ export default async function Navbar() {
       {/* Sub-barra de Utilidades */}
       <div className="border-t border-[#E8E5DF]/25 dark:border-stone-800/30 px-4 sm:px-6 lg:px-8 py-1.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
-          <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[10px] sm:text-[11px] font-sans font-medium text-stone-700 dark:text-stone-300 tracking-wider shadow-2xs">
             {storeAddress}
           </span>
           <div className="flex items-center gap-2">
