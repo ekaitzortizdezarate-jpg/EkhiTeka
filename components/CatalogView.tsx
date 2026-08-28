@@ -28,7 +28,17 @@ export function CatalogView({
   const { getSiteImage, getWhatsAppUrl, storeAddress } = useStoreConfig();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<'name_asc' | 'name_desc' | 'price_asc' | 'price_desc'>('name_asc');
+  const [sortBy, setSortBy] = useState<string>(initialCategory === 'all' ? 'category' : 'name_asc');
+
+  const handleCategoryChange = (catId: string) => {
+    setSelectedCat(catId);
+    if (catId === 'all') {
+      setSortBy('category');
+    } else if (sortBy === 'category') {
+      setSortBy('name_asc');
+    }
+    scrollToCatalog();
+  };
 
   const filteredProducts = useMemo(() => {
     return products
@@ -52,6 +62,45 @@ export function CatalogView({
         return 0;
       });
   }, [products, selectedCat, search, sortBy]);
+
+  const isGroupedByCategory = selectedCat === 'all' && sortBy === 'category';
+
+  const productsByCategory = useMemo(() => {
+    if (!isGroupedByCategory) return [];
+
+    const groups: { category: Category; items: ProductWithSeller[] }[] = [];
+    const seenIds = new Set<string>();
+
+    categories.forEach((cat) => {
+      const items = filteredProducts.filter((p) => getProductCategoryId(p) === cat.id);
+      if (items.length > 0) {
+        items.forEach((p) => seenIds.add(p.id));
+        groups.push({
+          category: cat,
+          items,
+        });
+      }
+    });
+
+    const remaining = filteredProducts.filter((p) => !seenIds.has(p.id));
+    if (remaining.length > 0) {
+      groups.push({
+        category: {
+          id: 'otros',
+          name_es: 'Otros Productos Gourmets',
+          name_eu: 'Beste Gourmet Produktu Batzuk',
+          name_fr: 'Autres Produits Gourmands',
+          name_en: 'Other Gourmet Products',
+          icon: 'Sparkles',
+          is_active: true,
+          display_order: 999,
+        },
+        items: remaining,
+      });
+    }
+
+    return groups;
+  }, [filteredProducts, categories, isGroupedByCategory]);
 
   const getCategoryName = (cat: Category) => {
     if (language === 'eu') return cat.name_eu;
@@ -132,10 +181,7 @@ export function CatalogView({
       <CategoryCircleGrid
         categories={categories}
         selectedCategory={selectedCat}
-        onSelectCategory={(id) => {
-          setSelectedCat(id);
-          scrollToCatalog();
-        }}
+        onSelectCategory={(id) => handleCategoryChange(id)}
       />
 
       {/* 3. Catálogo Principal */}
@@ -161,7 +207,7 @@ export function CatalogView({
         <div className="flex items-center gap-2.5 overflow-x-auto pb-2 no-scrollbar font-serif">
           <button
             type="button"
-            onClick={() => setSelectedCat('all')}
+            onClick={() => handleCategoryChange('all')}
             className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-bold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
               selectedCat === 'all'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black border border-[#FFE259] scale-102 shadow-xs'
@@ -178,7 +224,7 @@ export function CatalogView({
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setSelectedCat(cat.id)}
+                onClick={() => handleCategoryChange(cat.id)}
                 className={`flex items-center justify-center text-center gap-2 px-5 py-2.5 rounded-full tracking-[0.16em] uppercase text-[11px] font-bold whitespace-nowrap transition-all shadow-2xs cursor-pointer ${
                   selectedCat === cat.id
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-black border border-[#FFE259] scale-102 shadow-xs'
@@ -209,9 +255,12 @@ export function CatalogView({
             <SlidersHorizontal className="w-4 h-4 text-stone-400 shrink-0 stroke-[1.75]" />
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value)}
               className="px-3.5 py-2 bg-[#FAF8F5] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] rounded-xl text-xs font-bold text-stone-900 dark:text-stone-100 focus:outline-none cursor-pointer shadow-2xs font-serif uppercase tracking-[0.12em]"
             >
+              {selectedCat === 'all' && (
+                <option value="category">{t.prod_sort_category}</option>
+              )}
               <option value="name_asc">{t.prod_sort_name_asc}</option>
               <option value="name_desc">{t.prod_sort_name_desc}</option>
               <option value="price_asc">{t.prod_sort_price_asc}</option>
@@ -222,11 +271,47 @@ export function CatalogView({
 
         {/* Grid de Productos */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 items-start">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} isSeller={isSeller} />
-            ))}
-          </div>
+          isGroupedByCategory ? (
+            <div className="space-y-12">
+              {productsByCategory.map((group) => (
+                <div key={group.category.id} className="space-y-6 animate-fadeIn">
+                  {/* Cabecera de la Sección de Categoría */}
+                  <div className="flex items-center justify-between pb-3 border-b-2 border-[#FFE259] dark:border-[#FFE259]/60">
+                    <div className="flex items-center gap-3">
+                      <span className="w-3.5 h-3.5 rounded-full bg-[#FFE259] inline-block shrink-0 shadow-xs border border-stone-800/10" />
+                      <h3 className="text-xl sm:text-2xl font-bold uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
+                        {getCategoryName(group.category)}
+                      </h3>
+                      <span className="text-xs font-bold text-stone-400 font-mono">
+                        ({group.items.length})
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCategoryChange(group.category.id)}
+                      className="text-xs font-bold uppercase tracking-wider text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 transition-colors font-serif hover:underline hidden sm:inline-block cursor-pointer"
+                    >
+                      {language === 'eu' ? 'Ikusi kategoria hau soilik →' : 'Ver solo esta categoría →'}
+                    </button>
+                  </div>
+
+                  {/* Grid de Productos de esta Categoría */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 items-start">
+                    {group.items.map((product) => (
+                      <ProductCard key={product.id} product={product} isSeller={isSeller} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 items-start animate-fadeIn">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} isSeller={isSeller} />
+              ))}
+            </div>
+          )
         ) : (
           <div className="py-16 text-center bg-white dark:bg-[#1C1B19] rounded-3xl border border-[#E8E5DF] dark:border-[#2D2B27] p-8 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 mx-auto">

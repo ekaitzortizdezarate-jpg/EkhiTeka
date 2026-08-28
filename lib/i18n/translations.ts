@@ -83,6 +83,7 @@ export interface TranslationDict {
   prod_search_placeholder: string;
   prod_no_results: string;
   prod_sort_by: string;
+  prod_sort_category: string;
   prod_sort_name_asc: string;
   prod_sort_name_desc: string;
   prod_sort_price_asc: string;
@@ -741,6 +742,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_search_placeholder: 'Bilatu gazta, hegaluzea, txakolina...',
     prod_no_results: 'Ez da produkturik aurkitu',
     prod_sort_by: 'Ordenatu',
+    prod_sort_category: 'Kategoriaren arabera',
     prod_sort_name_asc: 'Izena (A-Z)',
     prod_sort_name_desc: 'Izena (Z-A)',
     prod_sort_price_asc: 'Prezioa (baxuena lehenik)',
@@ -1378,6 +1380,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_search_placeholder: 'Buscar quesos, bonito, gildas, txakoli...',
     prod_no_results: 'No se encontraron productos',
     prod_sort_by: 'Ordenar',
+    prod_sort_category: 'Por Categoría',
     prod_sort_name_asc: 'Nombre (A-Z)',
     prod_sort_name_desc: 'Nombre (Z-A)',
     prod_sort_price_asc: 'Precio (menor a mayor)',
@@ -2015,6 +2018,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_search_placeholder: 'Search cheeses, tuna, wine, beer...',
     prod_no_results: 'No products found',
     prod_sort_by: 'Sort by',
+    prod_sort_category: 'By Category',
     prod_sort_name_asc: 'Name (A-Z)',
     prod_sort_name_desc: 'Name (Z-A)',
     prod_sort_price_asc: 'Price (Lowest first)',
@@ -2652,6 +2656,7 @@ export const translations: Record<Language, TranslationDict> = {
     prod_search_placeholder: 'Rechercher fromages, thon, vins...',
     prod_no_results: 'Aucun produit trouvé',
     prod_sort_by: 'Trier par',
+    prod_sort_category: 'Par Catégorie',
     prod_sort_name_asc: 'Nom (A-Z)',
     prod_sort_name_desc: 'Nom (Z-A)',
     prod_sort_price_asc: 'Prix (croissant)',
