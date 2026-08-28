@@ -40,11 +40,50 @@ export function CatalogView({
     scrollToCatalog();
   };
 
+  const isProductInCategory = (p: ProductWithSeller, catIdOrSlug: string): boolean => {
+    const pCat = (getProductCategoryId(p) || '').toLowerCase();
+    const pDirectCat = (p.category_id || '').toLowerCase();
+    const target = (catIdOrSlug || '').toLowerCase();
+
+    if (pCat === target || pDirectCat === target) return true;
+    if (target.includes('queso') && (pCat.includes('queso') || pDirectCat.includes('queso'))) return true;
+    if (
+      (target.includes('atun') || target.includes('bonito') || target.includes('hegaluze')) &&
+      (pCat.includes('atun') || pCat.includes('bonito') || pCat.includes('hegaluze') || pDirectCat.includes('atun') || pDirectCat.includes('bonito'))
+    ) return true;
+    if (
+      (target.includes('salazon') || target.includes('anchoa') || target.includes('antxoa')) &&
+      (pCat.includes('salazon') || pCat.includes('anchoa') || pCat.includes('antxoa') || pDirectCat.includes('salazon') || pDirectCat.includes('anchoa'))
+    ) return true;
+    if (
+      (target.includes('gilda') || target.includes('jilda') || target.includes('piparra')) &&
+      (pCat.includes('gilda') || pCat.includes('jilda') || pDirectCat.includes('gilda') || pDirectCat.includes('jilda'))
+    ) return true;
+    if (
+      (target.includes('cerveza') || target.includes('garagardo')) &&
+      (pCat.includes('cerveza') || pCat.includes('garagardo') || pDirectCat.includes('cerveza'))
+    ) return true;
+    if (
+      (target.includes('txakoli') || target.includes('vino')) &&
+      (pCat.includes('txakoli') || pCat.includes('vino') || pDirectCat.includes('txakoli'))
+    ) return true;
+    if (
+      (target.includes('sidra') || target.includes('sagardo')) &&
+      (pCat.includes('sidra') || pCat.includes('sagardo') || pDirectCat.includes('sidra'))
+    ) return true;
+    if (
+      (target.includes('cesta') || target.includes('lote') || target.includes('saski') || target.includes('pack')) &&
+      (pCat.includes('cesta') || pCat.includes('lote') || pCat.includes('pack') || pDirectCat.includes('cesta') || pDirectCat.includes('lote') || p.format === 'pack')
+    ) return true;
+
+    return false;
+  };
+
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
         const matchesCategory =
-          selectedCat === 'all' || getProductCategoryId(p) === selectedCat;
+          selectedCat === 'all' || isProductInCategory(p, selectedCat);
         const matchesSearch =
           !search ||
           p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -62,30 +101,22 @@ export function CatalogView({
   }, [products, selectedCat, search, sortBy]);
 
   const productsByCategory = useMemo(() => {
-    const categoryMap = new Map<string, ProductWithSeller[]>();
+    const groups: { category: Category; items: ProductWithSeller[] }[] = [];
     const seenIds = new Set<string>();
 
     const targetCategories =
       selectedCat === 'all'
         ? categories
-        : categories.filter((c) => c.id === selectedCat);
+        : categories.filter((c) => c.id === selectedCat || c.slug === selectedCat);
 
-    targetCategories.forEach((c) => categoryMap.set(c.id, []));
-
-    filteredProducts.forEach((p) => {
-      const catId = getProductCategoryId(p);
-      const list = categoryMap.get(catId);
-      if (list) {
-        list.push(p);
-        seenIds.add(p.id);
-      }
-    });
-
-    const groups: { category: Category; items: ProductWithSeller[] }[] = [];
     targetCategories.forEach((cat) => {
-      const items = categoryMap.get(cat.id);
-      if (items && items.length > 0) {
-        groups.push({ category: cat, items });
+      const items = filteredProducts.filter((p) => isProductInCategory(p, cat.id) || (cat.slug ? isProductInCategory(p, cat.slug) : false));
+      if (items.length > 0) {
+        items.forEach((p) => seenIds.add(p.id));
+        groups.push({
+          category: cat,
+          items,
+        });
       }
     });
 
@@ -210,7 +241,7 @@ export function CatalogView({
           </button>
 
           {categories.map((cat) => {
-            const count = products.filter((p) => getProductCategoryId(p) === cat.id).length;
+            const count = products.filter((p) => isProductInCategory(p, cat.id) || (cat.slug ? isProductInCategory(p, cat.slug) : false)).length;
             return (
               <button
                 key={cat.id}
