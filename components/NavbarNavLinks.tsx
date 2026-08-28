@@ -201,7 +201,11 @@ export function NavbarNavLinks({
         </button>
 
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
-          <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105 transition-all shadow-xs bg-[#FAF7F2] shrink-0">
+          <div className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 transition-all shadow-xs bg-[#FAF7F2] shrink-0 ${
+            pathname === '/'
+              ? 'border-[#FFE259] scale-105 shadow-sm'
+              : 'border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] group-hover:scale-105'
+          }`}>
             <img
               src="/Logo.jpg"
               alt="EkhiTeka Logo"
@@ -209,8 +213,12 @@ export function NavbarNavLinks({
             />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="inline-flex items-center px-3 py-1.5 rounded-2xl bg-stone-100 group-hover:bg-stone-200 dark:bg-stone-800 dark:group-hover:bg-stone-700 border border-stone-200 dark:border-stone-700 font-serif font-black text-lg sm:text-xl tracking-tight text-[#1D1D1B] dark:text-stone-100 block leading-tight shadow-2xs transition-colors">
-              Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
+            <span className={`inline-flex items-center px-3 py-1.5 rounded-2xl font-serif font-black text-lg sm:text-xl tracking-tight block leading-tight shadow-2xs transition-all ${
+              pathname === '/'
+                ? 'bg-[#FFE259] text-[#1D1D1B] font-black border border-stone-800/10 scale-102 shadow-xs'
+                : 'bg-stone-100 group-hover:bg-stone-200 dark:bg-stone-800 dark:group-hover:bg-stone-700 border border-stone-200 dark:border-stone-700 text-[#1D1D1B] dark:text-stone-100'
+            }`}>
+              Ekhi<span className={pathname === '/' ? 'text-[#1D1D1B] opacity-90' : 'text-[#C68D07] dark:text-[#FFE259]'}>Teka</span>
             </span>
           </div>
         </Link>
@@ -417,8 +425,16 @@ export function NavbarNavLinks({
           <div className="fixed top-0 bottom-0 left-0 max-w-xs w-full bg-[#FAF8F5] dark:bg-[#141312] text-stone-900 dark:text-stone-100 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-[1000000] border-r border-[#E8E5DF] dark:border-stone-800 animate-in slide-in-from-left duration-300">
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-[#E8E5DF] dark:border-stone-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 p-0.5 bg-[#FAF7F2] dark:bg-stone-800 shrink-0">
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  <div className={`w-11 h-11 rounded-full overflow-hidden border-2 p-0.5 bg-[#FAF7F2] dark:bg-stone-800 shrink-0 transition-all ${
+                    pathname === '/'
+                      ? 'border-[#FFE259] scale-105 shadow-sm'
+                      : 'border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259]'
+                  }`}>
                     <img
                       src="/Logo.jpg"
                       alt="EkhiTeka"
@@ -426,14 +442,18 @@ export function NavbarNavLinks({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-serif font-bold text-base text-[#1D1D1B] dark:text-stone-100 tracking-wider shadow-2xs">
-                      Ekhi<span className="text-[#C68D07] dark:text-[#FFE259]">Teka</span>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-xl font-serif font-bold text-base tracking-wider shadow-2xs transition-all ${
+                      pathname === '/'
+                        ? 'bg-[#FFE259] text-[#1D1D1B] font-black border border-stone-800/10'
+                        : 'bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[#1D1D1B] dark:text-stone-100'
+                    }`}>
+                      Ekhi<span className={pathname === '/' ? 'text-[#1D1D1B] opacity-90' : 'text-[#C68D07] dark:text-[#FFE259]'}>Teka</span>
                     </span>
                     <span className="text-[9px] font-sans font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 pl-1">
                       Lekeitio · Bizkaia
                     </span>
                   </div>
-                </div>
+                </Link>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
