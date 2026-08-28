@@ -76,7 +76,7 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
     if (receiverId) {
       const { data: rawMsgs } = await supabase
         .from('chat_messages')
-        .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
+        .select('*')
         .or(`sender_id.eq.${receiverId},receiver_id.eq.${receiverId}`)
         .order('created_at', { ascending: true });
 
@@ -100,7 +100,7 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
     // Ver todos los mensajes del comprador con la tienda
     const { data: rawMsgs } = await supabase
       .from('chat_messages')
-      .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
+      .select('*')
       .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
       .order('created_at', { ascending: true });
 

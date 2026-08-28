@@ -3,7 +3,11 @@ import { redirect } from 'next/navigation';
 import { ChatInboxView, type InboxConversation } from '@/components/ChatInboxView';
 import { type Profile, parseProfile } from '@/types/database';
 
-export default async function ChatInboxPage() {
+export default async function ChatInboxPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ product_id?: string; order_id?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -11,13 +15,19 @@ export default async function ChatInboxPage() {
 
   if (!user) redirect('/login');
 
+  const sp = searchParams ? await searchParams : {};
+  const queryParams = new URLSearchParams();
+  if (sp.product_id) queryParams.set('product_id', sp.product_id);
+  if (sp.order_id) queryParams.set('order_id', sp.order_id);
+  const qs = queryParams.toString() ? `?${queryParams.toString()}` : '';
+
   // 1. Obtener perfil del usuario actual y todos los vendedores
   const [myProfileRes, allSellersRes] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('profiles').select('*').in('role', ['vendedor', 'admin']),
   ]);
 
-  const currentProfile = parseProfile(myProfileRes.data);
+  const currentProfile = parseProfile(myProfileRes?.data);
   const isSeller = currentProfile.role === 'vendedor' || currentProfile.role === 'admin';
   const allSellers = allSellersRes.data || [];
   const sellerIds = new Set(allSellers.map((s) => s.id));
@@ -32,10 +42,15 @@ export default async function ChatInboxPage() {
 
   // 2. Si es VENDEDOR: ver todas las conversaciones de compradores con la tienda
   if (isSeller) {
-    const { data: allMessages } = await supabase
-      .from('chat_messages')
-      .select('*, sender:profiles!chat_messages_sender_id_fkey(*), receiver:profiles!chat_messages_receiver_id_fkey(*)')
-      .order('created_at', { ascending: false });
+    const [{ data: allMessages }, { data: allProfiles }] = await Promise.all([
+      supabase.from('chat_messages').select('*').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('*'),
+    ]);
+
+    const profilesMap = new Map<string, any>();
+    (allProfiles || []).forEach((p) => {
+      profilesMap.set(p.id, p);
+    });
 
     const conversationsMap = new Map<string, InboxConversation>();
 
@@ -43,11 +58,11 @@ export default async function ChatInboxPage() {
       for (const msg of allMessages) {
         // Identificar el comprador en esta conversación
         const isSenderSeller = sellerIds.has(msg.sender_id);
-        const buyer = isSenderSeller ? msg.receiver : msg.sender;
         const buyerId = isSenderSeller ? msg.receiver_id : msg.sender_id;
+        const buyerRaw = buyerId ? profilesMap.get(buyerId) : null;
 
-        if (!buyerId || !buyer) continue;
-        // Si ambos son vendedores y no hay cliente, saltar o tratar como cliente
+        if (!buyerId) continue;
+        // Si ambos son vendedores y no hay cliente, saltar
         if (sellerIds.has(msg.sender_id) && sellerIds.has(msg.receiver_id) && msg.sender_id === msg.receiver_id) {
           continue;
         }
@@ -65,7 +80,7 @@ export default async function ChatInboxPage() {
 
         if (!conversationsMap.has(buyerId)) {
           conversationsMap.set(buyerId, {
-            otherUser: parseProfile(buyer),
+            otherUser: parseProfile(buyerRaw || { id: buyerId, full_name: 'Cliente EkhiTeka' }),
             lastMessage: displayLastMessage,
             lastMessageTime: msg.created_at,
             unreadCount: isUnreadForMe ? 1 : 0,
@@ -85,5 +100,5 @@ export default async function ChatInboxPage() {
 
   // 3. Si es COMPRADOR: Redirigir directamente a la sala de chat unificada con "EkhiTeka"
   const mainSeller = allSellers[0] || { id: 'store' };
-  redirect(`/chat/${mainSeller.id}`);
+  redirect(`/chat/${mainSeller.id}${qs}`);
 }

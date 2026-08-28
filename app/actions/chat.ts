@@ -47,7 +47,7 @@ export async function sendMessage(formData: FormData) {
       message: message,
       is_read: false,
     })
-    .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
+    .select('*')
     .maybeSingle();
 
   if (error) {
