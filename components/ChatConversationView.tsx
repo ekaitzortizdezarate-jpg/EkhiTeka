@@ -17,6 +17,7 @@ interface ChatConversationViewProps {
   initialMessages: ChatMessage[];
   contextProduct?: Product | null;
   contextOrder?: Order | null;
+  lastReadTimestamp?: string | null;
 }
 
 export function ChatConversationView({
@@ -28,6 +29,7 @@ export function ChatConversationView({
   initialMessages,
   contextProduct,
   contextOrder,
+  lastReadTimestamp = null,
 }: ChatConversationViewProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -41,9 +43,52 @@ export function ChatConversationView({
   const isInitialMount = useRef(true);
 
   // Primer mensaje no leído más antiguo
-  const firstUnreadMsg = initialMessages.find(
-    (m) => m.sender_id !== currentUserId && !m.is_read
-  );
+  const firstUnreadMsg = initialMessages.find((m) => {
+    if (m.sender_id === currentUserId) return false;
+    if (lastReadTimestamp) {
+      return new Date(m.created_at).getTime() > new Date(lastReadTimestamp).getTime();
+    }
+    return !m.is_read;
+  });
+
+  const scrollMessagesToTarget = (smooth = false) => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    // 1. Si hay un mensaje nuevo no leído, scroll hasta él
+    if (firstUnreadMsg) {
+      const el = document.getElementById(`chat-msg-${firstUnreadMsg.id}`);
+      if (el) {
+        const unreadRect = el.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const offset = unreadRect.top - containerRect.top;
+        container.scrollTo({
+          top: Math.max(0, container.scrollTop + offset - 16),
+          behavior: smooth ? 'smooth' : 'auto',
+        });
+        return;
+      }
+    }
+
+    // 2. Si no hay mensajes sin leer, scroll hasta el final del todo
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: smooth ? 'smooth' : 'auto',
+    });
+  };
+
+  const alignPageHeader = () => {
+    if (chatCardRef.current) {
+      const navbar = document.querySelector('header');
+      const navHeight = navbar ? navbar.getBoundingClientRect().height : 105;
+      const cardRect = chatCardRef.current.getBoundingClientRect();
+      const targetScrollY = window.scrollY + cardRect.top - navHeight - 12;
+      window.scrollTo({
+        top: Math.max(0, targetScrollY),
+        behavior: 'auto',
+      });
+    }
+  };
 
   useEffect(() => {
     // 1. Marcar como leído en BD / perfil
@@ -51,43 +96,24 @@ export function ChatConversationView({
       window.dispatchEvent(new CustomEvent('ekhiteka_chat_read', { detail: { receiverId } }));
     });
 
-    // 2. Control preciso de scroll al entrar en la conversación
-    const timer = setTimeout(() => {
-      // A) Scroll en la ventana de la página para que la cabecera (info del otro usuario) quede perfectamente visible arriba
-      if (chatCardRef.current) {
-        const navbar = document.querySelector('header');
-        const navHeight = navbar ? navbar.getBoundingClientRect().height : 105;
-        const cardRect = chatCardRef.current.getBoundingClientRect();
-        const targetScrollY = window.scrollY + cardRect.top - navHeight - 12;
-        window.scrollTo({
-          top: Math.max(0, targetScrollY),
-          behavior: 'smooth',
-        });
-      }
+    // 2. Ejecutar alineación inicial inmediata
+    alignPageHeader();
+    scrollMessagesToTarget(false);
 
-      // B) Scroll en la ventana del chat hasta el mensaje no leído más antiguo (o al final si no hay no leídos)
-      if (firstUnreadMsg && messagesContainerRef.current) {
-        const el = document.getElementById(`chat-msg-${firstUnreadMsg.id}`);
-        if (el) {
-          const container = messagesContainerRef.current;
-          container.scrollTo({
-            top: Math.max(0, el.offsetTop - container.offsetTop - 12),
-            behavior: 'smooth',
-          });
-          return;
-        }
-      }
+    // 3. Re-ejecutar tras montaje de DOM y renderizado de imágenes para garantizar posición exacta
+    const t1 = setTimeout(() => {
+      alignPageHeader();
+      scrollMessagesToTarget(true);
+    }, 80);
 
-      // Si no hay no leídos, scroll en la ventana del chat hasta el último mensaje
-      if (messagesContainerRef.current) {
-        messagesContainerRef.current.scrollTo({
-          top: messagesContainerRef.current.scrollHeight,
-          behavior: 'smooth',
-        });
-      }
-    }, 120);
+    const t2 = setTimeout(() => {
+      scrollMessagesToTarget(false);
+    }, 250);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [receiverId]);
 
   // Scroll al final del chat cuando se envían nuevos mensajes durante la sesión

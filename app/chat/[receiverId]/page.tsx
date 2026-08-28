@@ -130,6 +130,9 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
     } catch {}
   }
 
+  // Marca de lectura previa para identificar mensajes nuevos sin leer
+  const lastReadTimestamp = currentProfile.last_read_chats?.[targetReceiverId] || null;
+
   return (
     <ChatConversationView
       currentUserId={user.id}
@@ -140,6 +143,7 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
       initialMessages={messagesData}
       contextProduct={contextProduct}
       contextOrder={contextOrder}
+      lastReadTimestamp={lastReadTimestamp}
     />
   );
 }
