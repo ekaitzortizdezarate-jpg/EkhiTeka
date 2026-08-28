@@ -142,30 +142,18 @@ export function CatalogView({
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-            <div className="lg:col-span-8 space-y-5">
-              <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-                {t.shop_specialty} · Lekeitio
-              </span>
+          <div className="max-w-3xl space-y-5">
+            <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+              {t.shop_specialty} · Lekeitio
+            </span>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
-                {t.shop_hero_title}
-              </h1>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
+              {t.shop_hero_title}
+            </h1>
 
-              <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
-                {t.shop_hero_desc}
-              </p>
-            </div>
-
-            <div className="lg:col-span-4 flex justify-center lg:justify-end">
-              <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
-                <img
-                  src="/Logo.jpg"
-                  alt="EkhiTeka Lekeitio"
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </div>
-            </div>
+            <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-2xl font-normal drop-shadow-md">
+              {t.shop_hero_desc}
+            </p>
           </div>
         </div>
       </section>
