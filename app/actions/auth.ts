@@ -51,6 +51,17 @@ export async function register(formData: FormData) {
   }
 
   if (data.user) {
+    let initialBio: string | null = null;
+    if (role === 'vendedor' || role === 'admin') {
+      const storeConfig = await getUnifiedStoreConfig(supabase);
+      initialBio = JSON.stringify({
+        whatsapp_contacts: storeConfig.whatsapp_contacts,
+        whatsapp_phone: storeConfig.whatsapp_phone,
+        pickup_addresses: storeConfig.pickup_addresses,
+        event_addresses: storeConfig.event_addresses,
+      });
+    }
+
     await supabase.from('profiles').upsert({
       id: data.user.id,
       full_name: fullName,
@@ -58,6 +69,7 @@ export async function register(formData: FormData) {
       role: role as any,
       phone,
       town,
+      bio: initialBio,
     });
   }
 
@@ -259,12 +271,72 @@ export async function getUnifiedStoreConfig(supabaseClient?: any): Promise<Unifi
     }
   } catch {}
 
-  return {
+  // 3. Si aún no hay puntos de entrega configurados, suministrar el punto principal de la tienda en Lekeitio
+  if (pickup_addresses.length === 0) {
+    pickup_addresses = [
+      {
+        id: 'store_lekeitio_default',
+        title: 'EkhiTeka Lekeitio',
+        street: 'Gamarra Kalea',
+        number: '4',
+        town: 'Lekeitio',
+        province: 'Bizkaia',
+        postal_code: '48280',
+        schedule_details: {
+          days: ['lun', 'mar', 'mie', 'jue', 'vie', 'sab'],
+          weekday_morning_enabled: true,
+          weekday_morning_start: '10:00',
+          weekday_morning_end: '14:00',
+          weekday_afternoon_enabled: true,
+          weekday_afternoon_start: '17:00',
+          weekday_afternoon_end: '20:30',
+          weekend_morning_enabled: true,
+          weekend_morning_start: '10:30',
+          weekend_morning_end: '14:30',
+          weekend_afternoon_enabled: false,
+          weekend_afternoon_start: '17:30',
+          weekend_afternoon_end: '21:00',
+        },
+        schedule: 'Lun-Sáb: 10:00-14:00, 17:00-20:30 · Sáb-Dom: 10:30-14:30',
+        is_main: true,
+        is_active: true,
+      },
+    ];
+  }
+
+  if (whatsapp_contacts.length === 0) {
+    whatsapp_contacts = [
+      {
+        id: 'wa_default',
+        name: 'Atención EkhiTeka',
+        phone: '+34 600 000 000',
+        seller_id: null,
+        is_active: true,
+      },
+    ];
+  }
+
+  const resultConfig: UnifiedStoreConfig = {
     whatsapp_contacts,
     whatsapp_phone,
     pickup_addresses,
     event_addresses,
   };
+
+  // Guardar en Storage para que esté disponible instantáneamente para cualquier nuevo vendedor
+  try {
+    const configBlob = new Blob([JSON.stringify(resultConfig, null, 2)], {
+      type: 'application/json',
+    });
+    await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(STORE_CONFIG_FILE, configBlob, {
+        upsert: true,
+        contentType: 'application/json',
+      });
+  } catch {}
+
+  return resultConfig;
 }
 
 export async function updateStoreConfig(formData: FormData) {
