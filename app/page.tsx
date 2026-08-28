@@ -24,9 +24,9 @@ export default function HomePage() {
   const card4Image = getSiteImage('exp_cestas', '/images/secciones/Cestas.JPG');
 
   return (
-    <div className="space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
-      {/* 1. Hero Principal de Bienvenida */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-18 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[460px] flex items-center bg-[#FAF8F5]">
+    <div className="font-serif">
+      {/* 1. Hero Principal de Bienvenida a Pantalla Completa (Full Width, sin bordes de tarjeta) */}
+      <section className="relative w-full overflow-hidden min-h-[480px] sm:min-h-[560px] lg:min-h-[620px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
             src={heroHomeImage}
@@ -36,40 +36,44 @@ export default function HomePage() {
               (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30 dark:from-black/90 dark:via-black/75 dark:to-black/55" />
         </div>
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-          <div className="lg:col-span-8 space-y-6">
-            <span className="inline-flex items-center px-4 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-[11px] font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-              {t.home_hero_badge}
-            </span>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
-              Ekhi<span className="text-[#FFE259]">Teka</span>
-              <span className="block text-2xl sm:text-3xl lg:text-4xl font-light text-stone-200 mt-2">
-                {t.home_hero_subtitle}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
+            <div className="lg:col-span-8 space-y-6">
+              <span className="inline-flex items-center px-4 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-[11px] font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+                {t.home_hero_badge}
               </span>
-            </h1>
 
-            <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
-              {t.home_hero_desc}
-            </p>
-          </div>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
+                Ekhi<span className="text-[#FFE259]">Teka</span>
+                <span className="block text-2xl sm:text-3xl lg:text-4xl font-light text-stone-200 mt-2">
+                  {t.home_hero_subtitle}
+                </span>
+              </h1>
 
-          <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
-              <img
-                src="/Logo.jpg"
-                alt="EkhiTeka Lekeitio"
-                className="w-full h-full object-cover rounded-full"
-              />
+              <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
+                {t.home_hero_desc}
+              </p>
+            </div>
+
+            <div className="lg:col-span-4 flex justify-center lg:justify-end">
+              <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
+                <img
+                  src="/Logo.jpg"
+                  alt="EkhiTeka Lekeitio"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Los 4 Pilares de EkhiTeka */}
+      {/* Contenido Restante de la Página de Inicio */}
+      <div className="space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        {/* 2. Los 4 Pilares de EkhiTeka */}
       <section className="space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 block">
@@ -292,5 +296,6 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  );
+  </div>
+);
 }
