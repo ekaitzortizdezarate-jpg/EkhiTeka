@@ -351,9 +351,10 @@ export async function updateStoreConfig(formData: FormData) {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
-  if (currentProf?.role !== 'vendedor' && currentProf?.role !== 'admin') {
+  const userRole = currentProf?.role || user.user_metadata?.role || (user.app_metadata as any)?.role;
+  if (userRole !== 'vendedor' && userRole !== 'admin') {
     return { error: 'Permisos insuficientes para editar los datos de la tienda.' };
   }
 
@@ -390,62 +391,113 @@ export async function updateStoreConfig(formData: FormData) {
     console.error('Error guardando store_config en Supabase Storage:', err);
   }
 
-  // 2. Sincronizar en todos los perfiles de vendedores/admins de la BD
-  const { data: allSellers } = await supabase
-    .from('profiles')
-    .select('id, bio')
-    .in('role', ['vendedor', 'admin']);
-
-  if (allSellers) {
-    for (const seller of allSellers) {
-      let existingBio: Partial<ProfileDetails> = {};
-      if (seller.bio) {
-        try {
-          const parsed = JSON.parse(seller.bio);
-          if (typeof parsed === 'object' && parsed !== null) {
-            existingBio = parsed;
-          }
-        } catch {}
+  // 2. Sincronizar en el perfil del usuario actual (siempre permitido)
+  let myExistingBio: Partial<ProfileDetails> = {};
+  if (currentProf?.bio) {
+    try {
+      const parsed = JSON.parse(currentProf.bio);
+      if (typeof parsed === 'object' && parsed !== null) {
+        myExistingBio = parsed;
       }
-
-      const sellerParsed = parseProfile(seller);
-      const updatedDetails: ProfileDetails = {
-        ...existingBio,
-        first_name: sellerParsed.first_name,
-        last_name_1: sellerParsed.last_name_1,
-        last_name_2: sellerParsed.last_name_2,
-        birth_date: sellerParsed.birth_date,
-        dni: sellerParsed.dni,
-        phone: sellerParsed.phone,
-        province: sellerParsed.province,
-        town: sellerParsed.town,
-        postal_code: sellerParsed.postal_code,
-        street: sellerParsed.street,
-        number: sellerParsed.number,
-        stair: sellerParsed.stair,
-        floor: sellerParsed.floor,
-        door: sellerParsed.door,
-        whatsapp_phone: whatsappPhone,
-        whatsapp_contacts: whatsappContacts,
-        pickup_addresses: pickupAddresses,
-        event_addresses: eventAddresses,
-        delivery_addresses: sellerParsed.delivery_addresses || existingBio.delivery_addresses || [],
-        cart_data: sellerParsed.cart_data || existingBio.cart_data || [],
-        site_images: sellerParsed.site_images || (existingBio as any).site_images || {},
-        site_images_meta: sellerParsed.site_images_meta || (existingBio as any).site_images_meta || {},
-        last_read_chats: sellerParsed.last_read_chats || (existingBio as any).last_read_chats || {},
-        last_read_orders: sellerParsed.last_read_orders || (existingBio as any).last_read_orders || {},
-      };
-
-      await supabase
-        .from('profiles')
-        .update({
-          bio: JSON.stringify(updatedDetails),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', seller.id);
-    }
+    } catch {}
   }
+
+  const myParsed = parseProfile(currentProf);
+  const myUpdatedDetails: ProfileDetails = {
+    ...myExistingBio,
+    first_name: myParsed.first_name,
+    last_name_1: myParsed.last_name_1,
+    last_name_2: myParsed.last_name_2,
+    birth_date: myParsed.birth_date,
+    dni: myParsed.dni,
+    phone: myParsed.phone,
+    province: myParsed.province,
+    town: myParsed.town,
+    postal_code: myParsed.postal_code,
+    street: myParsed.street,
+    number: myParsed.number,
+    stair: myParsed.stair,
+    floor: myParsed.floor,
+    door: myParsed.door,
+    whatsapp_phone: whatsappPhone,
+    whatsapp_contacts: whatsappContacts,
+    pickup_addresses: pickupAddresses,
+    event_addresses: eventAddresses,
+    delivery_addresses: myParsed.delivery_addresses || myExistingBio.delivery_addresses || [],
+    cart_data: myParsed.cart_data || myExistingBio.cart_data || [],
+    site_images: myParsed.site_images || (myExistingBio as any).site_images || {},
+    site_images_meta: myParsed.site_images_meta || (myExistingBio as any).site_images_meta || {},
+    last_read_chats: myParsed.last_read_chats || (myExistingBio as any).last_read_chats || {},
+    last_read_orders: myParsed.last_read_orders || (myExistingBio as any).last_read_orders || {},
+  };
+
+  await supabase
+    .from('profiles')
+    .update({
+      bio: JSON.stringify(myUpdatedDetails),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', user.id);
+
+  // 3. Sincronizar en los demás vendedores si las políticas RLS lo permiten
+  try {
+    const { data: otherSellers } = await supabase
+      .from('profiles')
+      .select('id, bio')
+      .in('role', ['vendedor', 'admin'])
+      .neq('id', user.id);
+
+    if (otherSellers && otherSellers.length > 0) {
+      for (const seller of otherSellers) {
+        let sellerBio: Partial<ProfileDetails> = {};
+        if (seller.bio) {
+          try {
+            const parsed = JSON.parse(seller.bio);
+            if (typeof parsed === 'object' && parsed !== null) {
+              sellerBio = parsed;
+            }
+          } catch {}
+        }
+
+        const sellerParsed = parseProfile(seller);
+        const updatedDetails: ProfileDetails = {
+          ...sellerBio,
+          first_name: sellerParsed.first_name,
+          last_name_1: sellerParsed.last_name_1,
+          last_name_2: sellerParsed.last_name_2,
+          birth_date: sellerParsed.birth_date,
+          dni: sellerParsed.dni,
+          phone: sellerParsed.phone,
+          province: sellerParsed.province,
+          town: sellerParsed.town,
+          postal_code: sellerParsed.postal_code,
+          street: sellerParsed.street,
+          number: sellerParsed.number,
+          stair: sellerParsed.stair,
+          floor: sellerParsed.floor,
+          door: sellerParsed.door,
+          whatsapp_phone: whatsappPhone,
+          whatsapp_contacts: whatsappContacts,
+          pickup_addresses: pickupAddresses,
+          event_addresses: eventAddresses,
+          delivery_addresses: sellerParsed.delivery_addresses || sellerBio.delivery_addresses || [],
+          cart_data: sellerParsed.cart_data || sellerBio.cart_data || [],
+          site_images: sellerParsed.site_images || (sellerBio as any).site_images || {},
+          site_images_meta: sellerParsed.site_images_meta || (sellerBio as any).site_images_meta || {},
+          last_read_chats: sellerParsed.last_read_chats || (sellerBio as any).last_read_chats || {},
+          last_read_orders: sellerParsed.last_read_orders || (sellerBio as any).last_read_orders || {},
+        };
+
+        await supabase
+          .from('profiles')
+          .update({
+            bio: JSON.stringify(updatedDetails),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', seller.id);
+      }
+    }
+  } catch {}
 
   revalidatePath('/', 'layout');
   revalidatePath('/perfil');
