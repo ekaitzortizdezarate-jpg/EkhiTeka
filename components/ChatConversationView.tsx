@@ -32,21 +32,67 @@ export function ChatConversationView({
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [inputMsg, setInputMsg] = useState('');
   const [sending, setSending] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const isInitialMount = useRef(true);
+
+  // Primer mensaje no leído más antiguo
+  const firstUnreadMsg = initialMessages.find(
+    (m) => m.sender_id !== currentUserId && !m.is_read
+  );
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages.length]);
-
-  useEffect(() => {
+    // 1. Marcar como leído en BD / perfil
     markChatAsRead(receiverId).then(() => {
       window.dispatchEvent(new CustomEvent('ekhiteka_chat_read', { detail: { receiverId } }));
     });
+
+    // 2. Control preciso de scroll al entrar en la conversación
+    const timer = setTimeout(() => {
+      // A) Scroll en la ventana de la página hasta dejar el campo de escribir mensaje abajo en la pantalla
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ block: 'end', behavior: 'smooth' });
+      }
+
+      // B) Scroll en la ventana del chat hasta el mensaje no leído más antiguo (o al final si no hay no leídos)
+      if (firstUnreadMsg && messagesContainerRef.current) {
+        const el = document.getElementById(`chat-msg-${firstUnreadMsg.id}`);
+        if (el) {
+          const container = messagesContainerRef.current;
+          container.scrollTo({
+            top: Math.max(0, el.offsetTop - container.offsetTop - 12),
+            behavior: 'smooth',
+          });
+          return;
+        }
+      }
+
+      // Si no hay no leídos, scroll en la ventana del chat hasta el último mensaje
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTo({
+          top: messagesContainerRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    }, 120);
+
+    return () => clearTimeout(timer);
   }, [receiverId]);
+
+  // Scroll al final del chat cuando se envían nuevos mensajes durante la sesión
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages.length]);
 
   const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -86,7 +132,7 @@ export function ChatConversationView({
   return (
     <div className="max-w-3xl mx-auto h-[82vh] flex flex-col bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden font-serif">
       {/* 1. Cabecera Chat */}
-      <div className="p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-950/90 flex items-center justify-between gap-3">
+      <div className="p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-950/90 flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/chat"
@@ -137,7 +183,7 @@ export function ChatConversationView({
 
       {/* 2. Tarjeta Contextual (Si se abrió desde un Producto o Pedido) */}
       {contextProduct && (
-        <div className="p-3 bg-amber-50/70 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/50 flex items-center gap-3 text-xs">
+        <div className="p-3 bg-amber-50/70 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/50 flex items-center gap-3 text-xs shrink-0">
           {contextProduct.image_url ? (
             <img
               src={contextProduct.image_url}
@@ -161,7 +207,7 @@ export function ChatConversationView({
       )}
 
       {contextOrder && (
-        <div className="p-3 bg-stone-100 dark:bg-stone-850 border-b border-stone-200 dark:border-stone-700 flex items-center justify-between text-xs">
+        <div className="p-3 bg-stone-100 dark:bg-stone-850 border-b border-stone-200 dark:border-stone-700 flex items-center justify-between text-xs shrink-0">
           <div className="flex items-center gap-2">
             <Package className="w-4 h-4 text-amber-600" />
             <span className="font-black text-stone-900 dark:text-stone-100">
@@ -174,61 +220,74 @@ export function ChatConversationView({
         </div>
       )}
 
-      {/* 3. Lista de Mensajes */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 font-sans">
+      {/* 3. Lista de Mensajes con Contenedor de Scroll Interno */}
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 font-sans">
         {messages.length > 0 ? (
           messages.map((msg) => {
             const isMe = msg.sender_id === currentUserId;
             // Para el vendedor: saber si el mensaje fue enviado por el comprador o por otro vendedor
             const isFromBuyer = isSellerViewer && msg.sender_id === receiverId;
             const isFromOtherSeller = isSellerViewer && !isMe && !isFromBuyer;
+            const isFirstUnread = firstUnreadMsg && msg.id === firstUnreadMsg.id;
 
             return (
-              <div
-                key={msg.id}
-                className={`flex flex-col ${isMe || (!isSellerViewer && isMe) ? 'items-end' : isFromOtherSeller ? 'items-end' : 'items-start'}`}
-              >
-                {/* Nombre de autor visible para vendedores */}
-                {isSellerViewer ? (
-                  <span className="text-[10px] font-bold text-stone-500 dark:text-stone-400 mb-1 px-1">
-                    {isMe
-                      ? (language === 'eu' ? 'Zuk' : 'Tú')
-                      : isFromBuyer
-                      ? (recipient?.full_name || 'Cliente')
-                      : `${sellerMap[msg.sender_id]?.full_name || 'Vendedor'} (Vendedor)`}
-                  </span>
-                ) : (
-                  !isMe && (
-                    <span className="text-[10px] font-bold text-amber-800 dark:text-amber-300 mb-1 px-1 flex items-center gap-1 font-serif">
-                      <Store className="w-3 h-3" /> EkhiTeka
+              <div key={msg.id} id={`chat-msg-${msg.id}`} className="space-y-1">
+                {/* Separador visual si es el primer mensaje nuevo sin leer */}
+                {isFirstUnread && (
+                  <div className="w-full flex items-center justify-center my-3">
+                    <div className="h-px bg-amber-400/40 flex-1" />
+                    <span className="px-3 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 font-bold text-[10px] uppercase tracking-wider font-serif">
+                      {language === 'eu' ? 'Mezu berriak' : 'Nuevos mensajes'}
                     </span>
-                  )
+                    <div className="h-px bg-amber-400/40 flex-1" />
+                  </div>
                 )}
 
                 <div
-                  className={`max-w-[82%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow-xs leading-relaxed ${
-                    isMe
-                      ? 'bg-amber-600 text-white rounded-tr-none font-medium'
-                      : isFromOtherSeller
-                      ? 'bg-amber-100 dark:bg-amber-950/70 border-2 border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-100 rounded-tr-none font-medium'
-                      : 'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-700 rounded-tl-none font-medium'
-                  }`}
+                  className={`flex flex-col ${isMe || (!isSellerViewer && isMe) ? 'items-end' : isFromOtherSeller ? 'items-end' : 'items-start'}`}
                 >
-                  <p className="whitespace-pre-wrap">{msg.message}</p>
-                  <span
-                    className={`text-[9.5px] font-bold block text-right mt-1.5 ${
+                  {/* Nombre de autor visible para vendedores */}
+                  {isSellerViewer ? (
+                    <span className="text-[10px] font-bold text-stone-500 dark:text-stone-400 mb-1 px-1">
+                      {isMe
+                        ? (language === 'eu' ? 'Zuk' : 'Tú')
+                        : isFromBuyer
+                        ? (recipient?.full_name || 'Cliente')
+                        : `${sellerMap[msg.sender_id]?.full_name || 'Vendedor'} (Vendedor)`}
+                    </span>
+                  ) : (
+                    !isMe && (
+                      <span className="text-[10px] font-bold text-amber-800 dark:text-amber-300 mb-1 px-1 flex items-center gap-1 font-serif">
+                        <Store className="w-3 h-3" /> EkhiTeka
+                      </span>
+                    )
+                  )}
+
+                  <div
+                    className={`max-w-[82%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow-xs leading-relaxed ${
                       isMe
-                        ? 'text-amber-200'
+                        ? 'bg-amber-600 text-white rounded-tr-none font-medium'
                         : isFromOtherSeller
-                        ? 'text-amber-700 dark:text-amber-400'
-                        : 'text-stone-400'
+                        ? 'bg-amber-100 dark:bg-amber-950/70 border-2 border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-100 rounded-tr-none font-medium'
+                        : 'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-700 rounded-tl-none font-medium'
                     }`}
                   >
-                    {new Date(msg.created_at).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
+                    <p className="whitespace-pre-wrap">{msg.message}</p>
+                    <span
+                      className={`text-[9.5px] font-bold block text-right mt-1.5 ${
+                        isMe
+                          ? 'text-amber-200'
+                          : isFromOtherSeller
+                          ? 'text-amber-700 dark:text-amber-400'
+                          : 'text-stone-400'
+                      }`}
+                    >
+                      {new Date(msg.created_at).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
                 </div>
               </div>
             );
@@ -246,13 +305,13 @@ export function ChatConversationView({
             </p>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* 4. Input de Envío */}
       <form
+        ref={formRef}
         onSubmit={handleSend}
-        className="p-3 sm:p-4 border-t border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-950/90 flex gap-2 font-sans"
+        className="p-3 sm:p-4 border-t border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-950/90 flex gap-2 font-sans shrink-0"
       >
         <input
           name="message"

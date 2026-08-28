@@ -242,6 +242,24 @@ export function NavbarNavLinks({
                 <span>{t.nav_orders}</span>
               </Link>
 
+              <Link
+                href="/chat"
+                className={`relative flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-semibold transition-all whitespace-nowrap min-h-[38px] ${
+                  pathname.startsWith('/chat')
+                    ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
+                    : liveUnreadMessages > 0
+                    ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-2 border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-md animate-pulse'
+                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                }`}
+              >
+                <span>{t.nav_chats}</span>
+                {liveUnreadMessages > 0 && (
+                  <span className="ml-1.5 px-1.5 py-0.2 bg-red-600 text-white font-black text-[9.5px] rounded-full">
+                    {liveUnreadMessages}
+                  </span>
+                )}
+              </Link>
+
               {isSeller && (
                 <Link
                   href="/vendedor/productos/nuevo"
