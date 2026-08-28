@@ -29,6 +29,7 @@ async function checkSellerPermission(supabase: any, userId: string) {
 export async function getGlobalSiteImagesConfig(supabaseClient?: any): Promise<GlobalSiteImagesConfig> {
   const supabase = supabaseClient || (await createClient());
 
+  let hasStorage = false;
   let images: Record<string, string> = {};
   let meta: Record<string, SiteImageMeta> = {};
 
@@ -42,6 +43,7 @@ export async function getGlobalSiteImagesConfig(supabaseClient?: any): Promise<G
       const text = await fileData.text();
       const parsed = JSON.parse(text);
       if (parsed && typeof parsed === 'object') {
+        hasStorage = true;
         if (parsed.images && typeof parsed.images === 'object') {
           images = { ...parsed.images };
         }
@@ -54,28 +56,31 @@ export async function getGlobalSiteImagesConfig(supabaseClient?: any): Promise<G
     // Si no existe aún en storage, continuará escaneando los perfiles de la BD
   }
 
-  // 2. Escanear todos los perfiles de vendedores en la BD para recuperar cualquier imagen existente
-  try {
-    const { data: sellers } = await supabase
-      .from('profiles')
-      .select('bio')
-      .in('role', ['vendedor', 'admin']);
+  // 2. SOLO si no existía el archivo en Storage, escanear perfiles de la BD como fallback
+  if (!hasStorage) {
+    try {
+      const { data: sellers } = await supabase
+        .from('profiles')
+        .select('bio')
+        .in('role', ['vendedor', 'admin'])
+        .order('updated_at', { ascending: false });
 
-    if (sellers && sellers.length > 0) {
-      for (const s of sellers) {
-        if (!s.bio) continue;
-        try {
-          const parsed = JSON.parse(s.bio);
-          if (parsed?.site_images && typeof parsed.site_images === 'object') {
-            images = { ...parsed.site_images, ...images };
-          }
-          if (parsed?.site_images_meta && typeof parsed.site_images_meta === 'object') {
-            meta = { ...parsed.site_images_meta, ...meta };
-          }
-        } catch {}
+      if (sellers && sellers.length > 0) {
+        for (const s of sellers) {
+          if (!s.bio) continue;
+          try {
+            const parsed = JSON.parse(s.bio);
+            if (parsed?.site_images && typeof parsed.site_images === 'object') {
+              images = { ...parsed.site_images, ...images };
+            }
+            if (parsed?.site_images_meta && typeof parsed.site_images_meta === 'object') {
+              meta = { ...parsed.site_images_meta, ...meta };
+            }
+          } catch {}
+        }
       }
-    }
-  } catch {}
+    } catch {}
+  }
 
   return { images, meta };
 }

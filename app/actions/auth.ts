@@ -138,6 +138,8 @@ export async function updateProfile(formData: FormData) {
     } catch {}
   }
 
+  const globalStoreConfig = await getUnifiedStoreConfig(supabase);
+
   const profileData: ProfileDetails = {
     ...existingDetails,
     first_name: firstName,
@@ -154,12 +156,12 @@ export async function updateProfile(formData: FormData) {
     stair,
     floor,
     door,
-    whatsapp_phone: currentParsed.whatsapp_phone,
-    whatsapp_contacts: currentParsed.whatsapp_contacts,
-    pickup_addresses: currentParsed.pickup_addresses,
-    event_addresses: currentParsed.event_addresses,
-    delivery_addresses: currentParsed.delivery_addresses,
-    cart_data: currentParsed.cart_data,
+    whatsapp_phone: globalStoreConfig.whatsapp_phone,
+    whatsapp_contacts: globalStoreConfig.whatsapp_contacts,
+    pickup_addresses: globalStoreConfig.pickup_addresses,
+    event_addresses: globalStoreConfig.event_addresses,
+    delivery_addresses: currentParsed.delivery_addresses || existingDetails.delivery_addresses || [],
+    cart_data: currentParsed.cart_data || existingDetails.cart_data || [],
     site_images: currentParsed.site_images || (existingDetails as any).site_images || {},
     site_images_meta: currentParsed.site_images_meta || (existingDetails as any).site_images_meta || {},
     last_read_chats: currentParsed.last_read_chats || (existingDetails as any).last_read_chats || {},
@@ -211,12 +213,13 @@ export interface UnifiedStoreConfig {
 export async function getUnifiedStoreConfig(supabaseClient?: any): Promise<UnifiedStoreConfig> {
   const supabase = supabaseClient || (await createClient());
 
+  let hasStorage = false;
   let whatsapp_contacts: WhatsAppContact[] = [];
   let whatsapp_phone: string | null = null;
   let pickup_addresses: StoreAddress[] = [];
   let event_addresses: EventAddress[] = [];
 
-  // 1. Intentar descargar store_config.json desde Supabase Storage
+  // 1. Intentar descargar store_config.json desde Supabase Storage (Fuente Maestra de la Verdad)
   try {
     const { data: fileData, error } = await supabase.storage
       .from(BUCKET_NAME)
@@ -226,117 +229,117 @@ export async function getUnifiedStoreConfig(supabaseClient?: any): Promise<Unifi
       const text = await fileData.text();
       const parsed = JSON.parse(text);
       if (parsed && typeof parsed === 'object') {
-        if (Array.isArray(parsed.whatsapp_contacts) && parsed.whatsapp_contacts.length > 0) {
-          whatsapp_contacts = parsed.whatsapp_contacts;
-        }
-        if (parsed.whatsapp_phone) {
-          whatsapp_phone = parsed.whatsapp_phone;
-        }
-        if (Array.isArray(parsed.pickup_addresses) && parsed.pickup_addresses.length > 0) {
-          pickup_addresses = parsed.pickup_addresses;
-        }
-        if (Array.isArray(parsed.event_addresses) && parsed.event_addresses.length > 0) {
-          event_addresses = parsed.event_addresses;
-        }
+        hasStorage = true;
+        whatsapp_contacts = Array.isArray(parsed.whatsapp_contacts) ? parsed.whatsapp_contacts : [];
+        whatsapp_phone = parsed.whatsapp_phone || null;
+        pickup_addresses = Array.isArray(parsed.pickup_addresses) ? parsed.pickup_addresses : [];
+        event_addresses = Array.isArray(parsed.event_addresses) ? parsed.event_addresses : [];
       }
     }
   } catch {}
 
-  // 2. Si falta algún dato, escanear todos los perfiles de vendedores en la BD como fallback
-  try {
-    const { data: sellers } = await supabase
-      .from('profiles')
-      .select('bio')
-      .in('role', ['vendedor', 'admin']);
+  // 2. SOLO si no existía store_config.json en Supabase Storage, escanear el vendedor más reciente como fallback
+  if (!hasStorage) {
+    try {
+      const { data: sellers } = await supabase
+        .from('profiles')
+        .select('bio')
+        .in('role', ['vendedor', 'admin'])
+        .order('updated_at', { ascending: false });
 
-    if (sellers && sellers.length > 0) {
-      for (const s of sellers) {
-        if (!s.bio) continue;
-        try {
-          const parsed = JSON.parse(s.bio);
-          if (whatsapp_contacts.length === 0 && Array.isArray(parsed?.whatsapp_contacts) && parsed.whatsapp_contacts.length > 0) {
-            whatsapp_contacts = parsed.whatsapp_contacts;
-          }
-          if (!whatsapp_phone && parsed?.whatsapp_phone) {
-            whatsapp_phone = parsed.whatsapp_phone;
-          }
-          if (pickup_addresses.length === 0 && Array.isArray(parsed?.pickup_addresses) && parsed.pickup_addresses.length > 0) {
-            pickup_addresses = parsed.pickup_addresses;
-          }
-          if (event_addresses.length === 0 && Array.isArray(parsed?.event_addresses) && parsed.event_addresses.length > 0) {
-            event_addresses = parsed.event_addresses;
-          }
-        } catch {}
+      if (sellers && sellers.length > 0) {
+        for (const s of sellers) {
+          if (!s.bio) continue;
+          try {
+            const parsed = JSON.parse(s.bio);
+            if (whatsapp_contacts.length === 0 && Array.isArray(parsed?.whatsapp_contacts) && parsed.whatsapp_contacts.length > 0) {
+              whatsapp_contacts = parsed.whatsapp_contacts;
+            }
+            if (!whatsapp_phone && parsed?.whatsapp_phone) {
+              whatsapp_phone = parsed.whatsapp_phone;
+            }
+            if (pickup_addresses.length === 0 && Array.isArray(parsed?.pickup_addresses) && parsed.pickup_addresses.length > 0) {
+              pickup_addresses = parsed.pickup_addresses;
+            }
+            if (event_addresses.length === 0 && Array.isArray(parsed?.event_addresses) && parsed.event_addresses.length > 0) {
+              event_addresses = parsed.event_addresses;
+            }
+          } catch {}
+        }
       }
-    }
-  } catch {}
+    } catch {}
 
-  // 3. Si aún no hay puntos de entrega configurados, suministrar el punto principal de la tienda en Lekeitio
-  if (pickup_addresses.length === 0) {
-    pickup_addresses = [
-      {
-        id: 'store_lekeitio_default',
-        title: 'EkhiTeka Lekeitio',
-        street: 'Gamarra Kalea',
-        number: '4',
-        town: 'Lekeitio',
-        province: 'Bizkaia',
-        postal_code: '48280',
-        schedule_details: {
-          days: ['lun', 'mar', 'mie', 'jue', 'vie', 'sab'],
-          weekday_morning_enabled: true,
-          weekday_morning_start: '10:00',
-          weekday_morning_end: '14:00',
-          weekday_afternoon_enabled: true,
-          weekday_afternoon_start: '17:00',
-          weekday_afternoon_end: '20:30',
-          weekend_morning_enabled: true,
-          weekend_morning_start: '10:30',
-          weekend_morning_end: '14:30',
-          weekend_afternoon_enabled: false,
-          weekend_afternoon_start: '17:30',
-          weekend_afternoon_end: '21:00',
+    // 3. Si aún no hay datos en la BD, suministrar valores por defecto
+    if (pickup_addresses.length === 0) {
+      pickup_addresses = [
+        {
+          id: 'store_lekeitio_default',
+          title: 'EkhiTeka Lekeitio',
+          street: 'Gamarra Kalea',
+          number: '4',
+          town: 'Lekeitio',
+          province: 'Bizkaia',
+          postal_code: '48280',
+          schedule_details: {
+            days: ['lun', 'mar', 'mie', 'jue', 'vie', 'sab'],
+            weekday_morning_enabled: true,
+            weekday_morning_start: '10:00',
+            weekday_morning_end: '14:00',
+            weekday_afternoon_enabled: true,
+            weekday_afternoon_start: '17:00',
+            weekday_afternoon_end: '20:30',
+            weekend_morning_enabled: true,
+            weekend_morning_start: '10:30',
+            weekend_morning_end: '14:30',
+            weekend_afternoon_enabled: false,
+            weekend_afternoon_start: '17:30',
+            weekend_afternoon_end: '21:00',
+          },
+          schedule: 'Lun-Sáb: 10:00-14:00, 17:00-20:30 · Sáb-Dom: 10:30-14:30',
+          is_main: true,
+          is_active: true,
         },
-        schedule: 'Lun-Sáb: 10:00-14:00, 17:00-20:30 · Sáb-Dom: 10:30-14:30',
-        is_main: true,
-        is_active: true,
-      },
-    ];
+      ];
+    }
+
+    if (whatsapp_contacts.length === 0) {
+      whatsapp_contacts = [
+        {
+          id: 'wa_default',
+          name: 'Atención EkhiTeka',
+          phone: '+34 600 000 000',
+          seller_id: null,
+          is_active: true,
+        },
+      ];
+    }
+
+    // Guardar por primera vez en Storage
+    const seedConfig: UnifiedStoreConfig = {
+      whatsapp_contacts,
+      whatsapp_phone,
+      pickup_addresses,
+      event_addresses,
+    };
+    try {
+      const configBlob = new Blob([JSON.stringify(seedConfig, null, 2)], {
+        type: 'application/json',
+      });
+      await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(STORE_CONFIG_FILE, configBlob, {
+          upsert: true,
+          contentType: 'application/json',
+        });
+    } catch {}
   }
 
-  if (whatsapp_contacts.length === 0) {
-    whatsapp_contacts = [
-      {
-        id: 'wa_default',
-        name: 'Atención EkhiTeka',
-        phone: '+34 600 000 000',
-        seller_id: null,
-        is_active: true,
-      },
-    ];
-  }
-
-  const resultConfig: UnifiedStoreConfig = {
+  return {
     whatsapp_contacts,
     whatsapp_phone,
     pickup_addresses,
     event_addresses,
   };
-
-  // Guardar en Storage para que esté disponible instantáneamente para cualquier nuevo vendedor
-  try {
-    const configBlob = new Blob([JSON.stringify(resultConfig, null, 2)], {
-      type: 'application/json',
-    });
-    await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(STORE_CONFIG_FILE, configBlob, {
-        upsert: true,
-        contentType: 'application/json',
-      });
-  } catch {}
-
-  return resultConfig;
 }
 
 export async function updateStoreConfig(formData: FormData) {
