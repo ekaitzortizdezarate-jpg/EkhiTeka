@@ -64,7 +64,7 @@ export function CategoryCircleGrid({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
         {categories.map((cat) => {
           const isSelected = selectedCategory === cat.id;
           const siteKey = getCategorySiteKey((cat.slug || cat.id || '').toLowerCase());
@@ -81,7 +81,7 @@ export function CategoryCircleGrid({
               key={cat.id}
               type="button"
               onClick={() => onSelectCategory?.(cat.id)}
-              className={`group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square flex items-center justify-center p-3 sm:p-4 text-center cursor-pointer transition-all duration-300 hover:scale-103 shadow-md border-2 ${
+              className={`group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/9] flex items-center justify-center p-3 sm:p-5 text-center cursor-pointer transition-all duration-300 hover:scale-103 shadow-md border-2 ${
                 isSelected
                   ? 'border-[#FFE259] ring-2 ring-[#FFE259] scale-103 shadow-lg'
                   : 'border-transparent hover:border-[#FFE259]'
@@ -105,12 +105,12 @@ export function CategoryCircleGrid({
               />
 
               {/* Texto del nombre de la categoría en el centro */}
-              <div className="relative z-10 space-y-1 px-1 text-center">
-                <span className="block font-serif font-black text-xs sm:text-sm lg:text-[15px] text-white drop-shadow-md uppercase tracking-wider leading-tight">
+              <div className="relative z-10 space-y-1.5 px-2 text-center">
+                <span className="block font-serif font-black text-sm sm:text-base lg:text-lg text-white drop-shadow-md uppercase tracking-wider leading-tight">
                   {getCategoryName(cat)}
                 </span>
                 {isSelected && (
-                  <span className="inline-block px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-sans font-black uppercase tracking-widest shadow-xs">
+                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-sans font-black uppercase tracking-widest shadow-xs">
                     ✓
                   </span>
                 )}
