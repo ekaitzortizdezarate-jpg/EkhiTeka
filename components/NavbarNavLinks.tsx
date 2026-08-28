@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { signout } from '@/app/actions/auth';
 import type { Profile } from '@/types/database';
+import { getOrderStatusHistory } from '@/types/database';
 import { CartNavButton } from '@/components/CartNavButton';
 import {
   User,
@@ -23,7 +24,7 @@ interface NavbarNavLinksProps {
   profile: Profile | null;
   unreadMessagesCount: number;
   ordersCount: number;
-  activeOrders?: { id: string; status: string; seller_id?: string; buyer_id?: string }[];
+  activeOrders?: { id: string; status: string; seller_id?: string; buyer_id?: string; updated_at?: string; created_at?: string; shipping_notes?: string | null }[];
   storeAddress?: string;
 }
 
@@ -76,35 +77,52 @@ export function NavbarNavLinks({
         return;
       }
 
+      // 1. Extraer vistos guardados en la BD (para sincronizar entre móvil y ordenador)
+      let profileSeenMap: Record<string, string> = {};
+      if (profile?.bio) {
+        try {
+          const parsed = JSON.parse(profile.bio);
+          if (typeof parsed === 'object' && parsed !== null && parsed.last_read_orders) {
+            profileSeenMap = parsed.last_read_orders;
+          }
+        } catch {}
+      }
+
       if (isSeller) {
-        let seenMap: Record<string, string> = {};
+        let seenMap: Record<string, string> = { ...profileSeenMap };
         try {
           const stored =
             localStorage.getItem(`ekhiteka_seen_orders_${user.id}`) ||
             localStorage.getItem('ekhiteka_seen_orders_seller');
-          if (stored) seenMap = JSON.parse(stored);
+          if (stored) seenMap = { ...seenMap, ...JSON.parse(stored) };
         } catch {}
 
-        // Para el vendedor: verificar según el mapa de vistos del perfil o localStorage
+        // Para el vendedor: alertar solo si el pedido fue modificado por otra persona y no ha sido visto
         const hasNewOrdersForSeller = activeOrders.some((order) => {
+          const history = getOrderStatusHistory((order as any).shipping_notes);
+          const latestHistory = history.length > 0 ? history[history.length - 1] : null;
+          const isUpdatedByOther = latestHistory?.changed_by_id
+            ? latestHistory.changed_by_id !== user.id
+            : true;
+
           const lastSeen = seenMap[order.id];
-          if (!lastSeen) return true;
+          if (!lastSeen) return isUpdatedByOther;
           if (lastSeen.includes('T') || lastSeen.includes('-')) {
             const lastSeenTime = new Date(lastSeen).getTime();
-            const orderTime = new Date((order as any).updated_at || (order as any).created_at).getTime();
-            return orderTime > lastSeenTime;
+            const orderTime = new Date((order as any).updated_at || (order as any).created_at || 0).getTime();
+            return isUpdatedByOther && orderTime > lastSeenTime;
           }
-          return lastSeen !== order.status;
+          return isUpdatedByOther && lastSeen !== order.status;
         });
 
         setHasUnseenOrderUpdates(hasNewOrdersForSeller);
       } else {
-        let seenMap: Record<string, string> = {};
+        let seenMap: Record<string, string> = { ...profileSeenMap };
         try {
           const stored =
             localStorage.getItem(`ekhiteka_seen_orders_${user.id}`) ||
             localStorage.getItem('ekhiteka_seen_orders_buyer');
-          if (stored) seenMap = JSON.parse(stored);
+          if (stored) seenMap = { ...seenMap, ...JSON.parse(stored) };
         } catch {}
 
         // Para el comprador: cambios de estado en sus pedidos
@@ -112,15 +130,13 @@ export function NavbarNavLinks({
           const isMyPurchase = !order.buyer_id || order.buyer_id === user.id;
           if (!isMyPurchase) return false;
           const lastSeen = seenMap[order.id];
-          if (lastSeen) {
-            if (lastSeen.includes('T') || lastSeen.includes('-')) {
-              const lastSeenTime = new Date(lastSeen).getTime();
-              const orderTime = new Date((order as any).updated_at || (order as any).created_at).getTime();
-              return orderTime > lastSeenTime;
-            }
-            return lastSeen !== order.status;
+          if (!lastSeen) return order.status !== 'pendiente';
+          if (lastSeen.includes('T') || lastSeen.includes('-')) {
+            const lastSeenTime = new Date(lastSeen).getTime();
+            const orderTime = new Date((order as any).updated_at || (order as any).created_at || 0).getTime();
+            return orderTime > lastSeenTime;
           }
-          return order.status !== 'pendiente';
+          return lastSeen !== order.status;
         });
 
         setHasUnseenOrderUpdates(hasUpdatesForBuyer);
@@ -134,7 +150,7 @@ export function NavbarNavLinks({
       window.removeEventListener('ekhiteka_orders_seen_updated', checkUnseenOrders);
       window.removeEventListener('storage', checkUnseenOrders);
     };
-  }, [user, activeOrders, isSeller]);
+  }, [user, activeOrders, isSeller, profile?.bio]);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -154,10 +170,34 @@ export function NavbarNavLinks({
         <button
           type="button"
           onClick={() => setMobileMenuOpen(true)}
-          className="lg:hidden p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
+          className="lg:hidden relative p-2 -ml-1 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-2xl transition-colors cursor-pointer"
           aria-label="Menu"
         >
           <Menu className="w-6 h-6" />
+
+          {/* Globo de notificaciones en móvil */}
+          {hasUnseenOrderUpdates && liveUnreadMessages > 0 ? (
+            <span className="absolute top-1 right-1 flex items-center gap-0.5">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FFE259] border border-stone-900 shadow-xs"></span>
+              </span>
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600 border border-white dark:border-stone-900 shadow-xs"></span>
+              </span>
+            </span>
+          ) : liveUnreadMessages > 0 ? (
+            <span className="absolute top-1 right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600 border border-white dark:border-stone-900 shadow-xs"></span>
+            </span>
+          ) : hasUnseenOrderUpdates ? (
+            <span className="absolute top-1 right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#FFE259] border border-stone-900 shadow-xs"></span>
+            </span>
+          ) : null}
         </button>
 
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">

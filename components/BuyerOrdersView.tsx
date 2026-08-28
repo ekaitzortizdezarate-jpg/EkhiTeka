@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
 import Link from 'next/link';
 import { getProductImage, getPackItems, getOrderTypeBadge } from '@/lib/productHelpers';
-import { buyerCancelOrder, deleteOrderPermanently } from '@/app/actions/orders';
+import { buyerCancelOrder, deleteOrderPermanently, markOrderAsSeenBySeller } from '@/app/actions/orders';
 import { Order, getCleanShippingNotes } from '@/types/database';
 import {
   Package,
@@ -31,12 +31,31 @@ const STATUS_STEPS = [
   { key: 'entregado', labelKey: 'orders_step_delivered' },
 ];
 
-export function BuyerOrdersView({ orders }: { orders: Order[] }) {
+export function BuyerOrdersView({
+  orders,
+  currentUserId = '',
+  initialLastReadOrders = {},
+}: {
+  orders: Order[];
+  currentUserId?: string;
+  initialLastReadOrders?: Record<string, string>;
+}) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const [localOrders, setLocalOrders] = useState<Order[]>(orders);
   const [activeTab, setActiveTab] = useState<'actuales' | 'terminados'>('actuales');
-  const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+  const [seenMap, setSeenMap] = useState<Record<string, string>>(() => {
+    let fromLocal: Record<string, string> = {};
+    if (typeof window !== 'undefined' && currentUserId) {
+      try {
+        const stored =
+          localStorage.getItem(`ekhiteka_seen_orders_${currentUserId}`) ||
+          localStorage.getItem('ekhiteka_seen_orders_buyer');
+        if (stored) fromLocal = JSON.parse(stored);
+      } catch {}
+    }
+    return { ...initialLastReadOrders, ...fromLocal };
+  });
 
   useEffect(() => {
     setLocalOrders(orders);
@@ -66,22 +85,18 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
     loading: false,
   });
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('ekhiteka_seen_orders_buyer');
-      if (stored) {
-        setSeenMap(JSON.parse(stored));
-      }
-    } catch {}
-  }, []);
-
-  const handleMarkAsSeen = (orderId: string, currentStatus: string) => {
-    const updated = { ...seenMap, [orderId]: currentStatus };
+  const handleMarkAsSeen = async (orderId: string) => {
+    const nowIso = new Date().toISOString();
+    const updated = { ...seenMap, [orderId]: nowIso };
     setSeenMap(updated);
-    try {
-      localStorage.setItem('ekhiteka_seen_orders_buyer', JSON.stringify(updated));
-      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
-    } catch {}
+    if (currentUserId) {
+      try {
+        localStorage.setItem(`ekhiteka_seen_orders_${currentUserId}`, JSON.stringify(updated));
+        window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+      } catch {}
+    }
+    await markOrderAsSeenBySeller(orderId, nowIso);
+    router.refresh();
   };
 
   const handleOpenCancelModal = (orderId: string) => {
@@ -385,7 +400,16 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
               order.delivery_method === 'tienda';
 
             const lastSeenStatus = seenMap[order.id];
-            const hasUpdate = lastSeenStatus ? lastSeenStatus !== order.status : order.status !== 'pendiente';
+            let hasUpdate = false;
+            if (!lastSeenStatus) {
+              hasUpdate = order.status !== 'pendiente';
+            } else if (lastSeenStatus.includes('T') || lastSeenStatus.includes('-')) {
+              const lastSeenTime = new Date(lastSeenStatus).getTime();
+              const orderTime = new Date(order.updated_at || order.created_at).getTime();
+              hasUpdate = orderTime > lastSeenTime;
+            } else {
+              hasUpdate = lastSeenStatus !== order.status;
+            }
             const currentStepIdx = getStepIndex(order.status);
             const isCancelled = order.status === 'cancelado';
             const isDelivered = order.status === 'entregado';
@@ -446,7 +470,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleMarkAsSeen(order.id, order.status)}
+                      onClick={() => handleMarkAsSeen(order.id)}
                       className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-[11px] uppercase tracking-wider rounded-xl shadow-xs cursor-pointer transition-transform hover:scale-105"
                     >
                       <CheckCircle className="w-3.5 h-3.5" />

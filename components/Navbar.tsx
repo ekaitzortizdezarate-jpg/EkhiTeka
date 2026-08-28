@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { type Profile, parseProfile, isProfileComplete } from '@/types/database';
+import { type Profile, parseProfile, isProfileComplete, getOrderStatusHistory } from '@/types/database';
 import { getUnifiedStoreConfig } from '@/app/actions/auth';
 import { NavbarNavLinks } from '@/components/NavbarNavLinks';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -67,9 +67,18 @@ export default async function Navbar() {
         
         // Contar pedidos que tienen alertas no vistas por este vendedor específico
         const unreadOrders = activeOrders.filter((o) => {
+          const history = getOrderStatusHistory((o as any).shipping_notes);
+          const latestHistory = history.length > 0 ? history[history.length - 1] : null;
+          const isUpdatedByOther = latestHistory?.changed_by_id
+            ? latestHistory.changed_by_id !== user.id
+            : true;
+
           const lastSeen = lastReadOrdersMap[o.id] ? new Date(lastReadOrdersMap[o.id]).getTime() : 0;
           const orderTime = new Date(o.updated_at || o.created_at || 0).getTime();
-          return orderTime > lastSeen;
+          if (lastSeen) {
+            return isUpdatedByOther && orderTime > lastSeen;
+          }
+          return isUpdatedByOther;
         });
 
         ordersCount = unreadOrders.length;
@@ -109,9 +118,16 @@ export default async function Navbar() {
       ]);
 
       activeOrders = (ordersRes.data || []) as any;
-      ordersCount = activeOrders.filter((o) =>
-        ['pendiente', 'confirmado', 'preparando', 'listo_entrega'].includes(o.status)
-      ).length;
+      const unreadBuyerOrders = activeOrders.filter((o) => {
+        const lastSeen = lastReadOrdersMap[o.id] ? new Date(lastReadOrdersMap[o.id]).getTime() : 0;
+        const orderTime = new Date(o.updated_at || o.created_at || 0).getTime();
+        if (lastSeen) {
+          return orderTime > lastSeen;
+        }
+        return o.status !== 'pendiente';
+      });
+
+      ordersCount = unreadBuyerOrders.length;
 
       const myLastRead = Object.values(lastReadMap)[0];
       const lastReadTime = myLastRead ? new Date(myLastRead).getTime() : 0;
