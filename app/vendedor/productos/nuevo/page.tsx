@@ -3,7 +3,12 @@ import { redirect } from 'next/navigation';
 import { SellerProductForm } from '@/components/SellerProductForm';
 import { type Category, type Product, isProfileComplete, parseProfile } from '@/types/database';
 
-export default async function NewProductPage() {
+interface NewProductPageProps {
+  searchParams: Promise<{ duplicate_from?: string }>;
+}
+
+export default async function NewProductPage({ searchParams }: NewProductPageProps) {
+  const { duplicate_from } = (await searchParams) || {};
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,7 +32,7 @@ export default async function NewProductPage() {
 
   const parsed = parseProfile(profile);
 
-  const [categoriesRes, singleProductsRes] = await Promise.all([
+  const [categoriesRes, singleProductsRes, duplicateProductRes] = await Promise.all([
     supabase
       .from('categories')
       .select('*')
@@ -39,11 +44,16 @@ export default async function NewProductPage() {
       .eq('is_active', true)
       .neq('format', 'pack')
       .order('name', { ascending: true }),
+    duplicate_from
+      ? supabase.from('products').select('*').eq('id', duplicate_from).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   return (
     <SellerProductForm
       categories={(categoriesRes.data || []) as Category[]}
+      initialProduct={(duplicateProductRes.data as Product) || null}
+      isDuplicateMode={Boolean(duplicateProductRes.data)}
       availableSingleProducts={(singleProductsRes.data || []) as Product[]}
       pickupAddresses={parsed.pickup_addresses || []}
       eventAddresses={parsed.event_addresses || []}

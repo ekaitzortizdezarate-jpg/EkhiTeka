@@ -179,16 +179,27 @@ export function SellerProductsListView({
     }));
   }, [productosSueltos, categories, language]);
 
-  const handleDelete = async (productId: string, productName: string) => {
-    if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente "${productName}"?`)) {
-      return;
-    }
-    setDeletingId(productId);
-    const res = await deleteProduct(productId);
-    setDeletingId(null);
+  const [deleteModalProduct, setDeleteModalProduct] = useState<Product | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeletingModal, setIsDeletingModal] = useState<boolean>(false);
+
+  const openDeleteModal = (product: Product) => {
+    setDeleteModalProduct(product);
+    setDeleteError(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteModalProduct) return;
+    setIsDeletingModal(true);
+    setDeleteError(null);
+
+    const res = await deleteProduct(deleteModalProduct.id);
+    setIsDeletingModal(false);
+
     if (res?.error) {
-      alert(`Error al eliminar: ${res.error}`);
+      setDeleteError(res.error);
     } else {
+      setDeleteModalProduct(null);
       window.location.reload();
     }
   };
@@ -340,20 +351,30 @@ export function SellerProductsListView({
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/vendedor/productos/${product.id}/editar`}
-              className="inline-flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+              className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+              title={language === 'eu' ? 'Produktua editatu' : 'Editar producto'}
             >
               <Pencil className="w-3.5 h-3.5" />
               <span>{language === 'eu' ? 'Editatu' : 'Editar'}</span>
             </Link>
 
+            <Link
+              href={`/vendedor/productos/nuevo?duplicate_from=${product.id}`}
+              className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs uppercase tracking-wider transition-all shadow-xs border border-stone-200 dark:border-stone-700 cursor-pointer"
+              title={language === 'eu' ? 'Dendan gehitu' : 'Añadir a la tienda'}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{language === 'eu' ? 'Dendan gehitu' : 'Añadir a tienda'}</span>
+            </Link>
+
             <button
               type="button"
-              onClick={() => handleDelete(product.id, product.name)}
-              className="p-2.5 rounded-xl bg-stone-100 hover:bg-red-50 dark:bg-stone-800 dark:hover:bg-red-950/50 text-stone-600 hover:text-red-600 dark:text-stone-300 dark:hover:text-red-400 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
-              title="Eliminar producto"
+              onClick={() => openDeleteModal(product)}
+              className="p-2 sm:p-2.5 rounded-xl bg-stone-100 hover:bg-red-50 dark:bg-stone-800 dark:hover:bg-red-950/50 text-stone-600 hover:text-red-600 dark:text-stone-300 dark:hover:text-red-400 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
+              title={language === 'eu' ? 'Produktua ezabatu' : 'Eliminar producto'}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -434,20 +455,30 @@ export function SellerProductsListView({
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/vendedor/productos/${eventProduct.id}/editar`}
-                className="inline-flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+                className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+                title={language === 'eu' ? 'Ekitaldia editatu' : 'Editar evento'}
               >
                 <Pencil className="w-3.5 h-3.5" />
-                <span>{language === 'eu' ? 'Editatu Ekitaldia' : 'Editar Evento'}</span>
+                <span>{language === 'eu' ? 'Editatu' : 'Editar'}</span>
+              </Link>
+
+              <Link
+                href={`/vendedor/productos/nuevo?duplicate_from=${eventProduct.id}`}
+                className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs uppercase tracking-wider transition-all shadow-xs border border-stone-200 dark:border-stone-700 cursor-pointer"
+                title={language === 'eu' ? 'Dendan gehitu' : 'Añadir a la tienda'}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{language === 'eu' ? 'Dendan gehitu' : 'Añadir a tienda'}</span>
               </Link>
 
               <button
                 type="button"
-                onClick={() => handleDelete(eventProduct.id, eventProduct.name)}
-                className="p-2.5 rounded-xl bg-stone-100 hover:bg-red-50 dark:bg-stone-800 dark:hover:bg-red-950/50 text-stone-600 hover:text-red-600 dark:text-stone-300 dark:hover:text-red-400 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
-                title="Eliminar evento"
+                onClick={() => openDeleteModal(eventProduct)}
+                className="p-2 sm:p-2.5 rounded-xl bg-stone-100 hover:bg-red-50 dark:bg-stone-800 dark:hover:bg-red-950/50 text-stone-600 hover:text-red-600 dark:text-stone-300 dark:hover:text-red-400 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
+                title={language === 'eu' ? 'Ekitaldia ezabatu' : 'Eliminar evento'}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -892,6 +923,95 @@ export function SellerProductsListView({
       {activeMainTab === 'usuarios' && (
         <div className="animate-in fade-in duration-200">
           <SellerBuyersListView buyers={buyers} />
+        </div>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA BORRAR PRODUCTO */}
+      {deleteModalProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#1C1B19] rounded-3xl border border-stone-200 dark:border-stone-800 p-6 sm:p-7 shadow-2xl space-y-5 font-serif">
+            {/* Icono de advertencia */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/60 border border-red-200 dark:border-red-800/80 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                <Trash2 className="w-6 h-6 stroke-[1.75]" />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-black text-stone-900 dark:text-stone-100">
+                  {language === 'eu' ? 'Produktua ezabatu' : 'Confirmar eliminación'}
+                </h3>
+                <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                  {language === 'eu' ? 'Eragiketa honek produktua totez kenduko du' : 'Esta acción eliminará el producto para todos los usuarios'}
+                </p>
+              </div>
+            </div>
+
+            {/* Tarjeta resumen del producto a borrar */}
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800">
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 shrink-0">
+                <img
+                  src={getProductImage(deleteModalProduct)}
+                  alt={deleteModalProduct.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-sm text-stone-900 dark:text-stone-100 truncate">
+                  {deleteModalProduct.name}
+                </p>
+                <p className="text-xs text-stone-500 font-sans font-bold">
+                  {Number(deleteModalProduct.price).toFixed(2)} €
+                </p>
+              </div>
+            </div>
+
+            {/* Alerta de error si tiene pedidos en curso */}
+            {deleteError && (
+              <div className="p-3.5 rounded-2xl bg-red-50 dark:bg-red-950/60 border border-red-300 dark:border-red-800 text-xs font-bold text-red-800 dark:text-red-200 flex items-start gap-2.5 font-sans">
+                <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
+                <span className="leading-snug">{deleteError}</span>
+              </div>
+            )}
+
+            {/* Mensaje de confirmación */}
+            {!deleteError && (
+              <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed font-sans">
+                {language === 'eu'
+                  ? 'Ziur zaude produktu hau betiko ezabatu nahi duzula? Produktua ez da gehiago agertuko dendan ezta administratzaileen panelean ere.'
+                  : '¿Estás seguro de que deseas eliminar permanentemente este producto del catálogo? El producto desaparecerá de la tienda y del sistema para todos los usuarios.'}
+              </p>
+            )}
+
+            {/* Botones de acción: Cancelar y Eliminar */}
+            <div className="flex items-center justify-end gap-3 pt-2 font-serif">
+              <button
+                type="button"
+                disabled={isDeletingModal}
+                onClick={() => {
+                  setDeleteModalProduct(null);
+                  setDeleteError(null);
+                }}
+                className="px-5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 font-bold text-xs uppercase tracking-wider hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {language === 'eu' ? 'Utzi' : 'Cancelar'}
+              </button>
+
+              <button
+                type="button"
+                disabled={isDeletingModal}
+                onClick={handleConfirmDelete}
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md hover:scale-102 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {isDeletingModal ? (
+                  <span>{language === 'eu' ? 'Ezabatzen...' : 'Eliminando...'}</span>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>{language === 'eu' ? 'Ezabatu' : 'Eliminar'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -26,6 +26,7 @@ export default async function SellerProductsPage() {
     supabase
       .from('products')
       .select('*')
+      .eq('is_active', true)
       .order('created_at', { ascending: false }),
     supabase
       .from('categories')

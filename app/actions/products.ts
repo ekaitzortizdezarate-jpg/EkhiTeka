@@ -192,7 +192,7 @@ export async function createProduct(formData: FormData) {
   revalidatePath('/experiencias');
   revalidatePath('/vendedor/productos');
   revalidatePath('/vendedor/eventos');
-  redirect('/tienda');
+  redirect('/vendedor/productos');
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
@@ -216,8 +216,6 @@ export async function updateProduct(productId: string, formData: FormData) {
   const price = parseFloat(formData.get('price') as string);
   const format = (formData.get('format') as string) || 'unidad';
   const weightG = formData.get('weight_g') ? parseInt(formData.get('weight_g') as string) : null;
-  const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
-  const stock = isUnlimitedStock ? 999 : (formData.get('stock') ? parseInt(formData.get('stock') as string) : 10);
   const originRegion = (formData.get('origin_region') as string)?.trim() || 'Lekeitio / Bizkaia';
   const deliveryMethods = formData.getAll('delivery_methods') as string[];
 
@@ -230,22 +228,29 @@ export async function updateProduct(productId: string, formData: FormData) {
   const imageFile = formData.get('image_file') as File | null;
   const imageUrl = await processProductImage(supabase, user.id, imageFile, fallbackUrl);
 
+  const updateData: Record<string, any> = {
+    category_id: safeCategoryId,
+    name,
+    description,
+    price,
+    format: format as any,
+    weight_g: weightG,
+    origin_region: originRegion,
+    delivery_methods: deliveryMethods.length > 0 ? deliveryMethods : ['domicilio', 'recogida_tienda'],
+    image_url: imageUrl,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Si se envió stock explícitamente se actualiza, si no se mantiene el stock actual
+  if (formData.has('stock')) {
+    const isUnlimitedStock = formData.get('is_unlimited_stock') === 'true';
+    updateData.is_unlimited_stock = isUnlimitedStock;
+    updateData.stock = isUnlimitedStock ? 999 : (formData.get('stock') ? parseInt(formData.get('stock') as string) : 10);
+  }
+
   const { error } = await supabase
     .from('products')
-    .update({
-      category_id: safeCategoryId,
-      name,
-      description,
-      price,
-      format: format as any,
-      weight_g: weightG,
-      stock,
-      is_unlimited_stock: isUnlimitedStock,
-      origin_region: originRegion,
-      delivery_methods: deliveryMethods.length > 0 ? deliveryMethods : ['domicilio', 'recogida_tienda'],
-      image_url: imageUrl,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updateData)
     .eq('id', productId);
 
   if (error) {
@@ -256,8 +261,9 @@ export async function updateProduct(productId: string, formData: FormData) {
   revalidatePath('/tienda');
   revalidatePath('/regalos-gourmet');
   revalidatePath('/experiencias');
+  revalidatePath('/vendedor/productos');
   revalidatePath(`/producto/${productId}`);
-  redirect('/tienda');
+  redirect('/vendedor/productos');
 }
 
 export async function deleteProduct(productId: string) {
@@ -275,19 +281,55 @@ export async function deleteProduct(productId: string) {
     return { error: 'Permisos insuficientes. Solo los vendedores de EkhiTeka pueden eliminar productos.' };
   }
 
-  const { error } = await supabase
+  // 1. Comprobar si hay pedidos en curso asociados a este producto
+  const { data: orderItems, error: itemsError } = await supabase
+    .from('order_items')
+    .select('id, order_id, orders(id, status)')
+    .eq('product_id', productId);
+
+  if (orderItems && orderItems.length > 0) {
+    const activeOrders = orderItems.filter((item: any) => {
+      const status = item.orders?.status;
+      return status && status !== 'entregado' && status !== 'cancelado';
+    });
+
+    if (activeOrders.length > 0) {
+      return {
+        error: `No se puede eliminar este producto porque está incluido en ${activeOrders.length} pedido(s) en curso. Debes completar o cancelar los pedidos antes de poder eliminarlo del sistema.`,
+      };
+    }
+  }
+
+  // 2. Proceder al borrado del producto para todos los usuarios
+  const { error: deleteError } = await supabase
     .from('products')
-    .update({ is_active: false })
+    .delete()
     .eq('id', productId);
 
-  if (error) {
-    return { error: error.message };
+  if (deleteError) {
+    // Si hay items de pedidos históricos completados/cancelados con clave foránea
+    if (deleteError.code === '23503' || deleteError.message?.includes('foreign key')) {
+      await supabase.from('order_items').delete().eq('product_id', productId);
+      const { error: retryError } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
+
+      if (retryError) {
+        // Fallback: desactivar para que no aparezca en ninguna vista
+        await supabase.from('products').update({ is_active: false }).eq('id', productId);
+      }
+    } else {
+      await supabase.from('products').update({ is_active: false }).eq('id', productId);
+    }
   }
 
   revalidatePath('/');
   revalidatePath('/tienda');
   revalidatePath('/regalos-gourmet');
   revalidatePath('/experiencias');
+  revalidatePath('/vendedor/productos');
+  revalidatePath('/vendedor/eventos');
   revalidatePath(`/producto/${productId}`);
   return { success: true };
 }

@@ -64,6 +64,7 @@ export interface AddedListItem {
 export interface SellerProductFormProps {
   categories: Category[];
   initialProduct?: (Product & { profiles?: { full_name?: string | null } | null }) | null;
+  isDuplicateMode?: boolean;
   availableSingleProducts?: Product[];
   pickupAddresses?: StoreAddress[];
   eventAddresses?: EventAddress[];
@@ -72,6 +73,7 @@ export interface SellerProductFormProps {
 export function SellerProductForm({
   categories,
   initialProduct,
+  isDuplicateMode = false,
   availableSingleProducts = [],
   pickupAddresses = [],
   eventAddresses = [],
@@ -81,7 +83,7 @@ export function SellerProductForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isEditing = Boolean(initialProduct);
+  const isEditing = Boolean(initialProduct) && !isDuplicateMode;
 
   const initialMeta = useMemo(() => {
     if (!initialProduct?.description) return null;
@@ -863,10 +865,22 @@ export function SellerProductForm({
           </Link>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100">
-              {isEditing ? t.seller_edit_product : t.seller_new_product}
+              {isEditing
+                ? (language === 'eu' ? 'Produktua editatu' : 'Editar producto')
+                : isDuplicateMode
+                ? (language === 'eu' ? 'Dendan gehitu' : 'Añadir a la tienda')
+                : t.seller_new_product}
             </h1>
             <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-              {t.seller_shared_catalog_subtitle}
+              {isEditing
+                ? (language === 'eu'
+                    ? 'Aldatu produktu honen datuak (kantitatea izan ezik). Gorde ondoren produktu hau eguneratuko da.'
+                    : 'Modifica los datos de este producto (excepto cantidad). Al guardar se actualizará este producto sin duplicarlo.')
+                : isDuplicateMode
+                ? (language === 'eu'
+                    ? 'Sortu produktu berria dendan datu hauek oinarritzat hartuta.'
+                    : 'Edita los campos y añade un nuevo producto al catálogo de la tienda.')
+                : t.seller_shared_catalog_subtitle}
             </p>
           </div>
         </div>
@@ -1574,13 +1588,13 @@ export function SellerProductForm({
             </div>
           </div>
 
-          {/* 7. Stock */}
-          <div>
+          {/* 7. Stock / Cantidad */}
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between mb-1">
               <label className="font-bold text-stone-700 dark:text-stone-300">
                 {publishingType === 'cata_presencial' ? t.seller_seats_capacity_label : t.seller_stock_available_label}
               </label>
-              {publishingType !== 'cata_presencial' && (
+              {publishingType !== 'cata_presencial' && !isEditing && (
                 <label className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 cursor-pointer">
                   <input
                     type="checkbox"
@@ -1593,14 +1607,35 @@ export function SellerProductForm({
                 </label>
               )}
             </div>
-            <input
-              type="number"
-              name="stock"
-              min="0"
-              disabled={isUnlimited}
-              defaultValue={initialProduct?.stock ?? 10}
-              className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
-            />
+
+            {isEditing ? (
+              <div className="p-3.5 bg-stone-100 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 rounded-2xl space-y-1.5 font-serif">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-black text-sm text-stone-900 dark:text-stone-100">
+                    {initialProduct?.is_unlimited_stock
+                      ? (language === 'eu' ? 'Mugagabea' : 'Ilimitado')
+                      : `${initialProduct?.stock ?? 10} ${publishingType === 'cata_presencial' ? 'plazas' : 'uds'}`}
+                  </span>
+                  <span className="text-[10.5px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-lg border border-amber-200 dark:border-amber-900/40">
+                    {language === 'eu' ? 'Kantitatea blokeatuta' : 'Cantidad bloqueada en edición'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-500 dark:text-stone-400 font-sans leading-relaxed">
+                  {language === 'eu'
+                    ? 'Kantitatea ezin da aldatu editatzean. Stock berria sartzeko edo produktu berri bat sortzeko, erabili "Dendan gehitu".'
+                    : 'La cantidad no se puede modificar al editar. Para añadir más existencias o crear otro producto con diferente stock, utiliza "Añadir a tienda".'}
+                </p>
+              </div>
+            ) : (
+              <input
+                type="number"
+                name="stock"
+                min="0"
+                disabled={isUnlimited}
+                defaultValue={initialProduct?.stock ?? 10}
+                className="w-full px-3.5 py-2.5 bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-700 rounded-xl font-bold text-stone-900 dark:text-stone-100 disabled:opacity-40"
+              />
+            )}
           </div>
 
           {/* Si es cata en casa: Personas recomendadas */}
@@ -1952,7 +1987,15 @@ export function SellerProductForm({
             className="inline-flex items-center gap-2 px-7 py-3 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-2xl shadow-md transition-all hover:scale-102 cursor-pointer disabled:opacity-50"
           >
             <Check className="w-4 h-4" />
-            <span>{loading ? t.common_loading : isEditing ? t.seller_save_changes_btn : t.seller_publish_btn}</span>
+            <span>
+              {loading
+                ? t.common_loading
+                : isEditing
+                ? (language === 'eu' ? 'Gorde aldaketak' : 'Guardar cambios')
+                : isDuplicateMode
+                ? (language === 'eu' ? 'Dendan Gehitu' : 'Añadir a la tienda')
+                : t.seller_publish_btn}
+            </span>
           </button>
         </div>
       </form>
