@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
@@ -65,8 +65,47 @@ export function SellerProductsListView({
   const { t, language } = useLanguage();
   const router = useRouter();
 
+  const [localProducts, setLocalProducts] = useState<Product[]>(products);
+
+  useEffect(() => {
+    setLocalProducts(products);
+  }, [products]);
+
   // Selector central: 'productos' | 'eventos' | 'usuarios'
   const [activeMainTab, setActiveMainTab] = useState<'productos' | 'eventos' | 'usuarios'>('productos');
+
+  // Sincronizar y restaurar pestaña y posición de scroll
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabFromUrl = urlParams.get('tab') as 'productos' | 'eventos' | 'usuarios' | null;
+      const savedTab = tabFromUrl || (sessionStorage.getItem('ekhiteka_seller_tab') as 'productos' | 'eventos' | 'usuarios');
+      if (savedTab && ['productos', 'eventos', 'usuarios'].includes(savedTab)) {
+        setActiveMainTab(savedTab);
+      }
+      const savedScroll = sessionStorage.getItem('ekhiteka_seller_scroll');
+      if (savedScroll) {
+        sessionStorage.removeItem('ekhiteka_seller_scroll');
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+        }, 50);
+      }
+    } catch {}
+  }, []);
+
+  const handleTabChange = (tab: 'productos' | 'eventos' | 'usuarios') => {
+    setActiveMainTab(tab);
+    try {
+      sessionStorage.setItem('ekhiteka_seller_tab', tab);
+    } catch {}
+  };
+
+  const saveScrollPosition = () => {
+    try {
+      sessionStorage.setItem('ekhiteka_seller_scroll', window.scrollY.toString());
+      sessionStorage.setItem('ekhiteka_seller_tab', activeMainTab);
+    } catch {}
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -114,7 +153,7 @@ export function SellerProductsListView({
   };
 
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
+    return localProducts.filter((p) => {
       const type = getItemTypeKey(p);
       if (typeFilter !== 'all' && type !== typeFilter) {
         return false;
@@ -129,12 +168,12 @@ export function SellerProductsListView({
       }
       return true;
     });
-  }, [products, typeFilter, searchQuery]);
+  }, [localProducts, typeFilter, searchQuery]);
 
   // Agrupaciones principales
   const catasCasa = useMemo(() => filteredProducts.filter((p) => getItemTypeKey(p) === 'cata_casa'), [filteredProducts]);
   const catasPresenciales = useMemo(() => {
-    const list = products.filter((p) => getItemTypeKey(p) === 'cata_presencial');
+    const list = localProducts.filter((p) => getItemTypeKey(p) === 'cata_presencial');
     return list.sort((a, b) => {
       const metaA = getEventMeta(a);
       const metaB = getEventMeta(b);
@@ -200,8 +239,10 @@ export function SellerProductsListView({
     if (res?.error) {
       setDeleteError(res.error);
     } else {
+      const deletedId = deleteModalProduct.id;
+      setLocalProducts((prev) => prev.filter((p) => p.id !== deletedId));
       setDeleteModalProduct(null);
-      window.location.reload();
+      router.refresh();
     }
   };
 
@@ -355,6 +396,7 @@ export function SellerProductsListView({
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/vendedor/productos/${product.id}/editar`}
+              onClick={saveScrollPosition}
               className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
               title={language === 'eu' ? 'Produktua editatu' : 'Editar producto'}
             >
@@ -364,6 +406,7 @@ export function SellerProductsListView({
 
             <Link
               href={`/vendedor/productos/nuevo?duplicate_from=${product.id}`}
+              onClick={saveScrollPosition}
               className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs uppercase tracking-wider transition-all shadow-xs border border-stone-200 dark:border-stone-700 cursor-pointer"
               title={language === 'eu' ? 'Dendan gehitu' : 'Añadir a la tienda'}
             >
@@ -459,6 +502,7 @@ export function SellerProductsListView({
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/vendedor/productos/${eventProduct.id}/editar`}
+                onClick={saveScrollPosition}
                 className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
                 title={language === 'eu' ? 'Ekitaldia editatu' : 'Editar evento'}
               >
@@ -468,6 +512,7 @@ export function SellerProductsListView({
 
               <Link
                 href={`/vendedor/productos/nuevo?duplicate_from=${eventProduct.id}`}
+                onClick={saveScrollPosition}
                 className="inline-flex items-center gap-1.5 py-2 px-3 sm:px-3.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs uppercase tracking-wider transition-all shadow-xs border border-stone-200 dark:border-stone-700 cursor-pointer"
                 title={language === 'eu' ? 'Dendan gehitu' : 'Añadir a la tienda'}
               >
@@ -659,7 +704,7 @@ export function SellerProductsListView({
           {/* Botón 1: Productos */}
           <button
             type="button"
-            onClick={() => setActiveMainTab('productos')}
+            onClick={() => handleTabChange('productos')}
             className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'productos'
                 ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
@@ -670,14 +715,14 @@ export function SellerProductsListView({
               {language === 'eu' ? 'Produktuak' : language === 'fr' ? 'Produits' : language === 'en' ? 'Products' : 'Productos'}
             </span>
             <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-80 block leading-none">
-              ({products.length})
+              ({localProducts.length})
             </span>
           </button>
 
           {/* Botón 2: Eventos */}
           <button
             type="button"
-            onClick={() => setActiveMainTab('eventos')}
+            onClick={() => handleTabChange('eventos')}
             className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'eventos'
                 ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
@@ -695,7 +740,7 @@ export function SellerProductsListView({
           {/* Botón 3: Usuarios */}
           <button
             type="button"
-            onClick={() => setActiveMainTab('usuarios')}
+            onClick={() => handleTabChange('usuarios')}
             className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
               activeMainTab === 'usuarios'
                 ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
@@ -917,6 +962,7 @@ export function SellerProductsListView({
               </div>
               <Link
                 href="/vendedor/productos/nuevo"
+                onClick={saveScrollPosition}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#FFE259] text-[#1D1D1B] font-bold text-xs uppercase tracking-wider shadow-xs"
               >
                 <Plus className="w-4 h-4" />

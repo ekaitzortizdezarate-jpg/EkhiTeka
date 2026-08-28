@@ -858,7 +858,7 @@ export function SellerProductForm({
       <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-center gap-3">
           <Link
-            href="/tienda"
+            href="/vendedor/productos"
             className="p-2 rounded-xl bg-stone-100 dark:bg-[#1F1E1C] text-stone-600 dark:text-stone-300 hover:text-stone-900 transition-colors border border-stone-200 dark:border-stone-800"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -1025,6 +1025,7 @@ export function SellerProductForm({
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 p-6 sm:p-8 space-y-6 shadow-xs font-sans text-xs">
+        <input type="hidden" name="return_tab" value={publishingType === 'cata_presencial' ? 'eventos' : 'productos'} />
         <div className="space-y-5">
           <span className="text-[11px] font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 block font-serif">
             {t.seller_step2_label}
@@ -1975,7 +1976,7 @@ export function SellerProductForm({
 
         <div className="pt-4 border-t border-stone-200 dark:border-stone-800 flex items-center justify-end gap-3 font-serif">
           <Link
-            href="/tienda"
+            href="/vendedor/productos"
             className="px-5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold text-xs uppercase tracking-wider hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
           >
             {t.common_cancel}

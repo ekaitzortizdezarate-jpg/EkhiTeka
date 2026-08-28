@@ -44,6 +44,32 @@ export function BuyerOrdersView({
   const router = useRouter();
   const [localOrders, setLocalOrders] = useState<Order[]>(orders);
   const [activeTab, setActiveTab] = useState<'actuales' | 'terminados'>('actuales');
+
+  // Sincronizar y restaurar pestaña y posición de scroll
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabFromUrl = urlParams.get('tab') as 'actuales' | 'terminados' | null;
+      const savedTab = tabFromUrl || (sessionStorage.getItem('ekhiteka_buyer_orders_tab') as 'actuales' | 'terminados');
+      if (savedTab && ['actuales', 'terminados'].includes(savedTab)) {
+        setActiveTab(savedTab);
+      }
+      const savedScroll = sessionStorage.getItem('ekhiteka_buyer_orders_scroll');
+      if (savedScroll) {
+        sessionStorage.removeItem('ekhiteka_buyer_orders_scroll');
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+        }, 50);
+      }
+    } catch {}
+  }, []);
+
+  const handleTabChange = (tab: 'actuales' | 'terminados') => {
+    setActiveTab(tab);
+    try {
+      sessionStorage.setItem('ekhiteka_buyer_orders_tab', tab);
+    } catch {}
+  };
   const [seenMap, setSeenMap] = useState<Record<string, string>>(() => {
     let fromLocal: Record<string, string> = {};
     if (typeof window !== 'undefined' && currentUserId) {
@@ -360,7 +386,7 @@ export function BuyerOrdersView({
         <div className="flex items-center p-1 bg-stone-100 dark:bg-[#141312] rounded-2xl border border-stone-200 dark:border-stone-800 shadow-2xs font-sans text-xs shrink-0 self-start sm:self-auto">
           <button
             type="button"
-            onClick={() => setActiveTab('actuales')}
+            onClick={() => handleTabChange('actuales')}
             className={`py-2 px-4 rounded-xl font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === 'actuales'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs'
@@ -375,7 +401,7 @@ export function BuyerOrdersView({
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('terminados')}
+            onClick={() => handleTabChange('terminados')}
             className={`py-2 px-4 rounded-xl font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === 'terminados'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs'

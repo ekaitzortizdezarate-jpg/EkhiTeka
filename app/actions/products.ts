@@ -192,7 +192,8 @@ export async function createProduct(formData: FormData) {
   revalidatePath('/experiencias');
   revalidatePath('/vendedor/productos');
   revalidatePath('/vendedor/eventos');
-  redirect('/vendedor/productos');
+  const returnTab = (formData.get('return_tab') as string) || (categoryId === 'cata_presencial' ? 'eventos' : 'productos');
+  redirect(`/vendedor/productos?tab=${returnTab}`);
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
@@ -263,7 +264,8 @@ export async function updateProduct(productId: string, formData: FormData) {
   revalidatePath('/experiencias');
   revalidatePath('/vendedor/productos');
   revalidatePath(`/producto/${productId}`);
-  redirect('/vendedor/productos');
+  const returnTab = (formData.get('return_tab') as string) || (categoryId === 'cata_presencial' ? 'eventos' : 'productos');
+  redirect(`/vendedor/productos?tab=${returnTab}`);
 }
 
 export async function deleteProduct(productId: string) {

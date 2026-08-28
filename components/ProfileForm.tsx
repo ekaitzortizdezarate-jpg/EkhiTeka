@@ -55,6 +55,39 @@ export function ProfileForm({ profile, userProfile, storeProfile, sellers = [] }
   // Pestañas
   const [activeTab, setActiveTab] = useState<'usuario' | 'tienda'>('usuario');
 
+  // Sincronizar y restaurar pestaña y posición de scroll
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabFromUrl = urlParams.get('tab') as 'usuario' | 'tienda' | null;
+      const savedTab = tabFromUrl || (sessionStorage.getItem('ekhiteka_profile_tab') as 'usuario' | 'tienda');
+      if (savedTab && ['usuario', 'tienda'].includes(savedTab)) {
+        setActiveTab(savedTab);
+      }
+      const savedScroll = sessionStorage.getItem('ekhiteka_profile_scroll');
+      if (savedScroll) {
+        sessionStorage.removeItem('ekhiteka_profile_scroll');
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+        }, 50);
+      }
+    } catch {}
+  }, []);
+
+  const handleTabChange = (tab: 'usuario' | 'tienda') => {
+    setActiveTab(tab);
+    try {
+      sessionStorage.setItem('ekhiteka_profile_tab', tab);
+    } catch {}
+  };
+
+  const saveScrollPosition = () => {
+    try {
+      sessionStorage.setItem('ekhiteka_profile_scroll', window.scrollY.toString());
+      sessionStorage.setItem('ekhiteka_profile_tab', activeTab);
+    } catch {}
+  };
+
   // Sección Usuario
   const [isEditingUser, setIsEditingUser] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -685,7 +718,7 @@ export function ProfileForm({ profile, userProfile, storeProfile, sellers = [] }
         <div className="flex items-center gap-3 p-1.5 bg-stone-100 dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 max-w-md">
           <button
             type="button"
-            onClick={() => setActiveTab('usuario')}
+            onClick={() => handleTabChange('usuario')}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
               activeTab === 'usuario'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs'
@@ -698,7 +731,7 @@ export function ProfileForm({ profile, userProfile, storeProfile, sellers = [] }
 
           <button
             type="button"
-            onClick={() => setActiveTab('tienda')}
+            onClick={() => handleTabChange('tienda')}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
               activeTab === 'tienda'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs'
