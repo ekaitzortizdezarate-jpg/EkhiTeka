@@ -463,7 +463,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
                 )}
 
                 <Link
-                  href={`/chat/${sellerId || ''}?product_id=${product.id}`}
+                  href={`/chat/${sellerId || 'tienda'}?product_id=${product.id}`}
                   className="p-2 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1B19] hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors border border-[#E8E5DF] dark:border-[#2D2B27] shrink-0"
                   title={t.prod_ask_artisan}
                 >

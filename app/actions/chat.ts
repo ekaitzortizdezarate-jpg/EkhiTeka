@@ -14,13 +14,24 @@ export async function sendMessage(formData: FormData) {
     return { error: 'No autenticado' };
   }
 
-  const receiverId = formData.get('receiver_id') as string;
-  const message = formData.get('message') as string;
+  let receiverId = (formData.get('receiver_id') as string)?.trim();
+  const message = (formData.get('message') as string)?.trim();
   const productId = (formData.get('product_id') as string) || null;
   const orderId = (formData.get('order_id') as string) || null;
 
-  if (!message || !message.trim()) {
+  if (!message) {
     return { error: 'El mensaje no puede estar vacío' };
+  }
+
+  if (!receiverId || receiverId === 'store' || receiverId === 'null' || receiverId === 'undefined') {
+    const { data: firstSeller } = await supabase
+      .from('profiles')
+      .select('id')
+      .in('role', ['vendedor', 'admin'])
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    receiverId = firstSeller?.id || user.id;
   }
 
   const now = new Date().toISOString();
@@ -33,11 +44,11 @@ export async function sendMessage(formData: FormData) {
       receiver_id: receiverId,
       product_id: productId,
       order_id: orderId,
-      message: message.trim(),
+      message: message,
       is_read: false,
     })
     .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
-    .single();
+    .maybeSingle();
 
   if (error) {
     return { error: error.message };
@@ -86,6 +97,10 @@ export async function markChatAsRead(conversationUserId: string) {
 
   if (!user) return { success: false };
 
+  if (!conversationUserId || conversationUserId === 'store' || conversationUserId === 'null' || conversationUserId === 'undefined') {
+    return { success: true };
+  }
+
   const now = new Date().toISOString();
 
   // 1. Actualizar last_read_chats del usuario actual en profiles.bio
@@ -93,7 +108,7 @@ export async function markChatAsRead(conversationUserId: string) {
     .from('profiles')
     .select('bio')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   let details: Partial<ProfileDetails> = {};
   if (profileRaw?.bio) {

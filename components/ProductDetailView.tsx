@@ -181,7 +181,7 @@ export function ProductDetailView({
               </p>
             </div>
             <Link
-              href={`/chat/${product.seller_id || ''}?product_id=${product.id}`}
+              href={`/chat/${product.seller_id || 'tienda'}?product_id=${product.id}`}
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] text-xs font-bold uppercase tracking-[0.14em] transition-all font-serif shrink-0 shadow-2xs hover:scale-[1.01]"
             >
               <MessageCircle className="w-4 h-4 stroke-[1.75]" />

@@ -83,51 +83,7 @@ export default async function ChatInboxPage() {
     return <ChatInboxView conversations={conversations} isSellerViewer={true} />;
   }
 
-  // 3. Si es COMPRADOR: Ver conversación unificada con "EkhiTeka"
-  const { data: myMessages } = await supabase
-    .from('chat_messages')
-    .select('*, sender:profiles!chat_messages_sender_id_fkey(*), receiver:profiles!chat_messages_receiver_id_fkey(*)')
-    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-    .order('created_at', { ascending: false });
-
-  // Tienda oficial como destinatario
-  const mainSeller = allSellers[0] || { id: 'store', full_name: 'EkhiTeka', role: 'vendedor' };
-  const storeProfile: Profile = {
-    ...parseProfile(mainSeller),
-    id: mainSeller.id,
-    full_name: 'EkhiTeka',
-    role: 'vendedor',
-  };
-
-  const myLastReadStore = lastReadMap[mainSeller.id] ? new Date(lastReadMap[mainSeller.id]).getTime() : 0;
-
-  let unreadCountForBuyer = 0;
-  let lastMsgText = '';
-  let lastMsgTime = '';
-
-  if (myMessages && myMessages.length > 0) {
-    const latest = myMessages[0];
-    lastMsgText = latest.message;
-    lastMsgTime = latest.created_at;
-
-    myMessages.forEach((msg) => {
-      const isFromSeller = msg.sender_id !== user.id;
-      const msgTime = new Date(msg.created_at).getTime();
-      if (isFromSeller && msgTime > myLastReadStore) {
-        unreadCountForBuyer += 1;
-      }
-    });
-  }
-
-  const buyerConversations: InboxConversation[] = [];
-  if (myMessages && myMessages.length > 0) {
-    buyerConversations.push({
-      otherUser: storeProfile,
-      lastMessage: lastMsgText,
-      lastMessageTime: lastMsgTime,
-      unreadCount: unreadCountForBuyer,
-    });
-  }
-
-  return <ChatInboxView conversations={buyerConversations} isSellerViewer={false} />;
+  // 3. Si es COMPRADOR: Redirigir directamente a la sala de chat unificada con "EkhiTeka"
+  const mainSeller = allSellers[0] || { id: 'store' };
+  redirect(`/chat/${mainSeller.id}`);
 }

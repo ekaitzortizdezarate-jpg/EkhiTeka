@@ -687,7 +687,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 font-sans">
                     {/* Botón 1: Chat con el vendedor */}
                     <Link
-                      href={`/chat/${order.seller_id || ''}?order_id=${order.id}`}
+                      href={`/chat/${order.seller_id || 'tienda'}?order_id=${order.id}`}
                       className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer whitespace-nowrap min-h-[40px]"
                     >
                       <MessageCircle className="w-4 h-4 shrink-0" />
@@ -708,7 +708,7 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                   <div className="pt-4 border-t border-stone-100 dark:border-stone-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 font-sans">
                     {/* Botón 1: Chat con el vendedor */}
                     <Link
-                      href={`/chat/${order.seller_id || ''}?order_id=${order.id}`}
+                      href={`/chat/${order.seller_id || 'tienda'}?order_id=${order.id}`}
                       className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-xs hover:scale-102 cursor-pointer whitespace-nowrap min-h-[40px]"
                     >
                       <MessageCircle className="w-4 h-4 shrink-0" />

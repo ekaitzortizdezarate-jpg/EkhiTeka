@@ -1,8 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
-import { redirect, notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { ChatConversationView } from '@/components/ChatConversationView';
 import { markChatAsRead } from '@/app/actions/chat';
+import { getUnifiedStoreConfig } from '@/app/actions/auth';
 import { type ChatMessage, type Profile, type Product, type Order, parseProfile } from '@/types/database';
+
+export const revalidate = 0;
 
 interface ChatRoomPageProps {
   params: Promise<{ receiverId: string }>;
@@ -20,18 +23,19 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
 
   if (!user) redirect('/login');
 
-  // 1. Obtener mi perfil y todos los perfiles de vendedores
-  const [myProfileRes, allSellersRes] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
+  // 1. Obtener mi perfil, todos los perfiles de vendedores y la configuración de la tienda
+  const [myProfileRes, allSellersRes, storeConfig] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('profiles').select('*').in('role', ['vendedor', 'admin']),
+    getUnifiedStoreConfig(supabase),
   ]);
 
-  const currentProfile = parseProfile(myProfileRes.data);
+  const currentProfile = parseProfile(myProfileRes?.data);
   const isSeller = currentProfile.role === 'vendedor' || currentProfile.role === 'admin';
-  const allSellers = allSellersRes.data || [];
-  const sellerIds = new Set(allSellers.map((s) => s.id));
+  const allSellers = allSellersRes?.data || [];
+  const mainSeller = allSellers[0] || { id: 'store', full_name: 'EkhiTeka', role: 'vendedor' };
 
-  // Mapa de vendedores para mostrar nombres a otros vendedores
+  // Mapa de vendedores para mostrar nombres reales entre los propios vendedores
   const sellerMap: Record<string, { full_name: string; avatar_url?: string }> = {};
   allSellers.forEach((s) => {
     sellerMap[s.id] = {
@@ -40,35 +44,60 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
     };
   });
 
-  // 2. Obtener perfil del destinatario
   let recipientProfile: Profile | null = null;
-  const { data: recipientRaw } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', receiverId)
-    .single();
-
-  if (recipientRaw) {
-    recipientProfile = parseProfile(recipientRaw);
-  }
-
-  // 3. Marcar como leído en la BD y en profile.bio
-  await markChatAsRead(receiverId);
-
-  // 4. Obtener mensajes según el rol
+  let targetReceiverId = receiverId;
   let messagesData: ChatMessage[] = [];
 
   if (isSeller) {
-    // Si soy vendedor, ver todos los mensajes entre este cliente (receiverId) y CUALQUIER vendedor de la tienda
-    const { data: rawMsgs } = await supabase
-      .from('chat_messages')
-      .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
-      .or(`sender_id.eq.${receiverId},receiver_id.eq.${receiverId}`)
-      .order('created_at', { ascending: true });
+    // EL VISOR ES UN VENDEDOR: Está chateando con un cliente (receiverId = buyerId)
+    if (receiverId && receiverId !== 'store' && receiverId !== 'null') {
+      const { data: recipientRaw } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', receiverId)
+        .maybeSingle();
 
-    messagesData = (rawMsgs || []) as ChatMessage[];
+      if (recipientRaw) {
+        recipientProfile = parseProfile(recipientRaw);
+      }
+    }
+
+    if (!recipientProfile) {
+      recipientProfile = {
+        id: receiverId,
+        full_name: 'Cliente EkhiTeka',
+        role: 'comprador',
+      } as Profile;
+    }
+
+    targetReceiverId = receiverId;
+
+    // Ver todos los mensajes entre este cliente y CUALQUIER vendedor de la tienda
+    if (receiverId) {
+      const { data: rawMsgs } = await supabase
+        .from('chat_messages')
+        .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
+        .or(`sender_id.eq.${receiverId},receiver_id.eq.${receiverId}`)
+        .order('created_at', { ascending: true });
+
+      messagesData = (rawMsgs || []) as ChatMessage[];
+      await markChatAsRead(receiverId);
+    }
   } else {
-    // Si soy comprador, ver todos los mensajes de mi conversación con la tienda
+    // EL VISOR ES UN COMPRADOR: Siempre chatea con la entidad unificada "EkhiTeka"
+    targetReceiverId = mainSeller.id || receiverId || 'store';
+
+    recipientProfile = {
+      ...parseProfile(mainSeller),
+      id: targetReceiverId,
+      full_name: 'EkhiTeka',
+      role: 'vendedor',
+      avatar_url: '/Logo.jpg',
+      phone: storeConfig.whatsapp_phone || null,
+      town: 'Lekeitio',
+    } as Profile;
+
+    // Ver todos los mensajes del comprador con la tienda
     const { data: rawMsgs } = await supabase
       .from('chat_messages')
       .select('*, sender:profiles!chat_messages_sender_id_fkey(*)')
@@ -76,26 +105,27 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
       .order('created_at', { ascending: true });
 
     messagesData = (rawMsgs || []) as ChatMessage[];
+    await markChatAsRead(targetReceiverId);
   }
 
   // Contexto opcional: Producto
   let contextProduct: Product | null = null;
   if (product_id) {
-    const { data: p } = await supabase.from('products').select('*').eq('id', product_id).single();
-    contextProduct = p as Product;
+    const { data: p } = await supabase.from('products').select('*').eq('id', product_id).maybeSingle();
+    if (p) contextProduct = p as Product;
   }
 
   // Contexto opcional: Pedido
   let contextOrder: Order | null = null;
   if (order_id) {
-    const { data: o } = await supabase.from('orders').select('*').eq('id', order_id).single();
-    contextOrder = o as Order;
+    const { data: o } = await supabase.from('orders').select('*').eq('id', order_id).maybeSingle();
+    if (o) contextOrder = o as Order;
   }
 
   return (
     <ChatConversationView
       currentUserId={user.id}
-      receiverId={receiverId}
+      receiverId={targetReceiverId}
       recipient={recipientProfile}
       isSellerViewer={isSeller}
       sellerMap={sellerMap}
