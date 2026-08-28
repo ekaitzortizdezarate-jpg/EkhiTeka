@@ -41,8 +41,8 @@ export default function HomePage() {
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
           <div className="lg:col-span-8 space-y-6">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-[11px] font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-              <Sparkles className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" /> {t.home_hero_badge}
+            <span className="inline-flex items-center px-4 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-[11px] font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+              {t.home_hero_badge}
             </span>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
@@ -55,24 +55,6 @@ export default function HomePage() {
             <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
               {t.home_hero_desc}
             </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link
-                href="/tienda"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs sm:text-sm transition-all shadow-xl hover:scale-105 uppercase tracking-[0.14em]"
-              >
-                <ShoppingBag className="w-4 h-4 stroke-[1.75]" />
-                <span>{t.home_explore_btn}</span>
-              </Link>
-
-              <Link
-                href="/regalos-gourmet"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B]/80 hover:bg-[#1D1D1B] text-white font-bold text-xs sm:text-sm border border-stone-600 transition-all backdrop-blur-md shadow-lg hover:scale-105 uppercase tracking-[0.14em]"
-              >
-                <Gift className="w-4 h-4 stroke-[1.75] text-stone-300" />
-                <span>{t.home_gourmet_gifts_btn}</span>
-              </Link>
-            </div>
           </div>
 
           <div className="lg:col-span-4 flex justify-center lg:justify-end">

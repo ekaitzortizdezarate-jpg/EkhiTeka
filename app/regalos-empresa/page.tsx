@@ -49,8 +49,8 @@ export default function RegalosEmpresaPage() {
         </div>
 
         <div className="relative z-10 max-w-2xl space-y-4 text-white">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-            <Building2 className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" /> {t.corp_hero_badge}
+          <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+            {t.corp_hero_badge}
           </span>
 
           <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">

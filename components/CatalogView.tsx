@@ -131,8 +131,8 @@ export function CatalogView({
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
           <div className="lg:col-span-8 space-y-5">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-              <Sparkles className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" /> {t.shop_specialty} · Lekeitio
+            <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+              {t.shop_specialty} · Lekeitio
             </span>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
@@ -142,27 +142,6 @@ export function CatalogView({
             <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
               {t.shop_hero_desc}
             </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
-              <button
-                type="button"
-                onClick={scrollToCatalog}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs sm:text-sm transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-[0.14em]"
-              >
-                <span>{t.shop_see_cheeses}</span>
-                <ArrowDown className="w-4 h-4 stroke-[1.75]" />
-              </button>
-
-              <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20hacer%20un%20encargo%20a%20medida"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B]/80 hover:bg-[#1D1D1B] text-white font-bold text-xs sm:text-sm border border-stone-600 transition-all backdrop-blur-md shadow-lg hover:scale-105 uppercase tracking-[0.14em]"
-              >
-                <MessageCircle className="w-4 h-4 text-stone-300 stroke-[1.75]" />
-                <span>{t.shop_whatsapp_orders}</span>
-              </a>
-            </div>
           </div>
 
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
