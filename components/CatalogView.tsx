@@ -410,9 +410,9 @@ export function CatalogView({
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1D1D1B] hover:bg-stone-800 text-white dark:bg-white dark:hover:bg-stone-100 dark:text-[#1D1D1B] border border-stone-800 dark:border-white font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105 cursor-pointer"
               >
-                <MessageCircle className="w-4 h-4 text-[#FFE259] dark:text-[#C68D07] stroke-[2]" />
+                <MessageCircle className="w-4 h-4 stroke-[1.75]" />
                 <span>{t.shop_visit_contact}</span>
               </a>
               <button
