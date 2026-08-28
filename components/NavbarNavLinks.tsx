@@ -225,7 +225,7 @@ export function NavbarNavLinks({
             className={`flex items-center justify-center text-center px-3 xl:px-4 py-2 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[11px] xl:text-[12px] font-bold transition-all whitespace-nowrap min-h-[38px] ${
               pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
             }`}
           >
             <span>{t.nav_shop}</span>
@@ -236,7 +236,7 @@ export function NavbarNavLinks({
             className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
               pathname === '/regalos-gourmet'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
             }`}
           >
             <span className="block text-center">{t.nav_gourmet_gifts_line1}</span>
@@ -248,7 +248,7 @@ export function NavbarNavLinks({
             className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
               pathname === '/experiencias'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
             }`}
           >
             <span className="block text-center">{t.nav_tastings_line1}</span>
@@ -260,7 +260,7 @@ export function NavbarNavLinks({
             className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
               pathname === '/regalos-empresa'
                 ? 'bg-[#FFE259] text-[#1D1D1B] font-black shadow-xs border border-stone-800/10'
-                : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
             }`}
           >
             <span className="block text-center">{t.nav_corporate_line1}</span>
@@ -276,7 +276,7 @@ export function NavbarNavLinks({
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                     : hasUnseenOrderUpdates
                     ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-2 border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-md animate-pulse'
-                    : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                    : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
                 }`}
               >
                 <span>{t.nav_orders}</span>
@@ -290,7 +290,7 @@ export function NavbarNavLinks({
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                       : liveUnreadMessages > 0
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-2 border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-md animate-pulse'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span>{t.nav_chats}</span>
@@ -308,7 +308,7 @@ export function NavbarNavLinks({
                   className={`flex flex-col items-center justify-center text-center px-3.5 xl:px-4 py-1 rounded-2xl transition-all font-black uppercase tracking-[0.14em] xl:tracking-[0.16em] text-[10px] xl:text-[10.5px] leading-tight hover:scale-102 whitespace-nowrap min-h-[38px] ${
                     pathname === '/vendedor/productos/nuevo'
                       ? 'bg-[#FFE259] text-[#1D1D1B] shadow-xs border border-stone-800/10'
-                      : 'border-2 border-[#FFE259] bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span className="block text-center">{t.nav_add_product_line1}</span>
@@ -322,7 +322,7 @@ export function NavbarNavLinks({
                   className={`flex flex-col items-center justify-center text-center px-3 xl:px-4 py-1 rounded-2xl tracking-[0.14em] xl:tracking-[0.18em] uppercase text-[10.5px] xl:text-[11px] font-semibold transition-all leading-tight whitespace-nowrap min-h-[38px] ${
                     pathname === '/vendedor/productos'
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span className="block text-center">{t.nav_my_store_line1}</span>
@@ -338,7 +338,7 @@ export function NavbarNavLinks({
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-bold shadow-xs border border-stone-800/10'
                       : liveUnreadMessages > 0
                       ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-2 border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-md animate-pulse'
-                      : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span>{t.nav_chats}</span>
@@ -384,7 +384,7 @@ export function NavbarNavLinks({
             <form action={signout} className="shrink-0">
               <button
                 type="submit"
-                className="p-2.5 rounded-2xl text-stone-500 hover:text-red-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700"
+                className="p-2.5 rounded-2xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 hover:text-red-600 dark:text-stone-300 dark:hover:text-red-400 transition-colors cursor-pointer border border-stone-200 dark:border-stone-700 shadow-2xs"
                 title={t.nav_logout}
               >
                 <LogOut className="w-4 h-4" />
@@ -395,13 +395,13 @@ export function NavbarNavLinks({
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="px-3 sm:px-4 py-2 text-xs font-bold font-serif uppercase tracking-wider text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white rounded-2xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="px-3 sm:px-4 py-2 text-xs font-bold font-serif uppercase tracking-wider bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 rounded-2xl border border-stone-200 dark:border-stone-700 transition-colors shadow-2xs"
             >
               {t.nav_login}
             </Link>
             <Link
               href="/register"
-              className="hidden sm:inline-flex px-4 py-2 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs"
+              className="hidden sm:inline-flex px-4 py-2 text-xs font-black font-serif uppercase tracking-wider bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] text-white dark:text-stone-900 rounded-2xl transition-all shadow-2xs border border-stone-900 dark:border-stone-100"
             >
               {t.nav_register}
             </Link>
@@ -457,7 +457,7 @@ export function NavbarNavLinks({
                   className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
                     pathname === '/tienda' || pathname.startsWith('/categoria') || pathname.startsWith('/producto')
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span>{t.nav_shop}</span>
@@ -468,7 +468,7 @@ export function NavbarNavLinks({
                   className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
                     pathname === '/regalos-gourmet'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span>{t.nav_gourmet_gifts}</span>
@@ -479,7 +479,7 @@ export function NavbarNavLinks({
                   className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
                     pathname === '/experiencias'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span>{t.nav_tastings_experiences}</span>
@@ -490,7 +490,7 @@ export function NavbarNavLinks({
                   className={`flex items-center justify-center text-center p-3.5 rounded-full font-bold text-xs tracking-[0.16em] uppercase transition-all shadow-xs ${
                     pathname === '/regalos-empresa'
                       ? 'bg-[#FFE259] text-[#1D1D1B] scale-102 ring-2 ring-[#FFE259]'
-                      : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800 hover:border-[#FFE259]'
+                      : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <span>{t.nav_corporate_gifts}</span>
@@ -512,7 +512,7 @@ export function NavbarNavLinks({
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
                           : hasUnseenOrderUpdates
                           ? 'bg-[#FFE259] text-[#1D1D1B] font-black border-2 border-[#FFE259] ring-2 ring-[#FFE259]/60 shadow-md animate-pulse'
-                          : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
+                          : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                       }`}
                     >
                       <span>{t.nav_orders}</span>
@@ -525,7 +525,7 @@ export function NavbarNavLinks({
                         className={`flex items-center justify-center p-3.5 rounded-full font-black text-xs tracking-[0.16em] uppercase shadow-sm hover:scale-102 transition-all ${
                           pathname === '/vendedor/productos/nuevo'
                             ? 'bg-[#FFE259] text-[#1D1D1B] ring-2 ring-[#FFE259]'
-                            : 'border-2 border-[#FFE259] bg-[#FFE259]/10 dark:bg-transparent text-stone-900 dark:text-[#FFE259] hover:bg-[#FFE259] hover:text-[#1D1D1B]'
+                            : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                         }`}
                       >
                         <span>{t.nav_add_product}</span>
@@ -539,7 +539,7 @@ export function NavbarNavLinks({
                         className={`flex flex-col items-center justify-center text-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all leading-tight ${
                           pathname === '/vendedor/productos'
                             ? 'bg-[#FFE259] text-[#1D1D1B]'
-                            : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
+                            : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                         }`}
                       >
                         <span className="block text-center">{t.nav_my_store_line1}</span>
@@ -567,7 +567,7 @@ export function NavbarNavLinks({
                       className={`flex items-center justify-center gap-2 p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname.startsWith('/chat')
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
+                          : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                       }`}
                     >
                       <span>{t.nav_chats}</span>
@@ -584,7 +584,7 @@ export function NavbarNavLinks({
                       className={`flex items-center justify-center p-3 rounded-full font-bold text-xs tracking-[0.14em] uppercase transition-all ${
                         pathname === '/perfil'
                           ? 'bg-[#FFE259] text-[#1D1D1B]'
-                          : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
+                          : 'bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700'
                       }`}
                     >
                       <span>{t.nav_profile}</span>
@@ -593,7 +593,7 @@ export function NavbarNavLinks({
                     <form action={signout} className="pt-2">
                       <button
                         type="submit"
-                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase text-stone-500 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
+                        className="w-full flex items-center justify-center p-2.5 rounded-full text-xs font-bold tracking-[0.14em] uppercase bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-600 hover:text-red-600 dark:text-stone-400 dark:hover:text-red-400 border border-stone-200 dark:border-stone-700 transition-colors cursor-pointer"
                       >
                         <span>{t.nav_logout}</span>
                       </button>
@@ -604,14 +604,14 @@ export function NavbarNavLinks({
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border-2 border-stone-300 dark:border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-white hover:border-[#FFE259] hover:text-[#C68D07] dark:hover:text-[#FFE259] transition-all bg-white dark:bg-stone-900"
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full border border-stone-200 dark:border-stone-700 font-bold text-xs tracking-[0.14em] uppercase text-stone-800 dark:text-stone-200 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 transition-all shadow-2xs"
                     >
                       {t.nav_login}
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] dark:hover:bg-[#FFE259] dark:hover:text-[#1D1D1B] font-black text-xs tracking-[0.14em] uppercase text-white dark:text-stone-900 shadow-md hover:scale-102 transition-all"
+                      className="flex items-center justify-center text-center py-3 px-3 rounded-full bg-[#1D1D1B] dark:bg-stone-100 hover:bg-[#FFE259] hover:text-[#1D1D1B] dark:hover:bg-[#FFE259] dark:hover:text-[#1D1D1B] font-black text-xs tracking-[0.14em] uppercase text-white dark:text-stone-900 shadow-md hover:scale-102 transition-all border border-stone-900 dark:border-stone-100"
                     >
                       {t.nav_register}
                     </Link>
