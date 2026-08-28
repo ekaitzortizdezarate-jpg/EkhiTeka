@@ -34,7 +34,7 @@ export function NavbarNavLinks({
   unreadMessagesCount,
   ordersCount,
   activeOrders = [],
-  storeAddress = 'Gamarra Kalea 4, Lekeitio · Bizkaia',
+  storeAddress = 'Gamarra Kalea 4, Lekeitio',
 }: NavbarNavLinksProps) {
   const pathname = usePathname();
   const { t, language } = useLanguage();

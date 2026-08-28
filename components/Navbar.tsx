@@ -24,8 +24,8 @@ export default async function Navbar() {
     storeConfig.pickup_addresses?.[0];
 
   const storeAddress = mainStoreAddr
-    ? `${mainStoreAddr.street}${mainStoreAddr.number ? ` ${mainStoreAddr.number}` : ''}, ${mainStoreAddr.town} · ${mainStoreAddr.province}`
-    : 'Gamarra Kalea 4, Lekeitio · Bizkaia';
+    ? `${mainStoreAddr.street}${mainStoreAddr.number ? ` ${mainStoreAddr.number}` : ''}, ${mainStoreAddr.town}`
+    : 'Gamarra Kalea 4, Lekeitio';
 
   if (user) {
     const { data: profileRaw } = await supabase
