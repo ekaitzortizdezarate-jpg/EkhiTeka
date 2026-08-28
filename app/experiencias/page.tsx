@@ -125,7 +125,7 @@ export default function ExperienciasPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 items-start">
             {homeTastingKits.map((product) => (
               <ProductCard key={product.id} product={product} isSeller={isSeller} />
             ))}
@@ -150,7 +150,7 @@ export default function ExperienciasPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 items-start">
             {storeTastings.map((product) => (
               <ProductCard key={product.id} product={product} isSeller={isSeller} />
             ))}

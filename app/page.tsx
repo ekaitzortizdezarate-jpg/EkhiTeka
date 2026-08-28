@@ -87,38 +87,38 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {/* Tarjeta 1: Tienda */}
           <Link
             href="/tienda"
-            className="manduca-card group relative rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
+            className="manduca-card group relative rounded-2xl sm:rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
           >
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-36 sm:h-56 overflow-hidden">
               <img
                 src={card1Image}
                 alt={t.home_card1_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold uppercase tracking-[0.14em] rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
+              <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 px-2 sm:px-3 py-0.5 sm:py-1 bg-[#1D1D1B]/90 text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.14em] rounded-lg sm:rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
                 {t.home_card1_badge}
               </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block">
+              <div className="absolute bottom-2.5 left-3 right-3 sm:bottom-3 sm:left-4 sm:right-4 text-white">
+                <span className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block truncate">
                   {t.home_card1_sub}
                 </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
+                <h3 className="font-serif font-bold text-sm sm:text-xl leading-tight">
                   {t.home_card1_title}
                 </h3>
               </div>
             </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+            <div className="p-3 sm:p-5 space-y-2 sm:space-y-3 flex-1 flex flex-col justify-between">
+              <p className="text-[11px] sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-2 sm:line-clamp-none">
                 {t.home_card1_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+              <div className="flex items-center gap-1 font-bold text-[10px] sm:text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-1 sm:pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
                 <span>{t.home_card1_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
               </div>
             </div>
           </Link>
@@ -126,34 +126,34 @@ export default function HomePage() {
           {/* Tarjeta 2: Regalos Gourmet */}
           <Link
             href="/regalos-gourmet"
-            className="manduca-card group relative rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
+            className="manduca-card group relative rounded-2xl sm:rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
           >
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-36 sm:h-56 overflow-hidden">
               <img
                 src={card2Image}
                 alt={t.home_card2_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold uppercase tracking-[0.14em] rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
+              <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 px-2 sm:px-3 py-0.5 sm:py-1 bg-[#1D1D1B]/90 text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.14em] rounded-lg sm:rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
                 {t.home_card2_badge}
               </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block">
+              <div className="absolute bottom-2.5 left-3 right-3 sm:bottom-3 sm:left-4 sm:right-4 text-white">
+                <span className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block truncate">
                   {t.home_card2_sub}
                 </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
+                <h3 className="font-serif font-bold text-sm sm:text-xl leading-tight">
                   {t.home_card2_title}
                 </h3>
               </div>
             </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+            <div className="p-3 sm:p-5 space-y-2 sm:space-y-3 flex-1 flex flex-col justify-between">
+              <p className="text-[11px] sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-2 sm:line-clamp-none">
                 {t.home_card2_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+              <div className="flex items-center gap-1 font-bold text-[10px] sm:text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-1 sm:pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
                 <span>{t.home_card2_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
               </div>
             </div>
           </Link>
@@ -161,34 +161,34 @@ export default function HomePage() {
           {/* Tarjeta 3: Catas & Experiencias */}
           <Link
             href="/experiencias"
-            className="manduca-card group relative rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
+            className="manduca-card group relative rounded-2xl sm:rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
           >
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-36 sm:h-56 overflow-hidden">
               <img
                 src={card3Image}
                 alt={t.home_card3_title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold uppercase tracking-[0.14em] rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
+              <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 px-2 sm:px-3 py-0.5 sm:py-1 bg-[#1D1D1B]/90 text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.14em] rounded-lg sm:rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
                 {t.home_card3_badge}
               </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block">
+              <div className="absolute bottom-2.5 left-3 right-3 sm:bottom-3 sm:left-4 sm:right-4 text-white">
+                <span className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block truncate">
                   {t.home_card3_sub}
                 </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
+                <h3 className="font-serif font-bold text-sm sm:text-xl leading-tight">
                   {t.home_card3_title}
                 </h3>
               </div>
             </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+            <div className="p-3 sm:p-5 space-y-2 sm:space-y-3 flex-1 flex flex-col justify-between">
+              <p className="text-[11px] sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-2 sm:line-clamp-none">
                 {t.home_card3_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+              <div className="flex items-center gap-1 font-bold text-[10px] sm:text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-1 sm:pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
                 <span>{t.home_card3_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
               </div>
             </div>
           </Link>
@@ -196,9 +196,9 @@ export default function HomePage() {
           {/* Tarjeta 4: Regalos de Empresa */}
           <Link
             href="/regalos-empresa"
-            className="manduca-card group relative rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
+            className="manduca-card group relative rounded-2xl sm:rounded-3xl overflow-hidden bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 shadow-xs transition-all duration-300 flex flex-col justify-between"
           >
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-36 sm:h-56 overflow-hidden">
               <img
                 src={card4Image}
                 alt={t.home_card4_title}
@@ -208,25 +208,25 @@ export default function HomePage() {
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute top-3 left-3 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold uppercase tracking-[0.14em] rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
+              <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 px-2 sm:px-3 py-0.5 sm:py-1 bg-[#1D1D1B]/90 text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.14em] rounded-lg sm:rounded-xl shadow-md border border-stone-700/60 backdrop-blur-xs">
                 {t.home_card4_badge}
               </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block">
+              <div className="absolute bottom-2.5 left-3 right-3 sm:bottom-3 sm:left-4 sm:right-4 text-white">
+                <span className="text-[8.5px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-stone-300 block truncate">
                   {t.home_card4_sub}
                 </span>
-                <h3 className="font-serif font-bold text-xl leading-tight">
+                <h3 className="font-serif font-bold text-sm sm:text-xl leading-tight">
                   {t.home_card4_title}
                 </h3>
               </div>
             </div>
-            <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-              <p className="text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+            <div className="p-3 sm:p-5 space-y-2 sm:space-y-3 flex-1 flex flex-col justify-between">
+              <p className="text-[11px] sm:text-[13px] text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-2 sm:line-clamp-none">
                 {t.home_card4_desc}
               </p>
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
+              <div className="flex items-center gap-1 font-bold text-[10px] sm:text-xs text-[#1D1D1B] dark:text-[#F5F5F0] pt-1 sm:pt-2 uppercase tracking-[0.14em] group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259] transition-colors">
                 <span>{t.home_card4_btn}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform stroke-[1.75]" />
               </div>
             </div>
           </Link>

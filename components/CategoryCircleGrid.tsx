@@ -81,34 +81,39 @@ export function CategoryCircleGrid({
               key={cat.id}
               type="button"
               onClick={() => onSelectCategory?.(cat.id)}
-              className={`group relative p-3 sm:p-4 rounded-3xl border-2 text-center transition-all flex flex-col items-center justify-between cursor-pointer hover:scale-103 shadow-xs ${
+              className={`group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square flex items-center justify-center p-3 sm:p-4 text-center cursor-pointer transition-all duration-300 hover:scale-103 shadow-md border-2 ${
                 isSelected
-                  ? 'bg-[#FFE259] border-stone-900 dark:border-white shadow-md'
-                  : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 hover:border-[#FFE259] dark:hover:border-[#FFE259]'
+                  ? 'border-[#FFE259] ring-2 ring-[#FFE259] scale-103 shadow-lg'
+                  : 'border-transparent hover:border-[#FFE259]'
               }`}
             >
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-stone-200 dark:border-stone-700 group-hover:border-[#FFE259] mb-2 p-0.5 bg-[#FAF8F5]">
-                <img
-                  src={imageSrc}
-                  alt={getCategoryName(cat)}
-                  className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
-                  }}
-                />
-              </div>
+              {/* Imagen ocupando todo el fondo de la tarjeta */}
+              <img
+                src={imageSrc}
+                alt={getCategoryName(cat)}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
+                }}
+              />
+              <div
+                className={`absolute inset-0 transition-colors duration-300 ${
+                  isSelected
+                    ? 'bg-black/40'
+                    : 'bg-black/55 group-hover:bg-black/40'
+                }`}
+              />
 
-              <div className="space-y-0.5 min-w-0 w-full">
-                <span className={`block font-serif font-black text-xs sm:text-[13px] truncate leading-tight ${
-                  isSelected ? 'text-[#1D1D1B]' : 'text-stone-900 dark:text-stone-100 group-hover:text-[#C68D07] dark:group-hover:text-[#FFE259]'
-                }`}>
+              {/* Texto del nombre de la categoría en el centro */}
+              <div className="relative z-10 space-y-1 px-1 text-center">
+                <span className="block font-serif font-black text-xs sm:text-sm lg:text-[15px] text-white drop-shadow-md uppercase tracking-wider leading-tight">
                   {getCategoryName(cat)}
                 </span>
-                <span className={`block text-[9.5px] font-sans font-bold uppercase tracking-wider truncate ${
-                  isSelected ? 'text-stone-800' : 'text-stone-400 dark:text-stone-500'
-                }`}>
-                  {getCategorySubtitle(cat)}
-                </span>
+                {isSelected && (
+                  <span className="inline-block px-2 py-0.5 rounded-full bg-[#FFE259] text-[#1D1D1B] text-[9px] font-sans font-black uppercase tracking-widest shadow-xs">
+                    ✓
+                  </span>
+                )}
               </div>
             </button>
           );

@@ -82,11 +82,11 @@ export default function RegalosEmpresaPage() {
       {/* Contenedor del resto del contenido */}
       <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* 2. Tarjetas con Imagen: Lotes, Catas y Personalización */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
         {/* Tarjeta 1: Lotes y Cestas de Navidad */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] relative">
+        <div className="manduca-card group rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-3.5 sm:p-6 space-y-3 sm:space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="w-full h-36 sm:h-48 rounded-xl sm:rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src="/images/secciones/Cestas.JPG"
                 alt={t.corp_card1_title}
@@ -97,14 +97,14 @@ export default function RegalosEmpresaPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
-                <Briefcase className="w-4 h-4 stroke-[1.75]" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
+              <h2 className="text-sm sm:text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.corp_card1_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+              <p className="text-[11px] sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
                 {t.corp_card1_desc}
               </p>
             </div>
@@ -112,9 +112,9 @@ export default function RegalosEmpresaPage() {
         </div>
 
         {/* Tarjeta 2: Catas Privadas & Team Building */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] relative">
+        <div className="manduca-card group rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-3.5 sm:p-6 space-y-3 sm:space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="w-full h-36 sm:h-48 rounded-xl sm:rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src="/images/secciones/Catas.JPG"
                 alt={t.corp_card2_title}
@@ -125,14 +125,14 @@ export default function RegalosEmpresaPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
-                <Users className="w-4 h-4 stroke-[1.75]" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
+              <h2 className="text-sm sm:text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.corp_card2_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+              <p className="text-[11px] sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
                 {t.corp_card2_desc}
               </p>
             </div>
@@ -140,9 +140,9 @@ export default function RegalosEmpresaPage() {
         </div>
 
         {/* Tarjeta 3: Personalización con tu Marca */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] relative">
+        <div className="manduca-card group rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-3.5 sm:p-6 space-y-3 sm:space-y-4 shadow-xs flex flex-col justify-between overflow-hidden col-span-2 sm:col-span-1">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="w-full h-36 sm:h-48 rounded-xl sm:rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-[#141312] border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src="/images/secciones/Mesas.JPG"
                 alt={t.corp_card3_title}
@@ -153,14 +153,14 @@ export default function RegalosEmpresaPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
-                <Sparkles className="w-4 h-4 stroke-[1.75]" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
+              <h2 className="text-sm sm:text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.corp_card3_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+              <p className="text-[11px] sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
                 {t.corp_card3_desc}
               </p>
             </div>

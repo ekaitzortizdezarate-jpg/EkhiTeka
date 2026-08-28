@@ -138,7 +138,7 @@ export default function RegalosGourmetPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 items-start">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} isSeller={isSeller} />
             ))}
@@ -147,11 +147,11 @@ export default function RegalosGourmetPage() {
       )}
 
       {/* 3. Tres Bloques Editoriales con Imagen: Cestas, Packs y Tarjetas */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
         {/* Tarjeta 1: Cestas Gourmet a Medida */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
+        <div className="manduca-card group rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-3.5 sm:p-6 space-y-3 sm:space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="w-full h-36 sm:h-48 rounded-xl sm:rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src={getSiteImage('gifts_card1', '/images/secciones/Cestas.JPG')}
                 alt={t.gifts_card1_title}
@@ -162,28 +162,28 @@ export default function RegalosGourmetPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
-                <Package className="w-4 h-4 stroke-[1.75]" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
+              <h2 className="text-sm sm:text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.gifts_card1_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+              <p className="text-[11px] sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
                 {t.gifts_card1_desc}
               </p>
             </div>
           </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 tracking-[0.12em] uppercase">
-            <Truck className="w-4 h-4 text-stone-600 dark:text-stone-400 stroke-[1.75]" />
-            <span>{t.gifts_card1_feature}</span>
+          <div className="pt-1 sm:pt-2 text-[10px] sm:text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-1.5 sm:gap-2 tracking-[0.12em] uppercase">
+            <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-stone-600 dark:text-stone-400 stroke-[1.75]" />
+            <span className="truncate">{t.gifts_card1_feature}</span>
           </div>
         </div>
 
         {/* Tarjeta 2: Packs Degustación & Maridaje */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
+        <div className="manduca-card group rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-3.5 sm:p-6 space-y-3 sm:space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="w-full h-36 sm:h-48 rounded-xl sm:rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src={getSiteImage('gifts_card2', '/images/secciones/Quesos.JPG')}
                 alt={t.gifts_card2_title}
@@ -194,28 +194,28 @@ export default function RegalosGourmetPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
-                <Gift className="w-4 h-4 stroke-[1.75]" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
+              <h2 className="text-sm sm:text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.gifts_card2_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+              <p className="text-[11px] sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
                 {t.gifts_card2_desc}
               </p>
             </div>
           </div>
-          <div className="pt-2 text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-2 tracking-[0.12em] uppercase">
-            <Sparkles className="w-4 h-4 text-stone-600 dark:text-stone-400 stroke-[1.75]" />
-            <span>{t.gifts_card2_feature}</span>
+          <div className="pt-1 sm:pt-2 text-[10px] sm:text-xs font-bold text-stone-500 dark:text-stone-400 flex items-center gap-1.5 sm:gap-2 tracking-[0.12em] uppercase">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-stone-600 dark:text-stone-400 stroke-[1.75]" />
+            <span className="truncate">{t.gifts_card2_feature}</span>
           </div>
         </div>
 
         {/* Tarjeta 3: Tarjetas & Catas de Regalo */}
-        <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
-          <div className="space-y-4">
-            <div className="w-full h-48 rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
+        <div className="manduca-card group rounded-2xl sm:rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-3.5 sm:p-6 space-y-3 sm:space-y-4 shadow-xs flex flex-col justify-between overflow-hidden col-span-2 sm:col-span-1">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="w-full h-36 sm:h-48 rounded-xl sm:rounded-2xl overflow-hidden bg-[#FAF7F2] dark:bg-stone-850 border border-[#E8E5DF] dark:border-[#2D2B27] relative">
               <img
                 src={getSiteImage('gifts_card3', '/images/secciones/Mesas.JPG')}
                 alt={t.gifts_card3_title}
@@ -226,14 +226,14 @@ export default function RegalosGourmetPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
-                <CreditCard className="w-4 h-4 stroke-[1.75]" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2D2B27] flex items-center justify-center text-stone-700 dark:text-stone-300">
+                <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.75]" />
               </div>
-              <h2 className="text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
+              <h2 className="text-sm sm:text-xl font-bold text-[#1D1D1B] dark:text-stone-100 leading-snug">
                 {t.gifts_card3_title}
               </h2>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal">
+              <p className="text-[11px] sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
                 {t.gifts_card3_desc}
               </p>
             </div>

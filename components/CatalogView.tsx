@@ -9,7 +9,7 @@ import { ExperienceBanners } from '@/components/ExperienceBanners';
 import { CustomerReviews } from '@/components/CustomerReviews';
 import type { Category, ProductWithSeller } from '@/types/database';
 import { getProductCategoryId } from '@/lib/productHelpers';
-import { Search, SlidersHorizontal, Sparkles, ArrowDown, MessageCircle, MapPin, Clock } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, ArrowDown, MessageCircle, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CatalogViewProps {
   products: ProductWithSeller[];
@@ -43,16 +43,14 @@ export function CatalogView({
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
-        if (selectedCat !== 'all' && getProductCategoryId(p) !== selectedCat) return false;
-        if (search.trim()) {
-          const q = search.toLowerCase();
-          const matchName = p.name.toLowerCase().includes(q);
-          const matchDesc = (p.description || '').toLowerCase().includes(q);
-          const matchOrigin = (p.origin_region || '').toLowerCase().includes(q);
-          const matchSeller = (p.profiles?.full_name || '').toLowerCase().includes(q);
-          if (!matchName && !matchDesc && !matchOrigin && !matchSeller) return false;
-        }
-        return true;
+        const matchesCategory =
+          selectedCat === 'all' || getProductCategoryId(p) === selectedCat;
+        const matchesSearch =
+          !search ||
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          (p.description && p.description.toLowerCase().includes(search.toLowerCase())) ||
+          (p.origin_region && p.origin_region.toLowerCase().includes(search.toLowerCase()));
+        return matchesCategory && matchesSearch;
       })
       .sort((a, b) => {
         if (sortBy === 'name_asc') return a.name.localeCompare(b.name);
@@ -63,15 +61,16 @@ export function CatalogView({
       });
   }, [products, selectedCat, search, sortBy]);
 
-  const isGroupedByCategory = selectedCat === 'all' && sortBy === 'category';
-
   const productsByCategory = useMemo(() => {
-    if (!isGroupedByCategory) return [];
-
     const groups: { category: Category; items: ProductWithSeller[] }[] = [];
     const seenIds = new Set<string>();
 
-    categories.forEach((cat) => {
+    const targetCategories =
+      selectedCat === 'all'
+        ? categories
+        : categories.filter((c) => c.id === selectedCat);
+
+    targetCategories.forEach((cat) => {
       const items = filteredProducts.filter((p) => getProductCategoryId(p) === cat.id);
       if (items.length > 0) {
         items.forEach((p) => seenIds.add(p.id));
@@ -82,25 +81,38 @@ export function CatalogView({
       }
     });
 
-    const remaining = filteredProducts.filter((p) => !seenIds.has(p.id));
-    if (remaining.length > 0) {
-      groups.push({
-        category: {
-          id: 'otros',
-          name_es: 'Otros Productos Gourmets',
-          name_eu: 'Beste Gourmet Produktu Batzuk',
-          name_fr: 'Autres Produits Gourmands',
-          name_en: 'Other Gourmet Products',
-          icon: 'Sparkles',
-          is_active: true,
-          display_order: 999,
-        },
-        items: remaining,
-      });
+    if (selectedCat === 'all') {
+      const remaining = filteredProducts.filter((p) => !seenIds.has(p.id));
+      if (remaining.length > 0) {
+        groups.push({
+          category: {
+            id: 'otros',
+            name_es: 'Otros Productos Gourmets',
+            name_eu: 'Beste Gourmet Produktu Batzuk',
+            name_fr: 'Autres Produits Gourmands',
+            name_en: 'Other Gourmet Products',
+            icon: 'Sparkles',
+            is_active: true,
+            display_order: 999,
+          },
+          items: remaining,
+        });
+      }
     }
 
     return groups;
-  }, [filteredProducts, categories, isGroupedByCategory]);
+  }, [filteredProducts, categories, selectedCat]);
+
+  const scrollCategoryRow = (categoryId: string, direction: 'left' | 'right') => {
+    const el = document.getElementById(`cat-row-${categoryId}`);
+    if (el) {
+      const scrollAmount = Math.max(280, el.clientWidth * 0.75);
+      el.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   const getCategoryName = (cat: Category) => {
     if (language === 'eu') return cat.name_eu;
@@ -252,49 +264,73 @@ export function CatalogView({
           </div>
         </div>
 
-        {/* Grid de Productos */}
-        {filteredProducts.length > 0 ? (
-          isGroupedByCategory ? (
-            <div className="space-y-12">
-              {productsByCategory.map((group) => (
-                <div key={group.category.id} className="space-y-6 animate-fadeIn">
-                  {/* Cabecera de la Sección de Categoría */}
-                  <div className="flex items-center justify-between pb-3 border-b-2 border-[#FFE259] dark:border-[#FFE259]/60">
-                    <div className="flex items-center gap-3">
-                      <span className="w-3.5 h-3.5 rounded-full bg-[#FFE259] inline-block shrink-0 shadow-xs border border-stone-800/10" />
-                      <h3 className="text-xl sm:text-2xl font-bold uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
-                        {getCategoryName(group.category)}
-                      </h3>
-                      <span className="text-xs font-bold text-stone-400 font-mono">
-                        ({group.items.length})
-                      </span>
-                    </div>
+        {/* Filas de Categorías con Desplazamiento Horizontal */}
+        {productsByCategory.length > 0 ? (
+          <div className="space-y-12">
+            {productsByCategory.map((group) => (
+              <div key={group.category.id} className="space-y-4 sm:space-y-5 animate-fadeIn">
+                {/* Cabecera de la Sección de Categoría */}
+                <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b-2 border-[#FFE259] dark:border-[#FFE259]/60">
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-[#FFE259] inline-block shrink-0 shadow-xs border border-stone-800/10" />
+                    <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-stone-900 dark:text-stone-100 font-serif">
+                      {getCategoryName(group.category)}
+                    </h3>
+                    <span className="text-xs font-bold text-stone-400 font-mono">
+                      ({group.items.length})
+                    </span>
+                  </div>
+
+                  {/* Controles de desplazamiento y filtro */}
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    {selectedCat === 'all' && (
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryChange(group.category.id)}
+                        className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 transition-colors font-serif hover:underline hidden md:inline-block cursor-pointer mr-2"
+                      >
+                        {language === 'eu' ? 'Ikusi kategoria hau soilik →' : 'Ver solo esta categoría →'}
+                      </button>
+                    )}
 
                     <button
                       type="button"
-                      onClick={() => handleCategoryChange(group.category.id)}
-                      className="text-xs font-bold uppercase tracking-wider text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100 transition-colors font-serif hover:underline hidden sm:inline-block cursor-pointer"
+                      onClick={() => scrollCategoryRow(group.category.id, 'left')}
+                      className="p-1.5 sm:p-2 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 transition-colors cursor-pointer shadow-2xs"
+                      aria-label="Desplazar a la izquierda"
+                      title="Anterior"
                     >
-                      {language === 'eu' ? 'Ikusi kategoria hau soilik →' : 'Ver solo esta categoría →'}
+                      <ChevronLeft className="w-4 h-4 stroke-[2]" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollCategoryRow(group.category.id, 'right')}
+                      className="p-1.5 sm:p-2 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 transition-colors cursor-pointer shadow-2xs"
+                      aria-label="Desplazar a la derecha"
+                      title="Siguiente"
+                    >
+                      <ChevronRight className="w-4 h-4 stroke-[2]" />
                     </button>
                   </div>
-
-                  {/* Grid de Productos de esta Categoría */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 items-start">
-                    {group.items.map((product) => (
-                      <ProductCard key={product.id} product={product} isSeller={isSeller} />
-                    ))}
-                  </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 items-start animate-fadeIn">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} isSeller={isSeller} />
-              ))}
-            </div>
-          )
+
+                {/* Panel de Productos Desplazable Horizontalmente */}
+                <div
+                  id={`cat-row-${group.category.id}`}
+                  className="flex gap-3 sm:gap-6 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth no-scrollbar"
+                >
+                  {group.items.map((product) => (
+                    <div
+                      key={product.id}
+                      className="w-[calc(50%-6px)] sm:w-[260px] md:w-[280px] lg:w-[300px] shrink-0 snap-start flex flex-col"
+                    >
+                      <ProductCard product={product} isSeller={isSeller} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="py-16 text-center bg-white dark:bg-[#1C1B19] rounded-3xl border border-[#E8E5DF] dark:border-[#2D2B27] p-8 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 mx-auto">
