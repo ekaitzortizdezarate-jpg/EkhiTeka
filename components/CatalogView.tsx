@@ -314,15 +314,15 @@ export function CatalogView({
                   </div>
                 </div>
 
-                {/* Panel de Productos Desplazable Horizontalmente */}
+                {/* Panel de Productos Desplazable Horizontalmente con Altura Uniforme */}
                 <div
                   id={`cat-row-${group.category.id}`}
-                  className="flex gap-3 sm:gap-6 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth no-scrollbar"
+                  className="flex items-stretch gap-3 sm:gap-6 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth no-scrollbar"
                 >
                   {group.items.map((product) => (
                     <div
                       key={product.id}
-                      className="w-[calc(50%-6px)] sm:w-[260px] md:w-[280px] lg:w-[300px] shrink-0 snap-start flex flex-col"
+                      className="w-[calc(50%-6px)] sm:w-[260px] md:w-[280px] lg:w-[300px] shrink-0 snap-start flex flex-col h-auto"
                     >
                       <ProductCard product={product} isSeller={isSeller} />
                     </div>
