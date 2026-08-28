@@ -40,11 +40,47 @@ export function ProductDetailView({
 }: ProductDetailViewProps) {
   const { t, language } = useLanguage();
 
-  const isEvent =
-    product.category_id === 'catas' ||
+  const isCataCasa =
+    product.category_id === 'cata_casa' ||
+    (product.name && product.name.toLowerCase().includes('cata en casa'));
+
+  const isCataTienda =
     product.category_id === 'cata_presencial' ||
-    product.category_id === 'experiencia' ||
-    (product.name && product.name.toLowerCase().includes('cata'));
+    product.category_id === 'catas' ||
+    (product.name && (
+      product.name.toLowerCase().includes('cata presencial') ||
+      product.name.toLowerCase().includes('dastaketa presentziala') ||
+      (product.name.toLowerCase().includes('cata') && !isCataCasa)
+    ));
+
+  const isGiftCard =
+    product.category_id === 'tarjeta_regalo' ||
+    product.category_id === 'tarjetas' ||
+    (product.name && (
+      product.name.toLowerCase().includes('tarjeta') ||
+      product.name.toLowerCase().includes('txartel') ||
+      product.name.toLowerCase().includes('gift card') ||
+      product.name.toLowerCase().includes('carte cadeau')
+    ));
+
+  const isLoteGourmet =
+    product.category_id === 'lote' ||
+    product.category_id === 'lote_gourmet' ||
+    product.category_id === 'lotes' ||
+    product.category_id === 'lotes_gourmet' ||
+    product.category_id === 'cesta' ||
+    product.category_id === 'cesta_gourmet' ||
+    product.category_id === 'cestas' ||
+    product.category_id === 'cestas_gourmet' ||
+    product.format === 'pack' ||
+    (product.name && (
+      product.name.toLowerCase().includes('lote') ||
+      product.name.toLowerCase().includes('cesta') ||
+      product.name.toLowerCase().includes('pack')
+    ) && !isCataCasa && !isCataTienda && !isGiftCard);
+
+  const isEvent = isCataTienda || product.category_id === 'experiencia';
+  const isMultiProductOrEventOrCard = isCataCasa || isCataTienda || isGiftCard || isLoteGourmet;
 
   const imageUrl = getProductImage(product);
   const discountInfo = getProductDiscount(product);
@@ -89,7 +125,7 @@ export function ProductDetailView({
                 (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
               }}
             />
-            {translatedOrigin && (
+            {translatedOrigin && !isMultiProductOrEventOrCard && (
               <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-xl uppercase tracking-wide shadow-md font-sans">
                 <MapPin className="w-3.5 h-3.5 text-stone-300 stroke-[1.75]" />
                 <span>{translatedOrigin}</span>

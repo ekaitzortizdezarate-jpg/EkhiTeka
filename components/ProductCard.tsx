@@ -85,6 +85,7 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
   const sellerDescription = getSellerDescription(product.description);
   const isPackType = isCataCasa || isCataTienda || isLoteGourmet;
   const isEvent = isCataTienda;
+  const isMultiProductOrEventOrCard = isCataCasa || isCataTienda || isGiftCard || isLoteGourmet || isPackType;
 
   const imageUrl = getProductImage(product);
   const discountInfo = getProductDiscount(product);
@@ -159,8 +160,8 @@ export function ProductCard({ product, isSeller = false }: ProductCardProps) {
           }}
         />
 
-        {/* Origen (Top Left) */}
-        {translatedOrigin && (
+        {/* Origen (Top Left) - Oculto para cestas, lote en casa, lote en tienda y tarjetas */}
+        {translatedOrigin && !isMultiProductOrEventOrCard && (
           <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1D1D1B]/90 dark:bg-black/90 backdrop-blur-xs text-white text-[10.5px] sm:text-[11px] font-bold rounded-xl uppercase tracking-wide shadow-xs max-w-[55%] truncate font-sans">
             <MapPin className="w-3.5 h-3.5 text-stone-300 shrink-0 stroke-[1.75]" />
             <span className="truncate">{translatedOrigin}</span>
