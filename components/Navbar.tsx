@@ -16,7 +16,7 @@ export default async function Navbar() {
   let profile: Profile | null = null;
   let unreadMessagesCount = 0;
   let ordersCount = 0;
-  let activeOrders: { id: string; status: string }[] = [];
+  let activeOrders: { id: string; status: string; updated_at?: string; created_at?: string; seller_id?: string; buyer_id?: string }[] = [];
 
   const mainStoreAddr =
     storeConfig.pickup_addresses?.find((a) => a.is_main) ||
@@ -40,48 +40,56 @@ export default async function Navbar() {
     const profileComplete = isProfileComplete(profileRaw);
     const lastReadMap = parsedProfile.last_read_chats || {};
 
+    const lastReadOrdersMap = parsedProfile.last_read_orders || {};
+
     if (isSeller) {
       if (profileComplete) {
         // 1. Para vendedores activos: todos los pedidos y consultas de la tienda
-      const [ordersRes, allSellersRes, allMsgsRes] = await Promise.all([
-        supabase
-          .from('orders')
-          .select('id, status, seller_id, buyer_id, created_at, updated_at')
-          .order('updated_at', { ascending: false })
-          .limit(50),
-        supabase
-          .from('profiles')
-          .select('id')
-          .in('role', ['vendedor', 'admin']),
-        supabase
-          .from('chat_messages')
-          .select('id, sender_id, receiver_id, created_at')
-          .neq('sender_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(100),
-      ]);
+        const [ordersRes, allSellersRes, allMsgsRes] = await Promise.all([
+          supabase
+            .from('orders')
+            .select('id, status, seller_id, buyer_id, created_at, updated_at, shipping_notes')
+            .order('updated_at', { ascending: false })
+            .limit(50),
+          supabase
+            .from('profiles')
+            .select('id')
+            .in('role', ['vendedor', 'admin']),
+          supabase
+            .from('chat_messages')
+            .select('id, sender_id, receiver_id, created_at')
+            .neq('sender_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(100),
+        ]);
 
-      activeOrders = (ordersRes.data || []) as any;
-      ordersCount = activeOrders.filter((o) =>
-        ['pendiente', 'confirmado', 'preparando', 'listo_entrega'].includes(o.status)
-      ).length;
+        activeOrders = (ordersRes.data || []) as any;
+        
+        // Contar pedidos que tienen alertas no vistas por este vendedor específico
+        const unreadOrders = activeOrders.filter((o) => {
+          const lastSeen = lastReadOrdersMap[o.id] ? new Date(lastReadOrdersMap[o.id]).getTime() : 0;
+          const orderTime = new Date(o.updated_at || o.created_at || 0).getTime();
+          return orderTime > lastSeen;
+        });
 
-      const sellerIds = new Set((allSellersRes.data || []).map((s) => s.id));
-      const unreadConvs = new Set<string>();
+        ordersCount = unreadOrders.length;
 
-      (allMsgsRes.data || []).forEach((msg) => {
-        const isSenderSeller = sellerIds.has(msg.sender_id);
-        const buyerId = isSenderSeller ? msg.receiver_id : msg.sender_id;
-        if (!buyerId) return;
+        const sellerIds = new Set((allSellersRes.data || []).map((s) => s.id));
+        const unreadConvs = new Set<string>();
 
-        const myLastRead = lastReadMap[buyerId] ? new Date(lastReadMap[buyerId]).getTime() : 0;
-        const msgTime = new Date(msg.created_at).getTime();
-        if (msgTime > myLastRead) {
-          unreadConvs.add(buyerId);
-        }
-      });
+        (allMsgsRes.data || []).forEach((msg) => {
+          const isSenderSeller = sellerIds.has(msg.sender_id);
+          const buyerId = isSenderSeller ? msg.receiver_id : msg.sender_id;
+          if (!buyerId) return;
 
-      unreadMessagesCount = unreadConvs.size;
+          const myLastRead = lastReadMap[buyerId] ? new Date(lastReadMap[buyerId]).getTime() : 0;
+          const msgTime = new Date(msg.created_at).getTime();
+          if (msgTime > myLastRead) {
+            unreadConvs.add(buyerId);
+          }
+        });
+
+        unreadMessagesCount = unreadConvs.size;
       }
     } else {
       // 2. Para compradores: solo sus pedidos y mensajes de la tienda

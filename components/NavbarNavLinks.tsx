@@ -79,24 +79,31 @@ export function NavbarNavLinks({
       if (isSeller) {
         let seenMap: Record<string, string> = {};
         try {
-          const stored = localStorage.getItem('ekhiteka_seen_orders_seller');
+          const stored =
+            localStorage.getItem(`ekhiteka_seen_orders_${user.id}`) ||
+            localStorage.getItem('ekhiteka_seen_orders_seller');
           if (stored) seenMap = JSON.parse(stored);
         } catch {}
 
-        // Para el vendedor: CUALQUIER pedido de la tienda que sea nuevo o cuyo estado haya cambiado
+        // Para el vendedor: verificar según el mapa de vistos del perfil o localStorage
         const hasNewOrdersForSeller = activeOrders.some((order) => {
           const lastSeen = seenMap[order.id];
-          if (!lastSeen) {
-            return true; // Nuevo pedido sin revisar
+          if (!lastSeen) return true;
+          if (lastSeen.includes('T') || lastSeen.includes('-')) {
+            const lastSeenTime = new Date(lastSeen).getTime();
+            const orderTime = new Date((order as any).updated_at || (order as any).created_at).getTime();
+            return orderTime > lastSeenTime;
           }
-          return lastSeen !== order.status; // Estado actualizado
+          return lastSeen !== order.status;
         });
 
         setHasUnseenOrderUpdates(hasNewOrdersForSeller);
       } else {
         let seenMap: Record<string, string> = {};
         try {
-          const stored = localStorage.getItem('ekhiteka_seen_orders_buyer');
+          const stored =
+            localStorage.getItem(`ekhiteka_seen_orders_${user.id}`) ||
+            localStorage.getItem('ekhiteka_seen_orders_buyer');
           if (stored) seenMap = JSON.parse(stored);
         } catch {}
 
@@ -106,6 +113,11 @@ export function NavbarNavLinks({
           if (!isMyPurchase) return false;
           const lastSeen = seenMap[order.id];
           if (lastSeen) {
+            if (lastSeen.includes('T') || lastSeen.includes('-')) {
+              const lastSeenTime = new Date(lastSeen).getTime();
+              const orderTime = new Date((order as any).updated_at || (order as any).created_at).getTime();
+              return orderTime > lastSeenTime;
+            }
             return lastSeen !== order.status;
           }
           return order.status !== 'pendiente';

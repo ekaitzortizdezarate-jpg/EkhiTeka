@@ -261,13 +261,15 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
   const cleanNotes = getCleanShippingNotes(order?.shipping_notes);
   const sellerName = profileRaw.full_name || 'Vendedor EkhiTeka';
 
+  const nowIso = new Date().toISOString();
+
   const updatedHistory: OrderStatusHistoryItem[] = [
     ...existingHistory,
     {
       status,
       changed_by_name: sellerName,
       changed_by_id: user.id,
-      timestamp: new Date().toISOString(),
+      timestamp: nowIso,
     },
   ];
   const updatedShippingNotes = encodeOrderHistory(cleanNotes, updatedHistory);
@@ -277,13 +279,31 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     .update({
       status,
       shipping_notes: updatedShippingNotes,
-      updated_at: new Date().toISOString(),
+      updated_at: nowIso,
     })
     .eq('id', orderId);
 
   if (error) {
     return { error: error.message };
   }
+
+  // Marcar automáticamente como visto para el vendedor que realizó el cambio
+  try {
+    let actingBio: any = {};
+    if (profileRaw?.bio) {
+      try {
+        const parsed = JSON.parse(profileRaw.bio);
+        if (typeof parsed === 'object' && parsed !== null) actingBio = parsed;
+      } catch {}
+    }
+    const myLastReadOrders = { ...(actingBio.last_read_orders || {}) };
+    myLastReadOrders[orderId] = nowIso;
+    actingBio.last_read_orders = myLastReadOrders;
+    await supabase
+      .from('profiles')
+      .update({ bio: JSON.stringify(actingBio), updated_at: nowIso })
+      .eq('id', user.id);
+  } catch {}
 
   // Notificar al comprador mediante mensaje de chat del sistema
   if (order?.buyer_id) {
@@ -360,6 +380,7 @@ export async function cancelOrder(orderId: string, reason: string) {
   const existingHistory = getOrderStatusHistory(order.shipping_notes);
   const cleanNotes = getCleanShippingNotes(order.shipping_notes);
   const sellerName = profileRaw.full_name || 'Vendedor EkhiTeka';
+  const nowIso = new Date().toISOString();
 
   const updatedHistory: OrderStatusHistoryItem[] = [
     ...existingHistory,
@@ -367,7 +388,7 @@ export async function cancelOrder(orderId: string, reason: string) {
       status: 'cancelado',
       changed_by_name: sellerName,
       changed_by_id: user.id,
-      timestamp: new Date().toISOString(),
+      timestamp: nowIso,
       notes: reason.trim(),
     },
   ];
@@ -380,13 +401,31 @@ export async function cancelOrder(orderId: string, reason: string) {
       status: 'cancelado',
       cancel_reason: reason.trim(),
       shipping_notes: updatedShippingNotes,
-      updated_at: new Date().toISOString(),
+      updated_at: nowIso,
     })
     .eq('id', orderId);
 
   if (error) {
     return { error: error.message };
   }
+
+  // Marcar automáticamente como visto para el vendedor que cancela
+  try {
+    let actingBio: any = {};
+    if (profileRaw?.bio) {
+      try {
+        const parsed = JSON.parse(profileRaw.bio);
+        if (typeof parsed === 'object' && parsed !== null) actingBio = parsed;
+      } catch {}
+    }
+    const myLastReadOrders = { ...(actingBio.last_read_orders || {}) };
+    myLastReadOrders[orderId] = nowIso;
+    actingBio.last_read_orders = myLastReadOrders;
+    await supabase
+      .from('profiles')
+      .update({ bio: JSON.stringify(actingBio), updated_at: nowIso })
+      .eq('id', user.id);
+  } catch {}
 
   // 3. Enviar mensaje de chat automático al comprador con el motivo
   if (order.buyer_id) {
@@ -595,5 +634,88 @@ export async function deleteOrderPermanently(orderId: string) {
   revalidatePath('/vendedor/pedidos');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/chat');
+  return { success: true };
+}
+
+export async function markOrderAsSeenBySeller(orderId: string, timestamp?: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('bio')
+    .eq('id', user.id)
+    .single();
+
+  let details: any = {};
+  if (profile?.bio) {
+    try {
+      const parsed = JSON.parse(profile.bio);
+      if (typeof parsed === 'object' && parsed !== null) details = parsed;
+    } catch {}
+  }
+
+  const lastReadOrders = { ...(details.last_read_orders || {}) };
+  lastReadOrders[orderId] = timestamp || new Date().toISOString();
+
+  details.last_read_orders = lastReadOrders;
+
+  await supabase
+    .from('profiles')
+    .update({
+      bio: JSON.stringify(details),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', user.id);
+
+  revalidatePath('/vendedor/pedidos');
+  revalidatePath('/', 'layout');
+  return { success: true };
+}
+
+export async function markAllOrdersAsSeenBySeller(orderIds: string[]) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('bio')
+    .eq('id', user.id)
+    .single();
+
+  let details: any = {};
+  if (profile?.bio) {
+    try {
+      const parsed = JSON.parse(profile.bio);
+      if (typeof parsed === 'object' && parsed !== null) details = parsed;
+    } catch {}
+  }
+
+  const lastReadOrders = { ...(details.last_read_orders || {}) };
+  const now = new Date().toISOString();
+  orderIds.forEach((id) => {
+    lastReadOrders[id] = now;
+  });
+
+  details.last_read_orders = lastReadOrders;
+
+  await supabase
+    .from('profiles')
+    .update({
+      bio: JSON.stringify(details),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', user.id);
+
+  revalidatePath('/vendedor/pedidos');
+  revalidatePath('/', 'layout');
   return { success: true };
 }

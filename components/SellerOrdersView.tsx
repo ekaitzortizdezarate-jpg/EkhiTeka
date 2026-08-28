@@ -4,7 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { LOCALE_MAP } from '@/lib/i18n/translations';
-import { updateOrderStatus, cancelOrder, deleteOrderPermanently } from '@/app/actions/orders';
+import {
+  updateOrderStatus,
+  cancelOrder,
+  deleteOrderPermanently,
+  markOrderAsSeenBySeller,
+  markAllOrdersAsSeenBySeller,
+} from '@/app/actions/orders';
 import { getProductImage, getPackItems, getOrderTypeBadge } from '@/lib/productHelpers';
 import Link from 'next/link';
 import type { Order, OrderStatus } from '@/types/database';
@@ -26,6 +32,8 @@ import {
   Trash2,
   X,
   Layers,
+  Bell,
+  Eye,
 } from 'lucide-react';
 
 const STATUS_STEPS: { key: OrderStatus; labelKey: string }[] = [
@@ -36,17 +44,50 @@ const STATUS_STEPS: { key: OrderStatus; labelKey: string }[] = [
   { key: 'entregado', labelKey: 'orders_step_delivered' },
 ];
 
-export function SellerOrdersView({ orders }: { orders: Order[] }) {
+export function SellerOrdersView({
+  orders,
+  currentUserId = '',
+  initialLastReadOrders = {},
+}: {
+  orders: Order[];
+  currentUserId?: string;
+  initialLastReadOrders?: Record<string, string>;
+}) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const [localOrders, setLocalOrders] = useState<Order[]>(orders);
   const [activeTab, setActiveTab] = useState<'actuales' | 'terminados'>('actuales');
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [seenMap, setSeenMap] = useState<Record<string, string>>({});
+
+  // Mapa de vistos aislado por vendedor
+  const [seenMap, setSeenMap] = useState<Record<string, string>>(() => {
+    let fromLocal: Record<string, string> = {};
+    if (typeof window !== 'undefined' && currentUserId) {
+      try {
+        const stored =
+          localStorage.getItem(`ekhiteka_seen_orders_${currentUserId}`) ||
+          localStorage.getItem('ekhiteka_seen_orders_seller');
+        if (stored) fromLocal = JSON.parse(stored);
+      } catch {}
+    }
+    return { ...initialLastReadOrders, ...fromLocal };
+  });
 
   useEffect(() => {
     setLocalOrders(orders);
   }, [orders]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    try {
+      const stored =
+        localStorage.getItem(`ekhiteka_seen_orders_${currentUserId}`) ||
+        localStorage.getItem('ekhiteka_seen_orders_seller');
+      if (stored) {
+        setSeenMap((prev) => ({ ...initialLastReadOrders, ...JSON.parse(stored), ...prev }));
+      }
+    } catch {}
+  }, [currentUserId, initialLastReadOrders]);
 
   // Modal para cancelar pedido en curso (pasa a terminados)
   const [cancelModal, setCancelModal] = useState<{
@@ -74,34 +115,54 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
     loading: false,
   });
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('ekhiteka_seen_orders_seller');
-      if (stored) {
-        setSeenMap(JSON.parse(stored));
-      }
-    } catch {}
-  }, []);
-
-  const handleMarkAsSeen = (orderId: string, currentStatus?: string) => {
-    const updated = { ...seenMap, [orderId]: currentStatus || 'pendiente' };
+  const handleMarkAsSeen = async (orderId: string) => {
+    const nowIso = new Date().toISOString();
+    const updated = { ...seenMap, [orderId]: nowIso };
     setSeenMap(updated);
-    try {
-      localStorage.setItem('ekhiteka_seen_orders_seller', JSON.stringify(updated));
-      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
-    } catch {}
+    if (currentUserId) {
+      try {
+        localStorage.setItem(`ekhiteka_seen_orders_${currentUserId}`, JSON.stringify(updated));
+        window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+      } catch {}
+    }
+    await markOrderAsSeenBySeller(orderId, nowIso);
+    router.refresh();
+  };
+
+  const handleMarkAllAsSeen = async () => {
+    const nowIso = new Date().toISOString();
+    const updated = { ...seenMap };
+    const idsToMark: string[] = [];
+    localOrders.forEach((o) => {
+      updated[o.id] = nowIso;
+      idsToMark.push(o.id);
+    });
+    setSeenMap(updated);
+    if (currentUserId) {
+      try {
+        localStorage.setItem(`ekhiteka_seen_orders_${currentUserId}`, JSON.stringify(updated));
+        window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+      } catch {}
+    }
+    if (idsToMark.length > 0) {
+      await markAllOrdersAsSeenBySeller(idsToMark);
+    }
+    router.refresh();
   };
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
-    const updated = { ...seenMap, [orderId]: newStatus };
+    const nowIso = new Date().toISOString();
+    const updated = { ...seenMap, [orderId]: nowIso };
     setSeenMap(updated);
-    try {
-      localStorage.setItem('ekhiteka_seen_orders_seller', JSON.stringify(updated));
-      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
-    } catch {}
+    if (currentUserId) {
+      try {
+        localStorage.setItem(`ekhiteka_seen_orders_${currentUserId}`, JSON.stringify(updated));
+        window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+      } catch {}
+    }
 
     setLocalOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus, updated_at: nowIso } : o))
     );
     setLoadingId(orderId);
     await updateOrderStatus(orderId, newStatus);
@@ -125,16 +186,19 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
 
     setCancelModal((prev) => ({ ...prev, loading: true }));
     const orderId = cancelModal.orderId;
+    const nowIso = new Date().toISOString();
 
-    const updated = { ...seenMap, [orderId]: 'cancelado' };
+    const updated = { ...seenMap, [orderId]: nowIso };
     setSeenMap(updated);
-    try {
-      localStorage.setItem('ekhiteka_seen_orders_seller', JSON.stringify(updated));
-      window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
-    } catch {}
+    if (currentUserId) {
+      try {
+        localStorage.setItem(`ekhiteka_seen_orders_${currentUserId}`, JSON.stringify(updated));
+        window.dispatchEvent(new Event('ekhiteka_orders_seen_updated'));
+      } catch {}
+    }
 
     setLocalOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: 'cancelado' } : o))
+      prev.map((o) => (o.id === orderId ? { ...o, status: 'cancelado', updated_at: nowIso } : o))
     );
     await cancelOrder(orderId, cancelModal.reason);
     setCancelModal({
@@ -405,6 +469,57 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
         </div>
       </div>
 
+      {/* Banner resumen de alertas de cambios de estado sin revisar */}
+      {(() => {
+        const unseenCount = currentOrders.filter((order) => {
+          const history = getOrderStatusHistory(order.shipping_notes);
+          const latestHistory = history.length > 0 ? history[history.length - 1] : null;
+          const isUpdatedByOther = latestHistory?.changed_by_id
+            ? latestHistory.changed_by_id !== currentUserId
+            : true;
+          const lastSeen = seenMap[order.id];
+          if (!lastSeen) return true;
+          if (lastSeen.includes('T') || lastSeen.includes('-')) {
+            const lastSeenTime = new Date(lastSeen).getTime();
+            const orderTime = new Date(order.updated_at || order.created_at).getTime();
+            return isUpdatedByOther && orderTime > lastSeenTime;
+          }
+          return lastSeen !== order.status;
+        }).length;
+
+        if (unseenCount === 0) return null;
+
+        return (
+          <div className="p-4 rounded-2xl bg-amber-500/15 border-2 border-amber-400 dark:border-amber-500 flex flex-wrap items-center justify-between gap-3 shadow-md animate-fadeIn">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-[#FFE259] text-[#1D1D1B] shadow-xs">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-xs sm:text-sm font-black font-serif text-stone-900 dark:text-stone-100">
+                  {language === 'eu'
+                    ? `${unseenCount} egoera aldaketa berri ikusi gabe dituzu`
+                    : `Tienes ${unseenCount} alerta(s) de cambio de estado sin revisar`}
+                </h3>
+                <p className="text-[11px] text-stone-600 dark:text-stone-300">
+                  {language === 'eu'
+                    ? 'Beste saltzaileek egindako eguneraketak ikusi gisa markatu ditzakezu hemen.'
+                    : 'Los cambios de estado realizados por otros vendedores mantendrán la alerta hasta que des a "visto".'}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleMarkAllAsSeen}
+              className="px-4 py-2 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] active:scale-95 text-[#1D1D1B] font-black text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer ml-auto flex items-center gap-1.5"
+            >
+              <Check className="w-3.5 h-3.5 stroke-[3]" />
+              <span>{language === 'eu' ? 'Guztiak ikusi gisa markatu' : 'Marcar todas como vistas'}</span>
+            </button>
+          </div>
+        );
+      })()}
+
       {currentOrders.length > 0 ? (
         <div className="space-y-6">
           {currentOrders.map((order) => {
@@ -413,8 +528,24 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
               order.delivery_method === 'recogida_tienda' ||
               order.delivery_method === 'tienda';
 
-            const lastSeenStatus = seenMap[order.id];
-            const isNew = !lastSeenStatus || lastSeenStatus !== order.status;
+            const history = getOrderStatusHistory(order.shipping_notes);
+            const latestHistory = history.length > 0 ? history[history.length - 1] : null;
+            const isUpdatedByOther = latestHistory?.changed_by_id
+              ? latestHistory.changed_by_id !== currentUserId
+              : true;
+
+            const lastSeen = seenMap[order.id];
+            let hasUnseenAlert = false;
+            if (!lastSeen) {
+              hasUnseenAlert = true;
+            } else if (lastSeen.includes('T') || lastSeen.includes('-')) {
+              const lastSeenTime = new Date(lastSeen).getTime();
+              const orderTime = new Date(order.updated_at || order.created_at).getTime();
+              hasUnseenAlert = isUpdatedByOther && orderTime > lastSeenTime;
+            } else {
+              hasUnseenAlert = lastSeen !== order.status;
+            }
+
             const currentStepIdx = getStepIndex(order.status);
             const isCancelled = order.status === 'cancelado';
             const isDelivered = order.status === 'entregado';
@@ -423,7 +554,7 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
               <div
                 key={order.id}
                 className={`bg-white dark:bg-[#1C1B19] rounded-3xl border-2 p-6 space-y-6 shadow-xs transition-all ${
-                  isNew && !isCancelled && !isDelivered
+                  hasUnseenAlert && !isCancelled && !isDelivered
                     ? 'border-[#FFE259] ring-2 ring-[#FFE259]/50 shadow-lg bg-amber-50/20 dark:bg-amber-950/15'
                     : isCancelled
                     ? 'border-red-200 dark:border-red-950/60 opacity-95'
@@ -460,20 +591,46 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 </div>
 
-                {/* 2. Alerta de nuevo pedido o cancelado */}
-                {isNew && !isCancelled && !isDelivered && (
-                  <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-sans animate-fadeIn">
-                    <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100 font-bold">
-                      <Sparkles className="w-4 h-4 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
-                      <span>{t.orders_new_order_received}</span>
+                {/* 2. Alerta de nuevo pedido o cambio de estado */}
+                {hasUnseenAlert && !isCancelled && (
+                  <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border-2 border-[#FFE259] rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-sans animate-fadeIn shadow-xs">
+                    <div className="flex items-center gap-2.5 text-stone-900 dark:text-stone-100">
+                      <div className="p-1.5 rounded-lg bg-[#FFE259] text-[#1D1D1B]">
+                        <Bell className="w-4 h-4 animate-bounce" />
+                      </div>
+                      <div>
+                        <p className="font-serif font-black text-xs sm:text-[13px] text-[#1D1D1B] dark:text-[#FFE259]">
+                          {latestHistory && history.length > 1
+                            ? language === 'eu'
+                              ? 'Egoera aldaketa berria!'
+                              : '¡Alerta de cambio de estado!'
+                            : t.orders_new_order_received}
+                        </p>
+                        <p className="text-[11px] text-stone-600 dark:text-stone-300 font-medium">
+                          {latestHistory && history.length > 1 ? (
+                            <>
+                              <span>{language === 'eu' ? 'Aldatua:' : 'Cambiado por:'} </span>
+                              <strong className="font-bold">{latestHistory.changed_by_name || 'Vendedor'}</strong>
+                              <span> ({latestHistory.status})</span>
+                              {latestHistory.timestamp && (
+                                <span className="text-stone-400 ml-1">
+                                  · {new Date(latestHistory.timestamp).toLocaleTimeString(LOCALE_MAP[language] || 'eu', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              )}
+                            </>
+                          ) : (
+                            <span>{language === 'eu' ? 'Bezeroaren eskaera berria.' : 'Nuevo pedido recibido de cliente.'}</span>
+                          )}
+                        </p>
+                      </div>
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleMarkAsSeen(order.id, order.status)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-xs hover:scale-105"
+                      onClick={() => handleMarkAsSeen(order.id)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FFE259] hover:bg-[#F5D742] active:scale-95 text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-xs ml-auto"
                     >
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      <span>{t.orders_mark_seen}</span>
+                      <Eye className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>{language === 'eu' ? 'Ikusi gisa markatu' : 'Marcar como visto'}</span>
                     </button>
                   </div>
                 )}

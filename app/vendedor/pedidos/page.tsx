@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { SellerOrdersView } from '@/components/SellerOrdersView';
-import type { Order } from '@/types/database';
+import { parseProfile, type Order } from '@/types/database';
+
+export const revalidate = 0;
 
 export default async function SellerOrdersPage() {
   const supabase = await createClient();
@@ -11,13 +13,15 @@ export default async function SellerOrdersPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: rawProfile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('*')
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'vendedor' && profile?.role !== 'admin') {
+  const userProfile = parseProfile(rawProfile);
+
+  if (userProfile.role !== 'vendedor' && userProfile.role !== 'admin') {
     redirect('/');
   }
 
@@ -27,5 +31,11 @@ export default async function SellerOrdersPage() {
     .select('*, profiles!orders_buyer_id_fkey(id, full_name, phone, town, email), order_items(*, products(*))')
     .order('created_at', { ascending: false });
 
-  return <SellerOrdersView orders={(orders || []) as unknown as Order[]} />;
+  return (
+    <SellerOrdersView
+      orders={(orders || []) as unknown as Order[]}
+      currentUserId={user.id}
+      initialLastReadOrders={userProfile.last_read_orders || {}}
+    />
+  );
 }
