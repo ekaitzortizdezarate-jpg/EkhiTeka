@@ -1,10 +1,16 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { parseProfile, type ProfileDetails } from '@/types/database';
+import { parseProfile, isProfileComplete, type ProfileDetails } from '@/types/database';
 import type { CartItem } from '@/context/CartContext';
 
-export async function getUserCart(): Promise<{ items: CartItem[]; isAuthenticated: boolean; userId?: string }> {
+export async function getUserCart(): Promise<{
+  items: CartItem[];
+  isAuthenticated: boolean;
+  userId?: string;
+  isProfileComplete: boolean;
+  role?: string;
+}> {
   try {
     const supabase = await createClient();
     const {
@@ -12,26 +18,33 @@ export async function getUserCart(): Promise<{ items: CartItem[]; isAuthenticate
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return { items: [], isAuthenticated: false };
+      return { items: [], isAuthenticated: false, isProfileComplete: false };
     }
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('bio')
+      .select('*')
       .eq('id', user.id)
       .maybeSingle();
 
     if (!profile) {
-      return { items: [], isAuthenticated: true, userId: user.id };
+      return { items: [], isAuthenticated: true, userId: user.id, isProfileComplete: false, role: 'comprador' };
     }
 
     const parsed = parseProfile(profile);
     const cartItems = Array.isArray(parsed.cart_data) ? parsed.cart_data : [];
+    const complete = isProfileComplete(profile);
 
-    return { items: cartItems, isAuthenticated: true, userId: user.id };
+    return {
+      items: cartItems,
+      isAuthenticated: true,
+      userId: user.id,
+      isProfileComplete: complete,
+      role: profile.role || 'comprador',
+    };
   } catch (err) {
     console.error('Error fetching user cart:', err);
-    return { items: [], isAuthenticated: false };
+    return { items: [], isAuthenticated: false, isProfileComplete: false };
   }
 }
 

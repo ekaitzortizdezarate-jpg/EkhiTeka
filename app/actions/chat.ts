@@ -168,16 +168,34 @@ export async function deleteChatConversation(conversationPartnerId: string) {
     return { error: 'Identificador de chat no válido' };
   }
 
-  // Eliminar todos los mensajes asociados a esta conversación
-  const { error } = await supabase
+  // 1. Obtener IDs de todos los mensajes asociados a esta conversación
+  const { data: msgs } = await supabase
     .from('chat_messages')
-    .delete()
+    .select('id')
     .or(`sender_id.eq.${conversationPartnerId},receiver_id.eq.${conversationPartnerId}`);
 
-  if (error) {
-    console.error('Error al eliminar conversación de chat:', error);
-    return { error: error.message };
+  if (msgs && msgs.length > 0) {
+    const ids = msgs.map((m) => m.id);
+    const { error: delIdsError } = await supabase
+      .from('chat_messages')
+      .delete()
+      .in('id', ids);
+
+    if (delIdsError) {
+      console.error('Error deleting chat messages by IDs:', delIdsError);
+    }
   }
+
+  // 2. Eliminar de forma directa por sender_id y receiver_id
+  await supabase
+    .from('chat_messages')
+    .delete()
+    .eq('sender_id', conversationPartnerId);
+
+  await supabase
+    .from('chat_messages')
+    .delete()
+    .eq('receiver_id', conversationPartnerId);
 
   revalidatePath('/chat');
   revalidatePath(`/chat/${conversationPartnerId}`);

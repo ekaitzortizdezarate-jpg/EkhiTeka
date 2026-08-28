@@ -180,19 +180,19 @@ export function SellerBuyersListView({ buyers }: SellerBuyersListViewProps) {
             className="px-3 py-2 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-bold text-stone-800 dark:text-stone-200 focus:outline-hidden focus:ring-2 focus:ring-amber-500 cursor-pointer font-serif"
           >
             <option value="newest">
-              {language === 'eu' ? '🕒 Berrienak lehenik' : language === 'fr' ? '🕒 Plus récents' : language === 'en' ? '🕒 Newest first' : '🕒 Más nuevos a más viejos'}
+              {language === 'eu' ? '↓ Berrienak lehenik' : language === 'fr' ? '↓ Plus récents' : language === 'en' ? '↓ Newest first' : '↓ Más nuevos a más viejos'}
             </option>
             <option value="oldest">
-              {language === 'eu' ? '🕒 Zaharrenak lehenik' : language === 'fr' ? '🕒 Plus anciens' : language === 'en' ? '🕒 Oldest first' : '🕒 Más viejos a más nuevos'}
+              {language === 'eu' ? '↑ Zaharrenak lehenik' : language === 'fr' ? '↑ Plus anciens' : language === 'en' ? '↑ Oldest first' : '↑ Más viejos a más nuevos'}
             </option>
             <option value="name">
-              {language === 'eu' ? '🔤 Izena (A-Z)' : language === 'fr' ? '🔤 Nom (A-Z)' : language === 'en' ? '🔤 Name (A-Z)' : '🔤 Nombre (A-Z)'}
+              {language === 'eu' ? 'A-Z Izena' : language === 'fr' ? 'A-Z Nom' : language === 'en' ? 'A-Z Name' : 'A-Z Nombre'}
             </option>
             <option value="town">
-              {language === 'eu' ? '📍 Herria (A-Z)' : language === 'fr' ? '📍 Ville (A-Z)' : language === 'en' ? '📍 City (A-Z)' : '📍 Localidad / Población (A-Z)'}
+              {language === 'eu' ? 'A-Z Herria' : language === 'fr' ? 'A-Z Ville' : language === 'en' ? 'A-Z City' : 'A-Z Localidad'}
             </option>
             <option value="orders">
-              {language === 'eu' ? '📦 Eskaera gehien' : language === 'fr' ? '📦 Plus de commandes' : language === 'en' ? '📦 Most orders' : '📦 Más pedidos'}
+              {language === 'eu' ? '№ Eskaera gehien' : language === 'fr' ? '№ Plus de commandes' : language === 'en' ? '№ Most orders' : '№ Más pedidos'}
             </option>
           </select>
         </div>

@@ -1,11 +1,14 @@
 'use client';
 
 import React, { createContext, useContext, useMemo, useState, useCallback, useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import type { Product } from '@/types/database';
 import { getProductImage } from '@/lib/productHelpers';
 import { getUserCart, syncUserCart } from '@/app/actions/cart';
 import { createClient } from '@/lib/supabase/client';
+import { useLanguage } from '@/context/LanguageContext';
+import { AlertCircle, X, User } from 'lucide-react';
 
 export interface CartItem {
   productId: string;
@@ -24,7 +27,7 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   cart: CartItem[];
-  addToCart: (product: Product, sellerName?: string, quantity?: number) => void;
+  addToCart: (product: Product, sellerName?: string, quantity?: number) => boolean;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -34,15 +37,23 @@ interface CartContextType {
   totalPrice: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
+  isProfileComplete: boolean;
+  isAuthenticated: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { t, language } = useLanguage();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isProfileComplete, setIsProfileComplete] = useState(true);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileModalType, setProfileModalType] = useState<'incomplete' | 'login'>('incomplete');
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clave en localStorage aislada por ID de usuario
@@ -50,19 +61,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return uid ? `ekhiteka_cart_${uid}` : 'ekhiteka_cart_guest';
   };
 
-  // Función principal para cargar la cesta oficial desde Supabase
+  // Función principal para cargar la cesta oficial desde Supabase y el estado del perfil
   const refreshCartFromCloud = useCallback(async () => {
     try {
-      const { items: serverItems, isAuthenticated, userId } = await getUserCart();
+      const { items: serverItems, isAuthenticated: authOk, userId, isProfileComplete: profileOk } = await getUserCart();
       const activeUid = userId || null;
       setCurrentUserId(activeUid);
+      setIsAuthenticated(authOk);
+      setIsProfileComplete(profileOk);
 
-      if (isAuthenticated && activeUid) {
+      if (authOk && activeUid) {
         // Usuario autenticado: Supabase es la única fuente de verdad
         setItems(serverItems);
         try {
           localStorage.setItem(getStorageKey(activeUid), JSON.stringify(serverItems));
-          // Eliminar claves genéricas antiguas para no mezclar datos
           localStorage.removeItem('ekhiteka_cart');
           localStorage.removeItem('ekhiteka_cart_guest');
         } catch {}
@@ -92,6 +104,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         setCurrentUserId(null);
+        setIsAuthenticated(false);
+        setIsProfileComplete(false);
         setItems([]);
         try {
           localStorage.removeItem('ekhiteka_cart');
@@ -102,8 +116,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
+    const handleProfileUpdate = () => {
+      refreshCartFromCloud();
+    };
+    window.addEventListener('ekhiteka_profile_updated', handleProfileUpdate);
+
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('ekhiteka_profile_updated', handleProfileUpdate);
     };
   }, [refreshCartFromCloud]);
 
@@ -146,8 +166,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addToCart = useCallback(
-    (product: Product, sellerName?: string, quantity = 1) => {
-      if (!product.is_unlimited_stock && (product.stock ?? 0) <= 0) return;
+    (product: Product, sellerName?: string, quantity = 1): boolean => {
+      // 1. Control de autenticación y perfil completo obligatorio para compradores
+      if (!isAuthenticated) {
+        setProfileModalType('login');
+        setProfileModalOpen(true);
+        return false;
+      }
+
+      if (!isProfileComplete) {
+        setProfileModalType('incomplete');
+        setProfileModalOpen(true);
+        return false;
+      }
+
+      if (!product.is_unlimited_stock && (product.stock ?? 0) <= 0) return false;
       const maxStock = product.is_unlimited_stock ? 99 : Math.max(1, product.stock ?? 1);
 
       setItems((prevItems) => {
@@ -179,8 +212,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
 
       setIsCartOpen(true);
+      return true;
     },
-    [saveItems]
+    [isAuthenticated, isProfileComplete, saveItems]
   );
 
   const removeFromCart = useCallback(
@@ -244,9 +278,80 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         totalPrice,
         isCartOpen,
         setIsCartOpen,
+        isProfileComplete,
+        isAuthenticated,
       }}
     >
       {children}
+
+      {/* Modal Requisito de Perfil Completo para Compradores */}
+      {profileModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans animate-fadeIn">
+          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-2 border-stone-200 dark:border-stone-800 space-y-5 animate-scaleUp">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2.5 text-[#C68D07] dark:text-[#FFE259]">
+                <AlertCircle className="w-6 h-6 shrink-0" />
+                <h3 className="text-lg font-black font-serif text-stone-900 dark:text-stone-100 leading-tight">
+                  {profileModalType === 'login'
+                    ? (language === 'eu' ? 'Hasi Saioa Saskira Gehitzeko' : 'Inicia Sesión para Comprar')
+                    : (language === 'eu' ? 'Osatu Zure Profila Saskira Gehitzeko' : 'Completa tu Perfil para Comprar')}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setProfileModalOpen(false)}
+                className="p-1.5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2 text-sm text-stone-600 dark:text-stone-300">
+              {profileModalType === 'login' ? (
+                <p>
+                  {language === 'eu'
+                    ? 'Produktuak saskira gehitzeko eta zure eskaerak kudeatzeko saioa hasi edo kontu bat sortu behar duzu.'
+                    : 'Para añadir productos a tu cesta y realizar compras en la tienda, necesitas iniciar sesión con tu cuenta de comprador.'}
+                </p>
+              ) : (
+                <>
+                  <p>
+                    {language === 'eu'
+                      ? 'Erosketak egin eta produktuak saskira gehitu ahal izateko, derrigorrezkoa da zure bezero profileko datuak beteta izatea.'
+                      : 'Para poder añadir productos a tu cesta y tramitar pedidos, es obligatorio completar previamente los datos de tu perfil de comprador.'}
+                  </p>
+                  <p className="text-xs text-stone-400">
+                    {language === 'eu'
+                      ? 'Izena, NAN, telefonoa eta bidalketa helbidea beharrezkoak dira eskaera eta ordainketa zuzena bermatzeko.'
+                      : 'Nombre, apellidos, DNI, teléfono y dirección de entrega son obligatorios para garantizar la correcta preparación y entrega de tus compras.'}
+                  </p>
+                </>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-100 dark:border-stone-800 font-serif">
+              <button
+                type="button"
+                onClick={() => setProfileModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold text-xs uppercase tracking-wider cursor-pointer"
+              >
+                {language === 'eu' ? 'Utzi' : 'Cancelar'}
+              </button>
+              <Link
+                href={profileModalType === 'login' ? '/login' : '/perfil'}
+                onClick={() => setProfileModalOpen(false)}
+                className="px-5 py-2.5 rounded-xl bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider shadow-sm cursor-pointer flex items-center gap-1.5"
+              >
+                <span>
+                  {profileModalType === 'login'
+                    ? (language === 'eu' ? 'Hasi Saioa' : 'Iniciar Sesión')
+                    : (language === 'eu' ? 'Profila Bete Orain' : 'Completar Perfil')}
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </CartContext.Provider>
   );
 }
@@ -258,3 +363,4 @@ export function useCart() {
   }
   return context;
 }
+

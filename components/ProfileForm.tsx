@@ -618,6 +618,9 @@ export function ProfileForm({ profile, userProfile, storeProfile, sellers = [] }
         setCurrentProfile(parseProfile(res.updatedProfile));
       }
       setIsEditingUser(false);
+      try {
+        window.dispatchEvent(new Event('ekhiteka_profile_updated'));
+      } catch {}
       setTimeout(() => setUserMsg(null), 3000);
     }
   };

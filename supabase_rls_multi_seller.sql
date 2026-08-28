@@ -137,6 +137,18 @@ USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('vendedor', 'admin'))
 );
 
+DROP POLICY IF EXISTS "Sellers can delete chat messages" ON chat_messages;
+DROP POLICY IF EXISTS "Users can delete their chat messages" ON chat_messages;
+
+CREATE POLICY "Sellers can delete chat messages"
+ON chat_messages FOR DELETE
+TO authenticated
+USING (
+  sender_id = auth.uid() OR
+  receiver_id = auth.uid() OR
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('vendedor', 'admin'))
+);
+
 
 -- 5. TABLA PRODUCTS
 -- Lectura pública para el catálogo y gestión completa para cualquier vendedor.

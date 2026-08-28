@@ -39,11 +39,11 @@ export function ProductDetailAddToCart({
 
   const handleAdd = () => {
     if (isSoldOut || quantity <= 0) return;
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product, 'EkhiTeka Selección');
+    const ok = addToCart(product, 'EkhiTeka Selección', quantity);
+    if (ok) {
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2000);
     }
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
   };
 
   const getLowStockNotice = () => {
