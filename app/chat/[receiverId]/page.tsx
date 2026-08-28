@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ChatConversationView } from '@/components/ChatConversationView';
-import { markChatAsRead } from '@/app/actions/chat';
 import { getUnifiedStoreConfig } from '@/app/actions/auth';
 import { type ChatMessage, type Profile, type Product, type Order, parseProfile } from '@/types/database';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface ChatRoomPageProps {
@@ -32,7 +32,7 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
 
   const currentProfile = parseProfile(myProfileRes?.data);
   const isSeller = currentProfile.role === 'vendedor' || currentProfile.role === 'admin';
-  const allSellers = allSellersRes?.data || [];
+  const allSellers = (allSellersRes?.data || []) as any[];
   const mainSeller = allSellers[0] || { id: 'store', full_name: 'EkhiTeka', role: 'vendedor' };
 
   // Mapa de vendedores para mostrar nombres reales entre los propios vendedores
@@ -50,16 +50,18 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
 
   if (isSeller) {
     // EL VISOR ES UN VENDEDOR: Está chateando con un cliente (receiverId = buyerId)
-    if (receiverId && receiverId !== 'store' && receiverId !== 'null') {
-      const { data: recipientRaw } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', receiverId)
-        .maybeSingle();
+    if (receiverId && receiverId !== 'store' && receiverId !== 'null' && receiverId !== 'tienda') {
+      try {
+        const { data: recipientRaw } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', receiverId)
+          .maybeSingle();
 
-      if (recipientRaw) {
-        recipientProfile = parseProfile(recipientRaw);
-      }
+        if (recipientRaw) {
+          recipientProfile = parseProfile(recipientRaw);
+        }
+      } catch {}
     }
 
     if (!recipientProfile) {
@@ -74,14 +76,15 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
 
     // Ver todos los mensajes entre este cliente y CUALQUIER vendedor de la tienda
     if (receiverId) {
-      const { data: rawMsgs } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .or(`sender_id.eq.${receiverId},receiver_id.eq.${receiverId}`)
-        .order('created_at', { ascending: true });
+      try {
+        const { data: rawMsgs } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .or(`sender_id.eq.${receiverId},receiver_id.eq.${receiverId}`)
+          .order('created_at', { ascending: true });
 
-      messagesData = (rawMsgs || []) as ChatMessage[];
-      await markChatAsRead(receiverId);
+        messagesData = (rawMsgs || []) as ChatMessage[];
+      } catch {}
     }
   } else {
     // EL VISOR ES UN COMPRADOR: Siempre chatea con la entidad unificada "EkhiTeka"
@@ -93,33 +96,38 @@ export default async function ChatRoomPage({ params, searchParams }: ChatRoomPag
       full_name: 'EkhiTeka',
       role: 'vendedor',
       avatar_url: '/Logo.jpg',
-      phone: storeConfig.whatsapp_phone || null,
+      phone: storeConfig?.whatsapp_phone || null,
       town: 'Lekeitio',
     } as Profile;
 
     // Ver todos los mensajes del comprador con la tienda
-    const { data: rawMsgs } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-      .order('created_at', { ascending: true });
+    try {
+      const { data: rawMsgs } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order('created_at', { ascending: true });
 
-    messagesData = (rawMsgs || []) as ChatMessage[];
-    await markChatAsRead(targetReceiverId);
+      messagesData = (rawMsgs || []) as ChatMessage[];
+    } catch {}
   }
 
   // Contexto opcional: Producto
   let contextProduct: Product | null = null;
   if (product_id) {
-    const { data: p } = await supabase.from('products').select('*').eq('id', product_id).maybeSingle();
-    if (p) contextProduct = p as Product;
+    try {
+      const { data: p } = await supabase.from('products').select('*').eq('id', product_id).maybeSingle();
+      if (p) contextProduct = p as Product;
+    } catch {}
   }
 
   // Contexto opcional: Pedido
   let contextOrder: Order | null = null;
   if (order_id) {
-    const { data: o } = await supabase.from('orders').select('*').eq('id', order_id).maybeSingle();
-    if (o) contextOrder = o as Order;
+    try {
+      const { data: o } = await supabase.from('orders').select('*').eq('id', order_id).maybeSingle();
+      if (o) contextOrder = o as Order;
+    } catch {}
   }
 
   return (

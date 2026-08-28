@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation';
 import { ChatInboxView, type InboxConversation } from '@/components/ChatInboxView';
 import { type Profile, parseProfile } from '@/types/database';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ChatInboxPage({
   searchParams,
 }: {
