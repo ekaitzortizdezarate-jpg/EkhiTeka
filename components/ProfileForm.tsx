@@ -179,13 +179,32 @@ export function ProfileForm({ profile, userProfile, storeProfile, sellers = [] }
   };
 
   // Sección Tienda (Global compartida entre todos los vendedores)
-  const [whatsappContacts, setWhatsappContacts] = useState<WhatsAppContact[]>(parsedStore.whatsapp_contacts || []);
-  const [pickupAddresses, setPickupAddresses] = useState<StoreAddress[]>(() =>
-    ensureOneMainPickup(parsedStore.pickup_addresses || [])
+  const [whatsappContacts, setWhatsappContacts] = useState<WhatsAppContact[]>(
+    storeProfile?.whatsapp_contacts || parsedStore.whatsapp_contacts || []
   );
-  const [eventAddresses, setEventAddresses] = useState<EventAddress[]>(parsedStore.event_addresses || []);
+  const [pickupAddresses, setPickupAddresses] = useState<StoreAddress[]>(() =>
+    ensureOneMainPickup(storeProfile?.pickup_addresses || parsedStore.pickup_addresses || [])
+  );
+  const [eventAddresses, setEventAddresses] = useState<EventAddress[]>(
+    storeProfile?.event_addresses || parsedStore.event_addresses || []
+  );
   const [loadingStore, setLoadingStore] = useState(false);
   const [storeMsg, setStoreMsg] = useState<{ text: string; isError: boolean } | null>(null);
+
+  useEffect(() => {
+    const contacts = storeProfile?.whatsapp_contacts || parsedStore.whatsapp_contacts;
+    if (contacts && contacts.length > 0) {
+      setWhatsappContacts(contacts);
+    }
+    const pickups = storeProfile?.pickup_addresses || parsedStore.pickup_addresses;
+    if (pickups && pickups.length > 0) {
+      setPickupAddresses(ensureOneMainPickup(pickups));
+    }
+    const events = storeProfile?.event_addresses || parsedStore.event_addresses;
+    if (events && events.length > 0) {
+      setEventAddresses(events);
+    }
+  }, [storeProfile, parsedStore.whatsapp_contacts, parsedStore.pickup_addresses, parsedStore.event_addresses]);
 
   // Modales
   const [modalWA, setModalWA] = useState<{ open: boolean; contact: WhatsAppContact | null }>({ open: false, contact: null });
