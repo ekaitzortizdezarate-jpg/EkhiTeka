@@ -97,6 +97,23 @@ export function SellerBuyersListView({ buyers }: SellerBuyersListViewProps) {
     setExpandedBuyerId((prev) => (prev === buyerId ? null : buyerId));
   };
 
+  const getOrderTotalAmount = (o: Order | any): number => {
+    if (o.total_price !== undefined && o.total_price !== null && !isNaN(Number(o.total_price))) {
+      return Number(o.total_price);
+    }
+    if (o.total_amount !== undefined && o.total_amount !== null && !isNaN(Number(o.total_amount))) {
+      return Number(o.total_amount);
+    }
+    if (o.order_items && Array.isArray(o.order_items) && o.order_items.length > 0) {
+      return o.order_items.reduce((sum: number, it: any) => {
+        const q = Number(it.quantity || 1);
+        const u = Number(it.unit_price ?? it.products?.price ?? 0);
+        return sum + (q * (isNaN(u) ? 0 : u));
+      }, 0);
+    }
+    return 0;
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pendiente':
@@ -219,7 +236,7 @@ export function SellerBuyersListView({ buyers }: SellerBuyersListViewProps) {
             const buyerOrders = buyer.orders || [];
             const totalSpent = buyerOrders
               .filter((o) => o.status !== 'cancelado')
-              .reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+              .reduce((sum, o) => sum + getOrderTotalAmount(o), 0);
 
             const addressLine = [
               buyer.street ? `${buyer.street}${buyer.number ? ` ${buyer.number}` : ''}` : null,
@@ -434,6 +451,10 @@ export function SellerBuyersListView({ buyers }: SellerBuyersListViewProps) {
                                     {items.map((it: any) => {
                                       const prod = it.products || {};
                                       const img = getProductImage(prod);
+                                      const unitPrice = Number(it.unit_price ?? prod.price ?? 0) || 0;
+                                      const qty = Number(it.quantity || 1) || 1;
+                                      const itemTotal = !isNaN(Number(it.subtotal)) && Number(it.subtotal) > 0 ? Number(it.subtotal) : qty * unitPrice;
+
                                       return (
                                         <div
                                           key={it.id}
@@ -451,7 +472,7 @@ export function SellerBuyersListView({ buyers }: SellerBuyersListViewProps) {
                                               {prod.name || 'Producto'}
                                             </span>
                                             <span className="text-[11px] text-stone-500 dark:text-stone-400 block font-mono">
-                                              {it.quantity} x {Number(it.unit_price).toFixed(2)} € = {(it.quantity * Number(it.unit_price)).toFixed(2)} €
+                                              {qty} x {unitPrice.toFixed(2)} € = {itemTotal.toFixed(2)} €
                                             </span>
                                           </div>
                                         </div>
@@ -489,7 +510,7 @@ export function SellerBuyersListView({ buyers }: SellerBuyersListViewProps) {
                                   <div className="text-right">
                                     <span className="text-xs font-bold text-stone-400 mr-2 uppercase">Total:</span>
                                     <span className="text-base font-black text-stone-900 dark:text-stone-100 font-mono">
-                                      {Number(order.total_amount).toFixed(2)} €
+                                      {getOrderTotalAmount(order).toFixed(2)} €
                                     </span>
                                   </div>
                                 </div>
