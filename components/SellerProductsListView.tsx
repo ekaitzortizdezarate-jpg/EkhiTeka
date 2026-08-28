@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
 import type { Category, Product, StoreAddress, EventAddress } from '@/types/database';
 import { SellerBuyersListView, type BuyerWithOrders } from '@/components/SellerBuyersListView';
+import { AccentColorSelector } from '@/components/AccentColorSelector';
 import {
   getProductImage,
   getProductCategoryId,
@@ -595,26 +596,33 @@ export function SellerProductsListView({
     <div className="space-y-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 font-serif">
       {/* 1. Cabecera Principal */}
       <div className="pb-6 border-b border-stone-200 dark:border-stone-800">
-        <div className="space-y-1 text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-start gap-2.5">
-            <span className="p-2 rounded-2xl bg-[#FFE259] text-[#1D1D1B]">
-              <Layers className="w-6 h-6" />
-            </span>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2.5">
+              <span className="p-2 rounded-2xl bg-[#FFE259] text-[#1D1D1B]">
+                <Layers className="w-6 h-6" />
+              </span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#1D1D1B] dark:text-stone-100 tracking-tight">
+                {language === 'eu'
+                  ? 'Nire Produktuak eta Ekitaldiak'
+                  : language === 'fr'
+                  ? 'Mes Produits et Événements'
+                  : language === 'en'
+                  ? 'My Products & Events'
+                  : 'Mis Productos y Eventos'}
+              </h1>
+            </div>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans">
               {language === 'eu'
-                ? 'Nire Produktuak eta Ekitaldiak'
-                : language === 'fr'
-                ? 'Mes Produits et Événements'
-                : language === 'en'
-                ? 'My Products & Events'
-                : 'Mis Productos y Eventos'}
-            </h1>
+                ? 'Kudeatu zure dendako produktuak eta dastaketa presentzialak (ekitaldiak) leku bakarretik.'
+                : 'Gestiona todos tus productos de la tienda y catas presenciales (eventos) desde un único lugar.'}
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans">
-            {language === 'eu'
-              ? 'Kudeatu zure dendako produktuak eta dastaketa presentzialak (ekitaldiak) leku bakarretik.'
-              : 'Gestiona todos tus productos de la tienda y catas presenciales (eventos) desde un único lugar.'}
-          </p>
+
+          {/* Selector de Colores Dinámicos alineado a la derecha */}
+          <div className="shrink-0 self-center sm:self-auto">
+            <AccentColorSelector />
+          </div>
         </div>
       </div>
 

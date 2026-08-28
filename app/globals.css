@@ -6,8 +6,8 @@
 @theme {
   --font-sans: var(--font-dm-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: var(--font-cormorant), 'Playfair Display', Georgia, Cambria, serif;
-  --color-manduca-yellow: #FFE259;
-  --color-manduca-yellow-hover: #F5D742;
+  --color-manduca-yellow: var(--brand-accent, #C8821C);
+  --color-manduca-yellow-hover: var(--brand-accent, #B47214);
   --color-manduca-yellow-light: #FFF9DE;
   --color-manduca-dark: #1D1D1B;
   --color-manduca-cream: #FAF7F2;
@@ -19,16 +19,24 @@
     --background: #FAF8F5;
     --foreground: #1D1D1B;
     --card-bg: #FFFFFF;
-    --accent-yellow: #FFE259;
     --border-color: #E8E5DF;
+    --brand-accent-light: #C8821C;
+    --brand-accent-dark: #F3BA4C;
+    --brand-accent: var(--brand-accent-light);
+    --brand-accent-contrast: #FFFFFF;
+    --color-manduca-yellow: var(--brand-accent);
+    --accent-yellow: var(--brand-accent);
   }
 
   .dark {
     --background: #141312;
     --foreground: #F5F5F0;
     --card-bg: #1C1B19;
-    --accent-yellow: #FFE259;
     --border-color: #2D2B27;
+    --brand-accent: var(--brand-accent-dark);
+    --brand-accent-contrast: #1D1D1B;
+    --color-manduca-yellow: var(--brand-accent);
+    --accent-yellow: var(--brand-accent);
   }
 
   body {
@@ -83,6 +91,42 @@
   }
 }
 
+/* Dynamic Brand Accent System Mapping */
+.bg-\[\#FFE259\] {
+  background-color: var(--brand-accent) !important;
+  color: var(--brand-accent-contrast) !important;
+}
+
+.hover\:bg-\[\#F5D742\]:hover,
+.hover\:bg-\[\#FFE259\]:hover {
+  filter: brightness(0.93) saturate(1.05);
+}
+
+.text-\[\#FFE259\],
+.text-\[\#C68D07\],
+.dark\:text-\[\#FFE259\],
+.dark\:text-\[\#C68D07\] {
+  color: var(--brand-accent) !important;
+}
+
+.border-\[\#FFE259\],
+.dark\:border-\[\#FFE259\],
+.hover\:border-\[\#FFE259\]:hover {
+  border-color: var(--brand-accent) !important;
+}
+
+.accent-\[\#FFE259\] {
+  accent-color: var(--brand-accent) !important;
+}
+
+.focus\:ring-\[\#FFE259\]:focus {
+  --tw-ring-color: var(--brand-accent) !important;
+}
+
+.bg-\[\#FFE259\]\/15 {
+  background-color: color-mix(in srgb, var(--brand-accent) 18%, transparent) !important;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -101,8 +145,8 @@
 }
 
 .manduca-btn-yellow {
-  background-color: #FFE259;
-  color: #1D1D1B;
+  background-color: var(--brand-accent);
+  color: var(--brand-accent-contrast);
   font-weight: 800;
   font-family: var(--font-serif), Georgia, serif;
   letter-spacing: 0.12em;
@@ -111,14 +155,8 @@
 }
 
 .manduca-btn-yellow:hover {
-  background-color: #F5D742;
+  filter: brightness(0.93);
   transform: scale(1.02);
-}
-
-.manduca-btn-yellow:hover {
-  background-color: #F5D742;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 226, 89, 0.35);
 }
 
 @keyframes fadeIn {
