@@ -158,7 +158,7 @@ export default async function Navbar() {
       </div>
 
       {/* Sub-barra de Utilidades */}
-      <div className="border-t border-[#E8E5DF]/20 dark:border-stone-800/25 bg-[#FAF8F5]/20 dark:bg-[#141312]/20 px-4 sm:px-6 lg:px-8 py-1.5 backdrop-blur-xs">
+      <div className="border-t border-[#E8E5DF]/25 dark:border-stone-800/30 px-4 sm:px-6 lg:px-8 py-1.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs font-serif">
           <span className="text-[10px] sm:text-[11px] font-sans font-medium text-stone-500 dark:text-stone-400 tracking-wider">
             {storeAddress}
