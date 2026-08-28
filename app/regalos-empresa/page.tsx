@@ -33,9 +33,9 @@ export default function RegalosEmpresaPage() {
   }, []);
 
   return (
-    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
-      {/* 1. Hero Principal */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[380px] flex items-center bg-[#FAF8F5]">
+    <div className="font-serif">
+      {/* 1. Hero Principal a Pantalla Completa */}
+      <section className="relative w-full overflow-hidden min-h-[440px] sm:min-h-[500px] lg:min-h-[560px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/secciones/Cestas.JPG"
@@ -45,40 +45,44 @@ export default function RegalosEmpresaPage() {
               (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30 dark:from-black/90 dark:via-black/75 dark:to-black/55" />
         </div>
 
-        <div className="relative z-10 max-w-2xl space-y-4 text-white">
-          <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-            {t.corp_hero_badge}
-          </span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24 w-full">
+          <div className="max-w-2xl space-y-4 text-white">
+            <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+              {t.corp_hero_badge}
+            </span>
 
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
-            {t.corp_hero_title} <span className="text-[#FFE259]">{t.corp_hero_title_highlight}</span>
-          </h1>
+            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
+              {t.corp_hero_title} <span className="text-[#FFE259]">{t.corp_hero_title_highlight}</span>
+            </h1>
 
-          <p className="text-sm sm:text-base text-white/90 leading-relaxed font-normal">
-            {t.corp_hero_desc}
-          </p>
+            <p className="text-sm sm:text-base text-white/90 leading-relaxed font-normal">
+              {t.corp_hero_desc}
+            </p>
 
-          {!isSeller && (
-            <div className="pt-2">
-              <a
-                href="https://wa.me/34600000000?text=Hola,%20quisiera%20solicitar%20un%20presupuesto%20para%20Regalos%20de%20Empresa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-lg hover:scale-105"
-              >
-                <MessageCircle className="w-4 h-4 stroke-[1.75]" />
-                <span>{t.corp_whatsapp_btn}</span>
-              </a>
-            </div>
-          )}
+            {!isSeller && (
+              <div className="pt-2">
+                <a
+                  href="https://wa.me/34600000000?text=Hola,%20quisiera%20solicitar%20un%20presupuesto%20para%20Regalos%20de%20Empresa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-lg hover:scale-105"
+                >
+                  <MessageCircle className="w-4 h-4 stroke-[1.75]" />
+                  <span>{t.corp_whatsapp_btn}</span>
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* 2. Tarjetas con Imagen: Lotes, Catas y Personalización */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Contenedor del resto del contenido */}
+      <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* 2. Tarjetas con Imagen: Lotes, Catas y Personalización */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Tarjeta 1: Lotes y Cestas de Navidad */}
         <div className="manduca-card group rounded-3xl bg-white dark:bg-[#1C1B19] border border-[#E8E5DF] dark:border-[#2D2B27] hover:border-[#C8C1B3] dark:hover:border-stone-700 p-6 space-y-4 shadow-xs flex flex-col justify-between overflow-hidden">
           <div className="space-y-4">
@@ -202,5 +206,6 @@ export default function RegalosEmpresaPage() {
         </div>
       </section>
     </div>
-  );
+  </div>
+);
 }

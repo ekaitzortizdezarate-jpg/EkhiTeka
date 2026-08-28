@@ -117,51 +117,55 @@ export function CatalogView({
   };
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
-      {/* 1. Hero Editorial Gourmet */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[420px] flex items-center bg-[#FAF8F5]">
+    <div className="font-serif">
+      {/* 1. Hero Editorial Gourmet a Pantalla Completa */}
+      <section className="relative w-full overflow-hidden min-h-[480px] sm:min-h-[560px] lg:min-h-[620px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
             src={getSiteImage('tienda_hero', '/images/secciones/Tienda.JPG')}
             alt="Tienda EkhiTeka Lekeitio"
             className="w-full h-full object-cover object-center scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20 dark:from-black/85 dark:via-black/65 dark:to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30 dark:from-black/90 dark:via-black/75 dark:to-black/55" />
         </div>
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-          <div className="lg:col-span-8 space-y-5">
-            <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-              {t.shop_specialty} · Lekeitio
-            </span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
+            <div className="lg:col-span-8 space-y-5">
+              <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+                {t.shop_specialty} · Lekeitio
+              </span>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
-              {t.shop_hero_title}
-            </h1>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white drop-shadow-md">
+                {t.shop_hero_title}
+              </h1>
 
-            <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
-              {t.shop_hero_desc}
-            </p>
-          </div>
+              <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal drop-shadow-md">
+                {t.shop_hero_desc}
+              </p>
+            </div>
 
-          <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
-              <img
-                src="/Logo.jpg"
-                alt="EkhiTeka Lekeitio"
-                className="w-full h-full object-cover rounded-full"
-              />
+            <div className="lg:col-span-4 flex justify-center lg:justify-end">
+              <div className="w-48 h-48 sm:w-60 sm:h-60 rounded-full overflow-hidden border-2 border-white/60 shadow-2xl p-1 bg-[#FAF8F5] hover:scale-105 transition-transform duration-500">
+                <img
+                  src="/Logo.jpg"
+                  alt="EkhiTeka Lekeitio"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Categorías */}
-      <CategoryCircleGrid
-        categories={categories}
-        selectedCategory={selectedCat}
-        onSelectCategory={(id) => handleCategoryChange(id)}
-      />
+      {/* Contenedor del resto del contenido */}
+      <div className="space-y-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* 2. Categorías */}
+        <CategoryCircleGrid
+          categories={categories}
+          selectedCategory={selectedCat}
+          onSelectCategory={(id) => handleCategoryChange(id)}
+        />
 
       {/* 3. Catálogo Principal */}
       <section id="catalogo" className="space-y-6 pt-6">
@@ -376,5 +380,6 @@ export function CatalogView({
       {/* 6. Opiniones */}
       <CustomerReviews />
     </div>
-  );
+  </div>
+);
 }

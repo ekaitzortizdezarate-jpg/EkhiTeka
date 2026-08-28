@@ -74,9 +74,9 @@ export default function ExperienciasPage() {
   }, []);
 
   return (
-    <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 font-serif">
-      {/* 1. Hero Editorial */}
-      <section className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 border border-[#E8E5DF] dark:border-[#2D2B27] shadow-xl min-h-[380px] flex items-center bg-[#FAF8F5]">
+    <div className="font-serif">
+      {/* 1. Hero Editorial a Pantalla Completa */}
+      <section className="relative w-full overflow-hidden min-h-[440px] sm:min-h-[500px] lg:min-h-[560px] flex items-center bg-[#FAF8F5]">
         <div className="absolute inset-0 z-0">
           <img
             src="/images/secciones/Catas.JPG"
@@ -86,26 +86,30 @@ export default function ExperienciasPage() {
               (e.target as HTMLImageElement).src = '/images/secciones/Quesos.JPG';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20 dark:from-black/90 dark:via-black/75 dark:to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30 dark:from-black/90 dark:via-black/75 dark:to-black/55" />
         </div>
 
-        <div className="relative z-10 max-w-2xl space-y-4 text-white">
-          <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
-            {t.exp_hero_badge}
-          </span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24 w-full">
+          <div className="max-w-2xl space-y-4 text-white">
+            <span className="inline-flex items-center px-3.5 py-1.5 bg-[#1D1D1B]/90 backdrop-blur-xs text-white text-xs font-bold rounded-full uppercase tracking-[0.16em] shadow-md border border-stone-700/50">
+              {t.exp_hero_badge}
+            </span>
 
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
-            {t.exp_hero_title} <span className="text-[#FFE259]">{t.exp_hero_title_highlight}</span>
-          </h1>
+            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
+              {t.exp_hero_title} <span className="text-[#FFE259]">{t.exp_hero_title_highlight}</span>
+            </h1>
 
-          <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal">
-            {t.exp_hero_desc}
-          </p>
+            <p className="text-sm sm:text-base text-white/90 leading-relaxed max-w-xl font-normal">
+              {t.exp_hero_desc}
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* 2. Kits de Catas en Casa Disponibles */}
-      {homeTastingKits.length > 0 && (
+      {/* Contenedor del resto del contenido */}
+      <div className="space-y-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* 2. Kits de Catas en Casa Disponibles */}
+        {homeTastingKits.length > 0 && (
         <section id="catas-casa" className="space-y-6 pt-4">
           <div className="flex items-center justify-between pb-2 border-b border-[#E8E5DF] dark:border-[#2D2B27]">
             <div className="space-y-1">
@@ -314,5 +318,6 @@ export default function ExperienciasPage() {
         </div>
       </section>
     </div>
-  );
+  </div>
+);
 }
