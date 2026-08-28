@@ -150,6 +150,8 @@ export async function updateProfile(formData: FormData) {
     cart_data: currentParsed.cart_data,
     site_images: currentParsed.site_images || (existingDetails as any).site_images || {},
     site_images_meta: currentParsed.site_images_meta || (existingDetails as any).site_images_meta || {},
+    last_read_chats: currentParsed.last_read_chats || (existingDetails as any).last_read_chats || {},
+    last_read_orders: currentParsed.last_read_orders || (existingDetails as any).last_read_orders || {},
   };
 
   const structuredBio = JSON.stringify(profileData);
@@ -256,6 +258,8 @@ export async function updateStoreConfig(formData: FormData) {
         cart_data: sellerParsed.cart_data || existingBio.cart_data || [],
         site_images: sellerParsed.site_images || (existingBio as any).site_images || {},
         site_images_meta: sellerParsed.site_images_meta || (existingBio as any).site_images_meta || {},
+        last_read_chats: sellerParsed.last_read_chats || (existingBio as any).last_read_chats || {},
+        last_read_orders: sellerParsed.last_read_orders || (existingBio as any).last_read_orders || {},
       };
 
       await supabase
@@ -371,6 +375,8 @@ export async function updateDeliveryAddresses(deliveryAddresses: DeliveryAddress
     cart_data: currentParsed.cart_data || (existingDetails as any).cart_data || [],
     site_images: currentParsed.site_images || (existingDetails as any).site_images || {},
     site_images_meta: currentParsed.site_images_meta || (existingDetails as any).site_images_meta || {},
+    last_read_chats: currentParsed.last_read_chats || (existingDetails as any).last_read_chats || {},
+    last_read_orders: currentParsed.last_read_orders || (existingDetails as any).last_read_orders || {},
   };
 
   const structuredBio = JSON.stringify(profileData);

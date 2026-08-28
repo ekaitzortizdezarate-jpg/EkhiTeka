@@ -10,6 +10,8 @@ import { Footer } from '@/components/Footer';
 import { CartDrawer } from '@/components/CartDrawer';
 import { CookieBanner } from '@/components/CookieBanner';
 import { createClient } from '@/lib/supabase/server';
+import { getGlobalSiteImagesConfig } from '@/app/actions/site-images';
+import { parseProfile, type Profile } from '@/types/database';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -53,13 +55,26 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const { data: sellerRaw } = await supabase
-    .from('profiles')
-    .select('*')
-    .in('role', ['vendedor', 'admin'])
-    .order('updated_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+
+  const [sellersRes, siteImagesConfig] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*')
+      .in('role', ['vendedor', 'admin'])
+      .order('updated_at', { ascending: false }),
+    getGlobalSiteImagesConfig(supabase),
+  ]);
+
+  const allSellers = sellersRes.data || [];
+  const mainSellerRaw = allSellers[0] || null;
+  const parsedSeller = parseProfile(mainSellerRaw);
+
+  // Inyectar de forma definitiva las imágenes globales de Supabase Storage
+  const finalSellerProfile: Profile = {
+    ...parsedSeller,
+    site_images: siteImagesConfig.images,
+    site_images_meta: siteImagesConfig.meta,
+  };
 
   return (
     <html lang="eu" className={`${dmSans.variable} ${cormorant.variable}`} suppressHydrationWarning>
@@ -69,7 +84,7 @@ export default async function RootLayout({
       <body className="min-h-screen flex flex-col antialiased selection:bg-[#FFE259] selection:text-[#1D1D1B] bg-[#FAF8F5] dark:bg-[#141312] text-[#1D1D1B] dark:text-[#F5F5F0]">
         <ThemeProvider>
           <LanguageProvider>
-            <StoreConfigProvider initialSellerProfile={sellerRaw}>
+            <StoreConfigProvider initialSellerProfile={finalSellerProfile}>
               <CartProvider>
                 <Navbar />
                 <main className="flex-1 w-full">
