@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   Gift,
   Wine,
+  Store,
 } from 'lucide-react';
 
 interface SiteImageDef {
@@ -37,7 +38,7 @@ const SITE_IMAGE_DEFS: SiteImageDef[] = [
     defaultPath: '/images/secciones/Tienda.JPG',
     icon: Sparkles,
   },
-  // 1. Tienda
+  // 1. Tienda & Tarjeta Visítanos
   {
     key: 'tienda_hero',
     section: 'Tienda & Catálogo',
@@ -45,6 +46,14 @@ const SITE_IMAGE_DEFS: SiteImageDef[] = [
     description: 'Imagen de cabecera hero en la página de catálogo de la tienda.',
     defaultPath: '/images/secciones/Tienda.JPG',
     icon: ShoppingBag,
+  },
+  {
+    key: 'shop_visit_card',
+    section: 'Tienda & Catálogo',
+    title: 'Tarjeta: Visítanos en Lekeitio · Tienda Física',
+    description: 'Imagen de la tarjeta de presentación de la tienda física en la parte inferior de Inicio y Tienda.',
+    defaultPath: '/images/secciones/Tienda.JPG',
+    icon: Store,
   },
   // 2. Regalos Gourmet
   {

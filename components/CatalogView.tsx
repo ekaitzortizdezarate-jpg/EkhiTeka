@@ -25,7 +25,7 @@ export function CatalogView({
   isSeller = false,
 }: CatalogViewProps) {
   const { t, language } = useLanguage();
-  const { getSiteImage, getWhatsAppUrl, storeAddress } = useStoreConfig();
+  const { getSiteImage, getWhatsAppUrl, storeAddress, storeSchedule, hasActiveWhatsApp } = useStoreConfig();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<string>(initialCategory === 'all' ? 'category' : 'name_asc');
@@ -392,29 +392,31 @@ export function CatalogView({
             <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-stone-700 dark:text-stone-300 font-sans">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
-                <span>{storeAddress || 'Gamarra Kalea 4, Lekeitio · Bizkaia'}</span>
+                <span>{storeAddress}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-stone-700 dark:text-stone-300 stroke-[1.75]" />
-                <span>{t.footer_schedule_weekdays}</span>
+                <span>{storeSchedule}</span>
               </div>
             </div>
             <div className="pt-2 flex flex-wrap gap-3">
-              <a
-                href={
-                  getWhatsAppUrl(
-                    language === 'eu'
-                      ? 'Kaixo, Lekeitioko dendan produktuen eskuragarritasunari buruz galdetu nahi nuen.'
-                      : 'Hola, quisiera consultar disponibilidad de productos en la tienda de Lekeitio.'
-                  ) || 'https://wa.me/34600000000'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105 cursor-pointer"
-              >
-                <MessageCircle className="w-4 h-4 stroke-[1.75]" />
-                <span>{t.shop_visit_contact}</span>
-              </a>
+              {hasActiveWhatsApp && (
+                <a
+                  href={
+                    getWhatsAppUrl(
+                      language === 'eu'
+                        ? 'Kaixo, Lekeitioko dendan produktuen eskuragarritasunari buruz galdetu nahi nuen.'
+                        : 'Hola, quisiera consultar disponibilidad de productos en la tienda de Lekeitio.'
+                    )
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-bold text-xs uppercase tracking-[0.14em] transition-all shadow-md hover:scale-105 cursor-pointer"
+                >
+                  <MessageCircle className="w-4 h-4 stroke-[1.75]" />
+                  <span>{t.shop_visit_contact}</span>
+                </a>
+              )}
               <button
                 type="button"
                 onClick={scrollToCatalog}
@@ -428,9 +430,14 @@ export function CatalogView({
           <div className="lg:col-span-6">
             <div className="relative rounded-3xl overflow-hidden shadow-md border border-[#E8E5DF] dark:border-[#2D2B27] h-64 sm:h-80 group">
               <img
-                src={getSiteImage('tienda_hero', '/images/secciones/Tienda.JPG')}
+                src={getSiteImage('shop_visit_card', getSiteImage('tienda_hero', '/images/secciones/Tienda.JPG'))}
                 alt={t.shop_visit_title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/secciones/Tienda.JPG';
+                }}
               />
               <div className="absolute top-4 right-4 px-3 py-1 bg-[#1D1D1B]/90 text-white text-[10px] font-bold rounded-xl uppercase tracking-[0.14em] shadow-md border border-stone-700/60 backdrop-blur-xs font-sans">
                 Lekeitio Centro

@@ -8,7 +8,9 @@ interface StoreConfigContextType {
   hasActiveWhatsApp: boolean;
   whatsappPhone: string | null;
   activeWhatsAppContact: WhatsAppContact | null;
+  mainStoreAddress: StoreAddress | null;
   storeAddress: string;
+  storeSchedule: string;
   pickupAddresses: StoreAddress[];
   activePickupAddresses: StoreAddress[];
   eventAddresses: EventAddress[];
@@ -48,7 +50,17 @@ export function StoreConfigProvider({
 
   const activeWhatsAppContact = useMemo(() => {
     const contacts = seller.whatsapp_contacts || [];
-    return contacts.find((c) => c.is_active) || null;
+    const active = contacts.find((c) => c.is_active && c.phone && c.phone.trim().length > 0);
+    if (active) return active;
+    if (seller.whatsapp_phone && seller.whatsapp_phone.trim().length > 0) {
+      return {
+        id: 'default',
+        name: seller.full_name || 'EkhiTeka',
+        phone: seller.whatsapp_phone,
+        is_active: true,
+      };
+    }
+    return null;
   }, [seller]);
 
   const hasActiveWhatsApp = Boolean(activeWhatsAppContact && activeWhatsAppContact.phone && activeWhatsAppContact.phone.trim().length > 0);
@@ -64,13 +76,41 @@ export function StoreConfigProvider({
   const eventAddresses = useMemo(() => seller.event_addresses || [], [seller]);
   const activeEventAddresses = useMemo(() => eventAddresses.filter((a) => a.is_active), [eventAddresses]);
 
-  const storeAddress = useMemo(() => {
+  // Tienda Principal: La que tenga is_main === true y esté activa, o la primera activa
+  const mainStoreAddress = useMemo(() => {
+    const main = pickupAddresses.find((a) => a.is_main && a.is_active);
+    if (main) return main;
     const firstActive = activePickupAddresses[0];
-    if (firstActive) {
-      return `${firstActive.street}${firstActive.number ? ' ' + firstActive.number : ''}, ${firstActive.town} · ${firstActive.province}`;
+    if (firstActive) return firstActive;
+    return pickupAddresses[0] || null;
+  }, [pickupAddresses, activePickupAddresses]);
+
+  const storeAddress = useMemo(() => {
+    if (mainStoreAddress) {
+      return `${mainStoreAddress.street}${mainStoreAddress.number ? ' ' + mainStoreAddress.number : ''}, ${mainStoreAddress.town}${mainStoreAddress.province ? ' · ' + mainStoreAddress.province : ''}`;
     }
     return 'Gamarra Kalea 4, Lekeitio · Bizkaia';
-  }, [activePickupAddresses]);
+  }, [mainStoreAddress]);
+
+  const storeSchedule = useMemo(() => {
+    if (mainStoreAddress?.schedule && mainStoreAddress.schedule.trim().length > 0) {
+      return mainStoreAddress.schedule;
+    }
+    if (mainStoreAddress?.schedule_details) {
+      const d = mainStoreAddress.schedule_details;
+      const parts: string[] = [];
+      if (d.weekday_morning_enabled && d.weekday_morning_start && d.weekday_morning_end) {
+        parts.push(`${d.weekday_morning_start} - ${d.weekday_morning_end}`);
+      }
+      if (d.weekday_afternoon_enabled && d.weekday_afternoon_start && d.weekday_afternoon_end) {
+        parts.push(`${d.weekday_afternoon_start} - ${d.weekday_afternoon_end}`);
+      }
+      if (parts.length > 0) {
+        return parts.join(' / ');
+      }
+    }
+    return 'Lunes a Sábado: 10:00 - 14:00 / 17:30 - 20:30';
+  }, [mainStoreAddress]);
 
   const getWhatsAppUrl = useMemo(() => {
     return (message?: string) => {
@@ -87,7 +127,9 @@ export function StoreConfigProvider({
         hasActiveWhatsApp,
         whatsappPhone,
         activeWhatsAppContact,
+        mainStoreAddress,
         storeAddress,
+        storeSchedule,
         pickupAddresses,
         activePickupAddresses,
         eventAddresses,
@@ -111,7 +153,9 @@ export function useStoreConfig() {
       hasActiveWhatsApp: false,
       whatsappPhone: null,
       activeWhatsAppContact: null,
+      mainStoreAddress: null,
       storeAddress: 'Gamarra Kalea 4, Lekeitio · Bizkaia',
+      storeSchedule: 'Lunes a Sábado: 10:00 - 14:00 / 17:30 - 20:30',
       pickupAddresses: [],
       activePickupAddresses: [],
       eventAddresses: [],
