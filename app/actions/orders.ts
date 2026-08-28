@@ -2,7 +2,14 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { type OrderStatus, isProfileComplete } from '@/types/database';
+import {
+  type OrderStatus,
+  isProfileComplete,
+  encodeOrderHistory,
+  getOrderStatusHistory,
+  getCleanShippingNotes,
+  type OrderStatusHistoryItem,
+} from '@/types/database';
 
 export interface CreateOrderItemPayload {
   productId?: string;
@@ -95,7 +102,16 @@ export async function createOrder(payload: CreateOrderPayload) {
     }
   }
 
-  // 2. Crear pedido
+  // 2. Crear pedido con historial de creación
+  const initialHistory: OrderStatusHistoryItem[] = [
+    {
+      status: 'pendiente',
+      changed_by_name: 'Cliente',
+      timestamp: new Date().toISOString(),
+    },
+  ];
+  const encodedShippingNotes = encodeOrderHistory(shippingNotes || '', initialHistory);
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
@@ -104,7 +120,7 @@ export async function createOrder(payload: CreateOrderPayload) {
       status: 'pendiente',
       delivery_type: deliveryType,
       shipping_address: shippingAddress,
-      shipping_notes: shippingNotes,
+      shipping_notes: encodedShippingNotes,
       pickup_schedule: pickupSchedule,
       total_price: totalPrice,
     })
@@ -193,6 +209,21 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     return { error: 'No autenticado' };
   }
 
+  // Verificar rol de vendedor y perfil obligatorio completado
+  const { data: profileRaw } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (profileRaw?.role !== 'vendedor' && profileRaw?.role !== 'admin') {
+    return { error: 'Permisos insuficientes. Solo los vendedores pueden gestionar pedidos.' };
+  }
+
+  if (!isProfileComplete(profileRaw)) {
+    return { error: 'Debes completar tus datos obligatorios en Perfil / Usuario antes de gestionar pedidos de la tienda.' };
+  }
+
   // Si pasa a cancelado, restaurar stock de los productos
   if (status === 'cancelado') {
     const { data: orderItems } = await supabase
@@ -219,17 +250,33 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     }
   }
 
-  // Obtener info del pedido para notificar al comprador
+  // Obtener info del pedido e historial previo
   const { data: order } = await supabase
     .from('orders')
-    .select('id, buyer_id, seller_id, status')
+    .select('id, buyer_id, seller_id, status, shipping_notes')
     .eq('id', orderId)
     .single();
+
+  const existingHistory = getOrderStatusHistory(order?.shipping_notes);
+  const cleanNotes = getCleanShippingNotes(order?.shipping_notes);
+  const sellerName = profileRaw.full_name || 'Vendedor EkhiTeka';
+
+  const updatedHistory: OrderStatusHistoryItem[] = [
+    ...existingHistory,
+    {
+      status,
+      changed_by_name: sellerName,
+      changed_by_id: user.id,
+      timestamp: new Date().toISOString(),
+    },
+  ];
+  const updatedShippingNotes = encodeOrderHistory(cleanNotes, updatedHistory);
 
   const { error } = await supabase
     .from('orders')
     .update({
       status,
+      shipping_notes: updatedShippingNotes,
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId);
@@ -284,10 +331,25 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: 'No autenticado' };
   }
 
-  // 1. Obtener detalles del pedido para saber el comprador
+  // Verificar rol de vendedor y perfil obligatorio completado
+  const { data: profileRaw } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (profileRaw?.role !== 'vendedor' && profileRaw?.role !== 'admin') {
+    return { error: 'Permisos insuficientes. Solo los vendedores pueden cancelar pedidos.' };
+  }
+
+  if (!isProfileComplete(profileRaw)) {
+    return { error: 'Debes completar tus datos obligatorios en Perfil / Usuario antes de gestionar pedidos de la tienda.' };
+  }
+
+  // 1. Obtener detalles del pedido para saber el comprador y actualizar historial
   const { data: order } = await supabase
     .from('orders')
-    .select('id, buyer_id, seller_id, status')
+    .select('id, buyer_id, seller_id, status, shipping_notes')
     .eq('id', orderId)
     .single();
 
@@ -295,11 +357,29 @@ export async function cancelOrder(orderId: string, reason: string) {
     return { error: 'Pedido no encontrado' };
   }
 
-  // 2. Actualizar estado del pedido a cancelado
+  const existingHistory = getOrderStatusHistory(order.shipping_notes);
+  const cleanNotes = getCleanShippingNotes(order.shipping_notes);
+  const sellerName = profileRaw.full_name || 'Vendedor EkhiTeka';
+
+  const updatedHistory: OrderStatusHistoryItem[] = [
+    ...existingHistory,
+    {
+      status: 'cancelado',
+      changed_by_name: sellerName,
+      changed_by_id: user.id,
+      timestamp: new Date().toISOString(),
+      notes: reason.trim(),
+    },
+  ];
+  const updatedShippingNotes = encodeOrderHistory(cleanNotes, updatedHistory);
+
+  // 2. Actualizar estado del pedido a cancelado con historial
   const { error } = await supabase
     .from('orders')
     .update({
       status: 'cancelado',
+      cancel_reason: reason.trim(),
+      shipping_notes: updatedShippingNotes,
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId);
@@ -312,8 +392,8 @@ export async function cancelOrder(orderId: string, reason: string) {
   if (order.buyer_id) {
     const isPending = order.status === 'pendiente';
     const actionLabel = isPending ? 'rechazado' : 'cancelado';
-    const shortId = order.id.slice(0, 8);
-    const text = `⚠️ Tu pedido #${shortId} ha sido ${actionLabel} por el artesano.\n\nMotivo:\n${reason.trim()}`;
+    const shortId = order.id.slice(0, 8).toUpperCase();
+    const text = `⚠️ Tu pedido #${shortId} ha sido ${actionLabel} por la tienda.\n\nMotivo:\n${reason.trim()}`;
 
     await supabase.from('chat_messages').insert({
       sender_id: user.id,

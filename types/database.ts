@@ -300,6 +300,37 @@ export interface OrderItem {
   products?: Product | null;
 }
 
+export interface OrderStatusHistoryItem {
+  status: OrderStatus;
+  changed_by_name: string;
+  changed_by_id?: string;
+  timestamp: string;
+  notes?: string;
+}
+
+export function getCleanShippingNotes(raw?: string | null): string {
+  if (!raw) return '';
+  return raw.replace(/<!--HISTORY:[\s\S]*?-->/g, '').trim();
+}
+
+export function getOrderStatusHistory(raw?: string | null): OrderStatusHistoryItem[] {
+  if (!raw) return [];
+  const match = raw.match(/<!--HISTORY:([\s\S]*?)-->/);
+  if (!match || !match[1]) return [];
+  try {
+    const parsed = JSON.parse(match[1]);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function encodeOrderHistory(cleanNotes: string, history: OrderStatusHistoryItem[]): string {
+  const clean = cleanNotes.replace(/<!--HISTORY:[\s\S]*?-->/g, '').trim();
+  const historyTag = `<!--HISTORY:${JSON.stringify(history)}-->`;
+  return clean ? `${clean}\n\n${historyTag}` : historyTag;
+}
+
 export interface Order {
   id: string;
   buyer_id: string;
@@ -317,6 +348,7 @@ export interface Order {
   updated_at?: string;
   profiles?: Profile | null;
   order_items?: OrderItem[];
+  status_history?: OrderStatusHistoryItem[];
 }
 
 export interface ChatMessage {

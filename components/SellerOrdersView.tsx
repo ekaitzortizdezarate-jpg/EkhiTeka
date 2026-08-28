@@ -8,6 +8,7 @@ import { updateOrderStatus, cancelOrder, deleteOrderPermanently } from '@/app/ac
 import { getProductImage, getPackItems, getOrderTypeBadge } from '@/lib/productHelpers';
 import Link from 'next/link';
 import type { Order, OrderStatus } from '@/types/database';
+import { getOrderStatusHistory, getCleanShippingNotes } from '@/types/database';
 import {
   Package,
   MessageCircle,
@@ -536,6 +537,56 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                   </div>
                 ) : null}
 
+                {/* Historial de Gestión de la Tienda (Visible solo para vendedores) */}
+                {(() => {
+                  const history = getOrderStatusHistory(order.shipping_notes);
+                  if (history.length === 0) return null;
+
+                  return (
+                    <div className="p-3.5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/25 border border-amber-200/80 dark:border-amber-900/50 space-y-2 text-xs font-sans">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-950 dark:text-amber-200 font-serif">
+                        <Clock className="w-3.5 h-3.5 text-[#C68D07] dark:text-[#FFE259]" />
+                        <span>Historial de Estado (Equipo de Tienda):</span>
+                      </div>
+                      <div className="space-y-1.5 pl-1 border-l-2 border-amber-300 dark:border-amber-700 ml-1">
+                        {history.map((h, hIdx) => {
+                          const dateFormatted = new Date(h.timestamp).toLocaleDateString(LOCALE_MAP[language] || 'es', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          });
+                          return (
+                            <div key={hIdx} className="text-[11.5px] text-stone-700 dark:text-stone-300 pl-2">
+                              <span className="font-bold capitalize text-stone-900 dark:text-stone-100">
+                                {h.status === 'pendiente'
+                                  ? 'Pedido creado'
+                                  : h.status === 'confirmado'
+                                  ? 'Confirmado'
+                                  : h.status === 'preparando'
+                                  ? 'En preparación'
+                                  : h.status === 'listo_entrega'
+                                  ? 'Listo para entrega / envío'
+                                  : h.status === 'entregado'
+                                  ? 'Entregado'
+                                  : 'Cancelado'}
+                              </span>{' '}
+                              · <span className="font-semibold text-amber-800 dark:text-amber-300">{h.changed_by_name}</span>{' '}
+                              · <span className="text-stone-500 dark:text-stone-400">{dateFormatted}</span>
+                              {h.notes && (
+                                <span className="block italic text-[10.5px] text-stone-500 dark:text-stone-400 mt-0.5">
+                                  Motivo: "{h.notes}"
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* 4. Tipo de Envío / Datos de Entrega */}
                 <div className="p-4 rounded-2xl bg-stone-50 dark:bg-[#141312] border border-stone-200 dark:border-stone-800 text-xs space-y-2.5 font-sans">
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-stone-200/80 dark:border-stone-800">
@@ -577,9 +628,9 @@ export function SellerOrdersView({ orders }: { orders: Order[] }) {
                           <span className="text-[11px] text-stone-600 dark:text-stone-300">
                             {order.shipping_address || t.profile_not_specified || 'Dirección de entrega a domicilio'}
                           </span>
-                          {order.shipping_notes && (
+                          {getCleanShippingNotes(order.shipping_notes) && (
                             <span className="block text-[11px] italic text-stone-500 dark:text-stone-400 mt-0.5">
-                              Indicaciones: {order.shipping_notes}
+                              Indicaciones: {getCleanShippingNotes(order.shipping_notes)}
                             </span>
                           )}
                         </div>

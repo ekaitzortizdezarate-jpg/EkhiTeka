@@ -7,7 +7,7 @@ import { LOCALE_MAP } from '@/lib/i18n/translations';
 import Link from 'next/link';
 import { getProductImage, getPackItems, getOrderTypeBadge } from '@/lib/productHelpers';
 import { buyerCancelOrder, deleteOrderPermanently } from '@/app/actions/orders';
-import type { Order } from '@/types/database';
+import { Order, getCleanShippingNotes } from '@/types/database';
 import {
   Package,
   MessageCircle,
@@ -543,9 +543,9 @@ export function BuyerOrdersView({ orders }: { orders: Order[] }) {
                           <span className="text-[11px] text-stone-600 dark:text-stone-300">
                             {order.shipping_address || t.deliv_home_tag}
                           </span>
-                          {order.shipping_notes && (
+                          {getCleanShippingNotes(order.shipping_notes) && (
                             <span className="block text-[11px] italic text-stone-500 dark:text-stone-400 mt-0.5">
-                              Indicaciones: {order.shipping_notes}
+                              Indicaciones: {getCleanShippingNotes(order.shipping_notes)}
                             </span>
                           )}
                         </div>

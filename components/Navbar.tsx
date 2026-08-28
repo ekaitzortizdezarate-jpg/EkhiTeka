@@ -1,32 +1,27 @@
 import { createClient } from '@/lib/supabase/server';
-import { type Profile, parseProfile } from '@/types/database';
+import { type Profile, parseProfile, isProfileComplete } from '@/types/database';
+import { getUnifiedStoreConfig } from '@/app/actions/auth';
 import { NavbarNavLinks } from '@/components/NavbarNavLinks';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ThemeSelector } from '@/components/ThemeSelector';
 
 export default async function Navbar() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [storeConfig, { data: userRes }] = await Promise.all([
+    getUnifiedStoreConfig(supabase),
+    supabase.auth.getUser(),
+  ]);
+  const user = userRes?.user;
 
   let profile: Profile | null = null;
   let unreadMessagesCount = 0;
   let ordersCount = 0;
   let activeOrders: { id: string; status: string }[] = [];
 
-  const { data: sellerRaw } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('role', 'vendedor')
-    .limit(1)
-    .maybeSingle();
-
-  const sellerProfile = parseProfile(sellerRaw);
   const mainStoreAddr =
-    sellerProfile.pickup_addresses?.find((a) => a.is_main) ||
-    sellerProfile.pickup_addresses?.find((a) => a.is_active) ||
-    sellerProfile.pickup_addresses?.[0];
+    storeConfig.pickup_addresses?.find((a) => a.is_main) ||
+    storeConfig.pickup_addresses?.find((a) => a.is_active) ||
+    storeConfig.pickup_addresses?.[0];
 
   const storeAddress = mainStoreAddr
     ? `${mainStoreAddr.street}${mainStoreAddr.number ? ` ${mainStoreAddr.number}` : ''}, ${mainStoreAddr.town} · ${mainStoreAddr.province}`
@@ -42,10 +37,12 @@ export default async function Navbar() {
     profile = profileRaw;
     const parsedProfile = parseProfile(profileRaw);
     const isSeller = parsedProfile.role === 'vendedor' || parsedProfile.role === 'admin';
+    const profileComplete = isProfileComplete(profileRaw);
     const lastReadMap = parsedProfile.last_read_chats || {};
 
     if (isSeller) {
-      // 1. Para vendedores: todos los pedidos y consultas de la tienda
+      if (profileComplete) {
+        // 1. Para vendedores activos: todos los pedidos y consultas de la tienda
       const [ordersRes, allSellersRes, allMsgsRes] = await Promise.all([
         supabase
           .from('orders')
@@ -85,6 +82,7 @@ export default async function Navbar() {
       });
 
       unreadMessagesCount = unreadConvs.size;
+      }
     } else {
       // 2. Para compradores: solo sus pedidos y mensajes de la tienda
       const [ordersRes, myMsgsRes] = await Promise.all([

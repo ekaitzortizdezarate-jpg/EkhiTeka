@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { SellerProductsListView } from '@/components/SellerProductsListView';
-import { parseProfile } from '@/types/database';
+import { getUnifiedStoreConfig } from '@/app/actions/auth';
+import { isProfileComplete } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,7 @@ export default async function SellerProductsPage() {
     redirect('/login');
   }
 
-  const [profileRes, productsRes, categoriesRes] = await Promise.all([
+  const [profileRes, productsRes, categoriesRes, storeConfig] = await Promise.all([
     supabase
       .from('profiles')
       .select('*')
@@ -30,6 +31,7 @@ export default async function SellerProductsPage() {
       .from('categories')
       .select('*')
       .order('display_order', { ascending: true }),
+    getUnifiedStoreConfig(supabase),
   ]);
 
   const profile = profileRes.data;
@@ -38,9 +40,9 @@ export default async function SellerProductsPage() {
     redirect('/');
   }
 
-  const parsedProfile = parseProfile(profile);
-  const pickupAddresses = parsedProfile.pickup_addresses || [];
-  const eventAddresses = parsedProfile.event_addresses || [];
+  const profileComplete = isProfileComplete(profile);
+  const pickupAddresses = storeConfig.pickup_addresses || [];
+  const eventAddresses = storeConfig.event_addresses || [];
 
   return (
     <main className="min-h-screen bg-[#FAF8F5] dark:bg-[#141312] py-4 sm:py-8">
@@ -49,6 +51,7 @@ export default async function SellerProductsPage() {
         categories={categoriesRes.data || []}
         pickupAddresses={pickupAddresses}
         eventAddresses={eventAddresses}
+        isProfileComplete={profileComplete}
       />
     </main>
   );

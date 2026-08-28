@@ -48,6 +48,7 @@ interface SellerProductsListViewProps {
   categories: Category[];
   pickupAddresses: StoreAddress[];
   eventAddresses?: EventAddress[];
+  isProfileComplete?: boolean;
 }
 
 export function SellerProductsListView({
@@ -55,6 +56,7 @@ export function SellerProductsListView({
   categories,
   pickupAddresses,
   eventAddresses = [],
+  isProfileComplete = true,
 }: SellerProductsListViewProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -581,6 +583,33 @@ export function SellerProductsListView({
           </p>
         </div>
       </div>
+
+      {/* Alerta de Perfil Incompleto */}
+      {!isProfileComplete && (
+        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-[#FFE259] flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
+          <div className="flex items-center gap-2.5 text-stone-900 dark:text-stone-100">
+            <AlertCircle className="w-5 h-5 text-[#C68D07] dark:text-[#FFE259] shrink-0" />
+            <div>
+              <p className="font-bold text-sm">
+                {language === 'eu'
+                  ? 'Osatu zure erabiltzaile profila argitaratzeko baimenak aktibatzeko.'
+                  : 'Completa tus datos obligatorios en Perfil / Usuario para activar los permisos de edición.'}
+              </p>
+              <p className="text-[11px] text-stone-600 dark:text-stone-400">
+                {language === 'eu'
+                  ? 'Izena, abizenak, NAN, telefonoa eta jaiotze-data beharrezkoak dira dendako kide guztientzat.'
+                  : 'Nombre, apellidos, DNI, teléfono y fecha de nacimiento son obligatorios para publicar, editar y gestionar pedidos o chats.'}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/perfil"
+            className="px-4 py-2 bg-[#FFE259] hover:bg-[#F5D742] text-[#1D1D1B] font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs shrink-0"
+          >
+            {language === 'eu' ? 'Profila bete' : 'Completar Perfil'}
+          </Link>
+        </div>
+      )}
 
       {/* 2. SELECTOR CENTRAL DESTACADO (Productos / Eventos con cantidad debajo) */}
       <div className="w-full max-w-md mx-auto px-1">
