@@ -11,6 +11,7 @@ import { CartDrawer } from '@/components/CartDrawer';
 import { CookieBanner } from '@/components/CookieBanner';
 import { createClient } from '@/lib/supabase/server';
 import { getGlobalSiteImagesConfig } from '@/app/actions/site-images';
+import { getUnifiedStoreConfig } from '@/app/actions/auth';
 import { parseProfile, type Profile } from '@/types/database';
 
 const dmSans = DM_Sans({
@@ -56,22 +57,27 @@ export default async function RootLayout({
 }) {
   const supabase = await createClient();
 
-  const [sellersRes, siteImagesConfig] = await Promise.all([
+  const [sellersRes, siteImagesConfig, storeConfig] = await Promise.all([
     supabase
       .from('profiles')
       .select('*')
       .in('role', ['vendedor', 'admin'])
       .order('updated_at', { ascending: false }),
     getGlobalSiteImagesConfig(supabase),
+    getUnifiedStoreConfig(supabase),
   ]);
 
   const allSellers = sellersRes.data || [];
   const mainSellerRaw = allSellers[0] || null;
   const parsedSeller = parseProfile(mainSellerRaw);
 
-  // Inyectar de forma definitiva las imágenes globales de Supabase Storage
+  // Inyectar de forma unificada y definitiva los datos globales de la tienda y las imágenes
   const finalSellerProfile: Profile = {
     ...parsedSeller,
+    whatsapp_contacts: storeConfig.whatsapp_contacts,
+    whatsapp_phone: storeConfig.whatsapp_phone,
+    pickup_addresses: storeConfig.pickup_addresses,
+    event_addresses: storeConfig.event_addresses,
     site_images: siteImagesConfig.images,
     site_images_meta: siteImagesConfig.meta,
   };

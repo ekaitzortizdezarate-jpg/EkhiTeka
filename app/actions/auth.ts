@@ -186,6 +186,87 @@ export async function updateProfile(formData: FormData) {
   };
 }
 
+const STORE_CONFIG_FILE = 'site_config/store_config.json';
+const BUCKET_NAME = 'product-images';
+
+export interface UnifiedStoreConfig {
+  whatsapp_contacts: WhatsAppContact[];
+  whatsapp_phone: string | null;
+  pickup_addresses: StoreAddress[];
+  event_addresses: EventAddress[];
+}
+
+export async function getUnifiedStoreConfig(supabaseClient?: any): Promise<UnifiedStoreConfig> {
+  const supabase = supabaseClient || (await createClient());
+
+  let whatsapp_contacts: WhatsAppContact[] = [];
+  let whatsapp_phone: string | null = null;
+  let pickup_addresses: StoreAddress[] = [];
+  let event_addresses: EventAddress[] = [];
+
+  // 1. Intentar descargar store_config.json desde Supabase Storage
+  try {
+    const { data: fileData, error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .download(STORE_CONFIG_FILE);
+
+    if (!error && fileData) {
+      const text = await fileData.text();
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === 'object') {
+        if (Array.isArray(parsed.whatsapp_contacts) && parsed.whatsapp_contacts.length > 0) {
+          whatsapp_contacts = parsed.whatsapp_contacts;
+        }
+        if (parsed.whatsapp_phone) {
+          whatsapp_phone = parsed.whatsapp_phone;
+        }
+        if (Array.isArray(parsed.pickup_addresses) && parsed.pickup_addresses.length > 0) {
+          pickup_addresses = parsed.pickup_addresses;
+        }
+        if (Array.isArray(parsed.event_addresses) && parsed.event_addresses.length > 0) {
+          event_addresses = parsed.event_addresses;
+        }
+      }
+    }
+  } catch {}
+
+  // 2. Si falta algún dato, escanear todos los perfiles de vendedores en la BD como fallback
+  try {
+    const { data: sellers } = await supabase
+      .from('profiles')
+      .select('bio')
+      .in('role', ['vendedor', 'admin']);
+
+    if (sellers && sellers.length > 0) {
+      for (const s of sellers) {
+        if (!s.bio) continue;
+        try {
+          const parsed = JSON.parse(s.bio);
+          if (whatsapp_contacts.length === 0 && Array.isArray(parsed?.whatsapp_contacts) && parsed.whatsapp_contacts.length > 0) {
+            whatsapp_contacts = parsed.whatsapp_contacts;
+          }
+          if (!whatsapp_phone && parsed?.whatsapp_phone) {
+            whatsapp_phone = parsed.whatsapp_phone;
+          }
+          if (pickup_addresses.length === 0 && Array.isArray(parsed?.pickup_addresses) && parsed.pickup_addresses.length > 0) {
+            pickup_addresses = parsed.pickup_addresses;
+          }
+          if (event_addresses.length === 0 && Array.isArray(parsed?.event_addresses) && parsed.event_addresses.length > 0) {
+            event_addresses = parsed.event_addresses;
+          }
+        } catch {}
+      }
+    }
+  } catch {}
+
+  return {
+    whatsapp_contacts,
+    whatsapp_phone,
+    pickup_addresses,
+    event_addresses,
+  };
+}
+
 export async function updateStoreConfig(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -215,7 +296,29 @@ export async function updateStoreConfig(formData: FormData) {
   const activeWA = whatsappContacts.find((c) => c.is_active);
   const whatsappPhone = activeWA ? activeWA.phone.replace(/[^0-9]/g, '') : null;
 
-  // Obtener todos los perfiles de vendedores/admins para sincronizar los datos de tienda
+  const storeConfigData: UnifiedStoreConfig = {
+    whatsapp_contacts: whatsappContacts,
+    whatsapp_phone: whatsappPhone,
+    pickup_addresses: pickupAddresses,
+    event_addresses: eventAddresses,
+  };
+
+  // 1. Guardar de forma PERMANENTE en Supabase Storage
+  try {
+    const configBlob = new Blob([JSON.stringify(storeConfigData, null, 2)], {
+      type: 'application/json',
+    });
+    await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(STORE_CONFIG_FILE, configBlob, {
+        upsert: true,
+        contentType: 'application/json',
+      });
+  } catch (err) {
+    console.error('Error guardando store_config en Supabase Storage:', err);
+  }
+
+  // 2. Sincronizar en todos los perfiles de vendedores/admins de la BD
   const { data: allSellers } = await supabase
     .from('profiles')
     .select('id, bio')
@@ -276,6 +379,9 @@ export async function updateStoreConfig(formData: FormData) {
   revalidatePath('/perfil');
   revalidatePath('/tienda');
   revalidatePath('/experiencias');
+  revalidatePath('/vendedor/productos');
+  revalidatePath('/vendedor/productos/nuevo');
+  revalidatePath('/vendedor/eventos');
   return { success: true };
 }
 

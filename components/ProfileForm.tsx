@@ -39,14 +39,17 @@ interface SellerOption {
 interface ProfileFormProps {
   profile?: Profile;
   userProfile?: Profile;
+  storeProfile?: Profile;
   sellers?: SellerOption[];
 }
 
-export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormProps) {
-  const raw = profile || userProfile || ({} as Profile);
+export function ProfileForm({ profile, userProfile, storeProfile, sellers = [] }: ProfileFormProps) {
+  const rawUser = userProfile || profile || ({} as Profile);
+  const rawStore = storeProfile || profile || userProfile || ({} as Profile);
   const { t, language } = useLanguage();
 
-  const [currentProfile, setCurrentProfile] = useState<Profile>(parseProfile(raw));
+  const [currentProfile, setCurrentProfile] = useState<Profile>(parseProfile(rawUser));
+  const parsedStore = parseProfile(rawStore);
   const isSeller = currentProfile.role === 'vendedor' || currentProfile.role === 'admin';
 
   // Pestañas
@@ -175,12 +178,12 @@ export function ProfileForm({ profile, userProfile, sellers = [] }: ProfileFormP
     return sections.join(' · ');
   };
 
-  // Sección Tienda
-  const [whatsappContacts, setWhatsappContacts] = useState<WhatsAppContact[]>(currentProfile.whatsapp_contacts || []);
+  // Sección Tienda (Global compartida entre todos los vendedores)
+  const [whatsappContacts, setWhatsappContacts] = useState<WhatsAppContact[]>(parsedStore.whatsapp_contacts || []);
   const [pickupAddresses, setPickupAddresses] = useState<StoreAddress[]>(() =>
-    ensureOneMainPickup(currentProfile.pickup_addresses || [])
+    ensureOneMainPickup(parsedStore.pickup_addresses || [])
   );
-  const [eventAddresses, setEventAddresses] = useState<EventAddress[]>(currentProfile.event_addresses || []);
+  const [eventAddresses, setEventAddresses] = useState<EventAddress[]>(parsedStore.event_addresses || []);
   const [loadingStore, setLoadingStore] = useState(false);
   const [storeMsg, setStoreMsg] = useState<{ text: string; isError: boolean } | null>(null);
 
