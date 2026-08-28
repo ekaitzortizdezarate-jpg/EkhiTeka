@@ -631,6 +631,45 @@ export async function deleteOrderPermanently(orderId: string) {
     return { error: error.message };
   }
 
+  // 4. Si quien elimina es un vendedor: notificar a los demás vendedores por chat (al comprador NO)
+  try {
+    const { data: myProfile } = await supabase
+      .from('profiles')
+      .select('full_name, role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const isSeller = myProfile?.role === 'vendedor' || myProfile?.role === 'admin';
+    if (isSeller) {
+      const { data: otherSellers } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('role', ['vendedor', 'admin'])
+        .neq('id', user.id);
+
+      if (otherSellers && otherSellers.length > 0) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        const sellerName = myProfile?.full_name || 'Un vendedor';
+        const shortId = orderId.slice(0, 8).toUpperCase();
+        const noticeMessage = `🗑️ [Aviso a Vendedores] ${sellerName} ha eliminado el pedido #${shortId} a las ${timeStr} (${dateStr}).`;
+
+        for (const other of otherSellers) {
+          await supabase.from('chat_messages').insert({
+            sender_id: user.id,
+            receiver_id: other.id,
+            message: noticeMessage,
+            is_read: false,
+            created_at: now.toISOString(),
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error sending seller deletion notice:', err);
+  }
+
   revalidatePath('/vendedor/pedidos');
   revalidatePath('/comprador/pedidos');
   revalidatePath('/chat');

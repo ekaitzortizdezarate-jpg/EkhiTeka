@@ -1,9 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { deleteChatConversation } from '@/app/actions/chat';
 import type { Profile } from '@/types/database';
-import { MessageCircle, Store, User, ArrowRight } from 'lucide-react';
+import { MessageCircle, Store, User, ArrowRight, Trash2, X, AlertTriangle } from 'lucide-react';
 
 export interface InboxConversation {
   otherUser: Profile;
@@ -19,6 +22,32 @@ interface ChatInboxViewProps {
 
 export function ChatInboxView({ conversations, isSellerViewer = false }: ChatInboxViewProps) {
   const { t, language } = useLanguage();
+  const router = useRouter();
+
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    partnerId: string;
+    partnerName: string;
+    loading: boolean;
+  }>({
+    open: false,
+    partnerId: '',
+    partnerName: '',
+    loading: false,
+  });
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.partnerId || deleteModal.loading) return;
+    setDeleteModal((prev) => ({ ...prev, loading: true }));
+    const res = await deleteChatConversation(deleteModal.partnerId);
+    setDeleteModal({ open: false, partnerId: '', partnerName: '', loading: false });
+
+    if (res?.error) {
+      alert(`${t.common_error}: ${res.error}`);
+    } else {
+      router.refresh();
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-6 space-y-6 font-serif">
@@ -56,14 +85,16 @@ export function ChatInboxView({ conversations, isSellerViewer = false }: ChatInb
               const isOtherUserSeller = otherUser.role === 'vendedor' || otherUser.role === 'admin';
 
               return (
-                <Link
+                <div
                   key={otherUser.id}
-                  href={`/chat/${otherUser.id}`}
                   className={`p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-stone-50 dark:hover:bg-stone-850 transition-colors ${
                     unreadCount > 0 ? 'bg-amber-50/60 dark:bg-amber-950/30' : ''
                   }`}
                 >
-                  <div className="flex items-center gap-3.5 min-w-0">
+                  <Link
+                    href={`/chat/${otherUser.id}`}
+                    className="flex items-center gap-3.5 min-w-0 flex-1"
+                  >
                     <div className="relative shrink-0">
                       <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300 font-black text-base flex items-center justify-center border-2 border-amber-500/30">
                         {otherUser.avatar_url ? (
@@ -85,7 +116,7 @@ export function ChatInboxView({ conversations, isSellerViewer = false }: ChatInb
                       )}
                     </div>
 
-                    <div className="min-w-0 space-y-0.5">
+                    <div className="min-w-0 space-y-0.5 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="text-sm font-black text-stone-900 dark:text-stone-100 truncate">
                           {!isSellerViewer && isOtherUserSeller ? 'EkhiTeka' : otherUser.full_name}
@@ -111,20 +142,48 @@ export function ChatInboxView({ conversations, isSellerViewer = false }: ChatInb
                         {lastMessage}
                       </p>
                     </div>
-                  </div>
+                  </Link>
 
-                  <div className="text-right shrink-0 font-serif">
-                    <span className="text-[11px] font-bold text-stone-400 block font-sans">
-                      {lastMessageTime
-                        ? new Date(lastMessageTime).toLocaleDateString([], {
-                            day: '2-digit',
-                            month: 'short',
-                          })
-                        : ''}
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-stone-400 ml-auto mt-1" />
+                  <div className="flex items-center gap-2 shrink-0 font-serif">
+                    <div className="text-right">
+                      <span className="text-[11px] font-bold text-stone-400 block font-sans">
+                        {lastMessageTime
+                          ? new Date(lastMessageTime).toLocaleDateString([], {
+                              day: '2-digit',
+                              month: 'short',
+                            })
+                          : ''}
+                      </span>
+                    </div>
+
+                    {isSellerViewer && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDeleteModal({
+                            open: true,
+                            partnerId: otherUser.id,
+                            partnerName: otherUser.full_name || 'este usuario',
+                            loading: false,
+                          });
+                        }}
+                        className="p-2 rounded-xl text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer border border-transparent hover:border-red-200 dark:hover:border-red-800 ml-1"
+                        title={language === 'eu' ? 'Ezabatu elkarrizketa' : 'Eliminar conversación'}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+
+                    <Link
+                      href={`/chat/${otherUser.id}`}
+                      className="p-2 rounded-xl hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </div>
-                </Link>
+                </div>
               );
             })
           ) : (
@@ -142,6 +201,62 @@ export function ChatInboxView({ conversations, isSellerViewer = false }: ChatInb
           )}
         </div>
       </div>
+
+      {/* Modal de Confirmación para Eliminar Conversación */}
+      {deleteModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans animate-fadeIn">
+          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-stone-200 dark:border-stone-800 space-y-5 animate-scaleUp">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2.5 text-red-600 dark:text-red-400">
+                <AlertTriangle className="w-6 h-6" />
+                <h3 className="text-lg font-black font-serif text-stone-900 dark:text-stone-100">
+                  {language === 'eu' ? 'Ezabatu txata' : 'Eliminar conversación'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteModal({ open: false, partnerId: '', partnerName: '', loading: false })}
+                className="p-1.5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2 text-sm text-stone-600 dark:text-stone-300">
+              <p>
+                {language === 'eu'
+                  ? `Ziur zaude "${deleteModal.partnerName}" bezeroarekin elkarrizketa osoa ezabatu nahi duzula?`
+                  : `¿Estás seguro de que deseas eliminar todo el historial de chat con "${deleteModal.partnerName}"?`}
+              </p>
+              <p className="text-xs text-stone-400">
+                {language === 'eu'
+                  ? 'Ekintza hau ezin da desegin eta mezu guztiak betiko ezabatuko dira.'
+                  : 'Esta acción es irreversible y eliminará todos los mensajes de la conversación permanentemente.'}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-100 dark:border-stone-800 font-serif">
+              <button
+                type="button"
+                disabled={deleteModal.loading}
+                onClick={() => setDeleteModal({ open: false, partnerId: '', partnerName: '', loading: false })}
+                className="px-4 py-2.5 rounded-xl border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold text-xs uppercase tracking-wider cursor-pointer"
+              >
+                {language === 'eu' ? 'Utzi' : 'Cancelar'}
+              </button>
+              <button
+                type="button"
+                disabled={deleteModal.loading}
+                onClick={handleDeleteConfirm}
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>{deleteModal.loading ? (language === 'eu' ? 'Ezabatzen...' : 'Eliminando...') : (language === 'eu' ? 'Ezabatu Txata' : 'Eliminar Chat')}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

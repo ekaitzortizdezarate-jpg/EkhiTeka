@@ -325,12 +325,8 @@ export function NavbarNavLinks({
                       : 'text-stone-700 dark:text-stone-300 hover:text-stone-950 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                 >
-                  <span className="block text-center">
-                    {language === 'eu' ? 'Nire' : language === 'fr' ? 'Mes' : language === 'en' ? 'My' : 'Mis'}
-                  </span>
-                  <span className="block text-center">
-                    {language === 'eu' ? 'Produktuak' : language === 'fr' ? 'Produits' : language === 'en' ? 'Products' : 'Productos'}
-                  </span>
+                  <span className="block text-center">{t.nav_my_store_line1}</span>
+                  <span className="block text-center">{t.nav_my_store_line2}</span>
                 </Link>
               )}
 
@@ -546,12 +542,8 @@ export function NavbarNavLinks({
                             : 'bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-800'
                         }`}
                       >
-                        <span className="block text-center">
-                          {language === 'eu' ? 'Nire' : language === 'fr' ? 'Mes' : language === 'en' ? 'My' : 'Mis'}
-                        </span>
-                        <span className="block text-center">
-                          {language === 'eu' ? 'Produktuak' : language === 'fr' ? 'Produits' : language === 'en' ? 'Products' : 'Productos'}
-                        </span>
+                        <span className="block text-center">{t.nav_my_store_line1}</span>
+                        <span className="block text-center">{t.nav_my_store_line2}</span>
                       </Link>
                     )}
 

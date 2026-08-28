@@ -14,6 +14,10 @@ export interface TranslationDict {
   nav_cart: string;
   nav_orders: string;
   nav_my_products: string;
+  nav_my_store: string;
+  nav_my_store_line1: string;
+  nav_my_store_line2: string;
+  nav_users: string;
   nav_chats: string;
   nav_admin: string;
   nav_login: string;
@@ -670,6 +674,10 @@ export const translations: Record<Language, TranslationDict> = {
     nav_cart: 'Saskia',
     nav_orders: 'Eskaerak',
     nav_my_products: 'Nire Produktuak',
+    nav_my_store: 'Nire Denda',
+    nav_my_store_line1: 'Nire',
+    nav_my_store_line2: 'Denda',
+    nav_users: 'Erabiltzaileak',
     nav_chats: 'Txata',
     nav_admin: 'Admin',
     nav_login: 'Hasi Saioa',
@@ -1303,6 +1311,10 @@ export const translations: Record<Language, TranslationDict> = {
     nav_cart: 'Cesta',
     nav_orders: 'Pedidos',
     nav_my_products: 'Mis Productos',
+    nav_my_store: 'Mi Tienda',
+    nav_my_store_line1: 'Mi',
+    nav_my_store_line2: 'Tienda',
+    nav_users: 'Usuarios',
     nav_chats: 'Chat',
     nav_admin: 'Admin',
     nav_login: 'Iniciar Sesión',
@@ -1936,6 +1948,10 @@ export const translations: Record<Language, TranslationDict> = {
     nav_cart: 'Cart',
     nav_orders: 'Orders',
     nav_my_products: 'My Products',
+    nav_my_store: 'My Store',
+    nav_my_store_line1: 'My',
+    nav_my_store_line2: 'Store',
+    nav_users: 'Users',
     nav_chats: 'Chat',
     nav_admin: 'Admin',
     nav_login: 'Sign In',
@@ -2569,6 +2585,10 @@ export const translations: Record<Language, TranslationDict> = {
     nav_cart: 'Panier',
     nav_orders: 'Commandes',
     nav_my_products: 'Mes Produits',
+    nav_my_store: 'Ma Boutique',
+    nav_my_store_line1: 'Ma',
+    nav_my_store_line2: 'Boutique',
+    nav_users: 'Utilisateurs',
     nav_chats: 'Chat',
     nav_admin: 'Admin',
     nav_login: 'Connexion',

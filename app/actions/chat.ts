@@ -144,3 +144,42 @@ export async function markChatAsRead(conversationUserId: string) {
   revalidatePath(`/chat/${conversationUserId}`);
   return { success: true };
 }
+
+export async function deleteChatConversation(conversationPartnerId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: myProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const isSeller = myProfile?.role === 'vendedor' || myProfile?.role === 'admin';
+  if (!isSeller) {
+    return { error: 'Solo los vendedores pueden eliminar conversaciones de chat' };
+  }
+
+  if (!conversationPartnerId) {
+    return { error: 'Identificador de chat no válido' };
+  }
+
+  // Eliminar todos los mensajes asociados a esta conversación
+  const { error } = await supabase
+    .from('chat_messages')
+    .delete()
+    .or(`sender_id.eq.${conversationPartnerId},receiver_id.eq.${conversationPartnerId}`);
+
+  if (error) {
+    console.error('Error al eliminar conversación de chat:', error);
+    return { error: error.message };
+  }
+
+  revalidatePath('/chat');
+  revalidatePath(`/chat/${conversationPartnerId}`);
+  return { success: true };
+}

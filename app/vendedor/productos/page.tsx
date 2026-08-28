@@ -17,7 +17,7 @@ export default async function SellerProductsPage() {
     redirect('/login');
   }
 
-  const [profileRes, productsRes, categoriesRes, storeConfig] = await Promise.all([
+  const [profileRes, productsRes, categoriesRes, allProfilesRes, allOrdersRes, storeConfig] = await Promise.all([
     supabase
       .from('profiles')
       .select('*')
@@ -31,6 +31,14 @@ export default async function SellerProductsPage() {
       .from('categories')
       .select('*')
       .order('display_order', { ascending: true }),
+    supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('orders')
+      .select('*, order_items(*, products(*))')
+      .order('created_at', { ascending: false }),
     getUnifiedStoreConfig(supabase),
   ]);
 
@@ -44,6 +52,16 @@ export default async function SellerProductsPage() {
   const pickupAddresses = storeConfig.pickup_addresses || [];
   const eventAddresses = storeConfig.event_addresses || [];
 
+  const allProfiles = allProfilesRes.data || [];
+  const allOrders = allOrdersRes.data || [];
+
+  const buyers = allProfiles
+    .filter((p) => p.role !== 'vendedor' && p.role !== 'admin')
+    .map((b) => ({
+      ...b,
+      orders: allOrders.filter((o) => o.buyer_id === b.id),
+    }));
+
   return (
     <main className="min-h-screen bg-[#FAF8F5] dark:bg-[#141312] py-4 sm:py-8">
       <SellerProductsListView
@@ -52,6 +70,7 @@ export default async function SellerProductsPage() {
         pickupAddresses={pickupAddresses}
         eventAddresses={eventAddresses}
         isProfileComplete={profileComplete}
+        buyers={buyers as any}
       />
     </main>
   );

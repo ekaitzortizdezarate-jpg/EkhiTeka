@@ -4,9 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { sendMessage, markChatAsRead } from '@/app/actions/chat';
+import { sendMessage, markChatAsRead, deleteChatConversation } from '@/app/actions/chat';
 import type { ChatMessage, Profile, Product, Order } from '@/types/database';
-import { Send, ArrowLeft, Store, Package, User } from 'lucide-react';
+import { Send, ArrowLeft, Store, Package, User, Trash2, X, AlertTriangle } from 'lucide-react';
 
 interface ChatConversationViewProps {
   currentUserId: string;
@@ -36,6 +36,8 @@ export function ChatConversationView({
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [inputMsg, setInputMsg] = useState('');
   const [sending, setSending] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const chatCardRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -138,6 +140,21 @@ export function ChatConversationView({
     }
   };
 
+  const handleDeleteConversation = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    const res = await deleteChatConversation(receiverId);
+    setDeleting(false);
+    setDeleteModalOpen(false);
+
+    if (res?.error) {
+      alert(`${t.common_error}: ${res.error}`);
+    } else {
+      router.push('/chat');
+      router.refresh();
+    }
+  };
+
   const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const text = inputMsg.trim();
@@ -222,12 +239,25 @@ export function ChatConversationView({
           </div>
         </div>
 
-        {isSellerViewer && (
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-950/70 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 rounded-full text-[11px] font-bold">
-            <Store className="w-3.5 h-3.5" />
-            <span>{language === 'eu' ? 'Dendako Txata' : 'Chat de la Tienda'}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {isSellerViewer && (
+            <>
+              <button
+                type="button"
+                onClick={() => setDeleteModalOpen(true)}
+                className="p-2 rounded-xl text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer border border-transparent hover:border-red-200 dark:hover:border-red-800"
+                title={language === 'eu' ? 'Ezabatu elkarrizketa' : 'Eliminar conversación'}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-950/70 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 rounded-full text-[11px] font-bold">
+                <Store className="w-3.5 h-3.5" />
+                <span>{language === 'eu' ? 'Dendako Txata' : 'Chat de la Tienda'}</span>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* 2. Tarjeta Contextual (Si se abrió desde un Producto o Pedido) */}
@@ -379,6 +409,62 @@ export function ChatConversationView({
           <span className="hidden sm:inline">{language === 'eu' ? 'Bidali' : 'Enviar'}</span>
         </button>
       </form>
+
+      {/* Modal de Confirmación para Eliminar Conversación */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans animate-fadeIn">
+          <div className="bg-white dark:bg-[#1C1B19] rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-stone-200 dark:border-stone-800 space-y-5 animate-scaleUp">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2.5 text-red-600 dark:text-red-400">
+                <AlertTriangle className="w-6 h-6" />
+                <h3 className="text-lg font-black font-serif text-stone-900 dark:text-stone-100">
+                  {language === 'eu' ? 'Ezabatu txata' : 'Eliminar conversación'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteModalOpen(false)}
+                className="p-1.5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2 text-sm text-stone-600 dark:text-stone-300">
+              <p>
+                {language === 'eu'
+                  ? `Ziur zaude "${recipient?.full_name || 'erabiltzaile honekin'}" elkarrizketa osoa ezabatu nahi duzula?`
+                  : `¿Estás seguro de que deseas eliminar todo el historial de chat con "${recipient?.full_name || 'este usuario'}"?`}
+              </p>
+              <p className="text-xs text-stone-400">
+                {language === 'eu'
+                  ? 'Ekintza hau ezin da desegin eta mezu guztiak betiko ezabatuko dira.'
+                  : 'Esta acción es irreversible y eliminará todos los mensajes de la conversación permanentemente.'}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-stone-100 dark:border-stone-800 font-serif">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold text-xs uppercase tracking-wider cursor-pointer"
+              >
+                {language === 'eu' ? 'Utzi' : 'Cancelar'}
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDeleteConversation}
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>{deleting ? (language === 'eu' ? 'Ezabatzen...' : 'Eliminando...') : (language === 'eu' ? 'Ezabatu Txata' : 'Eliminar Chat')}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

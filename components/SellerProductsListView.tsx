@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { deleteProduct } from '@/app/actions/products';
 import type { Category, Product, StoreAddress, EventAddress } from '@/types/database';
+import { SellerBuyersListView, type BuyerWithOrders } from '@/components/SellerBuyersListView';
 import {
   getProductImage,
   getProductCategoryId,
@@ -49,6 +50,7 @@ interface SellerProductsListViewProps {
   pickupAddresses: StoreAddress[];
   eventAddresses?: EventAddress[];
   isProfileComplete?: boolean;
+  buyers?: BuyerWithOrders[];
 }
 
 export function SellerProductsListView({
@@ -57,12 +59,13 @@ export function SellerProductsListView({
   pickupAddresses,
   eventAddresses = [],
   isProfileComplete = true,
+  buyers = [],
 }: SellerProductsListViewProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
 
-  // Selector central: 'productos' | 'eventos'
-  const [activeMainTab, setActiveMainTab] = useState<'productos' | 'eventos'>('productos');
+  // Selector central: 'productos' | 'eventos' | 'usuarios'
+  const [activeMainTab, setActiveMainTab] = useState<'productos' | 'eventos' | 'usuarios'>('productos');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -611,9 +614,9 @@ export function SellerProductsListView({
         </div>
       )}
 
-      {/* 2. SELECTOR CENTRAL DESTACADO (Productos / Eventos con cantidad debajo) */}
-      <div className="w-full max-w-md mx-auto px-1">
-        <div className="grid grid-cols-2 p-1.5 rounded-3xl bg-white dark:bg-[#1C1B19] border-2 border-stone-200 dark:border-stone-800 shadow-sm gap-1 sm:gap-2 font-serif w-full">
+      {/* 2. SELECTOR CENTRAL DESTACADO (Productos / Eventos / Usuarios con cantidad debajo) */}
+      <div className="w-full max-w-xl mx-auto px-1">
+        <div className="grid grid-cols-3 p-1.5 rounded-3xl bg-white dark:bg-[#1C1B19] border-2 border-stone-200 dark:border-stone-800 shadow-sm gap-1 sm:gap-2 font-serif w-full">
           {/* Botón 1: Productos */}
           <button
             type="button"
@@ -647,6 +650,24 @@ export function SellerProductsListView({
             </span>
             <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-80 block leading-none">
               ({catasPresenciales.length})
+            </span>
+          </button>
+
+          {/* Botón 3: Usuarios */}
+          <button
+            type="button"
+            onClick={() => setActiveMainTab('usuarios')}
+            className={`flex flex-col items-center justify-center text-center py-2 sm:py-2.5 px-1 sm:px-3 rounded-2xl transition-all cursor-pointer ${
+              activeMainTab === 'usuarios'
+                ? 'bg-[#FFE259] text-[#1D1D1B] shadow-sm font-black'
+                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 font-bold'
+            }`}
+          >
+            <span className="text-xs sm:text-sm uppercase tracking-wider block leading-tight">
+              {language === 'eu' ? 'Erabiltzaileak' : language === 'fr' ? 'Utilisateurs' : language === 'en' ? 'Users' : 'Usuarios'}
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-mono mt-0.5 opacity-80 block leading-none">
+              ({buyers.length})
             </span>
           </button>
         </div>
@@ -864,6 +885,13 @@ export function SellerProductsListView({
               </Link>
             </div>
           )}
+        </div>
+      )}
+
+      {/* 5. VISTA 3: USUARIOS COMPRADORES */}
+      {activeMainTab === 'usuarios' && (
+        <div className="animate-in fade-in duration-200">
+          <SellerBuyersListView buyers={buyers} />
         </div>
       )}
     </div>
