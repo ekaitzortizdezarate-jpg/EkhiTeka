@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { sendMessage, markChatAsRead } from '@/app/actions/chat';
 import type { ChatMessage, Profile, Product, Order } from '@/types/database';
@@ -29,10 +30,12 @@ export function ChatConversationView({
   contextOrder,
 }: ChatConversationViewProps) {
   const { t, language } = useLanguage();
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [inputMsg, setInputMsg] = useState('');
   const [sending, setSending] = useState(false);
 
+  const chatCardRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const isInitialMount = useRef(true);
@@ -50,9 +53,16 @@ export function ChatConversationView({
 
     // 2. Control preciso de scroll al entrar en la conversación
     const timer = setTimeout(() => {
-      // A) Scroll en la ventana de la página hasta dejar el campo de escribir mensaje abajo en la pantalla
-      if (formRef.current) {
-        formRef.current.scrollIntoView({ block: 'end', behavior: 'smooth' });
+      // A) Scroll en la ventana de la página para que la cabecera (info del otro usuario) quede perfectamente visible arriba
+      if (chatCardRef.current) {
+        const navbar = document.querySelector('header');
+        const navHeight = navbar ? navbar.getBoundingClientRect().height : 105;
+        const cardRect = chatCardRef.current.getBoundingClientRect();
+        const targetScrollY = window.scrollY + cardRect.top - navHeight - 12;
+        window.scrollTo({
+          top: Math.max(0, targetScrollY),
+          behavior: 'smooth',
+        });
       }
 
       // B) Scroll en la ventana del chat hasta el mensaje no leído más antiguo (o al final si no hay no leídos)
@@ -94,6 +104,14 @@ export function ChatConversationView({
     }
   }, [messages.length]);
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push(isSellerViewer ? '/chat' : '/tienda');
+    }
+  };
+
   const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const text = inputMsg.trim();
@@ -130,16 +148,21 @@ export function ChatConversationView({
   };
 
   return (
-    <div className="max-w-3xl mx-auto h-[82vh] flex flex-col bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden font-serif">
+    <div
+      ref={chatCardRef}
+      className="max-w-3xl mx-auto h-[calc(100dvh-155px)] min-h-[480px] max-h-[820px] flex flex-col bg-white dark:bg-[#1C1B19] rounded-3xl border-2 border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden font-serif"
+    >
       {/* 1. Cabecera Chat */}
       <div className="p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800 bg-stone-50/90 dark:bg-stone-950/90 flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-3">
-          <Link
-            href="/chat"
-            className="p-2 rounded-xl hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors"
+          <button
+            type="button"
+            onClick={handleBack}
+            className="p-2 rounded-xl hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors cursor-pointer"
+            aria-label={language === 'eu' ? 'Atzera' : 'Volver'}
           >
             <ArrowLeft className="w-5 h-5" />
-          </Link>
+          </button>
 
           <div className="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300 font-black text-sm flex items-center justify-center border border-amber-500/30 shrink-0">
             {!isSellerViewer ? (
