@@ -9,45 +9,50 @@ export const DEFAULT_ACCENT_DARK = '#F3BA4C'; // Oro Miel Cálido / Champagne Go
 
 export interface AccentPreset {
   id: string;
+  number: number;
   name: string;
   name_eu: string;
   light: string;
   dark: string;
-  description: string;
+  description?: string;
 }
 
-export const ACCENT_PRESETS: AccentPreset[] = [
+export const DEFAULT_ACCENT_PRESETS: AccentPreset[] = [
   {
-    id: 'artisan_amber',
-    name: 'Ámbar Dorado Artesano (Recomendado)',
-    name_eu: 'Artisau Urre-Anbarra (Gomendatua)',
+    id: 'paleta_1',
+    number: 1,
+    name: 'Paleta 1',
+    name_eu: '1. Paleta',
     light: '#C8821C',
     dark: '#F3BA4C',
-    description: 'Tonos cálidos y elegantes inspirados en quesos curados, corteza tostada y Txakoli.',
+    description: 'Dorado Ámbar Artesano (Recomendado)',
   },
   {
-    id: 'gourmet_ochre',
-    name: 'Ocre Gourmet & Oro Miel',
-    name_eu: 'Okre Gourmet & Ezti-Urrea',
+    id: 'paleta_2',
+    number: 2,
+    name: 'Paleta 2',
+    name_eu: '2. Paleta',
     light: '#D97706',
     dark: '#FBBF24',
-    description: 'Dorado vivo con brillo ámbar suave y excelente contraste.',
+    description: 'Ocre Gourmet & Oro Miel',
   },
   {
-    id: 'rustic_terracotta',
-    name: 'Terracota Rústica & Melocotón',
-    name_eu: 'Terrakota Rustikoa & Mertxika',
+    id: 'paleta_3',
+    number: 3,
+    name: 'Paleta 3',
+    name_eu: '3. Paleta',
     light: '#C25E2A',
     dark: '#FB923C',
-    description: 'Calidez artesanal de barro cocido, madera de roble y membrillo.',
+    description: 'Terracota Rústica & Melocotón',
   },
   {
-    id: 'noble_bronze',
-    name: 'Bronce Noble & Seda',
-    name_eu: 'Brontze Noblea & Zeta',
+    id: 'paleta_4',
+    number: 4,
+    name: 'Paleta 4',
+    name_eu: '4. Paleta',
     light: '#9A5B18',
     dark: '#E6BC65',
-    description: 'Estilo sobrio, distinguido y clásico con reflejos champagne.',
+    description: 'Bronce Noble & Seda Champagne',
   },
 ];
 
@@ -57,10 +62,13 @@ interface ThemeContextType {
   setTheme: (theme: Theme) => void;
   accentLight: string;
   accentDark: string;
+  presets: AccentPreset[];
   setAccentLight: (color: string) => void;
   setAccentDark: (color: string) => void;
   applyPreset: (preset: AccentPreset) => void;
+  updatePreset: (id: string, newLight: string, newDark: string) => void;
   resetAccentColors: () => void;
+  resetPresets: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -68,6 +76,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const THEME_STORAGE_KEY = 'ekhiteka_theme';
 const ACCENT_LIGHT_KEY = 'ekhiteka_accent_light';
 const ACCENT_DARK_KEY = 'ekhiteka_accent_dark';
+const ACCENT_PRESETS_KEY = 'ekhiteka_paletas';
 
 function getResolvedTheme(theme: Theme): 'light' | 'dark' {
   if (theme === 'dark') return 'dark';
@@ -100,7 +109,6 @@ function getContrastTextColor(hexColor: string): string {
     g = parseInt(hex.slice(2, 4), 16);
     b = parseInt(hex.slice(4, 6), 16);
   }
-  // Formula YIQ para luminancia perceptiva
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
   return yiq >= 150 ? '#1D1D1B' : '#FFFFFF';
 }
@@ -124,6 +132,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
   const [accentLight, setAccentLightState] = useState<string>(DEFAULT_ACCENT_LIGHT);
   const [accentDark, setAccentDarkState] = useState<string>(DEFAULT_ACCENT_DARK);
+  const [presets, setPresets] = useState<AccentPreset[]>(DEFAULT_ACCENT_PRESETS);
 
   const applyTheme = useCallback(
     (t: Theme, curLight = accentLight, curDark = accentDark) => {
@@ -141,6 +150,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     let savedTheme: Theme = 'system';
     let savedLight = DEFAULT_ACCENT_LIGHT;
     let savedDark = DEFAULT_ACCENT_DARK;
+    let savedPresets = DEFAULT_ACCENT_PRESETS;
 
     try {
       const storedTheme = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
@@ -155,11 +165,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       if (storedDark && storedDark.startsWith('#')) {
         savedDark = storedDark;
       }
+      const storedPresetsStr = localStorage.getItem(ACCENT_PRESETS_KEY);
+      if (storedPresetsStr) {
+        const parsed = JSON.parse(storedPresetsStr);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          savedPresets = parsed;
+        }
+      }
     } catch {}
 
     setThemeState(savedTheme);
     setAccentLightState(savedLight);
     setAccentDarkState(savedDark);
+    setPresets(savedPresets);
     applyTheme(savedTheme, savedLight, savedDark);
   }, [applyTheme]);
 
@@ -227,10 +245,48 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [resolvedTheme]
   );
 
+  const updatePreset = useCallback(
+    (id: string, newLight: string, newDark: string) => {
+      setPresets((prev) => {
+        const next = prev.map((p) => {
+          if (p.id === id) {
+            return { ...p, light: newLight, dark: newDark };
+          }
+          return p;
+        });
+        try {
+          localStorage.setItem(ACCENT_PRESETS_KEY, JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+
+      setAccentLightState(newLight);
+      setAccentDarkState(newDark);
+      try {
+        localStorage.setItem(ACCENT_LIGHT_KEY, newLight);
+        localStorage.setItem(ACCENT_DARK_KEY, newDark);
+      } catch {}
+      applyAccentVariables(newLight, newDark, resolvedTheme === 'dark');
+    },
+    [resolvedTheme]
+  );
+
   const resetAccentColors = useCallback(() => {
     setAccentLightState(DEFAULT_ACCENT_LIGHT);
     setAccentDarkState(DEFAULT_ACCENT_DARK);
     try {
+      localStorage.removeItem(ACCENT_LIGHT_KEY);
+      localStorage.removeItem(ACCENT_DARK_KEY);
+    } catch {}
+    applyAccentVariables(DEFAULT_ACCENT_LIGHT, DEFAULT_ACCENT_DARK, resolvedTheme === 'dark');
+  }, [resolvedTheme]);
+
+  const resetPresets = useCallback(() => {
+    setPresets(DEFAULT_ACCENT_PRESETS);
+    setAccentLightState(DEFAULT_ACCENT_LIGHT);
+    setAccentDarkState(DEFAULT_ACCENT_DARK);
+    try {
+      localStorage.removeItem(ACCENT_PRESETS_KEY);
       localStorage.removeItem(ACCENT_LIGHT_KEY);
       localStorage.removeItem(ACCENT_DARK_KEY);
     } catch {}
@@ -245,10 +301,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setTheme,
         accentLight,
         accentDark,
+        presets,
         setAccentLight,
         setAccentDark,
         applyPreset,
+        updatePreset,
         resetAccentColors,
+        resetPresets,
       }}
     >
       {children}
@@ -265,10 +324,13 @@ export function useTheme() {
       setTheme: () => {},
       accentLight: DEFAULT_ACCENT_LIGHT,
       accentDark: DEFAULT_ACCENT_DARK,
+      presets: DEFAULT_ACCENT_PRESETS,
       setAccentLight: () => {},
       setAccentDark: () => {},
       applyPreset: () => {},
+      updatePreset: () => {},
       resetAccentColors: () => {},
+      resetPresets: () => {},
     };
   }
   return context;
